@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+{% block title %}
+    Service Order
+{% endblock title %}
+{% block menu %}
+    {% include "menus/logistics.htm" %}
+{% endblock menu %}
+{% block content %}
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/trumbowyg/dist/ui/trumbowyg.min.css">
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+    <div class="container-fluid">
+        <div class="well">
+            <header>
+                <h3>Orden de Servicio</h3>
+                <nav>
+                    <button class="btn btn-sm btn-warning text-black btn-new">
+                        <span class="fa fa-file"></span>
+                        <span>Nuevo</span>
+                    </button>
+                    <!-- <button class="btn btn-sm btn-danger btn-erase-fields">
+                        <span class="fa fa-eraser"></span>
+                        <span>Limpiar Todo</span>
+                    </button> -->
+                    <button class="btn btn-sm btn-primary btn-list">
+                        <span class="fa fa-list"></span>
+                        <span>Lista de Ordenes</span>
+                    </button>
+                    <button class="btn btn-sm btn-warning text-black btn-generate">
+                        <span class="fa fa-save"></span>
+                        <span class="fa fa-long-arrow-right"></span>
+                        <span class="fa fa-file-text"></span>
+                        <span>Generar Orden</span>
+                    </button>
+                </nav>
+            </header>
+            <section>
+                <div class="panel panel-primary panel-new">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label class="control-label">Proyecto</label>
+                                    <select name="project" id="" class="chosen-select form-control input-sm">
+                                        {% for x in project %}
+                                            <option value="{{ x.proyecto_id }}">{{ x.nompro }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">Subproyecto</label>
+                                    <select name="subproject" id="" class="form-control input-sm"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label class="control-label">Proveedor</label>
+                                    <select name="supplier" id="" class="chosen-select form-control input-sm">
+                                        {% for x in supplier %}
+                                            <option value="{{ x.proveedor_id }}">{{ x.razonsocial }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="control-label">Cotización</label>
+                                    <input type="text" name="quotation" maxlength="10" placeholder="000-000000" class="form-control input-sm">
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label class="control-label">Lugar de Ejecución</label>
+                                    <input type="text" name="arrival" placeholder="Ejecución" class="form-control input-sm">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="control-label">Documento</label>
+                                    <select name="document" id="" class="chosen-select form-control input-sm">
+                                        {% for x in document %}
+                                            <option value="{{ x.documento_id }}">{{ x.documento }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="control-label">Forma de Pago</label>
+                                    <select name="method" id="" class="chosen-select form-control input-sm">
+                                        {% for x in method %}
+                                            <option value="{{ x.pagos_id }}">{{ x.pagos }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="control-label">Fecha Inicio</label>
+                                    <input type="text" name="start" class="form-control input-sm" placeholder="aaaa-mm-dd">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="control-label">Fecha Fin</label>
+                                    <input type="text" name="execution" class="form-control input-sm" placeholder="aaaa-mm-dd">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="control-label">Descuento</label>
+                                    <div class="input-group">
+                                        <input type="number" max="100" min="0" step="0.10" name="dsct" class="form-control input-sm text-right numberValid" pattern="^\d*([\.]\d{0,2}|\d)$" placeholder="0.00" title="El formato para el descuento es *.00 solo se acepta dos decimales" value="0">
+                                        <span class="input-group-addon" >%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="control-label">Moneda</label>
+                                    <select name="currency" class="form-control input-sm">
+                                        {% for x in currency %}
+                                            <option value="{{ x.moneda_id }}">{{ x.moneda }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="control-label">Autoriza</label>
+                                    <select name="authorized" class="chosen-select form-control input-sm">
+                                        {% for x in authorized %}
+                                            <option value="{{ x.empdni_id }}">{{ x.name_complete }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Deposito</label>
+                                    <input type="file" name="deposit" class="form-control" accept="application/pdf">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table table-condensed table-float table-hover table-bordered table-float table-details">
+                                        <caption>
+                                            <div class="text-left">
+                                                <button class="btn btn-warning btn-sm text-black" data-toggle="modal" data-target="#mdetails">
+                                                    <span class="fa fa-plus-circle"></span>
+                                                    <span>Agregar Detalle</span>
+                                                </button>
+                                                <button class="btn btn-default btn-sm btn-refresh">
+                                                    <span class="fa fa-refresh"></span>
+                                                    <span>Recargar</span>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm btn-del">
+                                                    <span class="fa fa-check-square"></span>
+                                                    <span class="fa fa-long-arrow-right"></span>
+                                                    <span class="fa fa-trash"></span>
+                                                    <span>Eliminar</span>
+                                                </button>
+                                            </div>
+                                            <div class="text-right">
+                                                Seleccionar:
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="sel" value="1">
+                                                    Todo
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="sel" value="0">
+                                                    Ninguno.
+                                                </label>
+                                            </div>
+                                        </caption>
+                                        <thead>
+                                            <tr class="brand-warning">
+                                                <th class="col-1 text-center"></th>
+                                                <th class="col-1 text-center">Item</th>
+                                                <th class="text-center">Descripción</th>
+                                                <th class="col-2 text-center">Cantidad</th>
+                                                <th class="col-2 text-center">Unidad</th>
+                                                <th class="col-3 text-center">Precio</th>
+                                                <th class="col-3 text-center">Importe</th>
+                                                <th class="col-1"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="5" rowspan="4"></td>
+                                                <th>Subtotal</th>
+                                                <td class="text-right ramount"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>DSCTO <span class="vdsct">0</span>%</th>
+                                                <td class="text-right rdsct"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>IGV <span class="vigv">{{ vigv }}</span>%</th>
+                                                <td class="text-right rigv"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>TOTAL</th>
+                                                <th class="text-right rtotal"></th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-primary panel-list">
+                    <div class="table-responsible">
+                        <table class="table table-hover table-condensed">
+                            <thead>
+                                <tr class="brand-primary text-white">
+                                   <th></th>
+                                   <th>Código</th>
+                                   <th>Proveedor</th>
+                                   <th>Proyecto</th>
+                                   <th class="col-3 text-center">Registrado</th>
+                                   <th class="col-2 text-center">Documento</th>
+                                   <th>Metodo</th>
+                                   <th>Estado</th>
+                                   <th class="col-1 text-center">Deposito</th>
+                                   <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for x in service %}
+                                    <tr>
+                                        <td class="text-center">{{ forloop.counter }}</td>
+                                        <td class="text-center"><a href="{% url 'edorderservice_view' x.serviceorder_id %}">{{ x.serviceorder_id }}</a></td>
+                                        <td>{{ x.supplier.razonsocial }}</td>
+                                        <td>{{ x.project.nompro }}</td>
+                                        <td class="text-center">{{ x.register|date:"d M Y" }}</td>
+                                        <td>{{ x.document.documento }}</td>
+                                        <td>{{ x.method.pagos }}</td>
+                                        <td class="text-center">{{ x.status }}</td>
+                                        <td class="text-center">
+                                            {% if x.deposit %}
+                                                <a href="#" class="btn-link text-red">
+                                                    <span class="fa fa-file"></span>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{% url 'rpt_serviceorder' x.serviceorder_id %}" target="_blank" class="btn-link text-black">
+                                                <span class="fa fa-file-text"></span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="8">
+                                            No se han encontrado datos.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+<!-- modals -->
+<div class="modal fade in" id="mdetails">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">&times;</a>
+                <h5><strong>Partida de Orden</strong></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group has-warning">
+                            <!--<label class="control-label">Descripción</label>-->
+                            <textarea name="desc" class="form-control" rows="7"></textarea>
+                            {# <input type="text" > #}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group has-warning">
+                            <label class="control-label">Unidad</label>
+                            <select name="unit" class="form-control">
+                                {% for x in unit %}
+                                    <option value="{{ x.unidad_id }}">{{ x.uninom }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group has-warning">
+                            <label class="control-label">Cantidad</label>
+                            <input type="number" name="quantity" class="form-control input-sm numberValid">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group has-warning">
+                            <label class="control-label">Precio</label>
+                            <input type="number" name="price" class="form-control input-sm numberValid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-default pull-left" data-dismiss="modal">
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
+                <button class="btn btn-sm btn-warning text-black btn-add-item" data-dismiss="modal">
+                    <span class="fa fa-save"></span>
+                    Agregar
+                </button>
+                <input type="hidden" name="edit-item">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- variable -->
+{% csrf_token %}
+<script type="text/javascript" defer src="{{ MEDIA_URL }}js/mustache.js"></script>
+<script type="text/javascript" defer src="{{ MEDIA_URL }}js/floatThead.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}vendor/trumbowyg/dist/trumbowyg.min.js" defer></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<script type="text/javascript" defer src="{{ MEDIA_URL }}js/logistics/serviceorder.js"></script>
+{% endblock content %}

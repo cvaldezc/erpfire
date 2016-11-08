@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}
+    Group Materials
+{% endblock title %}
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+    <script src="{{ MEDIA_URL }}js/getMaterials.js"></script>
+    <script src="{{ MEDIA_URL }}js/chosen.jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".chosen-select").chosen(
+                {
+                    allow_single_deselect: true,
+                    width: "100%"
+                }
+            );
+            {% if update %}
+                setTimeout(function() {
+                    var e = $.Event("keypress");
+                    e.which = 13; //choose the one you want
+                    e.keyCode = 13;
+                    $("[name=code]").trigger(e);
+                }, 800);
+            {% endif %}
+        });
+        function prevent (event) {
+            event.preventDefault();
+            var name = $("input[name=name]").val()
+            var data = new Object();
+            if ($("select[name=tgroup]").val()){
+                data.tgroup = $("select[name=tgroup]").val()
+            }
+            if ($("input[name=name]").val()) {
+                data.name = $("input[name=name]").val()
+            };
+            if ($("td.id-mat").text()) {
+                data.materials = $("td.id-mat").text()
+                $("[name=materials]").val(data.materials);
+            };
+            if ($("textarea[name=observation]").val()) {
+                data.observation = $("textarea[name=observation]").val()
+            };
+            if (Object.keys(data).length >= 3) {
+                data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
+                document.forms["myform"].submit();
+                return true;
+            }else{
+                return false;
+            };
+        }
+    </script>
+{% endblock script %}
+{% block style %}
+    <link rel="stylesheet" href="{{ MEDIA_URL }}css/chosen.css">
+{% endblock style %}
+{% block menu %}
+    {% include "menus/sale.htm" %}
+{% endblock menu %}
+{% block content %}
+    <div class="container">
+        <div class="well">
+            <h1>Grupo de Materiales</h1>
+            {% if update %}
+                <form method="post" role="form" name="myform" action="/gmaterials/edit/save/{{ value.mgroup_id }}/" onSubmit="return prevent(event);">
+            {% else %}
+                <form method="post" role="form" name="myform" onSubmit="return prevent(event);">
+            {% endif %}
+                {% csrf_token %}
+                {#{ form.as_p }#}
+                <div class="panel panel-success">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group has-warning">
+                                    <label class="control-label">Tipo de Grupo</label>
+                                    {{ form.tgroup }}
+                                    {% if update %}
+                                        <input type="hidden" value="{{ value.mgroup_id }}" name="mgroup_id">
+                                    {% endif %}
+                                    <input type="hidden" name="materials">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group has-warning">
+                                    <label class="control-label">Codigo</label>
+                                    <input type="text" name="code" class="form-control input-sm" value="{{ value.materials_id }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group has-warning">
+                                    <label class="control-label">Descripción / Nombre de material</label>
+                                    <input type="text" class="form-control input-sm" name="description">
+                                    <ul id="matname-global" class="matname-global"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group has-warning">
+                                    <label class="control-label">Medida</label>
+                                    <select class="form-control input-sm" name="meter"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group has-warning">
+                                    <label class="control-label">Nombre de Grupo</label>
+                                    <input type="text" name="name" class="form-control input-sm" value="{{ value.name }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-warning alert-block">
+                                    <strong>Resumén</strong>
+                                    <table class="table-condensed tb-details">
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group has-warning">
+                                    <label class="control-label">Observation</label>
+                                    <textarea name="observation" rows="4" class="form-control input-sm">{{ value.observation }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'gmaterials_list' %}" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    Regresar
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <span class="glyphicon glyphicon-saved"></span>
+                    Guardar Cambios
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

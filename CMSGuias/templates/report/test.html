@@ -1,0 +1,20 @@
+<html>
+<head>
+<style>
+    @page title_template { margin: 5cm; }
+    @page regular_template { margin: 2cm; }
+</style>
+</head>
+
+<body>
+    <h1>Title Page</h1>
+    This is a title page with a large 5cm margin.
+
+    <!-- switch page templates 
+    <pdf:nexttemplate name="regular_template" />-->
+    <pdf:nextpage>
+
+    <h1>Chapter 1</h1>
+    This is a regular page with a regular 2cm margin.
+</body>
+</html>

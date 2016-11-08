@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block script %}
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+<script src="{{ MEDIA_URL }}js/almacen/supply.js"></script>
+{% endblock %}
+{% block menu %}
+	{% include "menus/storage_menu.htm" %}
+{% endblock menu %}
+{% block content %}
+<div class="container">
+	<div class="well">
+		<header>
+			<h3>Generar Suministro</h3>
+		</header>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<button class="btn btn-primary btn-gen"><span class="glyphicon glyphicon-chevron-down"></span> Generar Suministro</button>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-12 content">
+								<div class="btn-group">
+									<button class="btn btn-warning text-black btn-compress"><span class="glyphicon glyphicon-compressed"></span> Comprimir Lista</button>
+									<button class="btn btn-success text-black btn-generate"><span class="glyphicon glyphicon-floppy-disk"></span> Solicitar Suministro</button>
+									<button class="btn btn-danger btn-delete-all"><span class="glyphicon glyphicon-trash"></span> Eliminar Tmp</button>
+								</div>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label class="control-label">Asunto</label>
+											<input type="text" name="asunto" class="form-control" maxlength="180">
+										</div>
+									</div>
+									<div class="col-md-3">
+										<div class="form-group">
+											<label class="control-label">Almacén</label>
+											<select name="almacen" id="al" class="form-control">
+												{% for x in almacen %}
+													<option value="{{ x.almacen_id }}">{{ x.nombre }}</option>
+												{% empty %}
+												 <option value=""> -- Noting -- </option>
+												{% endfor %}
+											</select>
+										</div>
+									</div>
+									<div class="col-md-2">
+										<div class="form-group">
+											<label class="control-label">Ingreso Almacén</label>
+											<input type="text" class="form-control" name="ingreso">
+										</div>
+									</div>
+									<div class="col-md-4">
+										<div class="form-group">
+											<label class="control-label">Observación</label>
+											<textarea name="obser" id="obser" class="form-control obser" rows="1"></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="table-responsive">
+									<table class="table table-hover table-condensed data-condensed">
+										<thead>
+											<tr>
+												<td colspan="7">
+													<button class="btn btn-default btn-back"><span class="glyphicon glyphicon-chevron-left"></span> Regresar, Seleccionar más Materiales</button>
+												</td>
+											</tr>
+											<tr class="bg-success">
+												<th></th>
+												<th></th>
+												<th>Código</th>
+												<th>Descripción</th>
+												<th>Medida</th>
+												<th>Unid</th>
+												<th>Marca</th>
+												<th>Modelo</th>
+												<th>Cantidad</th>
+												<th>Stock</th>
+											</tr>
+										</thead>
+										<tbody>
+										</tbody>
+									</table>
+									<table class="hide table table-hover table-condensed table-first">
+										<caption class="bg-primary">
+											<div class="form-group pull-left">
+												&nbsp;Seleccionar <label class="radio-inline"><input type="radio" name="sel" value="true" />  Todo</label>
+												<label class="radio-inline"><input type="radio" name="sel" value="" checked /> Ninguno.</label>
+											</div>
+										</caption>
+										<thead>
+											<tr class="bg-primary">
+												<th></th>
+												<th></th>
+												<th>Código</th>
+												<th>Descripción</th>
+												<th>Medida</th>
+												<th>Unid</th>
+												<th>Marca</th>
+												<th>Modelo</th>
+												<th>Cantidad</th>
+												<th>Origin</th>
+												<th>Codigo</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for x in tmp %}
+												<tr>
+													<td>{{ forloop.counter }}</td>
+													<td><input type="checkbox" name="chk" value="{{ x.materiales_id }}"></td>
+													<td>{{ x.materiales_id }}</td>
+													<td>{{ x.materiales.matnom }}</td>
+													<td>{{ x.materiales.matmed }}</td>
+													<td>{{ x.materiales.unidad_id }}</td>
+													<td>{{ x.brand.brand }}</td>
+													<td>{{ x.model.model }}</td>
+													<td>{{ x.cantidad }}</td>
+													<td>{{ x.origin }}</td>
+													<td>{{ x.origin_id }}</td>
+												</tr>
+											{% empty %}
+												<div class="alert alert-warning alert-block">
+													<strong>Warning Data Empty</strong>
+													<p>
+														No se han encontrado datos para ser mostrados.
+													</p>
+												</div>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% csrf_token %}
+{% endblock %}

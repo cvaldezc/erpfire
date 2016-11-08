@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Purchase</title>
+    <link rel="stylesheet" type="text/css" href="/media/css/reports/purchaseorder.css">
+</head>
+<body>
+    <header>
+        <img id="logo" src="{{ MEDIA_URL }}images/icrlogo.png" alt="image">
+        <div id="dir" >
+            {{ request.session.company.address }}<br >
+            Central Telefonica: (511) {{ request.session.company.phone }}<br >
+            E-mail: logistica@icrperusa.com
+        </div>
+        <!-- <div id="info-type">
+            <h1>Materiales</h1>
+        </div> -->
+        <div id="nro-serie">
+            <h1>
+                ORDEN DE COMPRA
+            </h1>
+            <h1 id="nro">{{ bedside.compra_id }}</h1>
+        </div>
+        <div id="bedside-col1">
+            <table>
+                <tr><td><strong>Proveedor :</strong></td><td> {{ bedside.proveedor_id }} - {{ bedside.proveedor.razonsocial }}</td></tr>
+                <tr><td><strong></strong></td><td> {{ bedside.proveedor.direccion }} - {{ bedside.proveedor.distrito.distnom }}</td></tr>
+                <tr><td><strong>Cotización :</strong></td><td>
+                {% if bedside.cotizacion_id %} {{ bedside.cotizacion_id }} {% else %} {{ bedside.quotation }} {% endif %}</td></tr>
+                <tr><td width="3cm"><strong>Fecha Registrado :</strong></td><td> {{ bedside.registrado }}</td></tr>
+                <tr><td><strong>Fecha Traslado :</strong></td><td> {{ bedside.traslado }}</td></tr>
+                <tr><td><strong>Entrega:</strong></td><td> {{ bedside.lugent }}</td></tr>
+                <!-- <tr><td><strong>Razón Social:</strong></td><td> {{ details.0.proveedor.razonsocial }}</td></tr> -->
+            </table>
+        </div>
+        <div id="bedside-col2">
+            <table>
+                <tr><td><strong>Documento :</strong></td><td> {{ bedside.documento.documento }}</td></tr>
+                <tr><td><strong>Pago :</strong></td><td> {{ bedside.pagos.pagos }}</td></tr>
+                <tr><td><strong>Moneda:</strong></td><td> {{ bedside.moneda.moneda }}</td></tr>
+                <tr><td width="3cm"><strong>Estado :</strong></td><td> {% for k, v in status.iteritems %}
+                    {% ifequal k bedside.status %}
+                        {{ v }}
+                    {% endifequal %}
+                {% endfor %}</td></tr>
+                <tr><td><strong>Contacto :</strong></td><td> {{ bedside.contacto }}</td></tr>
+                <tr><td><strong>Proyectos :</strong></td><td> {{ bedside.projects }}</td></tr>
+            </table>
+        </div>
+    </header>
+    <section>
+        <div class="details">
+            {% for d in details %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th width="2cm">Código</th>
+                            <th width="7cm">Descripción</th>
+                            <!-- <th width="4cm">Medida</th> -->
+                            <th>Unidad</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th width="1.8cm">Dscto.</th>
+                            <th width="2cm">Percepción.</th>
+                            <th>Importe</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for x in d %}
+                            <tr>
+                                <td class="text-center item font-small">{{ x.item|floatformat:"2" }}</td>
+                                <td class="text-center font-small">{{ x.materials_id }}</td>
+                                <td>{{ x.matname }} {{ x.measure }} - {{ x.brand }} - {{ x.model }} {% if x.observation %}
+                                    {{ x.observation }}
+                                {% endif %}</td>
+                                <td class="text-center">{{ x.unit }}</td>
+                                <td class="text-center">{{ x.quantity|safe }}</td>
+                                <td class="text-center">{{ x.price|safe }}</td>
+                                <td class="text-center">{{ x.discount }}%</td>
+                                <td class="text-center">{% if x.perception %}{{conf.perception}}{%else%}0{% endif %}%</td>
+                                <td class="text-right">{{ x.amount|safe|floatformat:"2" }}</td>
+                            </tr>
+                        {% endfor%}
+                    </tbody>
+                </table>
+                {% if not forloop.last %}
+                    <div><pdf:nextpage /></div>
+                {% endif %}
+            {% endfor %}
+            <table>
+                <tfoot>
+                    <tr class="border">
+                        <td colspan="6" rowspan="4">
+                            <strong>
+                                SON: {{ literal }} /100 {{ bedside.moneda.moneda }}
+                            </strong>
+                        </td>
+                        <td class="text-left border">SUBTOTAL</td>
+                        <td class="text-right border">{{ subtotal|safe|floatformat:"2" }}</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="text-left">DSCTO {{ bedside.discount }}%</td>
+                        <td  class="text-right">{{ discount|safe|floatformat:"2" }}</td>
+                    </tr>
+                    <tr class="border">
+                    {% if bedside.sigv %}
+                            <!-- <td colspan="6"></td> -->
+                            <td class="text-left">IGV {{ igv }}%</td>
+                            <td class="text-right">{{ igvval|safe|floatformat:"2" }}</td>
+                    {% endif %}
+                    </tr>
+                    <tr class="border">
+                        <!-- <td colspan="6"></td> -->
+                        <th class="text-left">TOTAL</th>
+                        <th class="text-right">{{ total|safe|floatformat:"2" }}</th>
+                    </tr>
+                    {% if bedside.observation != '<p><br data-mce-bogus="1"></p>' and bedside.observation|length > 8 and bedside.observation != None %}
+                        <tr></tr>
+                        <tr class="border">
+                            <td colspan="8">
+                                <p><strong>Observación</strong></p>
+                                {{ bedside.observation|safe }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tfoot>
+            </table>
+        </div>
+    </section>
+    <footer>
+        <div id="footerContent">
+            <table>
+                <tbody>
+                    <tr class="border">
+                        <th class="text-center">
+                            DATOS DE FACTURACION
+                        </th>
+                    </tr>
+                    <tr class="border">
+                        <td>
+                            <p>
+                            MESA DE PARTES EN EL HORARIO DE LUNES A VIERNES DE 8:00 AM A 5:30 PM Y SABADOS DE 8:00 A 1:00PM
+                            <br>
+                               <strong>
+                                   {{ request.session.company.name }} <br>
+                                   RUC {{ request.session.company.ruc }}
+                                   <br>
+                               </strong>
+                               {{ request.session.company.address }}
+                                <br>
+                                <small>
+                                    * Adjuntar copia de esta orden a la factura original
+                                    * Confirmar dentro de 48 horas la no atencion de esta orden
+                                </small>
+                           </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </footer>
+</body>
+</html>

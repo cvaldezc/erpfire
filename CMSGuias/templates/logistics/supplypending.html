@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}
+	Supply Pending
+{% endblock title %}
+{% block script %}
+<script src="{{ MEDIA_URL }}js/logistics/supply.js"></script>
+{% endblock script %}
+{% block menu %}
+	{% include "menus/logistics.htm" %}
+{% endblock menu %}
+{% block content %}
+<div class="container">
+	<div class="well">
+		<header>
+			<h3><span class="glyphicon glyphicon-list-alt"></span> Suministros pendientes</h3>
+		</header>
+		<aside>
+			<div class="bs-callout bs-callout-warning">
+				<div class="row">
+					<form action="" method="GET">
+						<div class="col-md-3">
+							<div class="form-gruop">
+								Buscar por: 
+								<label class="radio-inline"><input type="radio" name="rdo" value="code"> Código</label>
+								<label class="radio-inline"><input type="radio" name="rdo" value="date" /> Fechas</label>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label">Código</label>
+									<input type="text" maxlength="10" placeholder="SPAA000000" class="form-control" name="id-su">
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label">Fecha Inicio</label>
+									<input type="text" maxlength="10" placeholder="aaaa-mm-dd" class="form-control" name="fi-su">
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label">Fecha Fin</label>
+									<input type="text" maxlength="10" placeholder="aaaa-mm-dd" class="form-control" name="ff-su">
+								</div>
+							</div>
+							<div class="col-md-1">
+								<div class="form-group">
+									<label class="control-label">Buscar</label>
+									<button class="btn btn-warning btn-block text-black"><span class="glyphicon glyphicon-search"></span></button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</aside>
+		<div class="table-responsive">
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr class="brand-warning">
+						<th></th><th></th><th>Código</th><th>Almacén</th><th>Registrado</th><th>Ingreso Almacén</th><th>Asunto</th><th>status</th><th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for x in supply %}
+						<tr>
+							<td>{{ forloop.counter }}</td>
+							<td>
+								<a class="btn-proccess text-center text-black" name="{{ x.suministro_id }}"><span class="glyphicon glyphicon-unchecked"></span></a>
+							</td>
+							<td>{{ x.suministro_id }}</td>
+							<td>{{ x.almacen.nombre }}</td>
+							<td>{{ x.registrado|date:"d M Y H:m" }}</td>
+							<td>{{ x.ingreso }}</td>
+							<td>{{ x.asunto }}</td>
+							<td>
+							{% for k, v in status.items %}
+								{% ifequal k x.status  %} 
+									{{ v }}
+								{% endifequal %}
+							{% endfor %}
+							</td>
+							<td><a href="{% url 'rpt_supply' x.suministro_id %}" class="text-black" target="_blank"><span class="glyphicon glyphicon-list-alt"></span></a></td>
+						</tr>
+					{% empty %}
+						<div class="alert alert-warning alert-block">
+							<strong>Notice</strong>
+							<p>
+								No hay suministros registrados para mostrar, al parecer no tienes trabajo por aquí.
+							</p>
+						</div>
+					{% endfor %}
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="7" class="text-center">
+							<ul class="pagination">
+								{% if supply.has_preveous %}
+									<li><a href="?page=1">&laquo;</a></li>	
+									<li><a href="?page={{ supply.previous_page_number }}">&laquo;</a></li>	
+								{% endif %}								
+								<li><a> Page {{ supply.number }} of {{ supply.paginator.num_pages }}</a></li>
+								{% if supply.has_next %}
+									<li><a href="?page={{ supply.next_page_number }}">&raquo;</a></li>
+									<li><a href="?page={{ supply.paginator.num_pages }}">&raquo;</a></li>
+								{% endif %}
+							</ul>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+</div>
+<!-- block modals -->
+<div class="modal fade msupply">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header bg-warning">
+				<a href="#" class="close" data-dismiss="modal">&times;</a>
+				<h4>
+					Suministro Nro <span class="nro-su"></span><br>
+					<small>Cambia el estado de la orden de suministro.</small>
+				</h4>
+			</div>
+			<div class="modal-body bg-warning">
+				<div class="form-group">
+					<button class="btn btn-block btn-success text-black btn-rpt">
+						<span class="glyphicon glyphicon-list-alt"></span> Ver Suministro
+					</button>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-danger btn-status" value="annular"><span class="glyphicon glyphicon-remove-circle"></span> Anular</button>
+					<button class="btn btn-primary pull-right btn-status" value="approve"><span class="glyphicon glyphicon-ok-circle"></span> Aprobar</button>
+				</div>
+				<div class="form-group">
+					<button data-dismiss="modal" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Salir</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% csrf_token %}
+{% endblock content %}

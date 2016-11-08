@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+{% block titlte %}
+Input Order Purchase
+{% endblock titlte %}
+{% block script %}
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/trumbowyg/dist/trumbowyg.min.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/trumbowyg/dist/ui/trumbowyg.min.css">
+<script src="{{ MEDIA_URL }}js/almacen/purchase.js"></script>
+{% endblock script %}
+{% block menu %}
+	{% include "menus/storage_menu.htm" %}
+{% endblock menu %}
+{% block content %}
+<div class="">
+	<div class="well step-first">
+		<header>
+			<h3>Lista de Ordenes de Compra</h3>
+		</header>
+		<section>
+			<article>
+				<div class="bs-callout bs-callout-warning">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								Buscar por:
+								<label class="inline-radio">
+									<input type="radio" name="search" value="code">
+									Nro de Compra
+								</label>
+								<label class="inline-radio">
+									<input type="radio" name="search" value="supplier">
+									Proveedor
+								</label>
+								<label class="inline-radio">
+									<input type="radio" name="search" value="dates">
+									Fechas
+								</label>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="control-label">Nro Compra</label>
+										<input type="text" name="code" class="form-control input-sm" maxlength="10" placeholder="OCAA000000" disabled="disabled">
+									</div>
+								</div>
+								<div class="col-md-5">
+									<div class="form-group">
+										<label class="control-label">Proveedor</label>
+										<input type="text" name="supplier" placeholder="Ingrese una descripción" class="form-control input-sm" disabled="disabled">
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="control-label">Fecha Incio </label>
+										<input type="text" name="start" maxlength="10" placeholder="aaaa-mm-dd" class="form-control input-sm" disabled="disabled">
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group">
+										<label class="control-label">Fecha Fin</label>
+										<input type="text" name="end" maxlength="10" placeholder="aaaa-mm-dd" class="form-control input-sm" disabled="disabled">
+									</div>
+								</div>
+								<div class="col-md-1">
+									<div class="form-group">
+										<label class="control-label"></label>
+										<button class="btn btn-block btn-warning text-black btn-search"><span class="glyphicon glyphicon-search"></span></button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</article>
+			<div class="panel panel-primary">
+				<div class="table-responsive">
+					<table class="table table-hover table-condensed">
+						<thead>
+							<th class="text-center">Item</th><th class="text-center">Nro Compra</th><th class="text-center">Proveedor</th><th class="text-center">Documento</th><th class="text-center">Traslado</th><th class="text-center">Deposito</th><th class="text-center">Ver</th><th class="text-center">Acción</th>
+						</thead>
+						<tbody>
+							{% for x in purchase %}
+								<tr>
+									<td>{{ forloop.counter }}</td>
+									<td>{{ x.compra_id }}</td>
+									<td>{{ x.proveedor.razonsocial }}</td>
+									<td>{{ x.documento.documento }}</td>
+									<td>{{ x.traslado }}</td>
+									<td class="text-center">
+										<a href="{{ MEDIA_URL }}{{ x.deposito }}" value="{{ x.compra_id }}" data-ruc="{{ x.proveedor_id }}" class="btn btn-link btn-xs text-black" target="_blank"><span class="glyphicon glyphicon-credit-card"></span></a>
+									</td>
+									<td class="text-center">
+										<a href="{% url 'rpt_purchase' x.compra_id %}" target="_blank" class="btn btn-xs btn-link text-black"><span class="glyphicon glyphicon-eye-open"></span></a>
+									</td>
+									<td class="text-center">
+										<button value="{{ x.compra_id }}" class="btn btn-link btn-xs text-black btn-action"><span class="glyphicon glyphicon-inbox"></span></button>
+									</td>
+								</tr>
+							{% empty %}
+								<div class="alert alert-block alert-warning">
+									<strong>Alerta</strong>
+									<p>
+										No se a encontrado <q>Ordenes de Compra</q>.
+									</p>
+								</div>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</div>
+	<div class="well step-second">
+		<header>
+			<h3>Ingreso de Orden de Compra <span class="purchase"></span></h3>
+			<button type="button" class="btn btn-return">
+				<i class="fa fa-chevron-left"></i>
+				<span>Regresar</span>
+			</button>
+		</header>
+		<section>
+			<article>
+				<div class="row">
+					<div class="col-md-6">
+						<dl class="dl-horizontal">
+							<dt>Proveedor :</dt>
+							<dd class="supplier"></dd>
+							<dt>Cotización :</dt>
+							<dd class="quote"></dd>
+							<dt>Entrega :</dt>
+							<dd class="place"></dd>
+							<dt>Documento :</dt>
+							<dd class="document"></dd>
+							<dt>Pago :</dt>
+							<dd class="payment"></dd>
+						</dl>
+					</div>
+					<div class="col-md-6">
+						<dl class="dl-horizontal">
+							<dt>Moneda :</dt>
+							<dd class="currency"></dd>
+							<dt>Registrado :</dt>
+							<dd class="register"></dd>
+							<dt>Traslado :</dt>
+							<dd class="transfer"></dd>
+							<dt>Contacto :</dt>
+							<dd class="contact"></dd>
+							<dt>Realizado :</dt>
+							<dd class="performed"></dd>
+							<dt>Deposito :</dt>
+							<dd class="deposit"></dd>
+						</dl>
+					</div>
+				</div>
+			</article>
+			<div class="alert alert-warning alert-dismissible text-black" role="alert" style="background-color:#f0ad4e;">
+			  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			  	<span aria-hidden="true"><i class="fa fa-times"></i></span>
+			  </button>
+			  <h4><strong>¡Ten en cuenta!</strong> <small class="text-black"> que algunos materailes se generan con una diferente unidad de medida al registrado inicialmente. Recuerde que para estos casos realize la converción manual he ingrese la cantidad resultante.</small></h4>
+			</div>
+			<div class="panel panel-primary">
+				<div class="table-responsive">
+					<table class="table table-hover table-condensed table-ingress">
+						<caption>
+							<div class="form-group pull-left">
+								Seleccionar :
+								<label class="radio-inline">
+									<input name="select" type="radio" value="1"> Todo</label>
+								<label class="radio-inline">
+									<input name="select" type="radio" value="0"> Ninguno.</label>
+							</div>
+							<div class="form-group pull-right">
+								<button class="btn btn-danger btn-generate-note">
+									<span class="glyphicon glyphicon-floppy-save"></span>
+									Generar Nota de Ingreso
+								</button>
+							</div>
+						</caption>
+						<thead>
+							<tr class="brand-danger text-white">
+								<th class="text-center"></th>
+								<th class="text-center">Item</th>
+								<th class="text-center">Código</th>
+								<th class="text-center">Descripción</th>
+								<!--<th class="text-center">Medida</th>-->
+								<th class="text-center">Marca</th>
+								<th class="text-center">Modelo</th>
+								<th class="text-center">UND COMPRA</th>
+								<th class="text-center">UND REG.</th>
+								<th class="text-center">CANT. Comprado</th>
+								<th class="text-center">CANT. PEND.</th>
+								<th class="col-3 text-center">Ingreso</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</div>
+	<div class="well step-tree">
+		<header>
+			<div class="alert alert-block alert-success">
+				<h4>Felicidades!, Nota de Ingreso <span class="note"></span></h4>
+				<p>
+					Se genero correctamente la <q>Nota de Ingreso</q> y el ingreso de los materiales al inventario.
+				</p>
+				<p>
+					<button class="btn btn-default pull-left btn-repeat">
+						<span class="glyphicon glyphicon-repeat"></span>
+						Seguir Ingresado Compras
+					</button>
+					<a href="#" target="_blank" class="btn btn-success pull-right show-note-ingress">
+						<span class="glyphicon glyphicon-file"></span>
+						Nota de Ingreso
+					</a>
+				</p>
+			</div>
+		</header>
+	</div>
+</div>
+<!-- block modal -->
+<div class="modal fade maction" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<a data-dismiss="modal" class="close">&times;</a>
+				<h4 class="title-modal">
+					Que desea hacer con la orden de compra?
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<button class="btn btn-block btn-danger btn-ingress">
+						<span class="glyphicon glyphicon-inbox"></span> Ingresar al Inventario
+					</button>
+					<button class="btn btn-block btn-primary btn-credit">
+						<span class="glyphicon glyphicon-credit-card"></span>
+						Nota de Credito
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade mingress" data-backdrop="static">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title text-black">
+					GENERAR NOTA DE INGRESO
+				</h3>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label ">Almacén</label>
+							<select name="storage" id="storage" class="form-control">
+							{% for x in storage %}
+								<option value="{{ x.almacen_id }}">{{ x.nombre }}</option>
+							{% empty %}
+								<option value="">-- Nothing --</option>
+							{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label ">Nro Compra</label>
+							<input type="text" maxlength="10" name="purchase" class="form-control" readonly="true">
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label ">Guias Remision</label>
+							<input type="text" name="guide" maxlength="12"  class="form-control" placeholder="000-00000000" required>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label ">Nro Factura</label>
+							<input type="text" name="invoice" maxlength="12"  class="form-control">
+						</div>
+					</div>
+					<div class="col-md-8">
+						<div class="form-group">
+							<label class="control-label ">Motivo de Ingreso</label>
+							<input type="text" name="motive" class="form-control" value="COMPRA">
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							<label class="control-label ">Observación</label>
+							<textarea name="observation" id="observation" class="form-control"></textarea>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label ">Recibido por</label>
+							<select name="receive" id="receive" class="form-control">
+							{% for x in employee %}
+								<option value="{{ x.empdni_id }}">{{ x.firstname }} {{ x.lastname }}</option>
+							{% empty %}
+								<option value="">-- Nothing --</option>
+							{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label ">Inspeccionado por</label>
+							<select name="inspection" id="inspection" class="form-control">
+							{% for x in employee %}
+								<option value="{{ x.empdni_id }}">{{ x.firstname }} {{ x.lastname }}</option>
+							{% empty %}
+								<option value="">-- Nothing --</option>
+							{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label ">Vista Bueno por</label>
+							<select name="approval" id="approval" class="form-control">
+							{% for x in employee %}
+								<option value="{{ x.empdni_id }}">{{ x.firstname }} {{ x.lastname }}</option>
+							{% empty %}
+								<option value="">-- Nothing --</option>
+							{% endfor %}
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-default pull-left" data-dismiss="modal">
+					<span class="glyphicon glyphicon-remove"></span> Cancelar
+				</button>
+				<button class="btn btn-danger btn-generate">
+					<span class="glyphicon glyphicon-floppy-save"></span> Guardar Cambios
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end block modal -->
+<!-- block csrf_token -->
+{% csrf_token %}
+{% endblock content %}

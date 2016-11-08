@@ -1,0 +1,211 @@
+.code {
+  background: #999;
+  background-color: #999;
+}
+input[type=text]:focus:not([readonly]),
+input[type=password]:focus:not([readonly]),
+input[type=email]:focus:not([readonly]),
+input[type=url]:focus:not([readonly]),
+input[type=time]:focus:not([readonly]),
+input[type=date]:focus:not([readonly]),
+input[type=datetime-local]:focus:not([readonly]),
+input[type=tel]:focus:not([readonly]),
+input[type=number]:focus:not([readonly]),
+input[type=search]:focus:not([readonly]),
+textarea.materialize-textarea:focus:not([readonly]),
+select:focus:not([readonly]) {
+  border-bottom: 1px solid #0091ea;
+  -webkit-box-shadow: 0 1px 0 0 #0091ea;
+  box-shadow: 0 1px 0 0 #0091ea;
+}
+input[type=text]:focus:not([readonly]) + label,
+input[type=password]:focus:not([readonly]) + label,
+input[type=email]:focus:not([readonly]) + label,
+input[type=url]:focus:not([readonly]) + label,
+input[type=time]:focus:not([readonly]) + label,
+input[type=date]:focus:not([readonly]) + label,
+input[type=datetime-local]:focus:not([readonly]) + label,
+input[type=tel]:focus:not([readonly]) + label,
+input[type=number]:focus:not([readonly]) + label,
+input[type=search]:focus:not([readonly]) + label,
+textarea.materialize-textarea:focus:not([readonly]) + label,
+select:focus:not([readonly]) + label {
+  color: #0091ea;
+}
+.input-field input,
+.input-field select {
+  border-bottom: 1px solid #9e9e9e;
+  -webkit-box-shadow: 0 1px 0 0 #9e9e9e;
+  box-shadow: 0 1px 0 0 #9e9e9e;
+}
+.input-field .prefix.active,
+.input-field .active {
+  color: #0091ea;
+}
+.text-16 {
+  font-size: 16px;
+}
+.text-14 {
+  font-size: 14px;
+}
+.text-13 {
+  font-size: 13px;
+}
+.text-12 {
+  font-size: 12px;
+}
+.text-11 {
+  font-size: 11px;
+}
+.text-10 {
+  font-size: 10px;
+}
+.text-9 {
+  font-size: 9px;
+}
+.text-32 {
+  font-size: 32px !important;
+}
+.cursor-hand {
+  cursor: pointer;
+}
+.col-1 {
+/*max-width 40px*/
+  min-width: 40px;
+  width: 40px;
+}
+.col-2 {
+/*max-width 70px*/
+  min-width: 70px;
+  width: 70px;
+}
+.col-3 {
+/*max-width 130px*/
+  min-width: 130px;
+  width: 130px;
+}
+.col-4 {
+/*max-width 164px*/
+  min-width: 164px;
+  width: 164px;
+}
+.col-5 {
+/*max-width 270px*/
+  min-width: 235px;
+  width: 235px;
+}
+.col-6 {
+/*max-width 290px*/
+  min-width: 280px;
+  width: 280px;
+}
+.bold-text {
+  font-weight: bold;
+}
+dt {
+  font-weight: bold;
+}
+dd {
+  background: none no-repeat left top;
+  padding-left: 50px;
+}
+table.table tbody tr td {
+  padding: 1px 2px 1px 2px;
+}
+table.table tbody tr td input[type="number"] {
+  height: 28px;
+  margin-bottom: 0px;
+}
+table.table tbody tr td input[type="checkbox"]+label {
+  display: initial !important;
+}
+table.table tbody tr td [type="checkbox"].filled-in.blue:checked+label:after {
+  background-color: #0089ec;
+  border: 2px solid #0870f6;
+}
+table.table tbody tr td [type="checkbox"].filled-in.red:checked+label:after {
+  background-color: #ea142b;
+  border: 2px solid #e8162a;
+}
+table.table tbody tr td [type="checkbox"].filled-in.amber:checked+label:after {
+  background-color: #ffe400;
+  border: 2px solid #f4b00a;
+}
+table.table tbody tr td [type="checkbox"].filled-in.grey:checked+label:after {
+  background-color: #606060;
+  border: 2px solid #303030;
+}
+input[type="checkbox"].filled-in.blue:checked+label:after {
+  background-color: #0089ec;
+  border: 2px solid #0870f6;
+}
+input[type="checkbox"].filled-in.red:checked+label:after {
+  background-color: #ea142b;
+  border: 2px solid #e8162a;
+}
+input[type="checkbox"].filled-in.amber:checked+label:after {
+  background-color: #ffe400;
+  border: 2px solid #f4b00a;
+}
+input[type="checkbox"].filled-in.grey:checked+label:after {
+  background-color: #606060;
+  border: 2px solid #303030;
+}
+.switch label input[type=checkbox]:checked+.lever.blue {
+  background-color: #0089ec;
+}
+.switch label input[type=checkbox]:checked+.lever.blue:after {
+  background-color: #0089ec;
+}
+.switch label input[type=checkbox]:checked+.lever.red {
+  background-color: #f44336;
+}
+.switch label input[type=checkbox]:checked+.lever.red:after {
+  background-color: #f44336 !important;
+}
+table.highlight > tbody > tr:hover {
+  background: #bfbbbb;
+  background-color: #bfbbbb;
+  background-color: rgba(191,187,187,0.8);
+}
+.margin .ml28 {
+  margin-left: 28px !important;
+}
+.margin .oml28 {
+  margin-left: -28px !important;
+}
+.margin .mt15 {
+  margin-top: 15px !important;
+}
+.margin .omt15 {
+  margin-top: -15px !important;
+}
+.margin .mb15 {
+  margin-bottom: 15px !important;
+}
+.margin .omb15 {
+  margin-bottom: -15px !important;
+}
+.padding .pl28 {
+  margin-left: 28px !important;
+}
+.padding .opl28 {
+  margin-left: -28px !important;
+}
+.padding .pt15 {
+  margin-top: 15px !important;
+}
+.padding .opt15 {
+  margin-top: -15px !important;
+}
+.padding .pb15 {
+  margin-bottom: 15px !important;
+}
+.padding .opb15 {
+  margin-bottom: -15px !important;
+}
+@media screen and (max-width: 992px) {
+  tbody tr td {
+    padding: 15px 5px 15px 5px !important;
+  }
+}

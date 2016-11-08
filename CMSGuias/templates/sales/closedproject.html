@@ -1,0 +1,270 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+        {% include "menus/salesmd.html" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'logistica'%}
+        {% include "menus/logisticsmd.htm" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'operaciones' %}
+        {% include "menus/operations.htm" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'almacen' %}
+        {% include "menus/storage_menu.htm" %}
+    {% endif %}
+    {% endblock menu %}
+{% block content %}
+<section ng-app="cpApp" ng-controller="cpCtrl">
+    <div class="row">
+        <div class="col s12 m9 l10">
+            <h4>
+                Archivar Proyecto {{ pro }} {{ pr.nompro }}
+                <br>
+                <small>CLIENTE: {{ pr.ruccliente }}</small><br />
+                <small>RESPONSABLE: {{ pr.empdni.firstname }} {{ pr.empdni.lastname }}</small><br />
+                <small>
+                    <a class="grey-text text-darken-3 right" href="#!" ng-model="call" ng-click="call=!call">
+                        <i class="fa" ng-class="{'fa-minus-square-o': call, 'fa-plus-square-o': !call}"></i>
+                    </a>
+                </small>
+            </h4>
+            <a href="{% url 'managerpro_view' pro %}" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+                <i class="fa fa-reply"></i>
+                <span>REGRESAR</span>
+            </a>
+            <div id="introduction" class="section scrollspy">
+                <ul class="collapsible" data-collapsible="accordion">
+                    <li ng-class="{'active': call, '': !call}">
+                        <div class="collapsible-header" ng-class="{'active': call, '': !call}">
+                            <i class="fa fa-info-circle fa-lg"></i>
+                            <strong>Información</strong>
+                        </div>
+                        <div class="collapsible-body" ng-style="mstyle">
+                            <p>Cada jefe de área debe de realizar un paso para realizar el cierre de proyecto.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- Closed Storage -->
+            <div id="storage" class="section scrollspy">
+                <ul class="collapsible popout" data-collapsible="accordion">
+                    <li ng-class="{'active': call, '': !call}">
+                        <div class="collapsible-header" ng-class="{'active': call, '': !call}">
+                            <i class="fa fa-th"></i>
+                            <span><strong>Cierre de Almacén</strong></span>
+                            <i class="fa right" ng-class="{'fa-check-square-o': sh.storage, 'fa-square-o': !sh.storage}"></i>
+                        </div>
+                        <div class="collapsible-body" ng-show="ctrl.storage" ng-style="mstyle" >
+                            <p>
+                                Si esta completamente seguro que ya se ha terminado de enviar todos los requerimientos a obra usted
+                                puedo completar esta paso. <br> Debe de tener encuenta que una vez completado este paso el proyecto no permitira realizar pedidos.
+                            </p>
+                            <div class="card-panel" ng-hide="sh.storage">
+                                <div class="switch">
+                                    <label>
+                                        Abrir
+                                        <input type="checkbox" ng-model="closedstorage" ng-init="closeStorage=false">
+                                        <span class="lever red"></span>
+                                        Cerrar
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- send letter delivery -->
+            <div id="letter" class="section scrollspy">
+                <ul class="collapsible popout" data-collapsible="accordion">
+                    <li ng-class="{'active': call, '': !call}">
+                        <div class="collapsible-header" ng-class="{'active': call, '': !call}">
+                            <i class="fa fa-file-text"></i>
+                            <span><strong>Carta de Entrega</strong></span>
+                            <i class="fa right" ng-class="{'fa-check-square-o': sh.operations, 'fa-square-o': !sh.operations}"></i>
+                        </div>
+                        <div class="collapsible-body" ng-show="ctrl.operations" ng-style="mstyle">
+                            <div class="card-panel">
+                                <span>Este apartado es para subir la carta de entrega que formaliza el termino de proyecto.</span>
+                                <div class="row" ng-hide="sh.operations">
+                                    <div class="col l12 m12 s12 file-field input-field">
+                                        <div class="btn red">
+                                            <i class="fa fa-file-text-o"></i>
+                                            <span>Carta</span>
+                                            <input type="file" id="letterup">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col l12 m12 s12">
+                                        <button type="button" class="right waves-effect waves-light btn light-blue" ng-click="letterClosed()">
+                                            <i class="fa fa-upload"></i>
+                                            <span class="hide-on-small-only">Cargar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- Closed Document -->
+            <div id="dossier" class="section scrollspy">
+                <ul class="collapsible popout" data-collapsible="accordion">
+                    <li ng-class="{'active': call, '': !call}">
+                        <div class="collapsible-header" ng-class="{'active': call, '': !call}">
+                            <i class="fa fa-book"></i>
+                            <span><strong>Documentos</strong></span>
+                            <i class="fa right" ng-class="{'fa-check-square-o': sh.quality, 'fa-square-o': !sh.quality}"></i>
+                        </div>
+                        <div class="collapsible-body" ng-show="ctrl.quality" ng-style="mstyle">
+                            <div class="card-panel" ng-hide="sh.quality">
+                                <span>Este apartado es para subir los documentos de calidad del proyecto.</span>
+                                <div class="row">
+                                    <div class="col l12 m12 s12 file-field input-field">
+                                        <div class="btn red">
+                                            <i class="fa fa-server"></i>
+                                            <span>Documentos</span>
+                                            <input type="file" id="qualityfile">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
+                                    </div>
+                                    <div class="col l12 m12 s12">
+                                        <button type="button" class="right waves-effect waves-light btn light-blue" ng-click="qualityClosed()">
+                                            <i class="fa fa-upload"></i>
+                                            <span class="hide-on-small-only">Cargar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- Contabilidad -->
+            <div id="invoce" class="section scrollspy">
+                <ul class="collapsible popout" data-collapsible="accordion">
+                    <li ng-class="{'active': call, '': !call}">
+                        <div class="collapsible-header" ng-class="{'active': call, '': !call}">
+                            <i class="fa fa-money"></i>
+                            <span><strong>Pagos</strong></span>
+                            <i class="fa right" ng-class="{'fa-check-square-o': sh.accounting, 'fa-square-o': !sh.accounting}"></i>
+                        </div>
+                        <div class="collapsible-body" ng-show="ctrl.accounting" ng-style="mstyle">
+                            <div class="row" ng-hide="sh.accounting">
+                                <div class="col l6 m6 s12 input-field">
+                                    <input type="number" min="0" class="right-align" ng-model="acctinvoice">
+                                    <label for="">Total Facturado</label>
+                                </div>
+                                <div class="col l6 m6 s12 input-field">
+                                    <input type="number" min="0" class="right-align" ng-model="acctiva">
+                                    <label for="">Total IGV</label>
+                                </div>
+                                <div class="col l6 m6 s12 input-field">
+                                    <input type="number" min="0" class="right-align" ng-model="acctotherin">
+                                    <label for="">Otros Ingresos</label>
+                                </div>
+                                <div class="col l6 m6 s12 input-field">
+                                    <input type="number" min="0" class="right-align" ng-model="acctotherout">
+                                    <label for="">Otras Salidas</label>
+                                </div>
+                                <div class="col l6 m6 s12 input-field">
+                                    <input type="number" min="0" class="right-align" ng-model="acctretention">
+                                    <label for="">Retenciones</label>
+                                </div>
+                                <div class="col l6 m6 s12 file-field input-field">
+                                    <div class="btn red">
+                                        <span>ARCHIVOS</span>
+                                        <input type="file" id="accountingfile">
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
+                                    </div>
+                                </div>
+                                <div class="col l12 m12 s12 input-field">
+                                    <button type="button" class="btn red waves-effect waves-light" ng-click="accountingQuit()">
+                                        <i class="fa fa-lock"></i>
+                                        <span class="hide-on-small-only">Cerrar</span>
+                                    </button>
+                                    <button type="button" class="btn light-blue waves-effect waves-light right"ng-click="accountingClosed()">
+                                        <i class="fa fa-floppy-o"></i>
+                                        <span class="hide-on-small-only">GUARDAR</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- Ventas -->
+            <div id="sales" class="section scrollspy">
+                <ul class="collapsible popout" data-collapsible="accordion">
+                    <li ng-class="{'active': call, '': !call}">
+                        <div class="collapsible-header" ng-class="{'active': call, '': !call}">
+                            <i class="fa fa-unlock-alt"></i>
+                            <span><strong>Cierre de Proyecto</strong></span>
+                            <i class="fa right" ng-class="{'fa-check-square-o': sh.sales, 'fa-square-o': !sh.sales}"></i>
+                        </div>
+                        <div class="collapsible-body" ng-show="ctrl.sales" ng-style="mstyle">
+                            <div class="row" ng-hide="sh.sales">
+                                <div class="col l4 m8 s8 input-field">
+                                    <i class="fa fa-certificate prefix"></i>
+                                    <input type="number" class="right-align" min="100000" max="999999" maxlength="6" name="gpin" ng-model="gpin" vcode>
+                                    <label for="">Código</label>
+                                </div>
+                                <div class="col l4 m4 s4 input-field">
+                                    <!-- <br> -->
+                                    <button type="button" class="btn green lighten-2 grey-text text-darken-3 waves-effect waves-light" ng-click="getPin()">
+                                        <i class="fa fa-key"></i>
+                                        <span class="hide-on-small-only">Obtener Código</span>
+                                    </button>
+                                </div>
+                                <div class="col l12 m12 s12">
+                                    <button type="button" class="btn red waves-effect waves-light right" ng-click="SaleClosed()">
+                                        <i class="fa fa-lock"></i>
+                                        <span class="hide-on-small-only">CERRAR PROYECTO</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+        </div>
+        <div class="col hide-on-small-only m3 l2">
+            <ul class="section table-of-contents pinned">
+                <li><a href="#introduction">Información</a></li>
+                <li><a href="#storage">Almacén</a></li>
+                <li><a href="#letter">Operaciones</a></li>
+                <li><a href="#dossier">Calidad</a></li>
+                <li><a href="#invoce">Contabilidad</a></li>
+                <li><a href="#sales">Ventas</a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- models utils -->
+    <input type="hidden" ng-model="uarea" ng-init="uarea='{{user.get_profile.empdni.charge.area | lower}}'">
+</section>
+<!-- block script -->
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js" defer></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js" defer></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/sales/closeproject.js" defer></script>
+{% endblock content %}

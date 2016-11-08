@@ -1,0 +1,86 @@
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'vista_home' %}">CMS Logística</a>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="{% url 'view_logistics' %}"><span class="glyphicon glyphicon-home"></span></a></li>
+
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Suministros <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'view_supply_pending' %}">Suministros Pendientes</a></li>
+            <li><a href="{% url 'view_convert_supply' %}">Suministros Aprobados</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Cotización <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">Vista</li>
+            <li><a href="{% url 'view_quote_list' %}">Cotización and Keys</a></li>
+            <li class="dropdown-header">Generar Cotizacion</li>
+            <li><a href="{% url 'view_quote_single' %}">Cotización Materiales</a></li>
+            <!-- <li class="dropdown-header">Order de Compra</li>
+            <li><a href="{% url 'view_purchase_single' %}">Compra Materiales</a></li>
+            <li><a href="{% url 'view_purchase_list' %}">Ordenes de Compra</a></li> -->
+            <li class="divider"></li>
+            <li><a href="{% url 'materials_price_views' %}">Precios</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Compras <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">COMPRAS</li>
+            <li><a href="{% url 'view_purchase_single' %}">Compra Simple</a></li>
+            <li><a href="{% url 'view_purchase_list' %}">Lista de Compras</a></li>
+            <li class="divider"></li>
+            <li><a href="{% url 'consult_purchase_view' %}">Detalle de Compras</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Proyectos <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'view_projects' %}">Proyectos</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Servicio<b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'orders_service' %}">Orden de Servicio</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mantenimientos <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">Proveedores</li>
+            <li><a href="{% url 'view_login_suppler' %}">Crear Usuario</a></li>
+            <li><a href="{% url 'view_create_supplier' %}">Nuevo Proveedor</a></li>
+            <li class="divider"></li>
+            <li><a href="{% url 'materials_price_views' %}">Precios</a></li>
+          </ul>
+        </li>
+        <!-- <li><a href="#">About</a></li> -->
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> {{ user.get_profile.empdni.firstname }}, {{ user.get_profile.empdni.lastname }} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a>Cargo: {{ user.get_profile.empdni.charge.cargos }}</a></li>
+            <li class="divider"></li>
+            <li><a href="{% url 'vista_logout' %}"><span class="glyphicon glyphicon-log-out"></span> Cerrar Session</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- navbar-collapse -->
+  </div><!-- container-fluid -->
+</nav>

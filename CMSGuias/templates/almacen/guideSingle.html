@@ -1,0 +1,304 @@
+{% extends "basemd.html" %}
+{% block title %}
+    Simple Guia Remision
+{% endblock title %}
+{% block content %}
+    <div ng-app="SGuideApp" ng-controller="SGuideCtrl">
+        <h3>Guia de Remision</h3>
+        <a href="/almacen/" class="btn grey lighten-5 grey-text text-darken-3">
+            <i class="fa fa-chevron-left"></i> REgresar
+        </a>
+        <div class="card">
+            <div class="card-action">
+                <button type="button" class="btn grey lighten-5 grey-text text-darken-3" ng-click="refresh()">
+                    <i class="fa fa-refresh"></i> ACtualizar
+                </button>
+                <button type="button" class="btn grey lighten-5 grey-text text-darken-3" ng-click="recycleData()">
+                    <i class="fa fa-recycle"></i>
+                    Inicio
+                </button>
+                <button type="button" class="btn grey lighten-5 grey-text text-darken-3 right" ng-model="vguide" ng-init="vguide=true" ng-click="saveGuide()" ng-disabled="vguide">
+                    <i class="fa fa-floppy-o"></i>
+                    GEnerar Guia
+                </button>
+            </div>
+        </div>
+        <div class="card-panel">
+            <h5>Datos Generales</h5>
+            <dvi class="row">
+                <div class="input-field col l2">
+                    <input type="text" maxlength="12" ng-model="guide.guide" ng-blur="validExistGuide()">
+                    <label for="">Nro Guia</label>
+                </div>
+                <div class="input-field col l2">
+                    <input type="date" maxlength="10" class="datepicker" ng-model="guide.transfer">
+                    <label for="">Fecha Traslado</label>
+                </div>
+                <div class="col l8">
+                    <div class="row">
+                        <div class="col l12">
+                            <label for="">Cliente</label>
+                            <select name="" id="" class="browser-default" ng-model="guide.customer">
+                                {% verbatim %}
+                                    <option ng-repeat="x in customers" value="{{x.pk}}">{{x.fields.razonsocial}}</option>
+                                {% endverbatim %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-field col l6">
+                    <input type="text" ng-model="guide.dotout" list="addr">
+                    <datalist id="addr">
+                        <option value="{{ address }}">
+                    </datalist>
+                    <label for="">Punto de Salida</label>
+                </div>
+                <div class="input-field col l6">
+                    <input type="text" ng-model="guide.dotarrival">
+                    <label for="">Punto de Llegada</label>
+                </div>
+                <div class="col l4">
+                    <label for="">Transportista</label>
+                    <select name="" id="" class="browser-default" ng-model="guide.carrier" ng-click="detCarriers($event)">
+                        {% verbatim %}
+                            <option ng-repeat="x in carriers" value="{{x.pk}}">{{x.fields.tranom}}</option>
+                        {% endverbatim %}
+                    </select>
+                </div>
+                <div class="col l4">
+                    <label for="">Conductor</label>
+                    <select name="" id="" class="browser-default" ng-model="guide.driver">
+                        {% verbatim %}
+                            <option ng-repeat="x in drivers" value="{{x.pk}}">{{x.fields.connom}}</option>
+                        {% endverbatim %}
+                    </select>
+                </div>
+                <div class="col l4">
+                    <label for="">Transporte</label>
+                    <select name="" id="" class="browser-default" ng-model="guide.transport">
+                        {% verbatim %}
+                            <option ng-repeat="x in transports" value="{{x.pk}}">{{x.fields.marca}} {{x.pk}}</option>
+                        {% endverbatim %}
+                    </select>
+                </div>
+                <div class="input-field col l2">
+                    <input type="text" value="VENTA" ng-model="guide.motive">
+                    <label for="">Motivo</label>
+                </div>
+                <div class="input-field col l5">
+                    <input type="text" ng-model="guide.observation">
+                    <label for="">Observaciones</label>
+                </div>
+                <div class="input-field col l5">
+                    <input type="text" ng-model="guide.note">
+                    <label for="">Nota</label>
+                </div>
+            </dvi>
+        </div>
+        <div class="card">
+            <h5><small>Detalle</small></h5>
+            <div class="card-action">
+                <button type="button" class="btn grey lighten-5 grey-text text-darken-3" ng-model="shwaddm" ng-init="shwaddm=false" ng-click="shwaddm=!shwaddm">
+                    <i class="fa fa-plus"></i>
+                    Agregar
+                </button>
+                <button type="button" class="btn grey lighten-5 grey-text text-darken-3" ng-click="listTemp()">
+                    <i class="fa fa-refresh"></i>
+                    ACtualizar
+                </button>
+                <button type="button" class="btn grey lighten-5 grey-text text-darken-3">
+                    <i class="fa fa-trash"></i>
+                    Eliminar
+                </button>
+            </div>
+            <div class="card-content" ng-show="shwaddm">
+                <button type="button" class="btn-flat right" ng-click="shwaddm=!shwaddm">
+                    <i class="fa fa-times"></i>
+                </button>
+                <div class="row">
+                    <div class="col l12">
+                        <div class="col l6 m6 s12 input-field">
+                            <input type="text" name="description">
+                            <label>Descripción</label>
+                            <ul id="matname-global" class="matname-global"></ul>
+                        </div>
+                        <div class="col l6 m6 s12">
+                            <label ng-class="{'active': measure}">Medida</label>
+                            <select name="meter" class="browser-default" ng-model="measure"></select>
+                        </div>
+                    </div>
+                    <div class="col l6 m6 s12">
+                        {% verbatim %}
+                            <div class="col l6 m6 s12 input-field">
+                                <input type="text" maxlength="15" name="code" ng-model="mat.code" value="{{mat.code}}">
+                                <label>Código</label>
+                            </div>
+                            <div class="input-field col l6 m6 s12">
+                                <input type="number" min="0" step="0.1" name="quantity" ng-model="mat.quantity">
+                                <label ng-class="{'active': mat.quantity}">Cantidad</label>
+                            </div>
+                            <div class="col l6 m6 s12">
+                                <label>Marca</label>
+                                <select class="browser-default" ng-model="mat.brand" ng-change="getStock()">
+                                    <option ng-repeat="x in brand" value="{{x.pk}}">{{x.fields.brand}}</option>
+                                </select>
+                            </div>
+                            <div class="col l6 m6 s12">
+                                <label>Modelo</label>
+                                <select class="browser-default" ng-model="mat.model" ng-change="getStock()">
+                                    <option ng-repeat="x in model" value="{{x.pk}}">{{x.fields.model}}</option>
+                                </select>
+                                <!-- <input type="hidden" ng-model="mat.obrand">
+                                <input type="hidden" ng-model="mat.omodel"> -->
+                            </div>
+                        {% endverbatim %}
+                        <div class="col l12 m12 s12 right-align">
+                            <br>
+                            <button type="button" class="btn grey lighten-5 grey-text text-darken-3 left" ng-click="shwaddm=false">
+                                <i class="fa fa-times"></i>
+                                <span class="hide-on-med-and-down">CERRAR</span>
+                            </button>
+                            <button type="button" class="btn light-blue darken-2" ng-click="saveDetalle()">
+                                <i class="fa fa-floppy-o"></i>
+                                <span class="hide-on-med-and-down">GUARDAR</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col l6 m6 s12">
+                        <table class="table responsive-table tb-details">
+                            <caption><strong>Resumén</strong></caption>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="col l6 m6 s12" ng-show="alternative.length">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Marca</th>
+                                    <th>Modelo</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% verbatim %}
+                                    <tr class="text-10" ng-repeat="x in alternative">
+                                        <td>{{$index + 1}}</td>
+                                        <td>{{x.fields.brand.fields.brand}}</td>
+                                        <td>{{x.fields.model.fields.model}}</td>
+                                        <th>{{x.fields.stock}}</th>
+                                    </tr>
+                                {% endverbatim %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col l6 m6 s12">
+                        <table class="table">
+                            <tbody>
+                                {% verbatim %}
+                                    <tr ng-repeat="x in exact">
+                                        <th class="col l4">Stock Material</th>
+                                        <th class="col l4">{{x.fields.stock}}</th>
+                                    </tr>
+                                    <tr ng-repeat="x in stkg">
+                                        <th class="col l4">Stock General</th>
+                                        <th class="col l4">{{x.fields.stock}}</th>
+                                    </tr>
+                                {% endverbatim %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% verbatim %}
+        <script type="text/ng-template" id="tmp.html">
+            <td>{{$index+1}}</td>
+            <td>{{x.fields.materials.pk}}</td>
+            <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
+            <td>{{x.fields.brand.fields.brand}}</td>
+            <td>{{x.fields.model.fields.model}}</td>
+            <td>{{x.fields.materials.fields.unidad}}</td>
+            <td>{{x.fields.quantity}}</td>
+            <td>
+                <a class='dropdown-button btn-flat' href='#' data-activates="{{x.fields.materials.pk}}{{x.fields.brand.pk}}{{x.fields.model.pk}}">
+                    <i class="fa fa-cog"></i>
+                </a>
+                <!-- Dropdown Structure -->
+                <ul id="{{x.fields.materials.pk}}{{x.fields.brand.pk}}{{x.fields.model.pk}}" class='dropdown-content'>
+                    <li>
+                        <a style="padding: 2px 0px 2px 3px;" class="grey-text text-darken-3" href="#!" ng-click="showEdit($event)" data-brand="{{x.fields.brand.pk}}" data-model="{{x.fields.model.pk}}">
+                            <small><i class="fa fa-edit"></i> Editar</small>
+                        </a>
+                    </li>
+                    <li>
+                        <a style="padding: 2px 0px 2px 3px;" class="grey-text text-darken-3" href="#!" ng-click="delItem($event)" data-brand="{{x.fields.brand.pk}}" data-model="{{x.fields.model.pk}}">
+                            <small><i class="fa fa-trash"></i> Eliminar</small>
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a style="padding: 2px 0px 2px 3px;" class="grey-text text-darken-3" href="#!" data-brand="{{x.fields.brand.pk}}" data-model="{{x.fields.model.pk}}" data-materials="{{x.fields.materials.pk}}" data-observation="{{x.fields.observation}}" ng-click="showObs($event)">
+                            <small><i class="fa fa-font"></i> Comentario</small>
+                        </a>
+                    </li>
+                </ul>
+            </td>
+        </script>
+        {% endverbatim %}
+        <table class="table reponsive-table">
+            <thead>
+                <tr class="blue accent-3">
+                    <th></th>
+                    <th>Codigo</th>
+                    <th>Descripcion</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Unidad</th>
+                    <th>Cantidad</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% verbatim %}
+                    <tr ng-include src="'tmp.html'" ng-repeat="x in list"></tr>
+                {% endverbatim %}
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="modal col l6 offset-l3" id="mobs">
+                <div class="modal-content">
+                    <div class="input-field">
+                        <textarea class="materialize-textarea" ng-model="obs.observation"></textarea>
+                        <label>Observaciones:</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn grey lighten-5 grey-text text-darken-3 modal-action modal-close left">
+                        <i class="fa fa-times"></i> Salir
+                    </button>
+                    {% verbatim %}
+                    <button type="button" class="btn green lighten-1 grey-text text-darken-3" data-materials="{{obs.materials}}" data-brand="{{obs.brand}}" data-model="{{obs.model}}" ng-click="saveObser($event)">
+                        <i class="fa fa-check"></i> Guardar
+                    </button>
+                    {% endverbatim %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+
+{% endblock content %}
+{% block footer %}
+    <!-- css -->
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/getMaterials.css">
+    <!-- tools utils -->
+    <script src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>
+    <script src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+    <script src="{{ MEDIA_URL }}vendor/angular-sanitize/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/mustache.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/getMaterials.js"></script>
+    <script src="{{ MEDIA_URL }}js/almacen/guideSingle.js"></script>
+{% endblock footer %}

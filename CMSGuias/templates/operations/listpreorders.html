@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% block title %}
+    List Pre Orders
+{% endblock title %}
+{% block script %}
+
+{% endblock script %}
+{% block menu %}
+    {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+        {% include "menus/salesmd.htm" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'logistica' %}
+        {% include "menus/logisticsmd.htm" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'operaciones' %}
+        {% include "menus/operations.htm" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'almacen' %}
+        {% include "menus/storage_menu.htm" %}
+    {% endif %}
+{% endblock menu %}
+{% block content %}
+    <div class="container">
+        <div class="well">
+            <header>
+                <h3>Lista de pre pedidos a almacén</h3>
+            </header>
+            <section>
+                <article>
+                    <div class="panel panel-warning">
+                        <div class="panel-body">
+                            Realizar busca por estado de pedido:
+                            <form action="" method="post">
+                                <div class="row">
+                                    <div class="col-md-11">
+                                        <div class="form-group">
+                                            <label class="control-label">Estado</label>
+                                            <select name="status" class="form-control input-sm" title="Seleccione un Estado" required>
+                                                <!-- <option value="">-- seleccione --</option>
+                                                <option value="AN">ANULAR</option>
+                                                <option value="CO">COMPLETO</option>
+                                                <option value="PE">PENDIENTE</option> -->
+                                                <option value="">-- seleccione --</option>
+                                                {% for k, v in status.items %}
+                                                    {% if k == search %}
+                                                        <option value="{{ k }}" selected>{{ v }}</option>
+                                                    {% else %}
+                                                        <option value="{{ k }}">{{ v }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                            {% csrf_token %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label class="control-label">Buscar</label>
+                                            <button type="submit" value="searchPreOrder" class="btn btn-sm btn-warning text-black">
+                                                <span class="glyphicon glyphicon-search"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                            <tr class="brand-warning">
+                                <th>Item</th>
+                                <th>Código</th>
+                                <th>Asunto</th>
+                                <th>Traslado</th>
+                                <th>Registrado</th>
+                                <th>Estado</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in list %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ x.preorder_id }}</td>
+                                    <td>{{ x.issue }}</td>
+                                    <td>{{ x.transfer }}</td>
+                                    <td>{{ x.register|date:"d/m/Y" }}</td>
+                                    <td>
+                                        {% for k, v in status.items %}
+                                            {% if k == x.status %}
+                                                {{ v }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'rpt_preorders' x.preorder_id %}" class="text-black" target="_blank">
+                                            <span class="fa fa-file"></span>
+                                        </a>
+                                    </td>
+                                    {% if x.status != 'CO' and x.status != 'AN' %}
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    <li class="dropdown-header">CAMBIAR ESTADO</li>
+                                                    <li><button type="button" name="showAnuler" class="btn btn-xs btn-link text-black" value="{{ x.preorder_id }}">Anular</button></li>
+                                                    <li><button type="button" class="btn btn-xs btn-link text-black changeComplete" value="{{ x.preorder_id }}">Completado</button></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <th colspan="8" class="text-center">
+                                        No existe Datos para esta tabla.
+                                    </th>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+<!-- modals -->
+<div class="modal fade" id="anular">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body">
+                <a data-dismiss="modal" class="close">&times;</a>
+                <h4 class="modal-title">
+                    Por que desea anular el <q>Pre Pedido <span class="idorder"></span></q>?
+                </h4>
+                <p>
+                    <textarea name="observation" rows="4" class="form-control"></textarea>
+                </p>
+                <button type="button" data-dismiss="modal" class="btn btn-default btn-sm">
+                    <span class="fa fa-times"></span>
+                    Salir
+                </button>
+                <button type="button" name="annulerOrder" class="btn btn-danger btn-sm pull-right">
+                    <span class="fa fa-save"></span>
+                    Anular
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% csrf_token %}
+<script>
+    $(document).ready(function() {
+        $("[name=showAnuler]").on("click", showAnnulerOrder);
+        $("[name=annulerOrder]").on("click", annularPreOrder);
+        $(".changeComplete").on("click", completePreOrder);
+    });
+    var showAnnulerOrder, changeCompleteOrder, annularPreOrder, completePreOrder;
+    showAnnulerOrder = function(event) {
+        $("[name=annulerOrder]").val(this.value);
+        $(".idorder").text(this.value);
+        $("#anular").modal("show");
+    }
+    annularPreOrder = function() {
+        var context = new Object();
+        context.pre = this.value;
+        $().toastmessage("showToast",
+            {
+                text: "Realmente desea anular el pre pedido a almacén?",
+                sticky: true,
+                type: "confirm",
+                buttons: [{value:"Si"}, {value:"No"}],
+                success: function(result) {
+                    if (result) {
+                        context.annular = $("[name=observation]").val()
+                        context.csrfmiddlewaretoken =$("[name=csrfmiddlewaretoken]").val()
+                        context.anullarPreOrders = true;
+                        $.post("", context, function(response) {
+                            if (response.status) {
+                                $().toastmessage("showSuccessToast", "Se anulo correctamente.")
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 2600);
+                            } else {
+                                $().toastmessage("showErrorToast", "Error no se a anulado la pre order a almacen. "+ response.raise+"");
+                            }
+                        }, "json");
+                    }
+                }
+            }
+        );
+    }
+    completePreOrder = function() {
+        var context = new Object();
+        context.pre = this.value;
+        $().toastmessage("showToast",
+        {
+            text: "Realmente desea cambiar el estado del Pre pedido a <q>Completado</q>?",
+            type: "confirm",
+            sticky: true,
+            buttons: [{value:"Si"}, {value:"No"}],
+            success: function(result) {
+                context.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                context.changeComplete = true
+                $.post("", context, function(response) {
+                    if(response.status) {
+                        $().toastmessage("showSuccessToast", "Se cambio el estado correctamente.");
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2600);
+                    } else {
+                        $().toastmessage("showErrorToast", "Error no se a podido cambiar el estado a <q>Completo</q>."+response.raise);
+                    }
+                }, "json");
+            }
+        });
+    }
+</script>
+{% endblock content %}

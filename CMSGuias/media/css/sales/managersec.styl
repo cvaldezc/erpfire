@@ -1,0 +1,17 @@
+vendor_prefixes ?= webkit moz o ms official
+
+@import 'nib'
+
+
+table.table-details
+table.table-modify
+table.table-pre-orders
+    & > tbody
+        font-size 12px
+        & > tr
+            & > td
+                & > input[type="text"], input[type="number"], select
+                    height 20px
+                    font-size 11px
+                    margin 0
+                    padding 0

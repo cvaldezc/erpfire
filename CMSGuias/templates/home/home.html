@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block style %}
+	<style>
+		.icon-circle {
+			display: block;
+			padding-top: 1.4em;
+			text-align: center;
+		}
+		.icon-circle span {
+			background-color: rgba(255,255,255,0.4);
+			border-radius: 50%;
+			box-shadow: 0 0 0 0.8em transparent;
+			display: inline-block;
+			font-size: 1.8em;
+			margin: 0 auto;
+			padding: 0.4em;
+			box-shadow: * .6s ease-in-out;
+		}
+		.icon-tab{
+			background-color: rgba(255,255,255,0.4);
+			border-radius: 50%;
+			box-shadow: 0 0 0 0.8em transparent;
+			display: inline-block;
+			margin: 0 auto;
+			padding: 0.4em;
+			box-shadow: * .6s ease-in-out;
+		}
+	</style>
+{% endblock style %}
+{% block content %}
+	{% include "menu.htm" %}
+	<script>
+		$.getJSON("/json/sunat/exchange/rate/",function (response) {
+			if (response.status) {
+				if (response.show) {
+					$().toastmessage("showNoticeToast", "Exito!, se obtubo el tipo de cambio")	;
+				};
+			};
+		});
+	</script>
+{% endblock content %}

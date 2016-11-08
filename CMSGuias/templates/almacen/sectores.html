@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block style %}
+<!--<link rel="stylesheet" href="/media/css/almacen/pedido.css">-->
+{% endblock %}
+{% block script %}
+<!--<script src="/media/js/almacen/pedido.js"></script>-->
+{% endblock %}
+{% block menu %}
+	{% include "menus/storage_menu.htm" %}
+{% endblock menu %}
+{% block content %}
+<div class="container">
+	<div class="well">
+	<h1 class="text-primary">Sectores <br>
+	<small>
+		{% if sid %}
+			Sectores de Subproyecto {{sid}}
+		{% endif %}
+	</small>
+	</h1>
+		{% csrf_token %}
+		<input type="hidden" class="empdni" value="{{user.get_profile.empdni}}">
+		<div class="row show-grid">
+			<div class="col-md-12">
+				<div class="btn-group">
+					<a href="{% url 'vista_project' %}" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-left"></span>  Proyecto</a>
+					{% if not sid %}
+					<a href="{% url 'vista_sub_project' pid %}" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> Subproyecto</a>
+					{% else %}
+					<a href="{% url 'vista_sub_project' pid %}" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-up"></span> Subproyecto</a>
+					{% endif %}
+					<a href="{% url 'vista_add_sectors' pid sid %}" class="btn btn-default btn-warning text-black"><span class="glyphicon glyphicon-plus"></span> Nuevo Sector</a>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="table-responsive">
+					<table class="table table-striped table-hover table-bordered table-condensed">
+						<thead>
+							<tr>
+								<th class="text-center">Item</th>
+								<th class="text-center">Proyecto</th>
+								<th>Subproyecto ID</th>
+								<th>Subproyecto</th>
+								<th class="text-center">Sector ID</th>
+								<th class="text-center">Plano</th>
+								<th>Sector</th>
+								<th class="text-center">Editar</th>
+								<th class="text-center">Eliminar</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% if lista %}
+								{% for x in lista %}
+								<tr class="tr-{{x.sector_id}}">
+									<td>{{forloop.counter}}</td>
+									<td>{{x.proyecto.nompro}}</td>
+									<td>{{x.subproyecto_id}}</td>
+									<td>{{x.subproyecto.nomsub}}</td>
+									<td>{{x.sector_id}}</td>
+									<td>{{x.nomsec}}</td>
+									<td>{{x.planoid}}</td>
+									<td class="text-center"><a href="{% url 'vista_edit_sector' pid sid x.sector_id %}" class="btn btn-link text-black" value="{{x.sector_id}}"><span class="glyphicon glyphicon-edit"></span></a></td>
+									<td class="text-center"><button type="Button" class="btn btn-link text-black btn-delete-project" title="{{x.nomsec}}" value="{{x.sector_id}}"><span class="glyphicon glyphicon-trash"></span></button></td>
+								</tr>
+								{% endfor%}
+							{% else %}
+								<div class="alert alert-warning">
+									<strong>Warning</strong>
+									<p>No se han encontrado <q><strong>Sectores</strong></q> para mostrar. Presione el botón <q><strong>Nuevo Sector</strong></q> para agregar.<p>
+								</div>
+							{% endif %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$(document).ready(function () {
+		$(".btn-delete-project").click(function (event) {
+			event.preventDefault();
+			var value = this.value;
+			$().toastmessage("showToast",{
+				text: "Eliminar Sector, recuerde que al eliminar a "+this.title+" sera permanentemente.<br>Desea Eliminar el Sector?",
+				sticky: true,
+				type: "confirm",
+				position: "middle-center",
+				buttons: [{value:'No'},{value: 'Si'}],
+				success: function (result) {
+					if (result == "Si") {
+						var data = { "sec": value, "csrfmiddlewaretoken": $("input[name=csrfmiddlewaretoken]").val() }
+						console.log(data);
+						$.post("",data,function (response) {
+							console.warn(response);
+							if (response.status) {
+								if ($("table tbody > tr").length > 1 ){
+									$(".tr-"+value).remove();
+								}else{
+									location.reload()
+								}
+							};
+						},"json");
+					};
+				}
+			});
+		});
+	});
+</script>
+{% endblock %}

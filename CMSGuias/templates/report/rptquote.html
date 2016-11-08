@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request of Quotation</title>
+    <link rel="stylesheet" type="text/css" href="/media/css/reports/ordersstore.css">
+</head>
+<body>
+    <header>
+        <img id="logo" src="/media/images/icrlogo.png" alt="image">
+        <div id="dir" >
+            {{ request.session.company.address }}<br >
+            Central Telefonica: (511) {{ request.session.company.phone }}<br >
+            E-mail: logistica@icrperusa.com
+        </div>
+        <div id="info-type">
+            <h1>Materiales</h1>
+        </div>
+        <div id="nro-serie">
+            <h1>Nro Solicitud Cotización</h1>
+            <h1 id="nro">{{ bedside.cotizacion_id }}</h1>
+        </div>
+        <div id="bedside-col1">
+            <table>
+                <tr><td><strong>Suministro :</strong></td><td> {{ bedside.suministro_id }}</td></tr>
+                <tr><td><strong>Almacén :</strong></td><td> {{ bedside.almacen.nombre }}</td></tr>
+                <tr><td width="3cm"><strong>Fecha Registrado :</strong></td><td> {{ bedside.registrado }}</td></tr>
+                <tr><td><strong>Fecha Traslado :</strong></td><td> {{ bedside.traslado }}</td></tr>
+                <tr><td><strong>RUC:</strong></td><td> {{ details.0.0.supplier_id }}</td></tr>
+                <tr><td><strong>Razón Social:</strong></td><td> {{ details.0.0.reason }}</td></tr>
+                <tr><td><strong>Observación :</strong></td><td> {{ bedside.obser|safe }}</td></tr>
+            </table>
+        </div>
+        <div id="bedside-col2">
+            <table>
+                <tr><td><strong>Contacto Proveedor:</strong></td><td> {{ customers.0.contacto }}</td></tr>
+                <tr><td><strong>Envio Proveedor:</strong></td><td> {{ customers.0.envio }}</td></tr>
+                <tr><td><strong>Validez:</strong></td><td> {{ customers.0.validez }}</td></tr>
+                <tr><td><strong>Moneda:</strong></td><td> {{ customers.0.moneda.moneda }}</td></tr>
+                <tr><td width="3cm"><strong>Estado :</strong></td><td> {% for k, v in status.iteritems %}
+                    {% ifequal k bedside.status %}
+                        {{ v }}
+                    {% endifequal %}
+                {% endfor %}</td></tr>
+                <tr><td><strong>Observación :</strong></td><td> {{ customers.0.obser|safe }}</td></tr>
+            </table>
+        </div>
+    </header>
+    <section>
+        <div class="details">
+        {% for s in details %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th width="2.5cm">Código</th>
+                        <th width="7cm">Descripción</th>
+                        <!-- <th width="4cm">Medida</th> -->
+                        <th>Unidad</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Entrega</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for x in s %}
+                    <tr>
+                        <td class="text-center item">{{ x.item }}</td>
+                        <td class="text-center cod">{{ x.materials }}</td>
+                        <td>{{ x.name }}</td>
+                        <td class="text-center">{{ x.unit }}</td>
+                        <td class="text-center">{{ x.quantity|safe }}</td>
+                        <td class="text-center">{{ x.price|floatformat:"2" }}</td>
+                        <td class="text-center">{{ x.brand }}</td>
+                        <td class="text-center">{{ x.model }}</td>
+                        <td class="text-center">{{ x.delivery|date:"d/m/Y" }}</td>
+                    </tr>
+                {% endfor%}
+                </tbody>
+            </table>
+            {% if not forloop.last %}
+                <div><pdf:nextpage /></div>
+            {% endif %}
+        {% endfor %}
+        </div>
+        <p>
+            {% if customers.obser %}
+                <strong>Nota:</strong>
+                {{ customers.obser }}
+            {% endif %}
+        </p>
+    </section>
+</body>
+</html>

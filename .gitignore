@@ -1,0 +1,15 @@
+*.pyc
+*.pdf
+*.dwg
+*.tmp
+*.rar
+django_yuml/
+**/storage/
+**/projects/
+**/pedido/
+**/vendor/
+node_modules/
+npm-debug.log
+**/images/
+.vscode/
+CMSGuias/static/load.json

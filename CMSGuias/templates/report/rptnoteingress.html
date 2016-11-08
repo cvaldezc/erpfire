@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Note Ingress</title>
+    <link rel="stylesheet" type="text/css" href="/media/css/reports/ordersstore.css">
+</head>
+<body>
+    <header>
+        <img id="logo" src="/media/images/icrlogo.png" alt="image">
+        <div id="dir" >
+            {{ request.session.company.address }}<br >
+            Central Telefonica: (511) {{ request.session.company.phone }}<br >
+            E-mail: logistica@icrperusa.com
+        </div>
+        <div id="info-type">
+            <h1>Materiales</h1>
+        </div>
+        <div id="nro-serie">
+            <h1>Nro Nota de Ingreso</h1>
+            <h1 id="nro">{{ bedside.ingress_id }}</h1>
+        </div>
+        <div id="bedside-col1">
+            <table>
+                <tr><td><strong>Almacén :</strong></td><td> {{ bedside.storage.nombre }}</td></tr>
+                <tr><td width="3cm"><strong>Nro Compra :</strong></td><td> {{ bedside.purchase_id }}</td></tr>
+                <tr><td><strong>Guia Remisión :</strong></td><td> {{ bedside.guide }}</td></tr>
+                <tr><td><strong>Nro Factura :</strong></td><td> {{ bedside.invoice }}</td></tr>
+                <tr><td><strong>Motivo :</strong></td><td> {{ bedside.motive }}</td></tr>
+            </table>
+        </div>
+        <div id="bedside-col2">
+            <table>
+                <tr><td><strong>Proveedor :</strong></td><td>{{ bedside.purchase.proveedor_id }} {{ bedside.purchase.proveedor.razonsocial }}</td></tr>
+                <tr><td><strong>Registrado:</strong></td><td> {{ bedside.register }}</td></tr>
+                <tr><td width="3cm"><strong>Estado :</strong></td><td> {% for k, v in status.iteritems %}
+                    {% ifequal k bedside.status %}
+                        {{ v }}
+                    {% endifequal %}
+                {% endfor %}</td></tr>
+                <tr><td><strong>Observación :</strong></td><td> {{bedside.observation|safe }}</td></tr>
+            </table>
+        </div>
+    </header>
+    <section>
+        <div class="details">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th width="2.5cm">Código</th>
+                        <th width="7cm">Descripción</th>
+                        <!-- <th width="4cm">Medida</th> -->
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Unidad</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for x in details %}
+                    <tr>
+                        <td class="text-center item">{{ forloop.counter }}</td>
+                        <td class="text-center cod">{{ x.materials_id }}</td>
+                        <td>{{ x.materials.matnom }}
+                        {{ x.materials.matmed }}</td>
+                        <td class="text-center">{{ x.brand.brand }}</td>
+                        <td class="text-center">{{ x.model.model }}</td>
+                        <td class="text-center">{{ x.materials.unidad.uninom }}</td>
+                        <td class="text-center">{{ x.quantity|safe }}</td>
+                    </tr>
+                {% endfor%}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <div id="footer_content">
+        <table class="table-note-footer">
+            <tbody>
+                <tr>
+                    <td width="6cm">
+                        <strong>Recibido por:</td></strong>
+                    </td>
+                    <td width="6cm">
+                        <strong>Inspeccionado por:</td></strong>
+                    </td>
+                    <td width="6cm">
+                        <strong>V. B. por:</td></strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        {{ bedside.receive_id }} <br> {{ bedside.receive.firstname }}, {{ bedside.receive.lastname }}
+                    </td>
+                    <td class="text-center">
+                        {{ bedside.inspection_id }} <br> {{ bedside.inspection.firstname }}, {{ bedside.inspection.lastname }}
+                    </td>
+                    <td class="text-center">
+                        {{ bedside.approval_id }} <br> {{ bedside.approval.firstname }}, {{ bedside.approval.lastname }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
