@@ -229,26 +229,26 @@
         if (isConfirm) {
           tg = $scope.so.tag;
           if (tg.search(/\#/) !== -1) {
-            tg = tg.split(/\#/).pop().split(/\s/)[0];
+            tg = tg.split(/\#/).pop();
             if (tg === "") {
               Materialize.toast("Error en la categoria", 3000);
               return false;
             } else {
-              $scope.so.tag = tg;
+              $scope.so.tag = ("#" + tg).toUpperCase();
             }
           } else {
             Materialize.toast("Formato de Categoria!", 3000);
             return false;
           }
           $scope.so.saveOrder = true;
+          $scope.so.det = JSON.stringify($scope.details);
+          $scope.so.del = JSON.stringify($scope.dels);
           soFactory.saveOrder($scope.so).success(function(response) {
             if (response.status) {
               Materialize.toast("<i class='fa fa-check fa-lg green-text'></i> &nbsp;Se actualizo correctamente!", 2500);
-              $timeout(function() {
-                location.href = '/logistics/services/orders/';
-              }, 2500);
+              $timeout(function() {}, 2500);
             } else {
-              Materialize.toast("NO se han guardado los datos", 4000);
+              Materialize.toast("No se han guardado los datos", 4000);
             }
           });
         }

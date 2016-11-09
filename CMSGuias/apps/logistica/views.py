@@ -1800,6 +1800,27 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                     # kwargs['status'] = True
                     pass
                 if 'saveOrder' in request.POST:
+                    print request.POST
+                    # save updade and create new details
+                    details = json.load(request.POST['det'])
+                    if len(details) > 0:
+                        for x in details:
+                            if x.model == 'add':
+                                DetailsServiceOrder.objects.create( description=x.fields.description,
+                                                                    unit_id=x.fields.unit,
+                                                                    quantity=x.fields.quantity,
+                                                                    price=x.fields.price)
+                            else:
+                                try:
+                                    ds = DetailsServiceOrder.objects.get(serviceorder_id=x.pk)
+                                    ds.description = x.fields.description
+                                    ds.unit_id = x.fields.unit
+                                    ds.quantity = x.fields.quantity
+                                    ds.price = x.fields.price
+                                    ds.save()
+                                except DetailsServiceOrder.DoesNotExist:
+                                    print e
+                    # if exists 
                     kwargs['status'] = True
             except ObjectDoesNotExist as e:
                 kwargs['status'] = False

@@ -178,7 +178,9 @@ do ->
                 if isConfirm
                     angular.forEach $scope.details, (obj, index) ->
                         if obj.pk is pk
-                            $scope.dels.push obj.pk 
+                            $scope.dels.push
+                                'pk': obj.pk
+                                'model': obj.model 
                             $scope.details.splice index, 1
                             $scope.$apply()
                             Materialize.toast "<i class='fa fa-fire fa-lg red-text'></i>&nbsp;Item eliminado!", 2600
@@ -202,24 +204,24 @@ do ->
                 if isConfirm
                     tg = $scope.so.tag
                     if tg.search(/\#/) isnt -1
-                        tg = tg.split(/\#/).pop().split(/\s/)[0]
+                        tg = tg.split(/\#/).pop()
                         if tg is ""
                             Materialize.toast "Error en la categoria", 3000
                             return false
                         else
-                            $scope.so.tag = tg
+                            $scope.so.tag = "##{tg}".toUpperCase()
                     else
                         Materialize.toast "Formato de Categoria!", 3000
                         return false
                     $scope.so.saveOrder = true
-                    $scope.so.det  = $scope.details
-                    $scope.so.del = $scope.dels
+                    $scope.so.det  = JSON.stringify $scope.details
+                    $scope.so.del = JSON.stringify $scope.dels
                     soFactory.saveOrder($scope.so)
                     .success (response) ->
                         if response.status
                             Materialize.toast "<i class='fa fa-check fa-lg green-text'></i> &nbsp;Se actualizo correctamente!", 2500
                             $timeout ->
-                                location.href = '/logistics/services/orders/'
+                                # location.href = '/logistics/services/orders/'
                                 return
                             , 2500
                             return
@@ -228,6 +230,8 @@ do ->
                             return
                     return
             return
+
+        
 
         $scope.$watch 'so.dsct', (nw, old) ->
             if nw isnt old
