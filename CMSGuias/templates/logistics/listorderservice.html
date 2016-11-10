@@ -1,0 +1,57 @@
+{% extends "basemd.html" %}
+{% block title %}
+    Service Order
+{% endblock title %}
+{% block menu %}
+    {% include "menus/logisticsmd.htm" %}
+{% endblock menu %}
+{% block content %}
+<section>
+    <header>
+        <h3>Lista de Ordenes de Servicio</h3>
+    </header>
+    <div class="card-panel">
+        <div class="input-field">
+            <i class="prefix fa fa-filter"></i>
+            <input type="text">
+            <label for="">Filtar Orden de Servicio</label>
+        </div>
+    </div>
+    <div class="card-panel">
+        <table class="table responsive-table highlight hovered">
+            <thead>
+                <tr class="lime lighten-2">
+                    <th>#</th>
+                    <th>Código</th>
+                    <th>Proyecto</th>
+                    <th>Proveedor</th>
+                    <th>Registrado</th>
+                    <th>Documento</th>
+                    <th>Pago</th>
+                    <th>Edit</th>
+                    <th>Ver</th>
+                    <th>Anular</th>
+                </tr>
+                <tr>
+                    <td colspan="10" class="center-align">
+                        <div class="preloader-wrapper big active">
+                            <div class="spinner-layer spinner-blue-only">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div><div class="gap-patch">
+                                <div class="circle"></div>
+                            </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                            </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock content %}

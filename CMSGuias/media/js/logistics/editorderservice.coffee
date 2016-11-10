@@ -40,6 +40,10 @@ do ->
         $scope.dels = []
 
         angular.element(document).ready ->
+            angular.element('.datepicker').pickadate
+                selectMonths: true
+                selectYears: 15
+                format: "yyyy-mm-dd"
             angular.element('.modal').modal()
             angular.element(".chosen-select").chosen width: '100%'
             angular.element("#desc").trumbowyg()

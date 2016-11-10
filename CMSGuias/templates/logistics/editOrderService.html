@@ -1,4 +1,7 @@
 {% extends "basemd.html" %}
+{% block title %}
+    Service Order - Edit
+{% endblock title %}
 {% block style %}
 <link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
 <link rel="stylesheet" href="{{ MEDIA_URL }}vendor/trumbowyg/dist/ui/trumbowyg.min.css">
@@ -89,13 +92,13 @@
                     </div>
                     <div class="col l2 m2 s12">
                         <div class="input-field">
-                            <input type="text" name="start" id="start" ng-model="so.start">
+                            <input type="text" name="start" class="datepicker" id="start" ng-model="so.start">
                             <label for="start" ng-class="{'active': so.start}">Fecha Inicio</label>
                         </div>
                     </div>
                     <div class="col l2 m2 s12">
                         <div class="input-field">
-                            <input type="text" name="term" id="term" ng-model="so.term">
+                            <input type="text" name="term" class="datepicker" id="term" ng-model="so.term">
                             <label for="term" ng-class="{'active': so.term}">Fecha Termino</label>
                         </div>
                     </div>

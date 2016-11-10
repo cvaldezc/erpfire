@@ -1582,6 +1582,24 @@ class ListCompressed(JSONResponseMixin, TemplateView):
             return self.render_to_json_response(context)
 
 
+class ListServiceOrders(JSONResponseMixin, TemplateView):
+
+    template_name = 'logistics/listorderservice.html'
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    if '' in request.GET:
+                        pass
+                except ObjectDoesNotExist as e:
+                    kwargs['raise'] = str(e)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+            return render(request, self.template_name, kwargs)
+        except TemplateDoesNotExist as ex:
+            raise Http404(ex)
+
 class ServiceOrders(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
@@ -1801,22 +1819,23 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                     pass
                 if 'saveOrder' in request.POST:
                     print request.POST
-                    details = json.load(request.POST['det'])
+                    details = json.loads(request.POST['det'])
                     if len(details) > 0:
                         # save updade and create new details
                         for x in details:
-                            if x.model == 'add':
-                                DetailsServiceOrder.objects.create( description=x.fields.description,
-                                                                    unit_id=x.fields.unit,
-                                                                    quantity=x.fields.quantity,
-                                                                    price=x.fields.price)
+                            if x['model'] == 'add':
+                                DetailsServiceOrder.objects.create( serviceorder_id=kwargs['oservice'],
+                                                                    description=x['fields']['description'],
+                                                                    unit_id=x['fields']['unit'],
+                                                                    quantity=x['fields']['quantity'],
+                                                                    price=x['fields']['price'])
                             else:
                                 try:
-                                    ds = DetailsServiceOrder.objects.get(serviceorder_id=kwargs['oservice'], pk=x.pk)
-                                    ds.description = x.fields.description
-                                    ds.unit_id = x.fields.unit
-                                    ds.quantity = x.fields.quantity
-                                    ds.price = x.fields.price
+                                    ds = DetailsServiceOrder.objects.get(serviceorder_id=kwargs['oservice'], pk=x['pk'])
+                                    ds.description = x['fields']['description']
+                                    ds.unit_id = x['fields']['unit']
+                                    ds.quantity = x['fields']['quantity']
+                                    ds.price = x['fields']['price']
                                     ds.save()
                                 except DetailsServiceOrder.DoesNotExist:
                                     print e
@@ -1824,15 +1843,31 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                     dels = json.loads(request.POST['del'])
                     if len(dels) > 0: 
                         for x in dels:
-                            if x.model != 'add':
+                            if x['model'] != 'add':
                                 try:
-                                    dl = DetailsServiceOrder.objects.get(serviceorder_id=kwargs['oservice'], pk=x.pk)
+                                    dl = DetailsServiceOrder.objects.get(serviceorder_id=kwargs['oservice'], pk=x['pk'])
                                     dl.delete()
                                 except DetailsServiceOrder as ex:
                                     print ex
                     # save bedside service order
+                    s = json.loads(request.POST['so'])
+                    print s
                     so = ServiceOrder.objects.get(serviceorder_id=kwargs['oservice'])
-                    so.project_id = request.POST['']
+                    so.project_id = s['project']
+                    so.supplier_id = s['supplier']
+                    so.quotation = s['quotation']
+                    so.arrival = s['arrival']
+                    so.document_id = s['document']
+                    so.method_id = s['method']
+                    so.start = s['start']
+                    so.term = s['term']
+                    so.dsct = s['dsct']
+                    so.elaborated_id = s['elaborated']
+                    so.authorized_id = s['authorized']
+                    so.currency_id = s['currency']
+                    so.sigv = s['sigv']
+                    so.tag = s['tag']
+                    so.save()
                     kwargs['status'] = True
             except ObjectDoesNotExist as e:
                 kwargs['status'] = False

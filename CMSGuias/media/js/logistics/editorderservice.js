@@ -82,6 +82,11 @@
     $scope.edit = {};
     $scope.dels = [];
     angular.element(document).ready(function() {
+      angular.element('.datepicker').pickadate({
+        selectMonths: true,
+        selectYears: 15,
+        format: "yyyy-mm-dd"
+      });
       angular.element('.modal').modal();
       angular.element(".chosen-select").chosen({
         width: '100%'
