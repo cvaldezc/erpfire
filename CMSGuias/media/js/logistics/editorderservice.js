@@ -79,7 +79,7 @@
     $scope.ddsct = 0;
     $scope.dsigv = 0;
     $scope.dtotal = 0;
-    $scope.edit = [];
+    $scope.edit = {};
     $scope.dels = [];
     angular.element(document).ready(function() {
       angular.element('.modal').modal();
@@ -169,9 +169,12 @@
     $scope.applyDetails = function() {
       $scope.edit.description = angular.element("#desc").trumbowyg('html');
       if ($scope.edit.hasOwnProperty("pk")) {
-        angular.forEach($scope.details, function(obj) {
+        angular.forEach($scope.details, function(obj, index) {
           if (obj.pk === $scope.edit.pk) {
-            obj.fields = $scope.edit;
+            obj.fields.description = $scope.edit.description;
+            obj.fields.quantity = $scope.edit.quantity;
+            obj.fields.price = $scope.edit.price;
+            obj.fields.unit = $scope.edit.unit;
           }
         });
       } else {
@@ -185,7 +188,7 @@
       $scope.eClean();
     };
     $scope.eClean = function() {
-      $scope.edit = [];
+      $scope.edit = {};
       angular.element("#desc").trumbowyg('html', '');
     };
     $scope.delItem = function(pk) {
@@ -203,9 +206,11 @@
         if (isConfirm) {
           angular.forEach($scope.details, function(obj, index) {
             if (obj.pk === pk) {
-              $scope.dels.push(obj.pk);
+              $scope.dels.push({
+                'pk': obj.pk,
+                'model': obj.model
+              });
               $scope.details.splice(index, 1);
-              $scope.$apply();
               Materialize.toast("<i class='fa fa-fire fa-lg red-text'></i>&nbsp;Item eliminado!", 2600);
               $scope.calc();
             }
@@ -214,6 +219,7 @@
       });
     };
     $scope.saveOrderService = function() {
+      console.log($scope.details);
       swal({
         title: 'Desea guardar los datos?',
         text: '',
@@ -225,7 +231,7 @@
         closeOnConfirm: true,
         closeOnCancel: true
       }, function(isConfirm) {
-        var tg;
+        var prm, tg;
         if (isConfirm) {
           tg = $scope.so.tag;
           if (tg.search(/\#/) !== -1) {
@@ -240,13 +246,19 @@
             Materialize.toast("Formato de Categoria!", 3000);
             return false;
           }
-          $scope.so.saveOrder = true;
-          $scope.so.det = JSON.stringify($scope.details);
-          $scope.so.del = JSON.stringify($scope.dels);
-          soFactory.saveOrder($scope.so).success(function(response) {
+          prm = {
+            saveOrder: true,
+            so: JSON.stringify($scope.so),
+            det: JSON.stringify($scope.details),
+            del: angular.toJson($scope.dels)
+          };
+          console.log(prm);
+          soFactory.saveOrder(prm).success(function(response) {
             if (response.status) {
               Materialize.toast("<i class='fa fa-check fa-lg green-text'></i> &nbsp;Se actualizo correctamente!", 2500);
-              $timeout(function() {}, 2500);
+              $timeout(function() {
+                location.href = '/logistics/services/orders/';
+              }, 2500);
             } else {
               Materialize.toast("No se han guardado los datos", 4000);
             }

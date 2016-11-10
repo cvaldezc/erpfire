@@ -1801,9 +1801,9 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                     pass
                 if 'saveOrder' in request.POST:
                     print request.POST
-                    # save updade and create new details
                     details = json.load(request.POST['det'])
                     if len(details) > 0:
+                        # save updade and create new details
                         for x in details:
                             if x.model == 'add':
                                 DetailsServiceOrder.objects.create( description=x.fields.description,
@@ -1812,7 +1812,7 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                                                                     price=x.fields.price)
                             else:
                                 try:
-                                    ds = DetailsServiceOrder.objects.get(serviceorder_id=x.pk)
+                                    ds = DetailsServiceOrder.objects.get(serviceorder_id=kwargs['oservice'], pk=x.pk)
                                     ds.description = x.fields.description
                                     ds.unit_id = x.fields.unit
                                     ds.quantity = x.fields.quantity
@@ -1820,7 +1820,19 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                                     ds.save()
                                 except DetailsServiceOrder.DoesNotExist:
                                     print e
-                    # if exists 
+                    # we walk for delete items
+                    dels = json.loads(request.POST['del'])
+                    if len(dels) > 0: 
+                        for x in dels:
+                            if x.model != 'add':
+                                try:
+                                    dl = DetailsServiceOrder.objects.get(serviceorder_id=kwargs['oservice'], pk=x.pk)
+                                    dl.delete()
+                                except DetailsServiceOrder as ex:
+                                    print ex
+                    # save bedside service order
+                    so = ServiceOrder.objects.get(serviceorder_id=kwargs['oservice'])
+                    so.project_id = request.POST['']
                     kwargs['status'] = True
             except ObjectDoesNotExist as e:
                 kwargs['status'] = False

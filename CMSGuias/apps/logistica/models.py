@@ -263,8 +263,7 @@ class ServiceOrder(models.Model):
                 Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     supplier = models.ForeignKey(Proveedor, to_field='proveedor_id')
     register = models.DateTimeField(auto_now_add=True)
-    quotation = models.ForeignKey(
-                Cotizacion, to_field='cotizacion_id', null=True, blank=True)
+    quotation = models.CharField(max_length=12, null=True, blank=True)
     arrival = models.CharField(max_length=250)
     document = models.ForeignKey(Documentos, to_field='documento_id')
     method = models.ForeignKey(FormaPago, to_field='pagos_id')
