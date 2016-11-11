@@ -6,16 +6,24 @@
     {% include "menus/logisticsmd.htm" %}
 {% endblock menu %}
 {% block content %}
-<section>
+<section ng-app="soApp" ng-controller="soCtrl">
     <header>
         <h3>Lista de Ordenes de Servicio</h3>
     </header>
     <div class="card-panel">
         <div class="input-field">
             <i class="prefix fa fa-filter"></i>
-            <input type="text">
+            <input type="text" ng-model="search">
             <label for="">Filtar Orden de Servicio</label>
         </div>
+       {% verbatim %}
+        <div class="input-field">
+            <label ng-class="{'active': sel}">Estado</label>
+            <select ng-model="sel" ng-options="x.key as x.val for x in status">
+                <option value="" disabled>-- Elija --</option>
+            </select>
+        </div>
+        {% endverbatim %}
     </div>
     <div class="card-panel">
         <table class="table responsive-table highlight hovered">
@@ -28,11 +36,11 @@
                     <th>Registrado</th>
                     <th>Documento</th>
                     <th>Pago</th>
-                    <th>Edit</th>
-                    <th>Ver</th>
-                    <th>Anular</th>
+                    <th class="center-align">Edit</th>
+                    <th class="center-align">Ver</th>
+                    <th class="center-align">Anular</th>
                 </tr>
-                <tr>
+                <tr ng-hide="list.length">
                     <td colspan="10" class="center-align">
                         <div class="preloader-wrapper big active">
                             <div class="spinner-layer spinner-blue-only">
@@ -49,9 +57,26 @@
                 </tr>
             </thead>
             <tbody>
-
+                {% verbatim list %}
+                <tr ng-repeat="x in list | filter: search">
+                    <td><small>{{$index+1}}</small></td>
+                    <td><small>{{x.pk}}</small></td>
+                    <td><small>{{x.fields.project.fields.nompro}}</small></td>
+                    <td><small>{{x.fields.supplier.fields.razonsocial}}</small></td>
+                    <td><small>{{x.fields.register | date:"yy-MM-dd HH:mm"}}</small></td>
+                    <td><small>{{x.fields.document.fields.documento}}</small></td>
+                    <td><small>{{x.fields.method.fields.pagos}}</small></td>
+                    <td class="center-align"><a href="/logistics/services/orders/edit/{{x.pk}}/" class="light-green-text"><i class="fa fa-pencil fa-lg"></i></a></td>
+                    <td class="center-align"><a href="/reports/services/orders/{{x.pk}}/" class="light-blue-text text-darken-4"><i class="fa fa-eye fa-lg"></i></a></td>
+                    <td class="center-align"><a href="#!del" class="red-text text-lighten-1"><i class="fa fa-trash fa-lg"></i></a></td>
+                </tr>
+                {% endverbatim list %}
             </tbody>
         </table>
     </div>
 </section>
+<!-- defined script -->
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script type="text/javascript" src="{{MEDIA_URL}}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/logistics/serviceorderlist.js" defer></script>
 {% endblock content %}

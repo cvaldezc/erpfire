@@ -8,7 +8,6 @@
 }
 .all-sectors > article {
   border: 1px solid #428bca;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
   -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
@@ -63,7 +62,6 @@
   color: #fff;
   background: #428bca;
   border: 1px solid #2b669a;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
   cursor: pointer;
 }
@@ -89,7 +87,6 @@
 .progress-project .bar {
   background: #fff;
   border: 1px solid #d5d5da;
-  -webkit-border-radius: 40px;
   border-radius: 40px;
   display: block;
   height: 40px;
@@ -97,7 +94,6 @@
 }
 .progress-project .circle .label,
 .progress-project .bar .label {
-  -webkit-border-radius: 32px;
   border-radius: 32px;
   -webkit-box-shadow: 0 0 2px #000;
   box-shadow: 0 0 2px #000;
@@ -129,7 +125,6 @@
 .progress-project .bar {
   border-top: none;
   border-bottom: none;
-  -webkit-border-radius: 0;
   border-radius: 0;
   height: 80px;
   margin-left: 16px;
@@ -165,7 +160,6 @@
 .btn-circle {
   background: #fff;
   border: 1px solid #eee;
-  -webkit-border-radius: 50%;
   border-radius: 50%;
   margin-top: 1px;
 }

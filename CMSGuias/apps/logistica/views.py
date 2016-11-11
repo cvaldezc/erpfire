@@ -1590,8 +1590,28 @@ class ListServiceOrders(JSONResponseMixin, TemplateView):
         try:
             if request.is_ajax():
                 try:
-                    if '' in request.GET:
-                        pass
+                    if 'getall' in request.GET:
+                        kwargs['data'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                ServiceOrder.objects.filter(status=request.GET['sel']).order_by('-register'),
+                                relations=('project', 'supplier', 'document', 'method')))
+                        kwargs['status'] = True
+                    if 'bystatus' in request.GET:
+                        kwargs['data'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                ServiceOrder.objects.filter(status=request.GET['sel']).order_by('-register'),
+                                relations=('project', 'supplier', 'document', 'method')))
+                        kwargs['status'] = True
+                    if 'gstatus' in request.GET:
+                        d = ServiceOrder.objects.all().order_by('status').distinct('status')
+                        print '=============================='
+                        for x in d:
+                            print x.status
+                        print '=============================='
+                        kwargs['sts'] = [{'key':x.status, 'val': globalVariable.status[x.status]} for x in d]
+                        kwargs['status'] = True
                 except ObjectDoesNotExist as e:
                     kwargs['raise'] = str(e)
                     kwargs['status'] = False

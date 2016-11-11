@@ -27,7 +27,7 @@
         </div>
         {% else %}
         <div class="card-action">
-            <a href="{% url 'orders_service' %}" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+            <a href="{% url 'oslist_view' %}" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
                 <i class="fa fa-reply"></i>
                 <span class="hide-on-small-only">REGRESAR</span>
             </a>
@@ -37,6 +37,12 @@
                     GUARDAR
                 </span>
             </button>
+            <a href="/reports/services/orders/{{oservice}}/" target=_blank class="btn grey lighten-5 grey-text text-darken-3 right">
+                <i class="fa fa-file-pdf-o"></i>
+                <span class="hide-on-small-only">
+                    VER FORMATO
+                </span>
+            </a>
         </div>
         <div class="center-align" ng-hide="projects.length">
             <div class="preloader-wrapper big active">

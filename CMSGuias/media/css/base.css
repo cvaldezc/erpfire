@@ -63,7 +63,6 @@ body {
 ::-webkit-scrollbar-track {
   -webkit-box-shadow: #000;
   -webkit-border-radius: 10px;
-  -webkit-border-radius: 10px;
   border-radius: 10px;
 }
 ::-webkit-scrollbar-track-piece {
@@ -71,7 +70,6 @@ body {
   background-color: rgba(2,2,2,0.6);
 }
 ::-webkit-scrollbar-thumb {
-  -webkit-border-radius: 10px;
   -webkit-border-radius: 10px;
   border-radius: 10px;
   background: #fff;
@@ -146,7 +144,6 @@ body {
   color: #f0ad4e;
 }
 .matname-global {
-  -webkit-border-radius: 4px;
   border-radius: 4px;
   max-height: 22em;
   padding-left: 0;
