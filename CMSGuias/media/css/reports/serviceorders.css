@@ -32,7 +32,7 @@
     -pdf-frame-content: orders;
     right: 1cm;
     top: 4cm;
-    width: 8.9cm;
+    width: 9.6cm;
   }
   @frame header_frame {
     -pdf-frame-content: method;
@@ -56,25 +56,25 @@
     -pdf-frame-content: execution;
     right: 1cm;
     top: 6cm;
-    width: 10.8cm;
+    width: 11.5cm;
   }
   @frame header_frame {
     -pdf-frame-content: arrival;
     right: 1cm;
     top: 7.3cm;
-    width: 10.8cm;
+    width: 11.5cm;
   }
   @frame header_frame {
     -pdf-frame-content: data;
     left: 1cm;
-    top: 8.6cm;
+    top: 8.7cm;
     width: 10cm;
   }
   @frame header_frame {
     -pdf-frame-content: authorized;
     right: 1cm;
-    top: 8.6cm;
-    width: 7.8cm;
+    top: 8.7cm;
+    width: 8.5cm;
   }
   @frame content_frame {
     top: 11.2cm;
@@ -125,28 +125,32 @@
   padding-right: 2px;
 }
 table.details > thead > tr {
-  background-color: #ffe4b5;
-  border: 1px solid #ffdead;
+  background-color: #d32b2b;
+  border: 1px solid #d32b2b;
   padding-top: 0.15cm;
   padding-bottom: 0.1cm;
 }
 table.details > tbody > tr,
 table.details tfoot > tr {
-  border-left: 1px solid #ffdead;
-  border-right: 1px solid #ffdead;
+  border-left: 1px solid #d32b2b;
+  border-right: 1px solid #d32b2b;
   padding-top: 0.05cm;
   padding-bottom: 0.01cm;
 }
+table.details > tbody > tr > td,
+table.details tfoot > tr > td {
+  padding-left: 5px;
+}
 table.details > tbody > tr:last-child,
 table.details tfoot > tr:last-child {
-  border-bottom: 1px solid #ffdead;
+  border-bottom: 1px solid #d32b2b;
 }
 table.details > tbody > tr > td:last-child,
 table.details tfoot > tr > td:last-child {
   padding-right: 2px;
 }
 table.details > tfoot > tr {
-  border: 1px solid #ffdead;
+  border: 1px solid #d32b2b;
   padding-top: 2px;
 }
 .text-up {

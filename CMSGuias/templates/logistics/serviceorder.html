@@ -13,18 +13,18 @@
             <header>
                 <h3>Orden de Servicio</h3>
                 <nav>
-                    <button class="btn btn-sm btn-warning text-black btn-new">
+                    <!--<button class="btn btn-sm btn-warning text-black btn-new">
                         <span class="fa fa-file"></span>
                         <span>Nuevo</span>
-                    </button>
+                    </button>-->
                     <!-- <button class="btn btn-sm btn-danger btn-erase-fields">
                         <span class="fa fa-eraser"></span>
                         <span>Limpiar Todo</span>
                     </button> -->
-                    <button class="btn btn-sm btn-primary btn-list">
+                    <!--<button class="btn btn-sm btn-primary btn-list">
                         <span class="fa fa-list"></span>
                         <span>Lista de Ordenes</span>
-                    </button>
+                    </button>-->
                     <button class="btn btn-sm btn-warning text-black btn-generate">
                         <span class="fa fa-save"></span>
                         <span class="fa fa-long-arrow-right"></span>
@@ -142,6 +142,18 @@
                                     <input type="file" name="deposit" class="form-control" accept="application/pdf">
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="category" class="control-label">Categoria</label>
+                                    <input type="text" id="category" class="form-control" placeholder="e.g #TODO #TRANSPORTE #ALQUILER">
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <label for="sigv" class="control-label">Incluir IGV</label>
+                                    <input type="checkbox" id="sigv" class="form-control">
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
@@ -200,7 +212,7 @@
                                                 <td class="text-right rdsct"></td>
                                             </tr>
                                             <tr>
-                                                <th>IGV <span class="vigv">{{ vigv }}</span>%</th>
+                                                <th>IGV <span class="vigv"></span>%</th>
                                                 <td class="text-right rigv"></td>
                                             </tr>
                                             <tr>
@@ -325,6 +337,7 @@
     </div>
 </div>
 <!-- variable -->
+<input type="hidden" id="igv" value="{{ vigv }}">
 {% csrf_token %}
 <script type="text/javascript" defer src="{{ MEDIA_URL }}js/mustache.js"></script>
 <script type="text/javascript" defer src="{{ MEDIA_URL }}js/floatThead.js"></script>

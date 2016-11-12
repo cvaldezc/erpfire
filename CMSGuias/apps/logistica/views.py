@@ -1606,10 +1606,6 @@ class ListServiceOrders(JSONResponseMixin, TemplateView):
                         kwargs['status'] = True
                     if 'gstatus' in request.GET:
                         d = ServiceOrder.objects.all().order_by('status').distinct('status')
-                        print '=============================='
-                        for x in d:
-                            print x.status
-                        print '=============================='
                         kwargs['sts'] = [{'key':x.status, 'val': globalVariable.status[x.status]} for x in d]
                         kwargs['status'] = True
                 except ObjectDoesNotExist as e:
@@ -1619,6 +1615,19 @@ class ListServiceOrders(JSONResponseMixin, TemplateView):
             return render(request, self.template_name, kwargs)
         except TemplateDoesNotExist as ex:
             raise Http404(ex)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        try:
+            if 'annular' in request.POST:
+                an = ServiceOrder.objects.get(serviceorder_id=request.POST['os'])
+                an.status = 'AN'
+                an.save()
+                kwargs['status'] = True
+        except ObjectDoesNotExist as ex:
+            kwargs['status'] = False
+            kwargs['raise'] = str(ex)
+        return self.render_to_json_response(kwargs)
 
 class ServiceOrders(JSONResponseMixin, TemplateView):
 

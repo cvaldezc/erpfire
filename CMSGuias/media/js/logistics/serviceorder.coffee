@@ -22,12 +22,24 @@ $(document).ready ->
     $(".chosen-select").chosen
         no_results_next: "Oops, nada encontrado!"
         width: "100%"
+    showNew()
+    $(".vigv").text "0"
+    $("#sigv").on "click", changeSelIGV
+    return
+
+changeSelIGV = (event) ->
+    if $("#sigv").is(":checked")
+        $(".vigv").text($("#igv").val())
+        calcamount()
+    else
+        $(".vigv").text "0"
+        calcamount()
     return
 
 showNew = (event) ->
     $("div.panel-list, button.btn-new").fadeOut 150
     $("div.panel-new, button.btn-list, button.btn-generate").fadeIn 1200
-    getListTmp()
+    # getListTmp()
     return
 
 showList = (event) ->
@@ -131,7 +143,10 @@ calcamount = (event) ->
         $td = $(element).find "td"
         amount += parseFloat $td.eq(6).text()
         return
-    igv = (parseFloat($(".vigv").text()) / 100)
+    if $("#sigv").is(":checked")
+        igv = (parseFloat($("#igv").val()) / 100)
+    else
+        igv = 0
     dsct = (parseFloat($(".vdsct").text() or 0) / 100)
     $(".rdsct").text (amount * dsct).toFixed 2
     $(".ramount").text amount.toFixed 2
@@ -207,6 +222,8 @@ saveServiceOrder = (event) ->
     data.term = $("input[name=execution]").val()
     data.dsct = $("input[name=dsct]").val()
     data.authorized = $("select[name=authorized]").val()
+    data.sigv = $("#sigv").is(":checked")
+    data.tag = $("#category").val()
     for x in Object.keys(data)
         if data[x] is "" and x isnt "quotation"
             valid = false
@@ -222,7 +239,6 @@ saveServiceOrder = (event) ->
             #console.log "#{x} , #{data[x]}"
         if $("input[name=deposit]").get(0).files.length
             prm.append "deposit", $("input[name=deposit]").get(0).files[0]
-
         $.ajax
             url: ""
             data: prm
@@ -235,7 +251,7 @@ saveServiceOrder = (event) ->
                 if response.status
                     $().toastmessage "showSuccessToast", "Se a generado Orden de Servicio: #{response.service}"
                     setTimeout ->
-                        location.reload()
+                        location.href = '/logistics/services/orders/'
                         return
                     , 2600
                     return

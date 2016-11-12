@@ -3,16 +3,23 @@ do ->
 
     app.config ($httpProvider) ->
         $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-        $httpProvider.defaults.xrsfCookieName = 'csrftoken'
-        $httpProvider.defaults.xrsfHeaderName = 'X-CSRFToken'
+        $httpProvider.defaults.xsrfCookieName = 'csrftoken'
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
         return
 
     factory = ($rootScope, $log, $http, $cookies) ->
-        # $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
-        # $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-        obj = new Object
-        obj.get = (options={})->
+        $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
+        $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+        obj = new Object()
+        fd = (options={}) ->
+            form = new FormData()
+            for k,v of options
+                form.append k, v
+            return form
+        obj.get = (options={}) ->
             $http.get "", params: options
+        obj.post = (options={}) ->
+            $http.post "", fd(options), transformRequest: angular.identity, headers: 'Content-Type': undefined 
         return obj
 
     app.factory 'soFactory', factory
@@ -77,6 +84,31 @@ do ->
                 else
                     Materialize.toast "#{response.raise} ", 3000
                     return
+            return
+        $scope.annularSo = (os) ->
+            swal
+                title: "Realmente desea Anular la Orden de Servicio #{os}"
+                text: ""
+                type: "warning"
+                showCancelButton: true
+                confirmButtonText: 'Si! anular.'
+                confirmButtonColor: '#fb3c4a'
+                closeOnConfirm: true
+                closeOnCancel: true
+            , (isConfirm) ->
+                if isConfirm
+                    params =
+                        'annular': true
+                        'os': os
+                    soFactory.post(params)
+                    .success (response) ->
+                        if response.status
+                            location.reload()
+                            return
+                        else
+                            Materialize.toast "#{response.raise}", 3000
+                            return
+                    console.log isConfirm
             return
         return
 

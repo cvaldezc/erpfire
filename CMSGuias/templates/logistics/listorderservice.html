@@ -11,6 +11,10 @@
         <h3>Lista de Ordenes de Servicio</h3>
     </header>
     <div class="card-panel">
+        <a href="{% url 'oservicenew_view' %}" class="waves-effect waves-light btn light-blue right">
+            <i class="fa fa-plus"></i>
+            <span class="hide-on-small-only">NUEVO</span>
+        </a>
         <div class="input-field">
             <i class="prefix fa fa-filter"></i>
             <input type="text" ng-model="search">
@@ -19,7 +23,7 @@
        {% verbatim %}
         <div class="input-field">
             <label ng-class="{'active': sel}">Estado</label>
-            <select ng-model="sel" ng-options="x.key as x.val for x in status">
+            <select ng-model="sel" ng-options="x.key as x.val for x in status" ng-change="listStatus()">
                 <option value="" disabled>-- Elija --</option>
             </select>
         </div>
@@ -66,9 +70,9 @@
                     <td><small>{{x.fields.register | date:"yy-MM-dd HH:mm"}}</small></td>
                     <td><small>{{x.fields.document.fields.documento}}</small></td>
                     <td><small>{{x.fields.method.fields.pagos}}</small></td>
-                    <td class="center-align"><a href="/logistics/services/orders/edit/{{x.pk}}/" class="light-green-text"><i class="fa fa-pencil fa-lg"></i></a></td>
-                    <td class="center-align"><a href="/reports/services/orders/{{x.pk}}/" class="light-blue-text text-darken-4"><i class="fa fa-eye fa-lg"></i></a></td>
-                    <td class="center-align"><a href="#!del" class="red-text text-lighten-1"><i class="fa fa-trash fa-lg"></i></a></td>
+                    <td class="center-align"><a href="/logistics/services/orders/edit/{{x.pk}}/" ng-show="x.fields.status=='PE'" class="light-green-text"><i class="fa fa-pencil fa-lg"></i></a></td>
+                    <td class="center-align"><a href="/reports/services/orders/{{x.pk}}/" target="_blank" class="light-blue-text text-darken-4"><i class="fa fa-eye fa-lg"></i></a></td>
+                    <td class="center-align"><a href="#!del" ng-click="annularSo(x.pk)" ng-show="x.fields.status!='AN'" class="red-text text-lighten-1"><i class="fa fa-trash fa-lg"></i></a></td>
                 </tr>
                 {% endverbatim list %}
             </tbody>

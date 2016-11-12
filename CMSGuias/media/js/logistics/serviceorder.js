@@ -1,4 +1,4 @@
-var addItem, calcamount, changeDsct, changeRadio, getListTmp, listDetails, loadEdit, saveServiceOrder, selectDel, selectProject, showList, showNew;
+var addItem, calcamount, changeDsct, changeRadio, changeSelIGV, getListTmp, listDetails, loadEdit, saveServiceOrder, selectDel, selectProject, showList, showNew;
 
 $(document).ready(function() {
   $(".btn-erase-fields,.btn-generate,.panel-new,.btn-list").hide();
@@ -28,12 +28,24 @@ $(document).ready(function() {
     no_results_next: "Oops, nada encontrado!",
     width: "100%"
   });
+  showNew();
+  $(".vigv").text("0");
+  $("#sigv").on("click", changeSelIGV);
 });
+
+changeSelIGV = function(event) {
+  if ($("#sigv").is(":checked")) {
+    $(".vigv").text($("#igv").val());
+    calcamount();
+  } else {
+    $(".vigv").text("0");
+    calcamount();
+  }
+};
 
 showNew = function(event) {
   $("div.panel-list, button.btn-new").fadeOut(150);
   $("div.panel-new, button.btn-list, button.btn-generate").fadeIn(1200);
-  getListTmp();
 };
 
 showList = function(event) {
@@ -132,7 +144,11 @@ calcamount = function(event) {
     $td = $(element).find("td");
     amount += parseFloat($td.eq(6).text());
   });
-  igv = parseFloat($(".vigv").text()) / 100;
+  if ($("#sigv").is(":checked")) {
+    igv = parseFloat($("#igv").val()) / 100;
+  } else {
+    igv = 0;
+  }
   dsct = parseFloat($(".vdsct").text() || 0) / 100;
   $(".rdsct").text((amount * dsct).toFixed(2));
   $(".ramount").text(amount.toFixed(2));
@@ -225,6 +241,8 @@ saveServiceOrder = function(event) {
   data.term = $("input[name=execution]").val();
   data.dsct = $("input[name=dsct]").val();
   data.authorized = $("select[name=authorized]").val();
+  data.sigv = $("#sigv").is(":checked");
+  data.tag = $("#category").val();
   ref = Object.keys(data);
   for (i = 0, len = ref.length; i < len; i++) {
     x = ref[i];
@@ -257,7 +275,7 @@ saveServiceOrder = function(event) {
         if (response.status) {
           $().toastmessage("showSuccessToast", "Se a generado Orden de Servicio: " + response.service);
           setTimeout(function() {
-            location.reload();
+            location.href = '/logistics/services/orders/';
           }, 2600);
         } else {
           $().toastmessage("showErrorToast", "No se a generado Orden de Servicio. " + response.status);
