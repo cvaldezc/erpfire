@@ -209,18 +209,24 @@ app.controller('proCtrl', function($scope, $http, $cookies) {
   $scope.pcustomers = true;
   $scope.pprojects = false;
   $scope.tadmin = false;
+  $scope.pstatus = '';
+  $scope.allprojects = [];
   angular.element(document).ready(function() {
+    angular.element('select').material_select();
     $scope.lCustomersCbox();
     $scope.listCustomers();
     $scope.permission = angular.element("[name=permission]").val();
+    $scope.pstatus = 'AC';
+    $scope.getstatus();
     if ($scope.permission === 'administrator' || $scope.permission === 'ventas') {
       $scope.tadmin = true;
+      $scope.sfcustomers = true;
     }
     if ($scope.permission === 'operaciones') {
       $scope.pprojects = true;
       $scope.pcustomers = false;
       $scope.sfcustomers = false;
-      $scope.sfprojects = false;
+      $scope.sfprojects = true;
       $scope.sTable();
     }
   });
@@ -269,7 +275,7 @@ app.controller('proCtrl', function($scope, $http, $cookies) {
         params: data
       }).success(function(response) {
         if (response.status) {
-          $("#" + data.customer).html(Mustache.render("{{#projects}} <li class=\"collection-item avatar\" ondblclick=\"location.href='manager/{{pk}}/'\">\n  <i class=\"fa fa-building circle\" onClick=\"location.href='manager/{{pk}}/'\"></i>\n  <span class=\"title\"><strong>{{pk}} - {{fields.nompro}}</strong></span>\n  <div class=\"row\">\n    <div class=\"col l6\">\n      <strong>Contacto: </strong> {{fields.contact}}\n    </div>\n    <div class=\"col l6\"><strong>Correo: </strong> {{fields.email}}</div>\n    <div class=\"col l4\">\n      <strong>Registrado: </strong> {{fields.registrado}}\n    </div>\n    <div class=\"col l4\">\n      <strong>Inicio: </strong> {{fields.comienzo}}\n    </div>\n    <div class=\"col l4\">\n      <strong>Termino: </strong> {{fields.fin}}\n    </div>\n  </div>\n  <a href=\"/almacen/keep/project/{{pk}}/edit/\" data-ng-show=\"tadmin\" target=\"popup\" class=\"secondary-content grey-text text-darken-3s " + (!$scope.tadmin ? 'hide' : void 0) + "\"><i class=\"fa fa-edit\"></i></a>\n</li>{{/projects}}", response));
+          $("#" + data.customer).html(Mustache.render("{{#projects}}\n  <li class=\"collection-item avatar\" ondblclick=\"location.href='manager/{{pk}}/'\">\n      <a href=\"manager/{{pk}}/\">\n          <i class=\"fa fa-building circle light-blue darken-3\"></i>\n      </a>\n  <span class=\"title\"><strong>{{pk}} - {{fields.nompro}}</strong></span>\n  <div class=\"row\">\n    <div class=\"col l6\">\n      <strong>Contacto: </strong> {{fields.contact}}\n    </div>\n    <div class=\"col l6\"><strong>Correo: </strong> {{fields.email}}</div>\n    <div class=\"col l4\">\n      <strong>Registrado: </strong> {{fields.registrado}}\n    </div>\n    <div class=\"col l4\">\n      <strong>Inicio: </strong> {{fields.comienzo}}\n    </div>\n    <div class=\"col l4\">\n      <strong>Termino: </strong> {{fields.fin}}\n    </div>\n    <div class=\"col l4\">\n      <strong>Cerrado:</strong>\n      <i class=\"fa {{#complete.storage}}fa-check-square-o{{/complete.storage}}{{^complete.storage}}fa-square-o{{/complete.storage}}\"></i>\n      <i class=\"fa {{#complete.operations}}fa-check-square-o{{/complete.operations}}{{^complete.operations}}fa-square-o{{/complete.operations}}\"></i>\n      <i class=\"fa {{#complete.quality}}fa-check-square-o{{/complete.quality}}{{^complete.quality}}fa-square-o{{/complete.quality}}\"></i>\n      <i class=\"fa {{#complete.accounting}}fa-check-square-o{{/complete.accounting}}{{^complete.accounting}}fa-square-o{{/complete.accounting}}\"></i>\n      <i class=\"fa {{#complete.sales}}fa-check-square-o{{/complete.sales}}{{^complete.sales}}fa-square-o{{/complete.sales}}\"></i>\n    </div>\n  </div>\n  <a href=\"/almacen/keep/project/{{pk}}/edit/\" data-ng-show=\"tadmin\" target=\"popup\" class=\"secondary-content grey-text text-darken-3s " + (!$scope.tadmin ? 'hide' : void 0) + "\"><i class=\"fa fa-edit\"></i></a>\n</li>{{/projects}}", response));
         } else {
           console.log("No data project. " + response.raise);
         }
@@ -299,12 +305,52 @@ app.controller('proCtrl', function($scope, $http, $cookies) {
       $scope.sfprojects = !$scope.sfprojects;
     }
   };
+  $scope.getClass = function(status) {
+    if (status) {
+      return 'fa-check-square-o';
+    } else {
+      return 'fa-square-o';
+    }
+  };
   $scope.sTable = function() {
     var row;
     row = angular.element("#lprojects > tbody > tr");
     if (!row.length) {
       $scope.ProjectsAll();
     }
+  };
+  $scope.getstatus = function() {
+    $http.get('', {
+      params: {
+        getstatus: true
+      }
+    }).success(function(response) {
+      if (response.status) {
+        $scope.gstatus = response.gstatus;
+        setTimeout(function() {
+          return angular.element('select').material_select('update');
+        }, 600);
+      } else {
+        console.warn("" + response.raise);
+      }
+    });
+  };
+  $scope.gprojectstatus = function() {
+    var prms;
+    $scope.allprojects = [];
+    prms = {
+      sgproject: true,
+      status: $scope.pstatus
+    };
+    $http.get("", {
+      params: prms
+    }).success(function(response) {
+      if (response.status) {
+        $scope.allprojects = response.projects;
+      } else {
+        console.warn(response.raise + " ");
+      }
+    });
   };
   $scope.$watch('scustomers', function() {
     $('.collapsible').collapsible();

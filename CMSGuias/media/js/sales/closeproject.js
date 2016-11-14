@@ -74,6 +74,7 @@
   };
   app.factory('cpFactory', cpFactories);
   app.controller('cpCtrl', function($rootScope, $scope, $log, cpFactory) {
+    var sendMail;
     $scope.call = false;
     $scope.mstyle = '';
     $scope.ctrl = {
@@ -154,9 +155,16 @@
           cpFactory.formData({
             'storage': true
           }).success(function(response) {
+            var prms;
             if (response.status) {
               $scope.sComplete();
               Materialize.toast("<i class='fa fa-check fa-lg green-text'></i>&nbsp;Almacén Cerrado", 4000);
+              prms = {
+                mails: response.fors,
+                issue: "APERTURA DE PROYECTO " + response.pr.pk + " " + response.pr.name + " - " + response.pr.customers,
+                body: ""
+              };
+              sendMail();
             } else {
               Materialize.toast("<i class='fa fa-times fa-lg red-text'></i>&nbsp;" + repsonse.raise, 4000);
             }
@@ -355,6 +363,33 @@
           Materialize.toast("<i class='fa fa-times fa-lg red-text'></i> " + response.raise);
         }
       });
+    };
+    sendMail = function(options) {
+      var prm;
+      if (options == null) {
+        options = {};
+      }
+      Materialize.toast('<i class="fa fa-refresh fa-spin fa-2x"></i> Estamos enviado el correo', 'some', 'toast-static');
+      prm = {
+        forsb: options.mails,
+        issue: options.issue,
+        body: options.body,
+        callback: 'JSON_CALLBACK'
+      };
+      cpFactory.formCross("", prm).success(function(rescross) {
+        if (rescross.status) {
+          angular.element(".toast-static").remove();
+          Materialize.toast('<i class="fa fa-paper-plane-o fa-lg"></i>&nbsp; Enviado correntamente!', 4000);
+        } else {
+          Materialize.toast('Se ha producido algun error #{rescross}', 7000);
+        }
+      });
+    };
+    $scope.makeBody = function(options) {
+      if (options == null) {
+        options = {};
+      }
+      return "<p>Operaciones Frecuentes</p><p><strong> CIERRE DE PROYECTO </strong></p>";
     };
     $scope.$watch('call', function(nw, old) {
       if (nw !== void 0) {

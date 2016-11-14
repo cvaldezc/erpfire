@@ -30,7 +30,7 @@
 {% block content %}
 <div data-ng-app="proApp">
   <div class="well" data-ng-controller="proCtrl">
-    <input type="hidden" data-ng-model="permission" name="permission" value="{{request.user.get_profile.empdni.charge.area|lower}}">
+      <input type="hidden" data-ng-model="permission" name="permission" value="{{request.user.get_profile.empdni.charge.area|lower}}">
       <header>
         <h3>Proyectos</h3>
       </header>
@@ -207,17 +207,17 @@
             <!-- <button class="btn left-align">
               <i class="fa fa-refresh"></i>
             </button> -->
-            <button type="button" class="btn waves-effect left-align grey lighten-5 grey-text text-darken-3" data-ng-click="showFilter()">
+            <!--<button type="button" class="btn waves-effect left-align grey lighten-5 grey-text text-darken-3" data-ng-click="">
               <i class="fa fa-search"></i>
-            </button>
-            <button type="button" class="btn waves-effect right light-green lighten-5 grey-text text-darken-3" data-ng-model="pprojects" data-ng-click="pprojects=true; pcustomers=false; sfcustomers=false; sfprojects=false; sTable()">
+            </button>-->
+            <button type="button" class="btn waves-effect right light-green lighten-5 grey-text text-darken-3" data-ng-model="pprojects" data-ng-click="pprojects=true; pcustomers=false; sfcustomers=false; sfprojects=false; sTable(); showFilter()">
               <i class="fa fa-list-alt fa-lg"></i>
             </button>
-            <button type="button" class="btn waves-effect right light-green lighten-5 grey-text text-darken-3" data-ng-model="pcustomers" data-ng-click="pcustomers=true; pprojects=false; sfcustomers=false; sfprojects=false">
+            <button type="button" class="btn waves-effect right light-green lighten-5 grey-text text-darken-3" data-ng-model="pcustomers" data-ng-click="pcustomers=true; pprojects=false; sfcustomers=false; sfprojects=false; showFilter()">
               <i class="fa fa-reorder fa-lg"></i>
             </button>
         </div>
-        <div class="card-">
+        <div class="card-content">
           <div class="row">
             <div class="col l12 input-field" data-ng-model="sfcustomers" data-ng-show="sfcustomers">
               <i class="fa fa-filter prefix"></i>
@@ -229,11 +229,31 @@
               <input type="text" data-ng-model="sprojects">
               <label>Buscar por Proyectos</label>
             </div>
+            <div class="col l12 input-field" ng-show="sfprojects">
+              <i class="fa fa-dot-circle-o prefix"></i>
+              <select ng-model="pstatus" ng-options="x.key as x.val for x in gstatus" ng-change="gprojectstatus()">
+                <option value="" disabled>--Elija--</option>
+              </select>
+              <label>Estado de Proyecto</label>
+            </div>
           </div>
         </div>
       </div>
       <section class="section" data-ng-show="pcustomers">
         {% verbatim %}
+        <div class="center-align" ng-show="!customers">
+          <div class="preloader-wrapper big customersclass" data-ng-class="{'active': !customers && pcustomers}">
+            <div class="spinner-layer spinner-blue-only">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div><div class="gap-patch">
+                <div class="circle"></div>
+              </div><div class="circle-clipper right">
+                <div class="circle"></div>
+              </div>
+            </div>
+          </div>
+        </div>
         <ul class="collapsible popout" data-collapsible="accordion" id="listCollapse">
           <li data-ng-repeat="x in customers | filter:scustomers">
             <div class="collapsible-header red lighten-1" data-ng-click="getProjects()">
@@ -249,65 +269,67 @@
       </section>
       <section class="section" data-ng-show="pprojects">
         {% verbatim %}
-          <h4>Lista de proyectos</h4>
+          <!--<h4>Lista de proyectos</h4>-->
           <table class="table responsive-table striped hoverable" id="lprojects">
             <thead>
               <tr class="red lighten-1">
                 <th class="text-center">Item</th>
                 <th></th>
-                <th class="text-center">Codigo</th>
-                <th>Nombre de Proyecto</th>
-                <th>Contacto</th>
-                <th class="text-center col-3">Registrado</th>
+                <th class="text-center">Código</th>
+                <th>Descripción</th>
+                <th>Cliente</th>
+                <!--<th class="text-center col-3">Registrado</th>-->
                 <th class="text-center col-3">Fecha Inicio</th>
                 <th class="text-center col-3">Fecha Fin</th>
+                <th class="text-center col-3">Cerrado</th>
                 <th data-ng-show="tadmin">Editar</th>
+              </tr>
+              <tr ng-show="!allprojects.length">
+                <td colspan="9" class="center-align">
+                    <div class="preloader-wrapper big active" >
+                      <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                          <div class="circle"></div>
+                        </div><div class="gap-patch">
+                          <div class="circle"></div>
+                        </div><div class="circle-clipper right">
+                          <div class="circle"></div>
+                        </div>
+                      </div>
+                    </div>
+                </td>
               </tr>
             </thead>
             <tbody>
               <tr data-ng-repeat="r in allprojects | filter:sprojects" ng-class="{'amber lighten-5': r.fields.status == 'AC'}">
                 <td>{{$index+1}}</td>
                 <td>
-                  <a href="manager/{{r.pk}}/" class="btn waves-effect waves-teal btn-flat text-black secondary-content">
-                    <i class="fa fa-building"></i>
+                  <a href="manager/{{r.pk}}/" class="waves-effect waves-light">
+                    <i class="fa fa-building fa-2x"></i>
                   </a>
                 </td>
-                <td>{{r.pk}}</td>
-                <td>{{r.fields.nompro}}</td>
-                <td>{{r.fields.contact}}</td>
-                <td class="text-center">{{r.fields.registrado|date:"dd-MM-y" }}</td>
+                <th>{{r.pk}}</th>
+                <th>{{r.fields.nompro}}</th>
+                <th>{{r.fields.ruccliente.fields.razonsocial}}</th>
+                <!--<td class="text-center">{{r.fields.registrado|date:"dd-MM-y" }}</td>-->
                 <td class="center-align">{{r.fields.comienzo|date:"dd-MM-y" }}</td>
                 <td class="center-align">{{r.fields.fin|date:"dd-MM-y" }}</td>
-                <td data-ng-show="tadmin" class="center-align"><a class="grey-text text-darken-3" href="/almacen/keep/project/{{r.pk}}/edit/" target="popup"><i class="fa fa-edit"></i></a></td>
+                <td class="center-align">
+                  <i class="fa" ng-class="getClass(r.complete.storage)"></i>
+                  <i class="fa" ng-class="getClass(r.complete.operations)"></i>
+                  <i class="fa" ng-class="getClass(r.complete.quality)"></i>
+                  <i class="fa" ng-class="getClass(r.complete.accounting)"></i>
+                  <i class="fa" ng-class="getClass(r.complete.sales)"></i>
+                </td>
+                <td data-ng-show="tadmin" class="center-align">
+                  <a class="grey-text text-darken-3" href="/almacen/keep/project/{{r.pk}}/edit/" target="popup"><i class="fa fa-edit"></i>
+                  </a>
+                </td>
               </tr>
             </tbody>
           </table>
         {% endverbatim %}
       </section>
-      <div class="section center-align">
-        <div class="preloader-wrapper big projectsclass" data-ng-class="{'active': !allprojects && pprojects}" >
-          <div class="spinner-layer spinner-blue-only">
-            <div class="circle-clipper left">
-              <div class="circle"></div>
-            </div><div class="gap-patch">
-              <div class="circle"></div>
-            </div><div class="circle-clipper right">
-              <div class="circle"></div>
-            </div>
-          </div>
-        </div>
-        <div class="preloader-wrapper big customersclass" data-ng-class="{'active': !customers && pcustomers}" >
-          <div class="spinner-layer spinner-blue-only">
-            <div class="circle-clipper left">
-              <div class="circle"></div>
-            </div><div class="gap-patch">
-              <div class="circle"></div>
-            </div><div class="circle-clipper right">
-              <div class="circle"></div>
-            </div>
-          </div>
-        </div>
-      </div>
   </div>
 </div>
 <!-- angular -->

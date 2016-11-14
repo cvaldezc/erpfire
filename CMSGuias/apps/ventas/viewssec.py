@@ -18,7 +18,8 @@ from django.views.generic import View
 
 # local Django
 from .models import Proyecto, CloseProject
-from ..tools.globalVariable import date_now, get_pin
+from ..home.models import Emails
+from ..tools.globalVariable import date_now, get_pin, emails
 from ..tools.uploadFiles import descompressRAR, get_extension
 
 
@@ -83,6 +84,18 @@ class ClosedProjectView(JSONResponseMixin, View):
     def post(self, request, *args, **kwargs):
         if request.is_ajax():
             try:
+                pr = dict()
+                try:
+                    pr = Proyecto.objects.get(proyecto_id=kwargs['pro'])
+                    kwargs['pk'] = {
+                        'pr': pr.proyecto_id,
+                        'name': pr.nompro,
+                        'customers': pr.ruccliente.razonsocial}
+                    issue = 'APERTURA DE PROYECTO %s %s - %s' % (pr.proyecto_id, pr.nompro, pr.ruccliente.razonsocial)
+                    fs = Email.objects.filter(issue=issue)
+                    kwargs['fors'] = fs[0].fors if fs else emails
+                except Proyecto.DoesNotExist:
+                    pass
                 if 'storage' in request.POST:
                     try:
                         cl = CloseProject.objects.get(project_id=kwargs['pro'])

@@ -186,17 +186,23 @@ app.controller 'proCtrl', ($scope, $http, $cookies) ->
     $scope.pcustomers = true
     $scope.pprojects = false
     $scope.tadmin = false
+    $scope.pstatus = ''
+    $scope.allprojects = []
     angular.element(document).ready ->
+        angular.element('select').material_select()
         $scope.lCustomersCbox()
         $scope.listCustomers()
         $scope.permission = angular.element("[name=permission]").val()
+        $scope.pstatus = 'AC'
+        $scope.getstatus()
         if $scope.permission is 'administrator' or $scope.permission is 'ventas'
             $scope.tadmin = true
+            $scope.sfcustomers = true
         if $scope.permission is 'operaciones'
             $scope.pprojects = true
             $scope.pcustomers = false
             $scope.sfcustomers = false
-            $scope.sfprojects = false
+            $scope.sfprojects = true
             $scope.sTable()
         return
     $scope.listCustomers = ->
@@ -236,8 +242,11 @@ app.controller 'proCtrl', ($scope, $http, $cookies) ->
             $http.get '', params: data
                 .success (response) ->
                     if response.status
-                        $("##{data.customer}").html Mustache.render """{{#projects}} <li class="collection-item avatar" ondblclick="location.href='manager/{{pk}}/'">
-                            <i class="fa fa-building circle" onClick="location.href='manager/{{pk}}/'"></i>
+                        $("##{data.customer}").html Mustache.render """{{#projects}}
+                            <li class="collection-item avatar" ondblclick="location.href='manager/{{pk}}/'">
+                                <a href="manager/{{pk}}/">
+                                    <i class="fa fa-building circle light-blue darken-3"></i>
+                                </a>
                             <span class="title"><strong>{{pk}} - {{fields.nompro}}</strong></span>
                             <div class="row">
                               <div class="col l6">
@@ -252,6 +261,14 @@ app.controller 'proCtrl', ($scope, $http, $cookies) ->
                               </div>
                               <div class="col l4">
                                 <strong>Termino: </strong> {{fields.fin}}
+                              </div>
+                              <div class="col l4">
+                                <strong>Cerrado:</strong>
+                                <i class="fa {{#complete.storage}}fa-check-square-o{{/complete.storage}}{{^complete.storage}}fa-square-o{{/complete.storage}}"></i>
+                                <i class="fa {{#complete.operations}}fa-check-square-o{{/complete.operations}}{{^complete.operations}}fa-square-o{{/complete.operations}}"></i>
+                                <i class="fa {{#complete.quality}}fa-check-square-o{{/complete.quality}}{{^complete.quality}}fa-square-o{{/complete.quality}}"></i>
+                                <i class="fa {{#complete.accounting}}fa-check-square-o{{/complete.accounting}}{{^complete.accounting}}fa-square-o{{/complete.accounting}}"></i>
+                                <i class="fa {{#complete.sales}}fa-check-square-o{{/complete.sales}}{{^complete.sales}}fa-square-o{{/complete.sales}}"></i>
                               </div>
                             </div>
                             <a href="/almacen/keep/project/{{pk}}/edit/" data-ng-show="tadmin" target="popup" class="secondary-content grey-text text-darken-3s #{ if not $scope.tadmin then 'hide'}"><i class="fa fa-edit"></i></a>
@@ -281,10 +298,39 @@ app.controller 'proCtrl', ($scope, $http, $cookies) ->
         if $scope.pprojects
             $scope.sfprojects = !$scope.sfprojects
         return
+    $scope.getClass = (status) ->
+        return if status then 'fa-check-square-o' else 'fa-square-o'
     $scope.sTable = ->
         row = angular.element("#lprojects > tbody > tr")
         if not row.length
             $scope.ProjectsAll()
+        return
+    $scope.getstatus = ->
+        $http.get '', params: getstatus: true
+        .success (response) ->
+            if response.status
+                $scope.gstatus = response.gstatus
+                setTimeout ->
+                    angular.element('select').material_select('update')
+                , 600
+                return
+            else
+                console.warn "#{response.raise}"
+                return
+        return
+    $scope.gprojectstatus = ->
+        $scope.allprojects = []
+        prms =
+            sgproject: true
+            status: $scope.pstatus
+        $http.get "", params: prms
+        .success (response) ->
+            if response.status
+                $scope.allprojects = response.projects
+                return
+            else
+                console.warn "#{response.raise} "
+                return
         return
     $scope.$watch 'scustomers', ->
         $('.collapsible').collapsible()

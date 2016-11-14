@@ -118,6 +118,11 @@ do ->
                         if response.status
                             $scope.sComplete()
                             Materialize.toast "<i class='fa fa-check fa-lg green-text'></i>&nbsp;Almacén Cerrado", 4000
+                            prms =
+                                mails:response.fors
+                                issue:"APERTURA DE PROYECTO #{response.pr.pk} #{response.pr.name} - #{response.pr.customers}"
+                                body : $scope.makeBody(response)
+                            sendMail()
                             return
                         else
                             Materialize.toast "<i class='fa fa-times fa-lg red-text'></i>&nbsp;#{repsonse.raise}", 4000
@@ -308,6 +313,26 @@ do ->
                     Materialize.toast "<i class='fa fa-times fa-lg red-text'></i> #{response.raise}"
                 return
             return
+        sendMail = (options={}) ->
+            Materialize.toast '<i class="fa fa-refresh fa-spin fa-2x"></i> Estamos enviado el correo', 'some', 'toast-static'
+            prm =
+                forsb: options.mails
+                issue: options.issue
+                body: options.body
+                callback: 'JSON_CALLBACK'
+            # cpFactory.formCross "http://190.41.246.91:3000/mailer/", prm
+            cpFactory.formCross "", prm
+            .success (rescross) ->
+                if rescross.status
+                    angular.element(".toast-static").remove()
+                    Materialize.toast '<i class="fa fa-paper-plane-o fa-lg"></i>&nbsp; Enviado correntamente!', 4000
+                    return
+                else
+                    Materialize.toast 'Se ha producido algun error #{rescross}', 7000
+                    return
+            return
+        $scope.makeBody = (options={}) ->
+            return """<p>Operaciones Frecuentes</p><p><strong> CIERRE DE PROYECTO </strong></p>"""
         ## cpCtrl
         $scope.$watch 'call', (nw, old) ->
             if nw isnt undefined

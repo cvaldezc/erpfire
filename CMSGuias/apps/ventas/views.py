@@ -168,6 +168,28 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                     context['projects'] = simplejson.loads(
                                             serializers.serialize(
                                                 'json', projects))
+                    for x in context['projects']:
+                        complete = {
+                                'storage': False,
+                                'operations': False,
+                                'quality': False,
+                                'accounting': False,
+                                'sales': False}
+                        try:
+                            cl = CloseProject.objects.get(project_id=x['pk'])
+                            if cl.storageclose != None and cl.storageclose != False:
+                                complete['storage'] = True
+                            if cl.letterdelivery != None and cl.letterdelivery != '':
+                                complete['operations'] = True
+                            if cl.documents != None and cl.documents != '':
+                                complete['quality'] = True
+                            if cl.accounting != None and cl.accounting != False:
+                                complete['accounting'] = True
+                            if cl.status != None and cl.status != 'PE':
+                                complete['sales'] = True
+                        except CloseProject.DoesNotExist:
+                            pass
+                        x['complete'] = complete
                     context['status'] = True
                 if 'allProjects' in request.GET:
                     if area == 'ventas' or area == 'administrator':
@@ -200,7 +222,32 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                     #     co += 1
                     context['projects'] = simplejson.loads(
                                             serializers.serialize(
-                                                'json', projects.order_by('-proyecto_id')))
+                                                'json',
+                                                projects.order_by('-proyecto_id'),
+                                                relations=('ruccliente',)))
+                    # set status of closed project
+                    for x in context['projects']:
+                        complete = {
+                                'storage': False,
+                                'operations': False,
+                                'quality': False,
+                                'accounting': False,
+                                'sales': False}
+                        try:
+                            cl = CloseProject.objects.get(project_id=x['pk'])
+                            if cl.storageclose != None and cl.storageclose != False:
+                                complete['storage'] = True
+                            if cl.letterdelivery != None and cl.letterdelivery != '':
+                                complete['operations'] = True
+                            if cl.documents != None and cl.documents != '':
+                                complete['quality'] = True
+                            if cl.accounting != None and cl.accounting != False:
+                                complete['accounting'] = True
+                            if cl.status != None and cl.status != 'PE':
+                                complete['sales'] = True
+                        except CloseProject.DoesNotExist:
+                            pass
+                        x['complete'] = complete
                     context['status'] = True
                 if 'ascAllProjects' in request.GET:
                     context['projects'] = json.loads(serializers.serialize(
@@ -210,8 +257,65 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                             ~Q(status='DA')
                             ).order_by('-proyecto_id')))
                     context['status'] = True
+                if 'getstatus' in request.GET:
+                    gs = Proyecto.objects.all().distinct('status').order_by('status')
+                    context['gstatus'] = [{'key': x.status, 'val': globalVariable.status[x.status]} for x in gs] 
+                    context['status'] = True
+                if 'sgproject' in request.GET:
+                    if area == 'ventas' or area == 'administrator':
+                        # print 'Aqui ingresa admin'
+                        projects = Proyecto.objects.filter(
+                                    Q(flag=True),
+                                    Q(status=request.GET['status']))#.order_by('-proyecto_id')
+                    elif area == 'operaciones':
+                        # print 'Aqui ingresa opera'
+                        projects = Proyecto.objects.filter(
+                                    Q(flag=True),
+                                    Q(status=request.GET['status']),
+                                    empdni_id=request.user.get_profile(
+                                        ).empdni_id)#.order_by('-proyecto_id')
+                    elif area == 'logistica' or area == 'almacen':
+                        # print 'Aqui ingresa log sto'
+                        projects = Proyecto.objects.filter(
+                                    Q(flag=True),
+                                    Q(status=request.GET['status']))#.order_by('-proyecto_id')
+                    cnom = request.user.get_profile(
+                            ).empdni.charge.cargos.lower()
+                    if cnom == 'jefe de operaciones':
+                        projects = Proyecto.objects.filter(
+                                    Q(flag=True),
+                                    Q(status=request.GET['status']))#.order_by('-proyecto_id')
+                    context['projects'] = simplejson.loads(
+                                            serializers.serialize(
+                                                'json',
+                                                projects.order_by('-proyecto_id'),
+                                                relations=('ruccliente',)))
+                    # set status of closed project
+                    for x in context['projects']:
+                        complete = {
+                                'storage': False,
+                                'operations': False,
+                                'quality': False,
+                                'accounting': False,
+                                'sales': False}
+                        try:
+                            cl = CloseProject.objects.get(project_id=x['pk'])
+                            if cl.storageclose != None and cl.storageclose != False:
+                                complete['storage'] = True
+                            if cl.letterdelivery != None and cl.letterdelivery != '':
+                                complete['operations'] = True
+                            if cl.documents != None and cl.documents != '':
+                                complete['quality'] = True
+                            if cl.accounting != None and cl.accounting != False:
+                                complete['accounting'] = True
+                            if cl.status != None and cl.status != 'PE':
+                                complete['sales'] = True
+                        except CloseProject.DoesNotExist:
+                            pass
+                        x['complete'] = complete
+                    context['status'] = True
             except ObjectDoesNotExist as e:
-                print e
+                # print e
                 context['raise'] = str(e)
                 context['status'] = False
             return self.render_to_json_response(context)
