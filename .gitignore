@@ -10,6 +10,6 @@ django_yuml/
 **/vendor/
 node_modules/
 npm-debug.log
-**/images/
+**/images/icrlogo.png
 .vscode/
 CMSGuias/static/load.json

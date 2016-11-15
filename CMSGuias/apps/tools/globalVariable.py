@@ -28,6 +28,7 @@ status = {
     'PE': 'PENDIENTE',
     'EN': 'ENVIADO',
     'UP': 'CARGADO',
+    'CL': 'RECICLADO',
 }
 
 doc_status = [
@@ -41,6 +42,7 @@ doc_status = [
     {'key': 'PE', 'status': 'PENDIENTE'},
     {'key': 'EN', 'status': 'ENVIADO'},
     {'key': 'UP', 'status': 'CARGADO'},
+    {'key': 'CL', 'status': 'RECICLADO'},
 ]
 
 # types nipples
