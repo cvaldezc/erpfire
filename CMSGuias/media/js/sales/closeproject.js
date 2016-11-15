@@ -74,7 +74,6 @@
   };
   app.factory('cpFactory', cpFactories);
   app.controller('cpCtrl', function($rootScope, $scope, $log, cpFactory) {
-    var sendMail;
     $scope.call = false;
     $scope.mstyle = '';
     $scope.ctrl = {
@@ -162,9 +161,9 @@
               prms = {
                 mails: response.fors,
                 issue: "APERTURA DE PROYECTO " + response.pr.pk + " " + response.pr.name + " - " + response.pr.customers,
-                body: ""
+                body: $scope.makeBody(response)
               };
-              sendMail();
+              $scope.sendMail(prms);
             } else {
               Materialize.toast("<i class='fa fa-times fa-lg red-text'></i>&nbsp;" + repsonse.raise, 4000);
             }
@@ -364,12 +363,12 @@
         }
       });
     };
-    sendMail = function(options) {
+    $scope.sendMail = function(options) {
       var prm;
       if (options == null) {
         options = {};
       }
-      Materialize.toast('<i class="fa fa-refresh fa-spin fa-2x"></i> Estamos enviado el correo', 'some', 'toast-static');
+      Materialize.toast('<i class="fa fa-refresh fa-spin fa-2x"></i>&nbsp; Estamos enviado el correo', 'some', 'toast-static');
       prm = {
         forsb: options.mails,
         issue: options.issue,
@@ -389,7 +388,7 @@
       if (options == null) {
         options = {};
       }
-      return "<p>Operaciones Frecuentes</p><p><strong> CIERRE DE PROYECTO </strong></p>";
+      return "<p>Operaciones Frecuentes</p>\n<p><strong> CIERRE DE PROYECTO </strong></p>\n<p>\n    <strong>PROYECTO:</strong> " + options.pr.pk + " " + options.pr.name + " <br />\n    <strong>FECHA:</strong> " + (new Date()) + " <br />\n    <strong>AREA CERRADA:</strong> " + options.area + "<br />\n    <br />\n    <b>" + options.pr.company.name + "</b>\n</p>";
     };
     $scope.$watch('call', function(nw, old) {
       if (nw !== void 0) {

@@ -109,7 +109,7 @@ emails = [
     # 'mauromartinezicr@gmail.com',
     'a.atenciov@icrperusa.com',
     'jhon.martinez@icrperusa.com',
-    'ingeneria1@icrperusa.com',
+    'ingenieria1@icrperusa.com',
     'info@icrperusa.com']
 
 # Type of project

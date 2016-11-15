@@ -87,13 +87,14 @@ class ClosedProjectView(JSONResponseMixin, View):
                 pr = dict()
                 try:
                     pr = Proyecto.objects.get(proyecto_id=kwargs['pro'])
-                    kwargs['pk'] = {
-                        'pr': pr.proyecto_id,
-                        'name': pr.nompro,
-                        'customers': pr.ruccliente.razonsocial}
+                    kwargs['pr'] = {
+                        'pk': pr.proyecto_id,
+                        'name': pr.nompro.upper(),
+                        'customers': pr.ruccliente.razonsocial.upper(),
+                        'company': request.session.get('company')}
                     issue = 'APERTURA DE PROYECTO %s %s - %s' % (pr.proyecto_id, pr.nompro, pr.ruccliente.razonsocial)
-                    fs = Email.objects.filter(issue=issue)
-                    kwargs['fors'] = fs[0].fors if fs else emails
+                    fs = Emails.objects.filter(issue=issue)
+                    kwargs['fors'] = fs[0].fors if fs else ','.join(emails)
                 except Proyecto.DoesNotExist:
                     pass
                 if 'storage' in request.POST:
@@ -106,6 +107,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                     cl.datestorage = date_now('datetime')
                     cl.performedstorage_id = request.user.get_profile().empdni_id
                     cl.save()
+                    kwargs['area'] = 'ALMACÉN'
                     kwargs['status'] = True
                 if 'operations' in request.POST:
                     try:
@@ -117,6 +119,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                     cl.dateletter = date_now('datetime')
                     cl.performedoperations_id = request.user.get_profile().empdni_id
                     cl.save()
+                    kwargs['area'] = 'OPERACIONES'
                     kwargs['status'] = True
                 if 'quality' in request.POST:
                     try:
@@ -130,6 +133,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                     cl.save()
                     if get_extension(cl.documents.name) == '.rar':
                         descompressRAR(cl.documents)
+                    kwargs['area'] = 'CALIDAD'
                     kwargs['status'] = True
                 if 'accounting' in request.POST:
                     try:
@@ -163,6 +167,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                     cl = CloseProject.objects.get(project_id=kwargs['pro'])
                     cl.accounting = True
                     cl.save()
+                    kwargs['area'] = 'CONTABILIDAD'
                     kwargs['status'] = True
                 if 'sales' in request.POST:
                     cl = CloseProject.objects.get(project_id=kwargs['pro'])
@@ -184,6 +189,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                             pr.status = 'CL'
                             pr.flag = False
                             pr.save()
+                            kwargs['area'] = 'VENTAS | PROYECTO CERRADO'
                             kwargs['status'] = True
             except (ObjectDoesNotExist or Exception) as e:
                 kwargs['raise'] = str(e)

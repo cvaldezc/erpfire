@@ -119,10 +119,10 @@ do ->
                             $scope.sComplete()
                             Materialize.toast "<i class='fa fa-check fa-lg green-text'></i>&nbsp;Almacén Cerrado", 4000
                             prms =
-                                mails:response.fors
-                                issue:"APERTURA DE PROYECTO #{response.pr.pk} #{response.pr.name} - #{response.pr.customers}"
+                                mails: response.fors
+                                issue: "APERTURA DE PROYECTO #{response.pr.pk} #{response.pr.name} - #{response.pr.customers}"
                                 body : $scope.makeBody(response)
-                            sendMail()
+                            $scope.sendMail prms
                             return
                         else
                             Materialize.toast "<i class='fa fa-times fa-lg red-text'></i>&nbsp;#{repsonse.raise}", 4000
@@ -313,8 +313,8 @@ do ->
                     Materialize.toast "<i class='fa fa-times fa-lg red-text'></i> #{response.raise}"
                 return
             return
-        sendMail = (options={}) ->
-            Materialize.toast '<i class="fa fa-refresh fa-spin fa-2x"></i> Estamos enviado el correo', 'some', 'toast-static'
+        $scope.sendMail = (options={}) ->
+            Materialize.toast '<i class="fa fa-refresh fa-spin fa-2x"></i>&nbsp; Estamos enviado el correo', 'some', 'toast-static'
             prm =
                 forsb: options.mails
                 issue: options.issue
@@ -332,7 +332,15 @@ do ->
                     return
             return
         $scope.makeBody = (options={}) ->
-            return """<p>Operaciones Frecuentes</p><p><strong> CIERRE DE PROYECTO </strong></p>"""
+            return """<p>Operaciones Frecuentes</p>
+                <p><strong> CIERRE DE PROYECTO </strong></p>
+                <p>
+                    <strong>PROYECTO:</strong> #{options.pr.pk} #{options.pr.name} <br />
+                    <strong>FECHA:</strong> #{new Date()} <br />
+                    <strong>AREA CERRADA:</strong> #{options.area}<br />
+                    <br />
+                    <b>#{options.pr.company.name}</b>
+                </p>"""
         ## cpCtrl
         $scope.$watch 'call', (nw, old) ->
             if nw isnt undefined
