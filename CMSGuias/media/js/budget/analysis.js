@@ -173,7 +173,7 @@ editAnalysis = function() {
   $('[name=unit]').val(this.getAttribute('data-unit'));
   $('[name=performance]').val(this.getAttribute('data-performance'));
   $('[name=edit]').val(this.getAttribute('data-value'));
-  $('#manalysis').openModal('show');
+  $('#manalysis').modal('open');
 };
 
 delAnalysis = function(event) {

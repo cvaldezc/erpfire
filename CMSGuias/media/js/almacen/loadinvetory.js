@@ -147,7 +147,7 @@ controller = function($scope, $timeout, $q, inventoryFactory) {
       if (response.status) {
         $scope.details = response.materials;
         $scope.amount = response.amount;
-        angular.element("#mdetails").openModal({
+        angular.element("#mdetails").modal('open', {
           dismissible: false
         });
       } else {

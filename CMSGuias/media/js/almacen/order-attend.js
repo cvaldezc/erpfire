@@ -373,7 +373,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
               'brand': prm.brand,
               'model': prm.model
             };
-            angular.element("#mstock").openModal({
+            angular.element("#mstock").modal('open', {
               dismissible: false
             });
             console.info(prm);
@@ -444,7 +444,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
           model = $scope.gmodel === obj.model;
           if (mat && brand && model) {
             $scope.snip = obj.details;
-            angular.element("#snip").openModal({
+            angular.element("#snip").modal('open', {
               dismissible: false
             });
           }
@@ -453,7 +453,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
         consulting().then(function(result) {
           if (result.length > 0) {
             $scope.snip = result;
-            angular.element("#snip").openModal({
+            angular.element("#snip").modal('open', {
               dismissible: false
             });
           }
@@ -774,7 +774,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
               $timeout(function() {
                 $scope.vgenrem = true;
                 $scope.nroguide = response.code;
-                angular.element("#mprint").openModal({
+                angular.element("#mprint").modal('open', {
                   dismissible: false
                 });
               }, 1800);

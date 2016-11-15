@@ -329,7 +329,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
 							'materials': prm.materials
 							'brand': prm.brand
 							'model': prm.model
-						angular.element("#mstock").openModal
+						angular.element("#mstock").modal 'open',
 							dismissible: false
 						console.info prm
 						$scope.cstock.splice 0, 1
@@ -396,7 +396,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
 					model = ($scope.gmodel is obj.model)
 					if mat and brand and model
 						$scope.snip = obj.details
-						angular.element("#snip").openModal
+						angular.element("#snip").modal 'open',
 							dismissible: false
 						return
 			else
@@ -405,7 +405,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
 					if result.length > 0
 						# show modal
 						$scope.snip = result
-						angular.element("#snip").openModal
+						angular.element("#snip").modal 'open',
 							dismissible: false
 						return
 				return
@@ -722,7 +722,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
 							$timeout ->
 								$scope.vgenrem = true
 								$scope.nroguide = response.code
-								angular.element("#mprint").openModal
+								angular.element("#mprint").modal 'open',
 									dismissible: false
 								return
 							, 1800
