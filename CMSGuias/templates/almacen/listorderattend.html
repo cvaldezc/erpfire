@@ -1,78 +1,78 @@
 {% extends 'base.html' %}
 {% block menu %}
-	{% include "menus/storage_menu.htm" %}
+  {% include "menus/storage_menu.htm" %}
 {% endblock menu %}
 {% block content %}
 <div class="container" ng-app="appAO" ng-controller="CtrlAO">
-	<input type="hidden" ng-init="area='{{request.user.get_profile.empdni.charge.area|lower}}'" ng-model="area">
-	<input type="hidden" ng-init="cargo='{{request.user.get_profile.empdni.charge.cargos|lower}}'" ng-model="cargo">
-	<div class="well">
-	<h1 class="text-danger">Atender Pedidos</h1>
-		<!--<input type="hidden" class="empdni" value="{{user.get_profile.empdni}}">-->
-		<div class="row show-grid">
-			<div class="col-md-12">
-				<div class="table-responsive">
-					<table class="table table-hovered table-bordered table-condensed table-float">
-						<caption>
-							<div class="form-group text-left">
-								<label for="" class="control-label text-left">Busqueda</label>
-								<input type="text" ng-model="search" class="form-control">
-							</div>
-						</caption>
-						<thead>
-							<tr class="brand-danger text-white">
-								<th class="text-center">Item</th>
-								<th class="text-center">Codigo</th>
-								<th>Proyecto</th>
-								<th>Almacén</th>
-								<th class="text-center">Fecha Traslado</th>
-								<th class="text-center">Estado</th>
-								<th class="text-center">Vista Previa</th>
-								<th class="text-center">Atender</th>
-								{% if request.user.get_profile.empdni.charge.area|lower == 'administrator' %}
-									<th>Anular</th>
-								{% endif %}
-							</tr>
-						</thead>
-						<tfoot>
-							<tr ng-hide="orders.length">
-								<th colspan="9" class="text-center">
-									<i class="fa fa-spinner fa-5x fa-pulse fa-fw"></i>
-								</th>
-							</tr>
-						</tfoot>
-						<tbody>
-						{% verbatim %}
-							<tr class="tr-{{x.pk}}" ng-repeat="x in orders | filter: search">
-								<td class="text-center">{{$index+1}}</td>
-								<td>{{x.pk}}</td>
-								<td>{{ x.fields.proyecto.pk }} {{x.fields.proyecto.fields.nompro}}</td>
-								<td>{{x.fields.almacen.fields.nombre}}</td>
-								<td class="text-center">{{x.fields.traslado}}</td>
-								<td class="text-center">{{x.fields.status}}</td>
-								<td class="text-center">
-									<a href="/reports/orders/{{x.pk}}/{{x.fields.status}}/" target="_blank" class="btn btn-xs btn-link text-black">
-										<span class="fa fa-file-text"></span>
-									</a>
-								</td>
-								<td class="text-center">
-									<a  class="btn btn-xs btn-link text-black" href="/almacen/order/attend/{{x.pk}}/">
-										<span class="glyphicon glyphicon-shopping-cart"></span>
-									</a>
-								</td>
-								<td class="text-center" ng-if="area == 'administrator' || cargo == 'jefe de almacen'">
-									<a href="#" class="btn btn-xs text-black" ng-click="cancelOrder($event)" data-order="{{x.pk}}">
-										<i class="fa fa-fire"></i>
-									</a>
-								</td>
-							</tr>
-						{% endverbatim %}
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
+  <input type="hidden" ng-init="area='{{request.user.get_profile.empdni.charge.area|lower}}'" ng-model="area">
+  <input type="hidden" ng-init="cargo='{{request.user.get_profile.empdni.charge.cargos|lower}}'" ng-model="cargo">
+  <div class="well">
+  <h1 class="text-danger">Atender Pedidos</h1>
+    <!--<input type="hidden" class="empdni" value="{{user.get_profile.empdni}}">-->
+    <div class="row show-grid">
+      <div class="col-md-12">
+        <div class="table-responsive">
+          <table class="table table-hovered table-bordered table-condensed table-float">
+            <caption>
+              <div class="form-group text-left">
+                <label for="" class="control-label text-left">Busqueda</label>
+                <input type="text" ng-model="search" class="form-control">
+              </div>
+            </caption>
+            <thead>
+              <tr class="brand-danger text-white">
+                <th class="text-center">Item</th>
+                <th class="text-center">Codigo</th>
+                <th>Proyecto</th>
+                <th>Almacén</th>
+                <th class="text-center">Fecha Traslado</th>
+                <th class="text-center">Estado</th>
+                <th class="text-center">Vista Previa</th>
+                <th class="text-center">Atender</th>
+                {% if request.user.get_profile.empdni.charge.area|lower == 'administrator' %}
+                  <th>Anular</th>
+                {% endif %}
+              </tr>
+            </thead>
+            <tfoot>
+              <tr ng-hide="orders.length">
+                <th colspan="9" class="text-center">
+                  <i class="fa fa-refresh fa-5x fa-pulse fa-fw"></i>
+                </th>
+              </tr>
+            </tfoot>
+            <tbody>
+            {% verbatim %}
+              <tr class="tr-{{x.pk}}" ng-repeat="x in orders | filter: search">
+                <td class="text-center">{{$index+1}}</td>
+                <td>{{x.pk}}</td>
+                <td>{{ x.fields.proyecto.pk }} {{x.fields.proyecto.fields.nompro}}</td>
+                <td>{{x.fields.almacen.fields.nombre}}</td>
+                <td class="text-center">{{x.fields.traslado}}</td>
+                <td class="text-center">{{x.fields.status}}</td>
+                <td class="text-center">
+                  <a href="/reports/orders/{{x.pk}}/{{x.fields.status}}/" target="_blank" class="btn btn-xs btn-link text-black">
+                    <span class="fa fa-file-text"></span>
+                  </a>
+                </td>
+                <td class="text-center">
+                  <a  class="btn btn-xs btn-link text-black" href="/almacen/order/attend/{{x.pk}}/">
+                    <span class="glyphicon glyphicon-shopping-cart"></span>
+                  </a>
+                </td>
+                <td class="text-center" ng-if="area == 'administrator' || cargo == 'jefe de almacen'">
+                  <a href="#" class="btn btn-xs text-black" ng-click="cancelOrder($event)" data-order="{{x.pk}}">
+                    <i class="fa fa-fire"></i>
+                  </a>
+                </td>
+              </tr>
+            {% endverbatim %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% csrf_token %}
 <script defer type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>

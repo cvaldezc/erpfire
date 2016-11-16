@@ -308,7 +308,7 @@ def view_keep_add_project(request):
                     add.proyecto_id = cod.strip()
                     add.flag = True
                     add.save()
-            return HttpResponseRedirect('/almacen/keep/project/')
+            return HttpResponseRedirect('/sales/projects/')
         if request.method == 'GET':
             form = forms.addProjectForm()
         ctx = {'form': form}
@@ -334,7 +334,7 @@ def view_keep_edit_project(request, proid):
                 edit.flag = True
                 # edit.proyecto_id = request.POST.get('proyecto_id')
                 edit.save()
-                return HttpResponseRedirect('/almacen/keep/project/')
+                return HttpResponseRedirect('/sales/projects/')
         ctx = {'form': form, 'idpro': proid}
         return render_to_response(
             'almacen/editproject.html',

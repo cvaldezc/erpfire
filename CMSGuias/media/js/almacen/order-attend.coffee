@@ -13,9 +13,9 @@ app.directive 'cinmam', ($parse) ->
   link: (scope, element, attrs, ngModel) ->
     element.bind 'change, blur', (event) ->
       if !isNaN(element.context.value) and element.context.value != ""
-        val = parseFloat element.context.value
+        val = parseFloat(parseFloat(element.context.value).toFixed(2))
       else
-        val = parseFloat attrs.max
+        val = parseFloat(parseFloat(attrs.max).toFixed(2))
       max = parseFloat attrs.max
       min = parseFloat attrs.min
       result = 0
@@ -28,7 +28,7 @@ app.directive 'cinmam', ($parse) ->
       #  console.log attrs
       if attrs.hasOwnProperty 'stk'
         console.log 'inside stk'
-        stk = parseFloat attrs.stk
+        stk = parseFloat(parseFloat(attrs.stk).toFixed(2))
         if result > stk
           result = stk
       if attrs.hasOwnProperty 'ngModel'
@@ -231,9 +231,9 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
             'mname': value.fields.model.fields.model
             'tipo': value.fields.tipo
             'meter': value.fields.metrado
-            'quantity': parseFloat((value.fields.cantidad).toFixed(2))
+            'quantity': parseFloat(parseFloat(value.fields.cantidad).toFixed(2))
             'send': value.fields.cantshop
-            'guide': parseFloar((value.fields.cantguide).toFixed(2))
+            'guide': parseFloat(parseFloat(value.fields.cantguide).toFixed(2))
             'tag': value.fields.tag
             # 'status': false
           return
@@ -288,7 +288,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
           model: el.attributes["data-model"].value
           nbrand: el.attributes["data-nbrand"].value
           nmodel: el.attributes["data-nmodel"].value
-          quantity: parseFloat((el.attributes['data-quantity'].value).toFixed(2))
+          quantity: el.attributes['data-quantity'].value
         return
     $q.all(promises).then (response) ->
       defer.resolve response
@@ -316,8 +316,8 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
             # show stock item and remove item cstock
             # return false
             $scope.stks = new Array()
-            $scope.istock = parseFloat (response.stock).toFixed(2)
-            $scope.qmax = parseFloat (prm.quantity).toFixed(2)
+            $scope.istock = response.stock
+            $scope.qmax = parseFloat(parseFloat(prm.quantity).toFixed(2))
             $scope.gbrand = prm.brand
             $scope.gmodel = prm.model
             $scope.gmaterials = prm.materials
@@ -419,7 +419,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
     tmp = new Array()
     amount = 0
     angular.forEach $scope.stks, (obj, index) ->
-      amount += obj['quantity']
+      amount += parseFloat(parseFloat(obj['quantity']).toFixed(2))
       return
     # console.log amount
     if amount > $scope.qmax
@@ -450,7 +450,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
                 'model': stk.model
                 'nbrand': stk.nbrand
                 'nmodel': stk.nmodel
-                'quantity': stk.quantity
+                'quantity': parseFloat(parseFloat(stk.quantity).toFixed(2))
               return
           return
       angular.forEach $scope.fchk, (obj, index) ->
@@ -555,31 +555,49 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
     $scope.verifyNip().then (response) ->
       console.warn response
       amount = 0
-      for i, x of $scope.snip
-        amount += ((x.meter * x.guide)/100)
-      if amount > $scope.stks[$scope.indexshownip].stock 
-        Materialize.toast "<i class='fa fa-times red-text'></i>&nbsp; Stock es menor a lo seleccionado.", 8000
-        $scope.snip = new Array()
-        angular.element("#snip").modal('close')
-        return false
-      else
-        $scope.stks[$scope.indexshownip].quantity = amount
-        if response >= 0
-          $scope.nipdetails[response].details = $scope.snip
+      defamount = ->
+        defer = $q.defer()
+        promises = []
+        for i, x of $scope.snip
+          im = 0
+          if x.guide == 0
+            continue
+          else
+            promises.push ((x.meter * x.guide) / 100)
+        $q.all(promises).then (result) ->
+          am = 0
+          for x in promises
+            am += x
+          defer.resolve am
+          return
+        return defer.promise
+      defamount().then (summ) ->
+        amount = parseFloat(Number(summ).toFixed(2))
+        if amount > $scope.stks[$scope.indexshownip].stock 
+          Materialize.toast "<i class='fa fa-times red-text'></i>&nbsp; Stock es menor a lo seleccionado.", 8000
           $scope.snip = new Array()
           angular.element("#snip").modal('close')
-          # console.log $scope.nipdetails
+          # return false
           return
         else
-          $scope.nipdetails.push
-            'materials': $scope.gmaterials
-            'brand': $scope.gbrand
-            'model': $scope.gmodel
-            'details': $scope.snip
-          $scope.snip = new Array()
-          angular.element("#snip").modal('close')
-          # console.log $scope.nipdetails
-          return
+          $scope.stks[$scope.indexshownip].quantity = parseFloat(parseFloat(amount).toFixed(2))
+          if response >= 0
+            $scope.nipdetails[response].details = $scope.snip
+            $scope.snip = new Array()
+            angular.element("#snip").modal('close')
+            # console.log $scope.nipdetails
+            return
+          else
+            $scope.nipdetails.push
+              'materials': $scope.gmaterials
+              'brand': $scope.gbrand
+              'model': $scope.gmodel
+              'details': $scope.snip
+            $scope.snip = new Array()
+            angular.element("#snip").modal('close')
+            # console.log $scope.nipdetails
+            return
+      return
     return
 
   $scope.setZeroNip = ->
@@ -680,7 +698,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
     return
 
   $scope.genGuide = ->
-    if $scope.ngvalid
+    if $scope.ngvalid = true
       # console.log $scope.guide
       prms = $scope.guide
       if isNaN(Date.parse(prms.transfer))
@@ -707,6 +725,8 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
         cancelButtonText:"No"
       , (isConfirm) ->
         if isConfirm
+          $scope.ngvalid = false
+          Materialize.toast '<i class="fa fa-cog fa-spin fa-fw fa-2x"></i>&nbsp;GENERANDO GUIA ...', 'sometimes', 'toast-quit grey-text text-darken-4 grey lighten-4'
           $scope.vgenrem = true
           prms['generateGuide'] = true
           prms['details'] = JSON.stringify $scope.dguide
@@ -716,7 +736,9 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
           console.info prms
           attendFactory.genGuideRemision(prms)
           .success (response) ->
+            $scope.ngvalid = true
             if response.status
+              angular.element('.toast-quit').remove()
               angular.element("#mguide").modal('close')
               Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia <strong>#{prms.guide}</strong>", 2000
               $timeout ->

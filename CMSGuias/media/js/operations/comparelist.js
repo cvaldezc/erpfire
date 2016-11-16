@@ -97,9 +97,11 @@ app.controller('ctrl', function($scope, $cookies, $timeout, $q, fDSMetrado) {
   $scope.ename = "";
   $scope.eunit = "";
   angular.element(document).ready(function() {
-    angular.element('.modal').modal();
     console.log("estamos listos!");
     $scope.loadList();
+    setTimeout((function() {
+      angular.element('.modal').modal();
+    }), 600);
   });
   $scope.loadList = function() {
     $scope.loader = false;

@@ -59,7 +59,9 @@ app.factory('cpf', function($http, $cookies) {
 app.controller('cpC', function($scope, $timeout, cpf) {
   $scope.selected = {};
   $scope.dg = false;
-  angular.element(document).ready(function() {});
+  angular.element(document).ready(function() {
+    angular.element('.modal').modal();
+  });
   $scope.getSGroup = function() {
     var prm;
     prm = {

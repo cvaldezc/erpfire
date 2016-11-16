@@ -17,9 +17,9 @@ app.directive('cinmam', function($parse) {
       element.bind('change, blur', function(event) {
         var max, min, result, stk, val;
         if (!isNaN(element.context.value) && element.context.value !== "") {
-          val = parseFloat(element.context.value);
+          val = parseFloat(parseFloat(element.context.value).toFixed(2));
         } else {
-          val = parseFloat(attrs.max);
+          val = parseFloat(parseFloat(attrs.max).toFixed(2));
         }
         max = parseFloat(attrs.max);
         min = parseFloat(attrs.min);
@@ -33,7 +33,7 @@ app.directive('cinmam', function($parse) {
         }
         if (attrs.hasOwnProperty('stk')) {
           console.log('inside stk');
-          stk = parseFloat(attrs.stk);
+          stk = parseFloat(parseFloat(attrs.stk).toFixed(2));
           if (result > stk) {
             result = stk;
           }
@@ -282,9 +282,9 @@ controllers = function($scope, $timeout, $q, attendFactory) {
             'mname': value.fields.model.fields.model,
             'tipo': value.fields.tipo,
             'meter': value.fields.metrado,
-            'quantity': value.fields.cantidad,
+            'quantity': parseFloat(parseFloat(value.fields.cantidad).toFixed(2)),
             'send': value.fields.cantshop,
-            'guide': value.fields.cantguide,
+            'guide': parseFloat(parseFloat(value.fields.cantguide).toFixed(2)),
             'tag': value.fields.tag
           });
         });
@@ -358,7 +358,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
           if (response.status) {
             $scope.stks = new Array();
             $scope.istock = response.stock;
-            $scope.qmax = parseFloat(prm.quantity);
+            $scope.qmax = parseFloat(parseFloat(prm.quantity).toFixed(2));
             $scope.gbrand = prm.brand;
             $scope.gmodel = prm.model;
             $scope.gmaterials = prm.materials;
@@ -464,7 +464,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
     tmp = new Array();
     amount = 0;
     angular.forEach($scope.stks, function(obj, index) {
-      amount += obj['quantity'];
+      amount += parseFloat(parseFloat(obj['quantity']).toFixed(2));
     });
     if (amount > $scope.qmax) {
       Materialize.toast("<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad mayor a la requerida.", 6000);
@@ -495,7 +495,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
                 'model': stk.model,
                 'nbrand': stk.nbrand,
                 'nmodel': stk.nmodel,
-                'quantity': stk.quantity
+                'quantity': parseFloat(parseFloat(stk.quantity).toFixed(2))
               });
             }
           });
@@ -590,36 +590,58 @@ controllers = function($scope, $timeout, $q, attendFactory) {
   };
   $scope.selectNip = function() {
     $scope.verifyNip().then(function(response) {
-      var amount, i, ref, x;
+      var amount, defamount;
       console.warn(response);
       amount = 0;
-      ref = $scope.snip;
-      for (i in ref) {
-        x = ref[i];
-        amount += (x.meter * x.guide) / 100;
-      }
-      if (amount > $scope.stks[$scope.indexshownip].stock) {
-        Materialize.toast("<i class='fa fa-times red-text'></i>&nbsp; Stock es menor a lo seleccionado.", 8000);
-        $scope.snip = new Array();
-        angular.element("#snip").modal('close');
-        return false;
-      } else {
-        $scope.stks[$scope.indexshownip].quantity = amount;
-        if (response >= 0) {
-          $scope.nipdetails[response].details = $scope.snip;
+      defamount = function() {
+        var defer, i, im, promises, ref, x;
+        defer = $q.defer();
+        promises = [];
+        ref = $scope.snip;
+        for (i in ref) {
+          x = ref[i];
+          im = 0;
+          if (x.guide === 0) {
+            continue;
+          } else {
+            promises.push((x.meter * x.guide) / 100);
+          }
+        }
+        $q.all(promises).then(function(result) {
+          var am, j, len;
+          am = 0;
+          for (j = 0, len = promises.length; j < len; j++) {
+            x = promises[j];
+            am += x;
+          }
+          defer.resolve(am);
+        });
+        return defer.promise;
+      };
+      defamount().then(function(summ) {
+        amount = parseFloat(Number(summ).toFixed(2));
+        if (amount > $scope.stks[$scope.indexshownip].stock) {
+          Materialize.toast("<i class='fa fa-times red-text'></i>&nbsp; Stock es menor a lo seleccionado.", 8000);
           $scope.snip = new Array();
           angular.element("#snip").modal('close');
         } else {
-          $scope.nipdetails.push({
-            'materials': $scope.gmaterials,
-            'brand': $scope.gbrand,
-            'model': $scope.gmodel,
-            'details': $scope.snip
-          });
-          $scope.snip = new Array();
-          angular.element("#snip").modal('close');
+          $scope.stks[$scope.indexshownip].quantity = parseFloat(parseFloat(amount).toFixed(2));
+          if (response >= 0) {
+            $scope.nipdetails[response].details = $scope.snip;
+            $scope.snip = new Array();
+            angular.element("#snip").modal('close');
+          } else {
+            $scope.nipdetails.push({
+              'materials': $scope.gmaterials,
+              'brand': $scope.gbrand,
+              'model': $scope.gmodel,
+              'details': $scope.snip
+            });
+            $scope.snip = new Array();
+            angular.element("#snip").modal('close');
+          }
         }
-      }
+      });
     });
   };
   $scope.setZeroNip = function() {
@@ -730,7 +752,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
   };
   $scope.genGuide = function() {
     var prms;
-    if ($scope.ngvalid) {
+    if ($scope.ngvalid = true) {
       prms = $scope.guide;
       if (isNaN(Date.parse(prms.transfer))) {
         Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-2x'></i>&nbsp;Fecha de traslado Inconrecta!", 8000);
@@ -760,13 +782,17 @@ controllers = function($scope, $timeout, $q, attendFactory) {
         cancelButtonText: "No"
       }, function(isConfirm) {
         if (isConfirm) {
+          $scope.ngvalid = false;
+          Materialize.toast('<i class="fa fa-cog fa-spin fa-fw fa-2x"></i>&nbsp;GENERANDO GUIA ...', 'sometimes', 'toast-quit grey-text text-darken-4 grey lighten-4');
           $scope.vgenrem = true;
           prms['generateGuide'] = true;
           prms['details'] = JSON.stringify($scope.dguide);
           prms['nipp'] = JSON.stringify($scope.nipdetails);
           console.info(prms);
           attendFactory.genGuideRemision(prms).success(function(response) {
+            $scope.ngvalid = true;
             if (response.status) {
+              angular.element('.toast-quit').remove();
               angular.element("#mguide").modal('close');
               Materialize.toast("<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia <strong>" + prms.guide + "</strong>", 2000);
               $timeout(function() {

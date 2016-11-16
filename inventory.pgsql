@@ -117,7 +117,7 @@ BEGIN
   -- DECREASE TABLE INVENTORYBRAND 
   SELECT stock into _stk FROM almacen_inventorybrand WHERE materials_id LIKE NEW.materiales_id AND brand_id LIKE NEW.brand_id AND model_id LIKE NEW.model_id;
   IF (_stk IS NOT NULL) THEN
-    _stk := (_stk - NEW.cantguide);
+    _stk := ROUND((_stk - NEW.cantguide)::NUMERIC, 2);
     if _stk < 0 THEN
       _stk := 0;
     END IF;
@@ -127,7 +127,7 @@ BEGIN
   -- DECREASE TABLE DETPEDIDO
   SELECT cantshop INTO _shop FROM almacen_detpedido WHERE pedido_id LIKE NEW.order_id AND materiales_id LIKE NEW.materiales_id AND brand_id LIKE NEW.obrand_id AND model_id LIKE NEW.omodel_id;
   IF (_shop IS NOT NULL) THEN
-    _shop := (_shop - NEW.cantguide);
+    _shop := ROUND((_shop - NEW.cantguide)::NUMERIC, 2);
     IF _shop < 0 THEN
       _shop := 0;
     END IF;

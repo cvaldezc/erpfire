@@ -27,7 +27,7 @@ app.controller 'cpC', ($scope, $timeout, cpf) ->
     $scope.selected = {}
     $scope.dg = false
     angular.element(document).ready ->
-        
+        angular.element('.modal').modal()
         return
     $scope.getSGroup = ->
         prm =
