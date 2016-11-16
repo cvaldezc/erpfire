@@ -212,7 +212,7 @@ app.controller('proCtrl', function($scope, $http, $cookies) {
   $scope.pstatus = '';
   $scope.allprojects = [];
   angular.element(document).ready(function() {
-    angular.element('select').material_select();
+    angular.element('.mselect').material_select();
     $scope.lCustomersCbox();
     $scope.listCustomers();
     $scope.permission = angular.element("[name=permission]").val();
@@ -328,7 +328,7 @@ app.controller('proCtrl', function($scope, $http, $cookies) {
       if (response.status) {
         $scope.gstatus = response.gstatus;
         setTimeout(function() {
-          return angular.element('select').material_select('update');
+          return angular.element('.mselect').material_select('update');
         }, 600);
       } else {
         console.warn("" + response.raise);

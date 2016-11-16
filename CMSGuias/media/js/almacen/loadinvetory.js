@@ -64,7 +64,7 @@ factories = function($http, $cookies) {
     return $http.post("", formd(options), {
       transformRequest: angular.identity,
       headers: {
-        'Content-Type': undefined
+        'Content-Type': void 0
       }
     });
   };
@@ -113,9 +113,7 @@ controller = function($scope, $timeout, $q, inventoryFactory) {
         $scope.ginit = true;
       }
     });
-    angular.element('.modal-trigger').modal({
-      dismissible: false
-    });
+    angular.element('.modal').modal();
   });
   $scope.getMaterials = function($event) {
     var prms;

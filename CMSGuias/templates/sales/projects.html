@@ -229,12 +229,12 @@
               <input type="text" data-ng-model="sprojects">
               <label>Buscar por Proyectos</label>
             </div>
-            <div class="col l12 input-field" ng-show="sfprojects">
-              <i class="fa fa-dot-circle-o prefix"></i>
-              <select ng-model="pstatus" ng-options="x.key as x.val for x in gstatus" ng-change="gprojectstatus()">
+            <div class="col l12 " ng-show="sfprojects">
+              <!--<i class="fa fa-dot-circle-o prefix"></i>-->
+              <label>Estado de Proyecto</label>
+              <select class="browser-default" ng-model="pstatus" ng-options="x.key as x.val for x in gstatus" ng-change="gprojectstatus()">
                 <option value="" disabled>--Elija--</option>
               </select>
-              <label>Estado de Proyecto</label>
             </div>
           </div>
         </div>

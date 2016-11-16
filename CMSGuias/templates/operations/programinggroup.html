@@ -34,7 +34,7 @@
       </div>
       <div class="card-action">
       {% if status == 'PE' %}
-        <button type="button" class="btn blue blue-lighten-3 waves-effect waves-light modal-trigger" data-target="mgroup" ng-if="area == 'administrator' || area == 'ventas' ">
+        <button type="button" class="btn blue blue-lighten-3 waves-effect waves-light " data-target="mgroup" ng-if="area == 'administrator' || area == 'ventas' ">
           <i class="fa fa-plus"></i> Agregar Grupo
         </button>
       {% endif %}
@@ -48,11 +48,11 @@
     </div>
     <div class="card-action">
       {% if status == 'PE' %}
-        <button type="button" class="btn green lighten-2 waves-effect waves-light modal-trigger" data-target="mdsector" ng-if="area == 'administrator' || area == 'ventas'">
+        <button type="button" class="btn green lighten-2 waves-effect waves-light " data-target="mdsector" ng-if="area == 'administrator' || area == 'ventas'">
           <i class="fa fa-plus"></i>
           <span>Agregar Area</span>
         </button>
-        <button type="button" class="btn green lighten-2 waves-effect waves-light modal-trigger" data-target="mexcel" ng-if="area == 'administrator' || area == 'ventas' || perdni == '46377134' || area == 'operaciones'">
+        <button type="button" class="btn green lighten-2 waves-effect waves-light " data-target="mexcel" ng-if="area == 'administrator' || area == 'ventas' || perdni == '46377134' || area == 'operaciones'">
           <i class="fa fa-file-excel-o"></i>
           <span>Archivo</span>
         </button>

@@ -153,9 +153,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
   $scope.idxobs = -1;
   $scope.nroguide = '';
   angular.element(document).ready(function() {
-    angular.element(".modal-trigger").modal({
-      dismissible: false
-    });
+    angular.element(".modal").modal();
     if ($scope.init === true) {
       angular.element(".datepicker").pickadate({
         container: 'body',

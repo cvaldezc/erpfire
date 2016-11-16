@@ -32,9 +32,6 @@ app.controller 'programingCtrl', ($scope, $http, $cookies, $timeout) ->
     console.log $scope.perdni
     console.log $scope.area
     console.log $scope.charge
-    $timeout ->
-      $('.modal').modal()
-    , 600
     return
   $scope.$watch 'group.colour', (val, old) ->
     $scope.group.rgba = hextorbga(val, 0.5)

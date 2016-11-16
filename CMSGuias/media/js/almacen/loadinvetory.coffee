@@ -32,7 +32,7 @@ factories = ($http, $cookies) ->
   obj.getDetails = (options = {}) ->
     $http.get "", params: options
   obj.loadInventory = (options = {}) ->
-    $http.post "", formd(options), transformRequest: angular.identity, headers: 'Content-Type': `undefined`
+    $http.post "", formd(options), transformRequest: angular.identity, headers: 'Content-Type': undefined
   obj.delInventory = (options = {}) ->
     $http.post "", formd(options), transformRequest: angular.identity, headers: 'Content-Type': undefined
   obj.sendOrder = (options = {}) ->
@@ -60,8 +60,9 @@ controller = ($scope, $timeout, $q, inventoryFactory) ->
             $scope.lstinv = response.materials
             $scope.ginit = true
             return
-    angular.element('.modal-trigger').modal
-      dismissible: false
+    angular.element('.modal').modal()
+    #, 'open'
+    #   dismissible: false
     return
 
   $scope.getMaterials = ($event) ->

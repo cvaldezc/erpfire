@@ -189,7 +189,7 @@ app.controller 'proCtrl', ($scope, $http, $cookies) ->
     $scope.pstatus = ''
     $scope.allprojects = []
     angular.element(document).ready ->
-        angular.element('select').material_select()
+        angular.element('.mselect').material_select()
         $scope.lCustomersCbox()
         $scope.listCustomers()
         $scope.permission = angular.element("[name=permission]").val()
@@ -311,7 +311,7 @@ app.controller 'proCtrl', ($scope, $http, $cookies) ->
             if response.status
                 $scope.gstatus = response.gstatus
                 setTimeout ->
-                    angular.element('select').material_select('update')
+                    angular.element('.mselect').material_select('update')
                 , 600
                 return
             else

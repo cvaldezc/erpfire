@@ -101,12 +101,12 @@
                     <i class="fa fa-plus"></i>
                     <span class="hide-on-med-and-down">Agregar</span>
                 </button>
-                <button type="button" class="btn waves waves-effect amber accent-2 grey-text text-darken-3 modal-trigger" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134'" data-target="mdplane">
+                <button type="button" class="btn waves waves-effect amber accent-2 grey-text text-darken-3 modal" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134'" data-target="mdplane">
                     <i class="fa fa-file-pdf-o"></i>
                     <span class="hide-on-med-and-down">Plano Detalle</span>
                 </button>
                 {% if modify|length <= 0 %}
-                    <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effects modal-trigger" data-target="mpcopy">
+                    <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effects modal" data-target="mpcopy">
                         <i class="fa fa-clone"></i>
                         <span class="hide-on-med-and-down">Copiar Lista</span>
                     </button>
@@ -114,7 +114,7 @@
                         <i class="fa fa-trash"></i>
                         <span class="hide-on-med-and-down">Eliminar Todo</span>
                     </button>
-                    <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect modal-trigger" data-target="mfileup">
+                    <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect modal" data-target="mfileup">
                         <i class="fa fa-file-excel-o"></i>
                         <span class="hide-on-med-and-down">Cargar Archivo</span>
                     </button>

@@ -8,7 +8,7 @@
   <input type="hidden" ng-model="pcargo" ng-init="pcargo='{{ request.user.get_profile.empdni.charge.cargos|lower }}'">
   <div class="card-panel">
     <h4>Inventario</h4>
-    <button type="button" class="waves-effect waves-light btn amber lighten-1 grey-text text-darken-3 modal-trigger" ng-show="parea=='administrator'" ng-model="bload" ng-init="bload=false" data-target="mupload">
+    <button type="button" class="waves-effect waves-light btn amber lighten-1 grey-text text-darken-3 " ng-show="parea=='administrator'" ng-model="bload" ng-init="bload=false" data-target="mupload">
       <i class="fa fa-upload"></i>
       <span class="hide-on-small-only">CARGAR INVENTARIO</span>
     </button>
