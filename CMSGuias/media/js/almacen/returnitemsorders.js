@@ -129,6 +129,7 @@ app.controller('rioC', function($scope, rioF) {
   $scope.np = [];
   $scope.dnp = [];
   angular.element(document).ready(function() {
+    angular.element('.modal').modal();
     $scope.getDetails();
   });
   $scope.checkall = function() {

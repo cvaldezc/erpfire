@@ -13,9 +13,9 @@ app.directive 'cinmam', ($parse) ->
   link: (scope, element, attrs, ngModel) ->
     element.bind 'change, blur', (event) ->
       if !isNaN(element.context.value) and element.context.value != ""
-        val = parseFloat(parseFloat(element.context.value).toFixed(2))
+        val = parseFloat(parseFloat(element.context.value).toFixed(3))
       else
-        val = parseFloat(parseFloat(attrs.max).toFixed(2))
+        val = parseFloat(parseFloat(attrs.max).toFixed(3))
       max = parseFloat attrs.max
       min = parseFloat attrs.min
       result = 0
@@ -28,7 +28,7 @@ app.directive 'cinmam', ($parse) ->
       #  console.log attrs
       if attrs.hasOwnProperty 'stk'
         console.log 'inside stk'
-        stk = parseFloat(parseFloat(attrs.stk).toFixed(2))
+        stk = parseFloat(parseFloat(attrs.stk).toFixed(3))
         if result > stk
           result = stk
       if attrs.hasOwnProperty 'ngModel'
@@ -231,9 +231,9 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
             'mname': value.fields.model.fields.model
             'tipo': value.fields.tipo
             'meter': value.fields.metrado
-            'quantity': parseFloat(parseFloat(value.fields.cantidad).toFixed(2))
+            'quantity': parseFloat(parseFloat(value.fields.cantidad).toFixed(3))
             'send': value.fields.cantshop
-            'guide': parseFloat(parseFloat(value.fields.cantguide).toFixed(2))
+            'guide': parseFloat(parseFloat(value.fields.cantguide).toFixed(3))
             'tag': value.fields.tag
             # 'status': false
           return
@@ -317,7 +317,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
             # return false
             $scope.stks = new Array()
             $scope.istock = response.stock
-            $scope.qmax = parseFloat(parseFloat(prm.quantity).toFixed(2))
+            $scope.qmax = parseFloat(parseFloat(prm.quantity).toFixed(3))
             $scope.gbrand = prm.brand
             $scope.gmodel = prm.model
             $scope.gmaterials = prm.materials
@@ -361,6 +361,12 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
           promises.push obj
           return
       $q.all(promises).then (response) ->
+        angular.forEach response, (obj, i) ->
+          # console.log obj
+          obj.guide = 0
+          obj.brand = $scope.stks[indexsnip].brand
+          obj.model = $scope.stks[indexsnip].model
+          return
         deferred.resolve response
         return
       return deferred.promise
@@ -375,7 +381,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
         mat = ($scope.gmaterials is obj.materials)
         brand = ($scope.gbrand is obj.brand)
         model = ($scope.gmodel is obj.model)
-        console.info mat, brand, model
+        # console.info mat, brand, model
         if mat and brand and model
           ver = (obj.details.length > 0 ? true : false)
           # console.log ver
@@ -419,7 +425,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
     tmp = new Array()
     amount = 0
     angular.forEach $scope.stks, (obj, index) ->
-      amount += parseFloat(parseFloat(obj['quantity']).toFixed(2))
+      amount += parseFloat(parseFloat(obj['quantity']).toFixed(3))
       return
     # console.log amount
     if amount > $scope.qmax
@@ -450,7 +456,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
                 'model': stk.model
                 'nbrand': stk.nbrand
                 'nmodel': stk.nmodel
-                'quantity': parseFloat(parseFloat(stk.quantity).toFixed(2))
+                'quantity': parseFloat(parseFloat(stk.quantity).toFixed(3))
               return
           return
       angular.forEach $scope.fchk, (obj, index) ->
@@ -572,7 +578,9 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
           return
         return defer.promise
       defamount().then (summ) ->
-        amount = parseFloat(Number(summ).toFixed(2))
+        amount = parseFloat(Number(summ).toFixed(3))
+        console.info $scope.gbrand
+        console.info $scope.gmodel
         if amount > $scope.stks[$scope.indexshownip].stock 
           Materialize.toast "<i class='fa fa-times red-text'></i>&nbsp; Stock es menor a lo seleccionado.", 8000
           $scope.snip = new Array()
@@ -580,7 +588,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
           # return false
           return
         else
-          $scope.stks[$scope.indexshownip].quantity = parseFloat(parseFloat(amount).toFixed(2))
+          $scope.stks[$scope.indexshownip].quantity = parseFloat(parseFloat(amount).toFixed(3))
           if response >= 0
             $scope.nipdetails[response].details = $scope.snip
             $scope.snip = new Array()
@@ -740,7 +748,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
             if response.status
               angular.element('.toast-quit').remove()
               angular.element("#mguide").modal('close')
-              Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia <strong>#{prms.guide}</strong>", 2000
+              Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia &nbsp;<strong>#{response.code}</strong>", 4000
               $timeout ->
                 $scope.vgenrem = true
                 $scope.nroguide = response.code

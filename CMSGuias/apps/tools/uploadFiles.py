@@ -13,8 +13,8 @@ def upload(absolutePath, archive, options={}):
         path = '%s%s'%(settings.MEDIA_ROOT, absolutePath)
         # verify path exists if not exists path makers the folders
         if not os.path.exists(path):
-            os.makedirs(path, 0774)
-            os.chmod(path, 0774)
+            os.makedirs(path, 0777)
+            os.chmod(path, 0777)
         # verify aggregate options to name of file
         name = None
         if len(options) > 0:
@@ -41,11 +41,11 @@ def upload(absolutePath, archive, options={}):
 
 def removeTmp(absolutePath):
     try:
+        os.chmod(absolutePath, 0777)
         os.remove(absolutePath)
         return True
     except Exception, e:
         print e
-        raise e
         return False
 
 def deleteFile(uriPath, partial=False):
@@ -59,26 +59,27 @@ def deleteFile(uriPath, partial=False):
         else:
             path = uriPath
         if path is not None:
+            os.chmod(path, 0777)
             os.remove(path)
         else:
             return False
     except Exception, e:
-        #print e
+        print e
         return False
 
 def fileExists(paths, partial=False):
     try:
         path_ = ''
-        print paths.startswith('/'), 'FILE Exists'
         if partial:
+            print paths.startswith('/'), 'FILE Exists'
             if not paths.startswith('/'):
                 paths = '/%s' % paths
             path_ = '%s%s' % (settings.MEDIA_ROOT, paths)
         else:
             path_ = paths
         return os.path.lexists(path_)
-    except Exception, e:
-        print e
+    except Exception as e:
+        print 'FILE EXCEPTION EXISTS', e
         return False
 
 def descompressRAR(filename, path_to_extract=''):

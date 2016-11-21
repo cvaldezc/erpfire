@@ -2848,7 +2848,7 @@ class AttendOrder(JSONResponseMixin, TemplateView):
                 guide.save()
                 # here save details guide
                 det = json.loads(request.POST['details'])
-                print 'DETALLE DE GUIA', det
+                # print 'DETALLE DE GUIA', det
                 for d in det:
                     for x in d['details']:
                         dg = DetGuiaRemision(
@@ -2864,7 +2864,7 @@ class AttendOrder(JSONResponseMixin, TemplateView):
                             omodel_id=d['model'])
                         dg.save()
                 nip = json.loads(request.POST['nipp'])
-                print 'NIPPLES', nip
+                # print 'NIPPLES', nip
                 if len(nip) > 0:
                     for n in nip:
                         for x in n['details']:
@@ -2945,9 +2945,9 @@ class LoadInventoryBrand(JSONResponseMixin, TemplateView):
                                 path,
                                 request.FILES['fload'],
                                 options)
+                    # print 'file name ', filename
                     if uploadFiles.fileExists(filename):
                         wb = load_workbook(filename=filename, read_only=True)
-                        # print filename
                         ws = wb.worksheets[0]
                         for x in range(1, (ws.max_row + 1)):
                             print x
@@ -3007,7 +3007,8 @@ class LoadInventoryBrand(JSONResponseMixin, TemplateView):
                                             purchase=ppurchase,
                                             sale=psales)
                                         ib.save()
-                        uploadFiles.removeTmp(filename)
+                        # print filename
+                        uploadFiles.deleteFile(filename)
                     context['status'] = True
                 if 'putorder' in request.POST:
                     dt = Detpedido.objects.filter(pedido_id__in=request.POST['order'].split(','))
