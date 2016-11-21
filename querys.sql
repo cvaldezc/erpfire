@@ -25,6 +25,7 @@ update operations_dsmetrado set brand_id = 'BR000', model_id = 'MO000';
 update operations_dsmetradoauditlogentry set brand_id = 'BR000', model_id = 'MO000';
 update almacen_detpedidoauditlogentry set brand_id = 'BR000', model_id = 'MO000';
 update operations_historydsmetrado set brand_id = 'BR000', model_id = 'MO000';
+update almacen_tmppedido set brand_id = 'BR000', model_id = 'MO000';
 
 select * from almacen_inventorybrand limit 1;
 
