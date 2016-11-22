@@ -210,6 +210,9 @@ table.highlight > tbody > tr:hover {
   font-size: 14px;
   padding: 13px 14px;
 }
+ul.tabs.idenred > .indicator {
+  background-color: #f00;
+}
 @media screen and (max-width: 992px) {
   tbody tr td {
     padding: 15px 5px 15px 5px !important;

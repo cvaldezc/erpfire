@@ -55,7 +55,9 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   $scope.lplanes = [];
   angular.element(document).ready(function() {
     var $table;
-    $('.modal').modal();
+    angular.element('.modal').modal();
+    angular.element('ul.tabs').tabs();
+    angular.element('.collapsible').collapsible();
     $table = $(".floatThead");
     $table.floatThead({
       position: 'absolute',
