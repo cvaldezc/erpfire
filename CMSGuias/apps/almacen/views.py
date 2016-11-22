@@ -3,12 +3,13 @@
 #
 import datetime
 import json
+import os
 
 from django.shortcuts import (
-                              render_to_response,
-                              get_object_or_404,
-                              render,
-                              get_list_or_404)
+    render_to_response,
+    get_object_or_404,
+    render,
+    get_list_or_404)
 from django.template import RequestContext, TemplateDoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -31,7 +32,6 @@ from CMSGuias.apps.almacen import forms
 from CMSGuias.apps.tools import genkeys, globalVariable, uploadFiles
 from CMSGuias.apps.logistica.models import Compra, DetCompra
 from CMSGuias.apps.operations.models import *
-
 
 ##
 #  Declare variables
@@ -90,8 +90,7 @@ def view_pedido(request):
                     det.model_id = x.model_id
                     det.save()
                 # saved niples of tmpniple
-                tmpn = tmpniple.objects.filter(
-                        empdni__exact=request.user.get_profile().empdni_id)
+                tmpn = tmpniple.objects.filter(empdni__exact=request.user.get_profile().empdni_id)
                 for x in tmpn:
                     nip = Niple()
                     nip.pedido_id = id
@@ -106,18 +105,14 @@ def view_pedido(request):
                     nip.tipo = x.tipo.strip()
                     nip.save()
                 # deleting tmps
-                tmp = tmppedido.objects.filter(
-                        empdni__exact=request.user.get_profile().empdni_id)
+                tmp = tmppedido.objects.filter(empdni__exact=request.user.get_profile().empdni_id)
                 tmp.delete()
-                tmp = tmpniple.objects.filter(
-                        empdni__exact=request.user.get_profile().empdni_id)
+                tmp = tmpniple.objects.filter(empdni__exact=request.user.get_profile().empdni_id)
                 tmp.delete()
                 data['status'] = True
             else:
                 data['status'] = False
-            return HttpResponse(
-                    simplejson.dumps(data),
-                    mimetype='application/json')
+            return HttpResponse(simplejson.dumps(data), mimetype='application/json')
     except TemplateDoesNotExist, e:
         raise Http404(e)
 
@@ -978,8 +973,7 @@ def view_attend_order(request, oid):
                     break
             # nipples= get_list_or_404(
             # Niple.objects.order_by('metrado'),pedido_id__exact=oid,flag=True)
-            nipples = Niple.objects.filter(
-                        pedido_id__exact=oid, flag=True).order_by('metrado')
+            nipples = Niple.objects.filter(pedido_id__exact=oid, flag=True).order_by('metrado')
             usr = userProfile.objects.get(empdni__exact=obj.empdni)
             tipo = {'A': 'Roscado', 'B': 'Ranurado', 'C': 'Rosca-Ranura'}
             ctx = {
@@ -2045,6 +2039,7 @@ class InputOrderPurchase(JSONResponseMixin, TemplateView):
                         add = form.save(commit=False)
                         ingress = genkeys.GenerateIdNoteIngress()
                         add.ingress_id = ingress
+                        add.guide = request.POST['']
                         add.status = 'CO'
                         add.save()
                         # save to bedside Note Ingress

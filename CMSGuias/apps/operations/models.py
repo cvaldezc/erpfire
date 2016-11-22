@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 import os
-
 from django.db import models
 from audit_log.models.managers import AuditLog
-
 from CMSGuias.apps.home.models import Materiale, Brand, Model, Employee
 from CMSGuias.apps.ventas.models import Proyecto, Subproyecto, Sectore
 from CMSGuias.apps.tools import globalVariable
@@ -19,19 +17,19 @@ class MetProject(models.Model):
                                     blank=True)
     sector = models.ForeignKey(Sectore, to_field='sector_id')
     materiales = models.ForeignKey(
-                                    Materiale,
-                                    to_field='materiales_id',
-                                    default='')
+        Materiale,
+        to_field='materiales_id',
+        default='')
     brand = models.ForeignKey(Brand, to_field='brand_id', default='BR000')
     model = models.ForeignKey(Model, to_field='model_id', default='MO000')
     cantidad = models.FloatField()
     precio = models.FloatField()
     sales = models.DecimalField(max_digits=9, decimal_places=3, default=0)
     comment = models.CharField(
-                                max_length=250,
-                                default='',
-                                null=True,
-                                blank=True)
+        max_length=250,
+        default='',
+        null=True,
+        blank=True)
     quantityorder = models.FloatField(default=0)
     tag = models.CharField(max_length=1, default='0')
     flag = models.BooleanField(default=True)
@@ -49,19 +47,19 @@ class MetProject(models.Model):
 
     def __unicode__(self):
         return '%s %s %s %f %f' % (
-                                    self.proyecto,
-                                    self.sector_id,
-                                    self.materiales_id,
-                                    self.cantidad,
-                                    self.precio)
+            self.proyecto,
+            self.sector_id,
+            self.materiales_id,
+            self.cantidad,
+            self.precio)
 
 
 class Deductive(models.Model):
     REL = (
-            ('NN', 'Nothing'),
-            ('GL', 'Global'),
-            ('ST', 'Un Sector'),
-            ('PR', 'Personalido'),)
+        ('NN', 'Nothing'),
+        ('GL', 'Global'),
+        ('ST', 'Un Sector'),
+        ('PR', 'Personalido'),)
     deductive_id = models.CharField(primary_key=True, max_length=10)
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproyecto = models.ForeignKey(Subproyecto,
@@ -69,10 +67,10 @@ class Deductive(models.Model):
                                     null=True,
                                     blank=True)
     sector = models.ForeignKey(
-                                Sectore,
-                                to_field='sector_id',
-                                null=True,
-                                blank=True)
+        Sectore,
+        to_field='sector_id',
+        null=True,
+        blank=True)
     register = models.DateTimeField(auto_now_add=True)
     rtype = models.CharField(max_length=3, choices=REL, default='NN')
     date = models.DateField(auto_now=True)
@@ -114,11 +112,11 @@ class Letter(models.Model):
 
     def url(self, filename):
         uri = 'storage/projects/%s/%s/letters/%s/%s.%s' % (
-                self.project.registrado.strftime('%Y'),
-                self.project_id,
-                self.letter_id,
-                self.letter_id,
-                filename.split('.')[-1])
+            self.project.registrado.strftime('%Y'),
+            self.project_id,
+            self.letter_id,
+            self.letter_id,
+            filename.split('.')[-1])
         name = '%s%s' % (globalVariable.relative_path, uri)
         if os.path.exists(name):
             os.remove(name)
@@ -132,10 +130,10 @@ class Letter(models.Model):
     fors = models.CharField(max_length=80)
     status = models.CharField(max_length=2, default='PE')
     letter = models.FileField(
-                                upload_to=url,
-                                blank=True,
-                                null=True,
-                                max_length=200)
+        upload_to=url,
+        blank=True,
+        null=True,
+        max_length=200)
     observation = models.TextField(blank=True, null=True)
     flag = models.BooleanField(default=True)
 
@@ -146,18 +144,19 @@ class Letter(models.Model):
 
 
 class LetterAnexo(models.Model):
+
     def url(self, filename):
         return 'storage/projects/%s/%s/letters/%s/anexos/%s' % (
-                    self.letter.project.registrado.strftime('%Y'),
-                    self.letter.project_id,
-                    self.letter_id,
-                    filename)
+            self.letter.project.registrado.strftime('%Y'),
+            self.letter.project_id,
+            self.letter_id,
+            filename)
     letter = models.ForeignKey(Letter, to_field='letter_id')
     anexo = models.FileField(
-                                upload_to=url,
-                                max_length=200,
-                                blank=True,
-                                null=True)
+        upload_to=url,
+        max_length=200,
+        blank=True,
+        null=True)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -170,15 +169,15 @@ class PreOrders(models.Model):
     preorder_id = models.CharField(primary_key=True, max_length=10)
     project = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproject = models.ForeignKey(
-                                    Subproyecto,
-                                    to_field='subproyecto_id',
-                                    blank=True,
-                                    null=True)
+        Subproyecto,
+        to_field='subproyecto_id',
+        blank=True,
+        null=True)
     sector = models.ForeignKey(
-                                Sectore,
-                                to_field='sector_id',
-                                blank=True,
-                                null=True)
+        Sectore,
+        to_field='sector_id',
+        blank=True,
+        null=True)
     performed = models.ForeignKey(Employee, to_field='empdni_id')
     register = models.DateTimeField(auto_now=True)
     transfer = models.DateField()
@@ -210,16 +209,16 @@ class DetailsPreOrders(models.Model):
 
 class SGroup(models.Model):
     sgroup_id = models.CharField(
-                                primary_key=True,
-                                max_length=18,
-                                default='PRAA000SG0000',
-                                unique=False)
+        primary_key=True,
+        max_length=18,
+        default='PRAA000SG0000',
+        unique=False)
     project = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproject = models.ForeignKey(
-                                    Subproyecto,
-                                    to_field='subproyecto_id',
-                                    blank=True,
-                                    null=True)
+        Subproyecto,
+        to_field='subproyecto_id',
+        blank=True,
+        null=True)
     sector = models.ForeignKey(Sectore, to_field='sector_id')
     name = models.CharField(max_length=255)
     register = models.DateTimeField(auto_now_add=True)
@@ -237,30 +236,31 @@ class SGroup(models.Model):
 
 
 class DSector(models.Model):
+
     def url(self, filename):
         return 'storage/projects/%s/%s/%s/%s.pdf' % (
-                self.project.registrado.strftime('%Y'),
-                self.project_id,
-                self.sgroup_id,
-                self.dsector_id)
+            self.project.registrado.strftime('%Y'),
+            self.project_id,
+            self.sgroup_id,
+            self.dsector_id)
 
     dsector_id = models.CharField(
-                                    primary_key=True,
-                                    max_length=23,
-                                    default='PRAA000VEN00SG0000DS000')
+        primary_key=True,
+        max_length=23,
+        default='PRAA000VEN00SG0000DS000')
     sgroup = models.ForeignKey(SGroup, to_field='sgroup_id')
     project = models.ForeignKey(Proyecto, to_field='proyecto_id')
     sector = models.ForeignKey(
-                               Sectore,
-                               to_field='sector_id',
-                               null=True,
-                               blank=True)
+        Sectore,
+        to_field='sector_id',
+        null=True,
+        blank=True)
     name = models.CharField(max_length=255)
     plane = models.FileField(
-                            upload_to=url,
-                            max_length=200,
-                            null=True,
-                            blank=True)
+        upload_to=url,
+        max_length=200,
+        null=True,
+        blank=True)
     register = models.DateTimeField(auto_now_add=True)
     datestart = models.DateField(null=True)
     dateend = models.DateField(null=True)
@@ -310,7 +310,6 @@ class DSMetrado(models.Model):
     # def squantity(self):
     #     quant += self.quantity
     #     return quant
-    
 
 
 class MMetrado(models.Model):
@@ -371,32 +370,33 @@ class HistoryDSMetrado(models.Model):
 
 
 class Nipple(models.Model):
+    """Class manager Niples in Dsector"""
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id', blank=True)
     subproyecto = models.ForeignKey(
-                                    Subproyecto,
-                                    to_field='subproyecto_id',
-                                    blank=True,
-                                    null=True)
+        Subproyecto,
+        to_field='subproyecto_id',
+        blank=True,
+        null=True)
     sector = models.ForeignKey(
-                                Sectore,
-                                to_field='sector_id',
-                                blank=True,
-                                null=True)
+        Sectore,
+        to_field='sector_id',
+        blank=True,
+        null=True)
     area = models.ForeignKey(
-            DSector,
-            to_field='dsector_id',
-            null=True,
-            blank=True)
+        DSector,
+        to_field='dsector_id',
+        null=True,
+        blank=True)
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     cantidad = models.FloatField(null=True, default=1)
     metrado = models.FloatField(null=False, default=0)
     cantshop = models.FloatField(null=True, default=0)
     tipo = models.CharField(max_length=1)
     comment = models.CharField(
-                                max_length=250,
-                                default='',
-                                null=True,
-                                blank=True)
+        max_length=250,
+        default='',
+        null=True,
+        blank=True)
     tag = models.CharField(max_length=1, default='0')
     flag = models.BooleanField(default=True)
 
@@ -410,3 +410,31 @@ class Nipple(models.Model):
             self.cantidad,
             self.metrado,
             self.tipo)
+
+
+class TempAdd(models.Model):
+    """Class for temporal add dsector """
+    dsector = models.ForeignKey(DSector, to_field='dsector_id')
+    materials = models.ForeignKey(Materiale, to_field='materiales_id')
+    brand = models.ForeignKey('Brand', related_name='brand_id')
+    model = models.ForeignKey('Model', related_name='model_id')
+    quantity = models.DecimalField(default=0, max_digits=5, decimal_places=3)
+    ppurchase = models.DecimalField(max_digits=8, decimal_places=3)
+    psales = models.DecimalField(max_digits=8, decimal_places=3)
+
+    def __str__(self):
+        return '%s %s' % (self.dsector, self.materials)
+
+    def __unicode__(self):
+        return '%s %s' % (self.dsector, self.materials)
+
+class TempEdit(models.Model):
+    
+
+    def __str__(self):
+        return 
+
+    def __unicode__(self):
+        return 
+
+

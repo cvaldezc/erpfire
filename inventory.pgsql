@@ -319,7 +319,7 @@ CREATE OR REPLACE FUNCTION proc_change_status_detcompra()
 $$
 DECLARE
   reg RECORD;
-  quantity DOUBLE PRECISION;
+  quantity NUMERIC;
   tag CHAR;
   buy varchar(10);
 BEGIN
@@ -340,15 +340,16 @@ BEGIN
   RETURN NEW;
 EXCEPTION
   WHEN OTHERS THEN
-  ROLLBACK;
-  RETURN NULL;
+    RAISE INFO 'EXCEPTION ERROR %', SQLERRM;
+    ROLLBACK;
+    RETURN NULL;
 END;
 $$
 LANGUAGE plpgsql VOLATILE
 COST 100;
-
+-- DROP TRIGGER IF EXISTS tr_change_status_detcompra ON almacen_detingress;
 CREATE TRIGGER tr_change_status_detcompra
-BEFORE INSERT ON almacen_detingress
+AFTER INSERT ON almacen_detingress
 FOR EACH ROW EXECUTE PROCEDURE proc_change_status_detcompra();
 
 

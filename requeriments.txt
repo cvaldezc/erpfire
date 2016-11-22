@@ -16,3 +16,5 @@ six==1.10.0
 South==1.0.2
 wadofstuff-django-serializers==1.1.0
 xlrd==0.9.4
+pylint
+autopep8
