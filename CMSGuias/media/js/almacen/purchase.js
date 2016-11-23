@@ -94,7 +94,7 @@ listTemplate = function(list) {
   $tb = $("table > tbody");
   $tb.empty();
   if (list.length) {
-    template = "<tr>\n	<td>{{ item }}</td>\n	<td>{{ purchase }}</td>\n	<td>{{ reason }}</td>\n	<td>{{ document }}</td>\n	<td>{{ transfer }}</td>\n	<td class=\"text-center\">\n		<button value=\"{{ purchase }}\" data-ruc=\"{{ x.supplier }}\" class=\"btn btn-link btn-xs text-black btn-deposit\"><span class=\"glyphicon glyphicon-credit-card\"></span></button>\n	</td>\n	<td class=\"text-center\">\n		<a href=\"/reports/order/purchase/{{ purchase }}/\" target=\"_blank\" class=\"btn btn-xs btn-link text-black\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>\n	</td>\n	<td class=\"text-center\">\n		<button value=\"{{ purchase }}\" data-ruc=\"{{ x.supplier }}\" class=\"btn btn-link btn-xs text-black btn-action\"><span class=\"glyphicon glyphicon-inbox\"></span></button>\n	</td>\n</tr>";
+    template = "<tr>\n    <td>{{ item }}</td>\n    <td>{{ purchase }}</td>\n    <td>{{ reason }}</td>\n    <td>{{ document }}</td>\n    <td>{{ transfer }}</td>\n    <td class=\"text-center\">\n        <button value=\"{{ purchase }}\" data-ruc=\"{{ x.supplier }}\" class=\"btn btn-link btn-xs text-black btn-deposit\"><span class=\"glyphicon glyphicon-credit-card\"></span></button>\n    </td>\n    <td class=\"text-center\">\n        <a href=\"/reports/order/purchase/{{ purchase }}/\" target=\"_blank\" class=\"btn btn-xs btn-link text-black\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>\n    </td>\n    <td class=\"text-center\">\n        <button value=\"{{ purchase }}\" data-ruc=\"{{ x.supplier }}\" class=\"btn btn-link btn-xs text-black btn-action\"><span class=\"glyphicon glyphicon-inbox\"></span></button>\n    </td>\n</tr>";
     for (x in list) {
       list[x].item = parseInt(x) + 1;
       $tb.append(Mustache.render(template, list[x]));
@@ -232,7 +232,6 @@ saveNoteIngress = function(response) {
     console.info(element);
     if (element.name !== "guide") {
       if ($.trim(element.value !== "")) {
-        data[element.name] = $.trim($(element).val());
         pass = true;
       } else {
         $().toastmessage("showWarningToast", "Campo vacio, " + element.name);
@@ -260,6 +259,13 @@ saveNoteIngress = function(response) {
           data.ingress = true;
           data.observation = $("textarea[name=observation]").val();
           data.purchase = $(".purchase").html();
+          data.storage = $("[name=storage]").val();
+          data.guide = $("[name=guide]").val();
+          data.invoice = $("[name=invoice]").val();
+          data.motive = $("[name=motive]").val();
+          data.receive = $("[name=receive]").val();
+          data.inspection = $("[name=inspection]").val();
+          data.approval = $("[name=approval]").val();
           data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
           console.warn(data);
           return $.post("", data, function(response) {
@@ -270,7 +276,7 @@ saveNoteIngress = function(response) {
               $(".note").html(response.ingress);
               return $(".show-note-ingress").attr("href", "/reports/note/ingress/" + response.ingress + "/");
             } else {
-              $().toastmessage("showWarningToast", "No se a podido generar la Nota de Ingreso.");
+              $().toastmessage("showWarningToast", "No se a podido generar la Nota de Ingreso. " + response.raise);
             }
           });
         }

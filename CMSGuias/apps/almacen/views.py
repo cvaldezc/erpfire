@@ -2034,12 +2034,11 @@ class InputOrderPurchase(JSONResponseMixin, TemplateView):
                 # print request.POST
                 if 'ingress' in request.POST:
                     form = forms.addNoteIngress(request.POST)
-                    print form
+                    print form.is_valid()
                     if form.is_valid():
                         add = form.save(commit=False)
                         ingress = genkeys.GenerateIdNoteIngress()
                         add.ingress_id = ingress
-                        add.guide = request.POST['']
                         add.status = 'CO'
                         add.save()
                         # save to bedside Note Ingress
@@ -2134,7 +2133,7 @@ class InputOrderPurchase(JSONResponseMixin, TemplateView):
                         context['status'] = True
                         context['ingress'] = ingress
                     else:
-                        context['raise'] = 'Formato'
+                        context['raise'] = 'Formulario con errores campos requeridos'
                         context['status'] = False
             except ObjectDoesNotExist, e:
                 context['raise'] = e.__str__()

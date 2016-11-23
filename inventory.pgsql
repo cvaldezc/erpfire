@@ -245,7 +245,7 @@ CREATE OR REPLACE FUNCTION proc_decrease_change_status_nip_order()
   RETURNS trigger AS
 $BODY$
 DECLARE
-  _quantity INTEGER := 0;
+  _quantity NUMERIC := 0;
   _tag CHAR := '';
 BEGIN
   SELECT cantshop INTO _quantity FROM almacen_niple WHERE id=NEW.related AND pedido_id LIKE NEW.order_id;

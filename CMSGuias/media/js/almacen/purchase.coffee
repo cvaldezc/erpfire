@@ -240,6 +240,13 @@ saveNoteIngress = (response) ->
                     data.ingress = true
                     data.observation = $("textarea[name=observation]").val()
                     data.purchase = $(".purchase").html()
+                    data.storage = $("[name=storage]").val()
+                    data.guide = $("[name=guide]").val()
+                    data.invoice = $("[name=invoice]").val()
+                    data.motive = $("[name=motive]").val()
+                    data.receive = $("[name=receive]").val()
+                    data.inspection = $("[name=inspection]").val()
+                    data.approval = $("[name=approval]").val()
                     data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val()
                     console.warn data
                     $.post "", data, (response) ->
@@ -250,6 +257,6 @@ saveNoteIngress = (response) ->
                             $(".note").html response.ingress
                             $(".show-note-ingress").attr "href", "/reports/note/ingress/#{response.ingress}/"
                         else
-                            $().toastmessage "showWarningToast", "No se a podido generar la Nota de Ingreso."
+                            $().toastmessage "showWarningToast", "No se a podido generar la Nota de Ingreso. #{response.raise}"
                             return
     return
