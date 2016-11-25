@@ -33,7 +33,7 @@ app.factory 'Factory', ($http, $cookies) ->
     for k, v in options
       _form.append k, v
     return _form
-  obj.get (option={}) ->
+  obj.get = (option={}) ->
     $http.get "", params: options
   return obj
 
@@ -54,7 +54,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   $scope.lplanes = []
   angular.element(document).ready ->
     angular.element('.modal').modal()
-    angular.element('ul.tabs').tabs -> window.scrollTo 0, 680
+    angular.element('ul.tabs').tabs 'onShow': -> window.scrollTo 0, 680
     angular.element('.collapsible').collapsible()
     $table = $(".floatThead")
     $table.floatThead

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 import json
+import time
+from decimal import Decimal, ROUND_UP, ROUND_DOWN
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
@@ -18,7 +20,6 @@ from django.views.generic import TemplateView, View
 from django.core.serializers.json import DjangoJSONEncoder
 # from xlrd import open_workbook, XL_CELL_EMPTY
 from openpyxl import load_workbook, Workbook, cell, styles
-import time
 
 from CMSGuias.apps.home.models import *
 from .models import *
@@ -730,6 +731,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                 dsmup.update(ppurchase=request.POST['ppurchase'])
                             if 'psales' in request.POST:
                                 dsmup.update(psales=request.POST['psales'])
+                        # end function update price
                     except DSMetrado.DoesNotExist as e:
                         context['raise'] = str(e)
                         dsm = DSMetrado()
@@ -862,6 +864,70 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             context['status'] = False
                     else:
                         context['status'] = False
+                if 'savemmat' in request.POST:
+                    def saveAccesory(regt=''):
+                        try:
+                            dsmt = DSMetradoTemp.objects.get(
+                                dsector_id=kwargs['area'],
+                                materials_id=request.POST['code'],
+                                brand_id=request.POST['brand'],
+                                model_id=request.POST['model'])
+                            dsmt.quantity += Decimal(request.POST['quantity']).quantize(Decimal('0.001'))
+                            dsmt.missingsend += Decimal(request.POST['quantity']).quantize(Decimal('0.001'))
+                            dsmt.type = regt
+                            dsmt.symbol = '+'
+                            dstm.save()
+                        except DSMetradoTemp.DoesNotExist as ex:
+                            print ex
+                            DSMetradoTemp.objects.create(dsector_id=kwargs['area'], 
+                            materials_id=request.POST['code'], 
+                            brand_id=request.POST['brand'],
+                            model_id=request.POST['model'],
+                            missingsend=request.POST['quantity'],
+                            quantity=request.POST['quantity'],
+                            ppurchase=request.POST['ppurchase'],
+                            psales=request.POST['psales'],
+                            type=regt)
+                    try:
+                        # if exists in table principal se debe de almacen como una modificacion
+                        MMetrado.objects.get(
+                            dsector_id=kwargs['area'],
+                            materials_id=request.POST['code'],
+                            brand_id=request.POST['brand'],
+                            model_id=request.POST['model'])
+                        saveAccesory('M')
+                    except (MMetrado.DoesNotExist) as mex:
+                        print mex
+                        saveAccesory('N')
+
+                    # remove all 2016-24-11
+                    # try:
+                    #     mm = MMetrado.objects.get(
+                    #         dsector_id=kwargs['area'],
+                    #         materials_id=request.POST['code'],
+                    #         brand_id=request.POST['brand'],
+                    #         model_id=request.POST['model'])
+                    #     mm.quantity = (
+                    #         mm.quantity + float(request.POST['quantity']))
+                    #     mm.qorder = (
+                    #         mm.qorder + float(request.POST['quantity']))
+                    #     mm.ppurchase = request.POST['ppurchase']
+                    #     mm.psales = request.POST['psales']
+                    # except MMetrado.DoesNotExist, e:
+                    #     context['raise'] = str(e)
+                    #     mm = MMetrado()
+                    #     mm.dsector_id = kwargs['area']
+                    #     mm.sector_id = kwargs['sec']
+                    #     mm.materials_id = request.POST['code']
+                    #     mm.brand_id = request.POST['brand']
+                    #     mm.model_id = request.POST['model']
+                    #     mm.quantity = request.POST['quantity']
+                    #     mm.qorder = request.POST['quantity']
+                    #     mm.qguide = 0
+                    #     mm.ppurchase = request.POST['ppurchase']
+                    #     mm.psales = request.POST['psales']
+                    # mm.save()
+                    context['status'] = True
                 if 'editMM' in request.POST:
                     # remove all 2016-24-11
                     update = MMetrado.objects.filter(
@@ -886,7 +952,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         context['status'] = False
                         context['raise'] = 'Data not found'
                 if 'delMM' in request.POST:
-                    # remove all 2016-24-11
+                    # remove all section 2016-24-11
                     MMetrado.objects.filter(
                         dsector_id=kwargs['area'],
                         materials_id=request.POST['materials'],
@@ -897,35 +963,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     # this ok, before add support for new table DSMetradoTemp
                     MMetrado.objects.filter(dsector_id=kwargs['area']).delete()
                     context['status'] = True
-                if 'savemmat' in request.POST:
-                    # remove all 2016-24-11
-                    try:
-                        mm = MMetrado.objects.get(
-                            dsector_id=kwargs['area'],
-                            materials_id=request.POST['code'],
-                            brand_id=request.POST['brand'],
-                            model_id=request.POST['model'])
-                        mm.quantity = (
-                            mm.quantity + float(request.POST['quantity']))
-                        mm.qorder = (
-                            mm.qorder + float(request.POST['quantity']))
-                        mm.ppurchase = request.POST['ppurchase']
-                        mm.psales = request.POST['psales']
-                    except MMetrado.DoesNotExist, e:
-                        context['raise'] = str(e)
-                        mm = MMetrado()
-                        mm.dsector_id = kwargs['area']
-                        mm.sector_id = kwargs['sec']
-                        mm.materials_id = request.POST['code']
-                        mm.brand_id = request.POST['brand']
-                        mm.model_id = request.POST['model']
-                        mm.quantity = request.POST['quantity']
-                        mm.qorder = request.POST['quantity']
-                        mm.qguide = 0
-                        mm.ppurchase = request.POST['ppurchase']
-                        mm.psales = request.POST['psales']
-                    mm.save()
-                    context['status'] = True
+                
                 if 'approvedModify' in request.POST:
                     # remove all 2016-24-11 change function
                     lm = MMetrado.objects.filter(dsector_id=kwargs['area'])

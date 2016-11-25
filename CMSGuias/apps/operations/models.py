@@ -414,6 +414,7 @@ class Nipple(models.Model):
 
 class DSMetradoTemp(models.Model):
     """Class for temporal add dsector add, edit, del """
+    STATUS = (('N', 'NEW'), ('M', 'MODIFY'), ('D', 'DELETE'), )
     register = models.DateTimeField(auto_now_add=True)
     dsector = models.ForeignKey(DSector, to_field='dsector_id')
     materials = models.ForeignKey(Materiale, to_field='materiales_id')
@@ -423,7 +424,7 @@ class DSMetradoTemp(models.Model):
     quantity = models.DecimalField(default=0, max_digits=5, decimal_places=3)
     ppurchase = models.DecimalField(max_digits=8, decimal_places=3, default=0)
     psales = models.DecimalField(max_digits=8, decimal_places=3, default=0)
-    type = models.CharField(max_length=1, null=False)
+    type = models.CharField(max_length=1, null=False, choices=STATUS)
     sysmbol = models.CharField(max_length=1, default='+')
     flag = models.BooleanField(default=True)
 

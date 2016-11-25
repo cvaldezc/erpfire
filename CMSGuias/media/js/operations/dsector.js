@@ -57,14 +57,14 @@ app.factory('Factory', function($http, $cookies) {
     }
     return _form;
   };
-  obj.get(function(option) {
+  obj.get = function(option) {
     if (option == null) {
       option = {};
     }
     return $http.get("", {
       params: options
     });
-  });
+  };
   return obj;
 });
 
@@ -86,8 +86,10 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   angular.element(document).ready(function() {
     var $table;
     angular.element('.modal').modal();
-    angular.element('ul.tabs').tabs(function() {
-      return window.scrollTo(0, 680);
+    angular.element('ul.tabs').tabs({
+      'onShow': function() {
+        return window.scrollTo(0, 680);
+      }
     });
     angular.element('.collapsible').collapsible();
     $table = $(".floatThead");
