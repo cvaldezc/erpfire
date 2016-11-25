@@ -834,6 +834,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         materiales_id=request.POST['materials']).delete()
                     context['status'] = True
                 if 'modifyArea' in request.POST:
+                    # 2016-24-11 633 ok available by modify dsmetrado
                     valid = MMetrado.objects.filter(dsector_id=kwargs['area'])
                     if not valid:
                         clipboard = DSMetrado.objects.filter(
@@ -862,6 +863,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     else:
                         context['status'] = False
                 if 'editMM' in request.POST:
+                    # remove all 2016-24-11
                     update = MMetrado.objects.filter(
                         dsector_id=kwargs['area'],
                         materials_id=request.POST['materials'],
@@ -884,6 +886,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         context['status'] = False
                         context['raise'] = 'Data not found'
                 if 'delMM' in request.POST:
+                    # remove all 2016-24-11
                     MMetrado.objects.filter(
                         dsector_id=kwargs['area'],
                         materials_id=request.POST['materials'],
@@ -891,9 +894,11 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         model_id=request.POST['model']).delete()
                     context['status'] = True
                 if 'annModify' in request.POST:
+                    # this ok, before add support for new table DSMetradoTemp
                     MMetrado.objects.filter(dsector_id=kwargs['area']).delete()
                     context['status'] = True
                 if 'savemmat' in request.POST:
+                    # remove all 2016-24-11
                     try:
                         mm = MMetrado.objects.get(
                             dsector_id=kwargs['area'],
@@ -922,6 +927,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     mm.save()
                     context['status'] = True
                 if 'approvedModify' in request.POST:
+                    # remove all 2016-24-11 change function
                     lm = MMetrado.objects.filter(dsector_id=kwargs['area'])
                     mn = DSMetrado.objects.filter(
                             dsector_id=kwargs['area'])
@@ -1018,6 +1024,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     dm.save()
                     context['status'] = True
                 if 'saveOrders' in request.POST:
+                    # checked this fucntion don't work ideal
                     # get id new orders
                     gkey = genkeys.GenerateIdOrders()
                     orders = Pedido()

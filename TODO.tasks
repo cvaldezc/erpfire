@@ -1,0 +1,22 @@
+Projects:
+    * erpfire
+    Apps:
+        * Operations
+        * Sales
+        * Logistics
+        * Storage
+
+Tasks:
+    New Task:
+        TO-DO:
+            - Missing Organize
+            ☐ add user in note of ingress (Rocio, Mauro) @Storage @low
+        Doing:
+            ☐ Update modify of table dsmetrado -> implement three tables for details (add, edit, del) @Operations @high
+    Tasks Complete:
+        Apps:
+            Sales:
+            Operations:
+            Logistics:
+            Storage:
+    Tasks Sugestion:

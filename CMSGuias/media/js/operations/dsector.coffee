@@ -3,14 +3,14 @@ app = angular.module 'dsApp', ['ngCookies']
         $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
         $httpProvider.defaults.xsrfCookieName = 'csrftoken'
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
-      .directive 'stringToNumber', ->
-          require: 'ngModel'
-          link: (scope, element, attrs, ngModel) ->
-            ngModel.$parsers.push (value) ->
-              return '' + value
-            ngModel.$formatters.push (value) ->
-              return parseFloat value, 10
-            return
+app.directive 'stringToNumber', ->
+  require: 'ngModel'
+  link: (scope, element, attrs, ngModel) ->
+    ngModel.$parsers.push (value) ->
+      return '' + value
+    ngModel.$formatters.push (value) ->
+      return parseFloat value, 10
+    return
 
 app.directive 'file', ($parse) ->
   restrict: 'A'
@@ -20,11 +20,24 @@ app.directive 'file', ($parse) ->
     model = $parse attrs.file
     modelSetter = model.assign
     element.bind 'change', (event) ->
-      file = event.target.files[0];
+      file = event.target.files[0]
       scope.file = if file then file else undefined
       scope.$apply()
+      
+app.factory 'Factory', ($http, $cookies) ->
+  $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
+  $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+  obj = new Object()
+  form = (options={}) ->
+    _form = new FormData()
+    for k, v in options
+      _form.append k, v
+    return _form
+  obj.get (option={}) ->
+    $http.get "", params: options
+  return obj
 
-app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q) ->
+app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q, Factory) ->
   $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
   $scope.perarea = ""
@@ -41,7 +54,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q)
   $scope.lplanes = []
   angular.element(document).ready ->
     angular.element('.modal').modal()
-    angular.element('ul.tabs').tabs()
+    angular.element('ul.tabs').tabs -> window.scrollTo 0, 680
     angular.element('.collapsible').collapsible()
     $table = $(".floatThead")
     $table.floatThead
@@ -173,9 +186,9 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q)
   $scope.editDMaterial = ($event) ->
     $scope.mat.code = $event.currentTarget.dataset.materials
     $timeout (->
-        e = $.Event 'keypress', keyCode: 13
-        $("[name=code]").trigger e
-        return
+      e = $.Event 'keypress', keyCode: 13
+      $("[name=code]").trigger e
+      return
     ), 100
     $timeout (->
       quantity = parseFloat $event.currentTarget.dataset.quantity
@@ -874,7 +887,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q)
           $np = $("#n#{$e.attr("data-nid")}")
           amount += parseInt($np.val())*parseFloat($np.attr("data-measure"))
           return
-      $scope.ordersm["#{$event.currentTarget.value}"] = (amount/100)
+      $scope.ordersm["#{$event.currentTarget.value}"] = (amount / 100)
     , 200
     return
   $scope.saveOrdersStorage = ($event) ->
@@ -1000,7 +1013,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q)
     angular.forEach data, (value, key) ->
       form.append key, value
       return
-    $http.post "", form, transformRequest: angular.identity, headers: 'Content-Type': `undefined`
+    $http.post "", form, transformRequest: angular.identity, headers: 'Content-Type': undefined
     .success (response, status, headers, config) ->
       if response.status
         angular.element("#mdplane").modal('close')

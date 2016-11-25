@@ -4,7 +4,9 @@ app = angular.module('dsApp', ['ngCookies']).config(function($httpProvider) {
   $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
   $httpProvider.defaults.xsrfCookieName = 'csrftoken';
   return $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-}).directive('stringToNumber', function() {
+});
+
+app.directive('stringToNumber', function() {
   return {
     require: 'ngModel',
     link: function(scope, element, attrs, ngModel) {
@@ -38,7 +40,35 @@ app.directive('file', function($parse) {
   };
 });
 
-app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $sce, $q) {
+app.factory('Factory', function($http, $cookies) {
+  var form, obj;
+  $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+  $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+  obj = new Object();
+  form = function(options) {
+    var _form, i, k, len, v;
+    if (options == null) {
+      options = {};
+    }
+    _form = new FormData();
+    for (v = i = 0, len = options.length; i < len; v = ++i) {
+      k = options[v];
+      _form.append(k, v);
+    }
+    return _form;
+  };
+  obj.get(function(option) {
+    if (option == null) {
+      option = {};
+    }
+    return $http.get("", {
+      params: options
+    });
+  });
+  return obj;
+});
+
+app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $sce, $q, Factory) {
   $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
   $scope.perarea = "";
@@ -56,7 +86,9 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   angular.element(document).ready(function() {
     var $table;
     angular.element('.modal').modal();
-    angular.element('ul.tabs').tabs();
+    angular.element('ul.tabs').tabs(function() {
+      return window.scrollTo(0, 680);
+    });
     angular.element('.collapsible').collapsible();
     $table = $(".floatThead");
     $table.floatThead({
@@ -1089,7 +1121,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     $http.post("", form, {
       transformRequest: angular.identity,
       headers: {
-        'Content-Type': undefined
+        'Content-Type': void 0
       }
     }).success(function(response, status, headers, config) {
       if (response.status) {

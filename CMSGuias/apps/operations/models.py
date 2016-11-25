@@ -412,29 +412,20 @@ class Nipple(models.Model):
             self.tipo)
 
 
-# class TempAdd(models.Model):
-#     """Class for temporal add dsector """
-#     dsector = models.ForeignKey(DSector, to_field='dsector_id')
-#     materials = models.ForeignKey(Materiale, to_field='materiales_id')
-#     brand = models.ForeignKey('Brand', related_name='brand_id')
-#     model = models.ForeignKey('Model', related_name='model_id')
-#     quantity = models.DecimalField(default=0, max_digits=5, decimal_places=3)
-#     ppurchase = models.DecimalField(max_digits=8, decimal_places=3)
-#     psales = models.DecimalField(max_digits=8, decimal_places=3)
+class DSMetradoTemp(models.Model):
+    """Class for temporal add dsector add, edit, del """
+    register = models.DateTimeField(auto_now_add=True)
+    dsector = models.ForeignKey(DSector, to_field='dsector_id')
+    materials = models.ForeignKey(Materiale, to_field='materiales_id')
+    brand = models.ForeignKey(Brand, related_name='brand_DSMtemp')
+    model = models.ForeignKey(Model, related_name='model_DSMtemp')
+    missingsend = models.DecimalField(max_digits=8, decimal_places=8, default=0)
+    quantity = models.DecimalField(default=0, max_digits=5, decimal_places=3)
+    ppurchase = models.DecimalField(max_digits=8, decimal_places=3, default=0)
+    psales = models.DecimalField(max_digits=8, decimal_places=3, default=0)
+    type = models.CharField(max_length=1, null=False)
+    sysmbol = models.CharField(max_length=1, default='+')
+    flag = models.BooleanField(default=True)
 
-#     def __str__(self):
-#         return '%s %s' % (self.dsector, self.materials)
-
-#     def __unicode__(self):
-#         return '%s %s' % (self.dsector, self.materials)
-
-# class TempEdit(models.Model):
-    
-
-#     def __str__(self):
-#         return 
-
-#     def __unicode__(self):
-#         return 
-
-
+    def __unicode__(self):
+        return '%s %s' % (self.dsector, self.materials)
