@@ -43,19 +43,19 @@ keyUpDescription = (event) ->
   return
 
 getMeters = ->
-    $nom = $("[name=description]")
-    unless $nom.val() is ""
-      data = matnom: $nom.val()
-      $.getJSON "/json/get/meter/materials/", data, (response) ->
-        template = "<option value=\"{{ materiales_id }}\">{{ matmed }}</option>"
-        $med = $("[name=meter]")
-        $med.empty()
-        for x of response.list
-            $med.append Mustache.render(template, response.list[x])
-        getSummaryMaterials()
+  $nom = $("[name=description]")
+  unless $nom.val() is ""
+    data = matnom: $nom.val()
+    $.getJSON "/json/get/meter/materials/", data, (response) ->
+      template = "<option value=\"{{ materiales_id }}\">{{ matmed }}</option>"
+      $med = $("[name=meter]")
+      $med.empty()
+      for x of response.list
+        $med.append Mustache.render(template, response.list[x])
+      getSummaryMaterials()
       return
-    else
-      console.warn "The Field Name is empty!"
+  else
+    console.warn "The Field Name is empty!"
     return
 
 getSummaryMaterials = ->
@@ -63,6 +63,7 @@ getSummaryMaterials = ->
   $med = $("[name=meter]")
   $pro = $("input[name=pro]")
   $sec = $("input[name=sec]")
+
   if $nom.val().trim() isnt "" and $med.val() isnt ""
     data =
       matnom: $nom.val()
@@ -70,8 +71,10 @@ getSummaryMaterials = ->
       matid: $med.val()
       pro: $pro.val()
       sec: $sec.val()
+    if $("[name=lds]").length
+      data['lds'] = true
     $.getJSON "/json/get/resumen/details/materiales/", data, (response) ->
-      console.log(response);
+      console.log(response)
       searchUnitOption()
       template = """<tr><th>Codigo :</th><td class='id-mat'>{{materialesid}}</td></tr><tr><th>Descripción :</th><td>{{matnom}}</td></tr><tr><th>Medida :</th><td>{{matmed}}</td></tr><tr><th>Unidad :</th><td>{{unidad}}</td></tr>"""
       $tb = $(".tb-details > tbody")
@@ -85,13 +88,20 @@ getSummaryMaterials = ->
       $("input[name=sales]").val response.list[0].sale
       $("input[name=sale]").val response.list[0].sale
       $lstp = $("#lstpurchase")
-      $lstp.empty()
-      if $lstp.length > 0 and response.purchase
-        $lstp.append Mustache.render """{{#purchase}}<option label="{{currency}}" value="{{purchase}}" />{{/purchase}}""", response
+      $lstp.html("")
+      if $lstp.length > 0
+        $lstp.append Mustache.render """
+            {{#purchase}}
+                <option label="{{currency}}" value="{{purchase}}" />
+            {{/purchase}}""", response
+
       $lsts = $("#lstsales")
-      $lsts.empty()
-      if $lsts.length > 0 and response.purchase
-        $lsts.append Mustache.render """{{#purchase}}<option label="{{currency}}" value="{{sales}}" />{{/purchase}}""", response
+      $lsts.html("")
+      if $lsts.length > 0
+        $lsts.append Mustache.render """
+            {{#purchase}}
+                <option label="{{currency}}" value="{{sales}}" />
+            {{/purchase}}""", response
       if $("#unit").length > 0
         setTimeout ->
           console.log response.list[0].unidad

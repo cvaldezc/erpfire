@@ -658,6 +658,15 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                 cantshop__gt=0),
                             relations=('materiales')))
                     context['status'] = True
+                if 'lsttemp' in request.GET:
+                    def lists(args):
+                        lst = DSMetradoTemp.objects.filter(dsector_id=kwargs['area'],
+                            type='N')
+                        return json.loads(serializers.serialize(
+                            'json', lst, relations=('materials', 'brand', 'model')
+                        ))
+                    context['listtmp'] = lists(request.GET['type'])
+                    context['status'] = True
             except ObjectDoesNotExist as e:
                 context['raise'] = str(e)
                 context['status'] = False

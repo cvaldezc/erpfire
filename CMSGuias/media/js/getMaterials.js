@@ -56,7 +56,7 @@ getMeters = function() {
     data = {
       matnom: $nom.val()
     };
-    $.getJSON("/json/get/meter/materials/", data, function(response) {
+    return $.getJSON("/json/get/meter/materials/", data, function(response) {
       var $med, template, x;
       template = "<option value=\"{{ materiales_id }}\">{{ matmed }}</option>";
       $med = $("[name=meter]");
@@ -64,9 +64,8 @@ getMeters = function() {
       for (x in response.list) {
         $med.append(Mustache.render(template, response.list[x]));
       }
-      return getSummaryMaterials();
+      getSummaryMaterials();
     });
-    return;
   } else {
     console.warn("The Field Name is empty!");
   }
@@ -85,6 +84,9 @@ getSummaryMaterials = function() {
       pro: $pro.val(),
       sec: $sec.val()
     };
+    if ($("[name=lds]").length) {
+      data['lds'] = true;
+    }
     $.getJSON("/json/get/resumen/details/materiales/", data, function(response) {
       var $lstp, $lsts, $tb, template, x;
       console.log(response);
@@ -102,14 +104,14 @@ getSummaryMaterials = function() {
       $("input[name=sales]").val(response.list[0].sale);
       $("input[name=sale]").val(response.list[0].sale);
       $lstp = $("#lstpurchase");
-      $lstp.empty();
-      if ($lstp.length > 0 && response.purchase) {
-        $lstp.append(Mustache.render("{{#purchase}}<option label=\"{{currency}}\" value=\"{{purchase}}\" />{{/purchase}}", response));
+      $lstp.html("");
+      if ($lstp.length > 0) {
+        $lstp.append(Mustache.render("{{#purchase}}\n    <option label=\"{{currency}}\" value=\"{{purchase}}\" />\n{{/purchase}}", response));
       }
       $lsts = $("#lstsales");
-      $lsts.empty();
-      if ($lsts.length > 0 && response.purchase) {
-        $lsts.append(Mustache.render("{{#purchase}}<option label=\"{{currency}}\" value=\"{{sales}}\" />{{/purchase}}", response));
+      $lsts.html("");
+      if ($lsts.length > 0) {
+        $lsts.append(Mustache.render("{{#purchase}}\n    <option label=\"{{currency}}\" value=\"{{sales}}\" />\n{{/purchase}}", response));
       }
       if ($("#unit").length > 0) {
         setTimeout(function() {

@@ -11,6 +11,8 @@ Tasks:
         TO-DO:
             - Missing Organize
             ☐ add user in note of ingress (Rocio, Mauro) @Storage @low
+            ☐ add field in "detcompra" for convert in of input @storage @critical 
+            ☐ change trigger "change status detcompra trigger in detingress" @storage @critical 
         Doing:
             ☐ Update modify of table dsmetrado -> implement three tables for details (add, edit, del) @Operations @high
     Tasks Complete:

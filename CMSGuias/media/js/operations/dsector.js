@@ -57,9 +57,9 @@ app.factory('Factory', function($http, $cookies) {
     }
     return _form;
   };
-  obj.get = function(option) {
-    if (option == null) {
-      option = {};
+  obj.get = function(options) {
+    if (options == null) {
+      options = {};
     }
     return $http.get("", {
       params: options
@@ -84,7 +84,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   $scope.sdnip = [];
   $scope.lplanes = [];
   angular.element(document).ready(function() {
-    var $table;
+    var $table, i, len, ref, x;
     angular.element('.modal').modal();
     angular.element('ul.tabs').tabs({
       'onShow': function() {
@@ -102,6 +102,11 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     });
     if ($scope.modify > 0) {
       $scope.modifyList();
+      ref = new Array('n', 'm', 'd');
+      for (i = 0, len = ref.length; i < len; i++) {
+        x = ref[i];
+        $scope.listTemps(x.toUpperCase());
+      }
     } else {
       $scope.getListAreaMaterials();
       $scope.getProject();
@@ -1169,6 +1174,16 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
             swal("Error", "No se a eliminado el plano seleccionado", "error");
           }
         });
+      }
+    });
+  };
+  $scope.listTemps = function(tp) {
+    Factory.get({
+      'lsttemp': true,
+      'type': tp
+    }).success(function(response) {
+      if (response.status) {
+        return $scope["lst" + tp] = response.listtmp;
       }
     });
   };

@@ -33,7 +33,7 @@ app.factory 'Factory', ($http, $cookies) ->
     for k, v in options
       _form.append k, v
     return _form
-  obj.get = (option={}) ->
+  obj.get = (options={}) ->
     $http.get "", params: options
   return obj
 
@@ -64,6 +64,8 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         return $table.closest('.wrapper')
     if $scope.modify > 0
       $scope.modifyList()
+      for x in new Array('n', 'm', 'd')
+        $scope.listTemps(x.toUpperCase())
     else
       $scope.getListAreaMaterials()
       $scope.getProject()
@@ -1059,6 +1061,13 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
               swal "Error", "No se a eliminado el plano seleccionado", "error"
               return
           return
+    return
+  
+  $scope.listTemps = (tp) ->
+    Factory.get('lsttemp': true, 'type': tp).
+    success (response) ->
+      if response.status
+        $scope["lst#{tp}"] = response.listtmp
     return
 
   $scope.$watch 'ascsector', ->
