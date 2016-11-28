@@ -326,6 +326,7 @@ BEGIN
   buy := (SELECT purchase_id FROM almacen_noteingress WHERE ingress_id = NEW.ingress_id LIMIT 1);
   SELECT INTO reg * FROM logistica_detcompra WHERE compra_id = buy AND materiales_id = NEW.materials_id AND brand_id = NEW.brand_id AND model_id = NEW.model_id;
   IF FOUND THEN
+    -- 2016-11-28 08:44:58 Change by implement fields convert in detcompra for not throw exception
     quantity = ROUND((reg.cantidad - NEW.quantity)::NUMERIC, 2);
     CASE WHEN quantity = 0 THEN tag := '2';
           WHEN (quantity >= 0.1) AND (quantity < reg.cantstatic) THEN tag := '1';

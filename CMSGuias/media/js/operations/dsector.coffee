@@ -35,6 +35,10 @@ app.factory 'Factory', ($http, $cookies) ->
     return _form
   obj.get = (options={}) ->
     $http.get "", params: options
+  obj.post = (options={}) ->
+    $http.post '', form(options),
+    transformRequest: angular.identity,
+    headers: 'Content-Type': undefined
   return obj
 
 app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q, Factory) ->
@@ -52,8 +56,14 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   $scope.radioO = []
   $scope.sdnip = []
   $scope.lplanes = []
+  $scope.meditindex = -1
+  $scope.objedit = []
+  $scope.editm =
+    'brand': ''
+    'model': ''
+    'quantity': 0
   angular.element(document).ready ->
-    angular.element('.modal').modal()
+    angular.element('.modal').modal 'dismissible': false
     angular.element('ul.tabs').tabs 'onShow': -> window.scrollTo 0, 680
     angular.element('.collapsible').collapsible()
     $table = $(".floatThead")
@@ -66,6 +76,16 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       $scope.modifyList()
       for x in new Array('n', 'm', 'd')
         $scope.listTemps(x.toUpperCase())
+      $http.get '/brand/list/', params: 'brandandmodel': true
+        .success (response) ->
+          if response.status
+            $scope.lbrand = response.brand
+            $scope.lmodel = response.model
+            setTimeout (->
+              angular.element("select").material_select()
+              return
+              ), 1200
+            return
     else
       $scope.getListAreaMaterials()
       $scope.getProject()
@@ -1062,12 +1082,58 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
               return
           return
     return
-  
+  # 2016-11-28 08:54:50 add new modify
   $scope.listTemps = (tp) ->
     Factory.get('lsttemp': true, 'type': tp).
     success (response) ->
       if response.status
         $scope["lst#{tp}"] = response.listtmp
+    return
+
+  $scope.enableModify = (index, obj) ->
+    $scope.meditindex = index
+    $scope.objedit = obj
+    return
+
+  $scope.showEdit = () ->
+    if Object.keys($scope.objedit).length > 0
+      $scope.editm['quantity'] = $scope.objedit.fields.quantity
+      $scope.editm['brand'] = $scope.objedit.fields.brand.pk
+      $scope.editm['model'] = $scope.objedit.fields.model.pk
+      $scope.editm['missingsend'] = $scope.objedit.fields.qorder
+      angular.element("#msedit").modal 'open'
+      setTimeout (->
+        angular.element("#edbrand,#edmodel").material_select()
+        return
+        ), 600
+      console.log $scope.objedit
+    else
+      Materialize.toast "<i class='fa fa-warning amber-text'></i>
+        &nbsp; Debe de elegir un material para modifcar.", 4400
+    return
+
+  $scope.enableDel = () ->
+    if Object.keys($scope.objedit).length > 0
+      swal
+        title: "Realmente desea eliminar?"
+        text: """#{$scope.objedit.fields.materials.fields.matnom}
+              #{$scope.objedit.fields.materials.fields.matmed}
+              <small>Nota: si se han enviado cantidades no
+              se eliminara por completo quedara registrado.</small>"""
+        type: "warning"
+        showCancelButton: true
+      , (isConfirm) ->
+        if isConfirm
+          console.log isConfirm
+    else
+      Materialize.toast "<i class='fa fa-warning amber-text'></i>
+        &nbsp; Debe de elegir un material para eliminar.", 4400
+    return
+
+  $scope.disableModify = ->
+    $scope.meditindex = -1
+    $scope.objedit = {}
+    $scope.editm = {}
     return
 
   $scope.$watch 'ascsector', ->

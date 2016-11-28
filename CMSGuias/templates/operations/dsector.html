@@ -663,7 +663,7 @@
                         <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.psales}}</td>
                         <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.quantity * x.fields.ppurchase | number:2}}</td>
                         <td class="center-align">
-                            <input type="radio" name="wrench" class="with-gap" id="rb{{$index}}">
+                            <input type="radio" name="wrench" class="with-gap" id="rb{{$index}}" ng-click="enableModify($index, x)">
                             <label for="rb{{$index}}"></label>
                             <!--<a href="#!" style="padding: 2px 0px 2px 3px;" ng-show="" ng-click="closeEditM($event)" class="waves-effect waves-light light-blue-text text-darken-3"><i class="fa fa-edit"></i></a>
                             <a href="#!" style="padding: 2px 0px 2px 3px;" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'" ng-click="delEditM($event)" data-brand="{{x.fields.brand.pk}}" data-model="{{x.fields.model.pk}}" class="waves-effect waves-light red-text text-darken-1"><i class="fa fa-trash"></i></a>-->
@@ -698,21 +698,20 @@
                     </thead>
                     <tbody>
                     {% verbatim %}
-                        <tr ng-include src="'modifytmp.html'" ng-repeat="x in lmodify | filter: finme" ng-dblclick="showEditM($event)" class="text-12"></tr>
+                        <tr ng-include src="'modifytmp.html'" ng-repeat="x in lmodify | filter: finme" class="text-12"></tr>
                     {% endverbatim %}
                     </tbody>
                 </table>
                 <br>
                 <br>
-                <div class="fixed-action-btn horizontal click-to-toggle">
+                <div class="fixed-action-btn horizontal">
                     <a class="btn-floating btn-large red">
                         <i class="fa fa-wrench"></i>
                     </a>
                     <ul>
-                        <li><a class="btn-floating red"><i class="fa fa-trash"></i></a></li>
-                        <li><a class="btn-floating yellow darken-1"><i class="fa fa-times"></i></a></li>
-                        <li><a class="btn-floating green"><i class="fa fa-floppy-o"></i></a></li>
-                        <li><a class="btn-floating blue"><i class="fa fa-pencil-square-o"></i></a></li>
+                        <li ng-show="meditindex!=-1"><a class="waves-effect btn-floating  red" ng-click="enableDel()"><i class="fa fa-trash"></i></a></li>
+                        <li ng-show="meditindex!=-1"><a class="waves-effect btn-floating  blue" ng-click="showEdit()"><i class="fa fa-pencil"></i></a></li>
+                        <li ng-show="meditindex!=-1"><a class="waves-effect btn-floating  grey darken-1" ng-click="disableModify()"><i class="fa fa-times"></i></a></li>
                     </ul>
                 </div>
             </div>
@@ -1025,6 +1024,44 @@
         </button>
         <div class="modal-content">
             <iframe id"sfplane" type="application/pdf" style="height: 96%; width: 97%; position: absolute;" src=""></iframe>
+        </div>
+    </div>
+    <!-- modal update 2016-11-28 11:49:36-->
+    <div class="modal" id="msedit">
+        <div class="modal-content">
+            <h5>
+                {{objedit.fields.materials.fields.matnom}} {{objedit.fields.materials.fields.matmed}}
+                <br>
+                <small>{{objedit.fields.materials.pk}} / {{objedit.fields.materials.fields.unidad}}</small>
+            </h5>
+            <div class="row">
+                <div class="col l6 m6 s12">
+                    <select id="edbrand" ng-model="editm['brand']" ng-options="x.pk as x.fields.brand for x in lbrand">
+                        <option value="" disabled>--Seleccione-</option>
+                    </select>
+                    <label for="edbrand">Marca</label>
+                </div>
+                <div class="col l6 m6 s12">
+                    <select id="edmodel" ng-model="editm['model']" id="" ng-options="x.pk as x.fields.model for x in lmodel">
+                        <option value="" disabled>--Seleccione-</option>
+                    </select>
+                    <label for="edmodel">Modelo</label>
+                </div>
+                <div class="col l6 m6 s12 input-field">
+                    <input type="number" class="right-align" ng-model="editm['quantity']">
+                    <label for="">Cantidad</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="buton" class="left modal-action modal-close waves-effect btn grey lighten-5 grey-text text-darken-3">
+                <i class="fa fa-times"></i>
+                <span class="hide-on-small-only">Salir</span>
+            </button>
+            <button type="buton" class="waves-effect btn blue ">
+                <i class="fa fa-floppy-o"></i>
+                <span class="hide-on-small-only">Guardar</span>
+            </button>
         </div>
     </div>
     {% endverbatim %}

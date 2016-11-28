@@ -65,6 +65,17 @@ app.factory('Factory', function($http, $cookies) {
       params: options
     });
   };
+  obj.post = function(options) {
+    if (options == null) {
+      options = {};
+    }
+    return $http.post('', form(options), {
+      transformRequest: angular.identity,
+      headers: {
+        'Content-Type': void 0
+      }
+    });
+  };
   return obj;
 });
 
@@ -83,9 +94,18 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   $scope.radioO = [];
   $scope.sdnip = [];
   $scope.lplanes = [];
+  $scope.meditindex = -1;
+  $scope.objedit = [];
+  $scope.editm = {
+    'brand': '',
+    'model': '',
+    'quantity': 0
+  };
   angular.element(document).ready(function() {
     var $table, i, len, ref, x;
-    angular.element('.modal').modal();
+    angular.element('.modal').modal({
+      'dismissible': false
+    });
     angular.element('ul.tabs').tabs({
       'onShow': function() {
         return window.scrollTo(0, 680);
@@ -107,6 +127,19 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         x = ref[i];
         $scope.listTemps(x.toUpperCase());
       }
+      $http.get('/brand/list/', {
+        params: {
+          'brandandmodel': true
+        }
+      }).success(function(response) {
+        if (response.status) {
+          $scope.lbrand = response.brand;
+          $scope.lmodel = response.model;
+          setTimeout((function() {
+            angular.element("select").material_select();
+          }), 1200);
+        }
+      });
     } else {
       $scope.getListAreaMaterials();
       $scope.getProject();
@@ -1186,6 +1219,46 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         return $scope["lst" + tp] = response.listtmp;
       }
     });
+  };
+  $scope.enableModify = function(index, obj) {
+    $scope.meditindex = index;
+    $scope.objedit = obj;
+  };
+  $scope.showEdit = function() {
+    if (Object.keys($scope.objedit).length > 0) {
+      $scope.editm['quantity'] = $scope.objedit.fields.quantity;
+      $scope.editm['brand'] = $scope.objedit.fields.brand.pk;
+      $scope.editm['model'] = $scope.objedit.fields.model.pk;
+      $scope.editm['missingsend'] = $scope.objedit.fields.qorder;
+      angular.element("#msedit").modal('open');
+      setTimeout((function() {
+        angular.element("#edbrand,#edmodel").material_select();
+      }), 600);
+      console.log($scope.objedit);
+    } else {
+      Materialize.toast("<i class='fa fa-warning amber-text'></i> &nbsp; Debe de elegir un material para modifcar.", 4400);
+    }
+  };
+  $scope.enableDel = function() {
+    if (Object.keys($scope.objedit).length > 0) {
+      swal({
+        title: "Realmente desea eliminar?",
+        text: $scope.objedit.fields.materials.fields.matnom + "\n" + $scope.objedit.fields.materials.fields.matmed + "\n<small>Nota: si se han enviado cantidades no\nse eliminara por completo quedara registrado.</small>",
+        type: "warning",
+        showCancelButton: true
+      }, function(isConfirm) {
+        if (isConfirm) {
+          return console.log(isConfirm);
+        }
+      });
+    } else {
+      Materialize.toast("<i class='fa fa-warning amber-text'></i> &nbsp; Debe de elegir un material para eliminar.", 4400);
+    }
+  };
+  $scope.disableModify = function() {
+    $scope.meditindex = -1;
+    $scope.objedit = {};
+    $scope.editm = {};
   };
   $scope.$watch('ascsector', function() {
     if ($scope.ascsector) {
