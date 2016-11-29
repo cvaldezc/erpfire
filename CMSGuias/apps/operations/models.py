@@ -425,7 +425,7 @@ class DSMetradoTemp(models.Model):
     ppurchase = models.DecimalField(max_digits=8, decimal_places=3, default=0)
     psales = models.DecimalField(max_digits=8, decimal_places=3, default=0)
     type = models.CharField(max_length=1, null=False, choices=STATUS)
-    sysmbol = models.CharField(max_length=1, default='+')
+    symbol = models.CharField(max_length=1, default='+')
     flag = models.BooleanField(default=True)
 
     def __unicode__(self):

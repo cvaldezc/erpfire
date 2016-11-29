@@ -1054,12 +1054,12 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="buton" class="left modal-action modal-close waves-effect btn grey lighten-5 grey-text text-darken-3">
+            <button ng-disabled="status" type="buton" class="left modal-action modal-close waves-effect btn grey lighten-5 grey-text text-darken-3">
                 <i class="fa fa-times"></i>
                 <span class="hide-on-small-only">Salir</span>
             </button>
-            <button type="buton" class="waves-effect btn blue ">
-                <i class="fa fa-floppy-o"></i>
+            <button ng-disabled="status" type="buton" class="waves-effect btn blue" ng-click="saveModify()">
+                <i class="fa" ng-class="{'fa-cog fa-spin fa-fw': status, 'fa-floppy-o': !status}"></i>
                 <span class="hide-on-small-only">Guardar</span>
             </button>
         </div>

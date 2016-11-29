@@ -937,6 +937,15 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     #     mm.psales = request.POST['psales']
                     # mm.save()
                     context['status'] = True
+                if 'delteModifyN' in request.POST:
+                    DSMetradoTemp.objects.get(
+                        dsector_id=kwargs['area'],
+                        materials_id=request.POST['materials'],
+                        brand_id=request.POST['brand'],
+                        model_id=request.POST['model'],
+                        type='N'
+                    ).delete()
+                    context['status'] = True
                 if 'editMM' in request.POST:
                     # remove all 2016-24-11
                     update = MMetrado.objects.filter(
@@ -960,6 +969,51 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     else:
                         context['status'] = False
                         context['raise'] = 'Data not found'
+                if 'saveModify' in request.POST:
+                    # time.sleep(6) save
+                    dsm = DSMetrado.objects.get(
+                        dsector_id=kwargs['area'],
+                        materials_id=request.POST['materials'],
+                        brand_id=request.POST['obrand'],
+                        model_id=request.POST['omodel'])
+                    qtt = float(request.POST['quantity'])
+                    symb = '+'
+                    if qtt > dsm.quantity:
+                        symb = '+'
+                    else:
+                        symb = '-'
+                    try:
+                        dsmt = DSMetradoTemp.objects.get(
+                            materials_id=request.POST['materials'],
+                            brand_id=requet.POST['brand'],
+                            model_id=request.POST['model'],
+                            type='M')
+                        dsmt.missingsend = request.POST['missingsend']
+                        dmst.quantity = request.POST['quantity']
+                        dmst.type = 'M'
+                        dmst.symbol = symb
+                        dmst.save()
+                    except DSMetradoTemp.DoesNotExist as ex:
+                        DSMetradoTemp.objects.create(dsector_id=kwargs['area'],
+                            materials_id=request.POST['materials'],
+                            brand_id=request.POST['brand'],
+                            model_id=request.POST['model'],
+                            missingsend=request.POST['missingsend'],
+                            quantity=request.POST['quantity'],
+                            ppurchase=request.POST['ppurchase'],
+                            psales=request.POST['psales'],
+                            type='M',
+                            symbol=symb)
+                    context['status'] = True
+                if 'deleteModify' in request.POST:
+                    DSMetradoTemp.objects.get(
+                        dsector_id=kwargs['area'],
+                        materials_id=request.POST['materials'],
+                        brand_id=request.POST['brand'],
+                        model_id=request.POST['model'],
+                        type='M'
+                    ).delete()
+                    context['status'] = True
                 if 'delMM' in request.POST:
                     # remove all section 2016-24-11
                     MMetrado.objects.filter(
@@ -972,7 +1026,6 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     # this ok, before add support for new table DSMetradoTemp
                     MMetrado.objects.filter(dsector_id=kwargs['area']).delete()
                     context['status'] = True
-                
                 if 'approvedModify' in request.POST:
                     # remove all 2016-24-11 change function
                     lm = MMetrado.objects.filter(dsector_id=kwargs['area'])

@@ -41,21 +41,21 @@ app.directive('file', function($parse) {
 });
 
 app.factory('Factory', function($http, $cookies) {
-  var form, obj;
+  var frm, obj;
   $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
   obj = new Object();
-  form = function(options) {
-    var _form, i, k, len, v;
+  frm = function(options) {
+    var f, i, k, len, v;
     if (options == null) {
       options = {};
     }
-    _form = new FormData();
+    f = new FormData();
     for (v = i = 0, len = options.length; i < len; v = ++i) {
       k = options[v];
-      _form.append(k, v);
+      f.append(k, v);
     }
-    return _form;
+    return f;
   };
   obj.get = function(options) {
     if (options == null) {
@@ -63,17 +63,6 @@ app.factory('Factory', function($http, $cookies) {
     }
     return $http.get("", {
       params: options
-    });
-  };
-  obj.post = function(options) {
-    if (options == null) {
-      options = {};
-    }
-    return $http.post('', form(options), {
-      transformRequest: angular.identity,
-      headers: {
-        'Content-Type': void 0
-      }
     });
   };
   return obj;
@@ -101,6 +90,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     'model': '',
     'quantity': 0
   };
+  $scope.status = false;
   angular.element(document).ready(function() {
     var $table, i, len, ref, x;
     angular.element('.modal').modal({
@@ -1229,6 +1219,8 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
       $scope.editm['quantity'] = $scope.objedit.fields.quantity;
       $scope.editm['brand'] = $scope.objedit.fields.brand.pk;
       $scope.editm['model'] = $scope.objedit.fields.model.pk;
+      $scope.editm['obrand'] = $scope.objedit.fields.brand.pk;
+      $scope.editm['omodel'] = $scope.objedit.fields.model.pk;
       $scope.editm['missingsend'] = $scope.objedit.fields.qorder;
       angular.element("#msedit").modal('open');
       setTimeout((function() {
@@ -1239,13 +1231,42 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
       Materialize.toast("<i class='fa fa-warning amber-text'></i> &nbsp; Debe de elegir un material para modifcar.", 4400);
     }
   };
+  $scope.saveModify = function() {
+    var f, k, param, v;
+    $scope.status = true;
+    param = $scope.editm;
+    param['saveModify'] = true;
+    console.log(param);
+    f = new FormData();
+    for (k in param) {
+      v = param[k];
+      f.append(k, v);
+    }
+    $http.post("", f, {
+      transformRequest: angular.identity,
+      headers: {
+        'Content-Type': void 0
+      }
+    }).success(function(response) {
+      if (response.status) {
+        $scope.status = false;
+        console.log(response);
+        $scope.disableModify();
+      }
+    });
+  };
   $scope.enableDel = function() {
     if (Object.keys($scope.objedit).length > 0) {
       swal({
         title: "Realmente desea eliminar?",
-        text: $scope.objedit.fields.materials.fields.matnom + "\n" + $scope.objedit.fields.materials.fields.matmed + "\n<small>Nota: si se han enviado cantidades no\nse eliminara por completo quedara registrado.</small>",
+        text: $scope.objedit.fields.materials.fields.matnom + "\n" + $scope.objedit.fields.materials.fields.matmed + "\n<br><small>Nota: si se han enviado cantidades no\nse eliminara por completo quedara registrado.</small>",
         type: "warning",
-        showCancelButton: true
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Si!, eliminar",
+        closeOnCancel: true,
+        closeOnConfirm: true,
+        html: true
       }, function(isConfirm) {
         if (isConfirm) {
           return console.log(isConfirm);

@@ -28,17 +28,13 @@ app.factory 'Factory', ($http, $cookies) ->
   $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
   obj = new Object()
-  form = (options={}) ->
-    _form = new FormData()
+  frm = (options={}) ->
+    f = new FormData()
     for k, v in options
-      _form.append k, v
-    return _form
+      f.append k, v
+    return f
   obj.get = (options={}) ->
     $http.get "", params: options
-  obj.post = (options={}) ->
-    $http.post '', form(options),
-    transformRequest: angular.identity,
-    headers: 'Content-Type': undefined
   return obj
 
 app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q, Factory) ->
@@ -62,6 +58,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     'brand': ''
     'model': ''
     'quantity': 0
+  $scope.status = false
   angular.element(document).ready ->
     angular.element('.modal').modal 'dismissible': false
     angular.element('ul.tabs').tabs 'onShow': -> window.scrollTo 0, 680
@@ -1100,6 +1097,8 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       $scope.editm['quantity'] = $scope.objedit.fields.quantity
       $scope.editm['brand'] = $scope.objedit.fields.brand.pk
       $scope.editm['model'] = $scope.objedit.fields.model.pk
+      $scope.editm['obrand'] = $scope.objedit.fields.brand.pk
+      $scope.editm['omodel'] = $scope.objedit.fields.model.pk
       $scope.editm['missingsend'] = $scope.objedit.fields.qorder
       angular.element("#msedit").modal 'open'
       setTimeout (->
@@ -1112,16 +1111,38 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         &nbsp; Debe de elegir un material para modifcar.", 4400
     return
 
+  $scope.saveModify = ->
+    $scope.status = true
+    param = $scope.editm
+    param['saveModify'] = true
+    console.log param
+    f = new FormData()
+    for k, v of param
+      f.append k, v
+    $http.post "", f, transformRequest: angular.identity, headers: 'Content-Type': undefined
+    .success (response) ->
+      if response.status
+        $scope.status = false
+        console.log response
+        $scope.disableModify()
+        return
+    return
+
   $scope.enableDel = () ->
     if Object.keys($scope.objedit).length > 0
       swal
         title: "Realmente desea eliminar?"
         text: """#{$scope.objedit.fields.materials.fields.matnom}
               #{$scope.objedit.fields.materials.fields.matmed}
-              <small>Nota: si se han enviado cantidades no
+              <br><small>Nota: si se han enviado cantidades no
               se eliminara por completo quedara registrado.</small>"""
         type: "warning"
         showCancelButton: true
+        confirmButtonColor: "#DD6B55"
+        confirmButtonText: "Si!, eliminar"
+        closeOnCancel: true
+        closeOnConfirm: true
+        html: true
       , (isConfirm) ->
         if isConfirm
           console.log isConfirm
