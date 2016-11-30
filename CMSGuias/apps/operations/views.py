@@ -659,9 +659,9 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             relations=('materiales')))
                     context['status'] = True
                 if 'lsttemp' in request.GET:
-                    def lists(args):
+                    def lists(tp):
                         lst = DSMetradoTemp.objects.filter(dsector_id=kwargs['area'],
-                            type='N')
+                            type=tp)
                         return json.loads(serializers.serialize(
                             'json', lst, relations=('materials', 'brand', 'model')
                         ))
@@ -1001,7 +1001,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             missingsend=request.POST['missingsend'],
                             quantity=request.POST['quantity'],
                             ppurchase=request.POST['ppurchase'],
-                            psales=request.POST['psales'],
+                            psales=Decimal(request.POST['psales']).quantize(Decimal('0.001')),
                             type='M',
                             symbol=symb)
                     context['status'] = True
@@ -1013,6 +1013,50 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         model_id=request.POST['model'],
                         type='M'
                     ).delete()
+                    context['status'] = True
+                if 'deleteReg' in request.POST:
+                    dp = Detpedido.objects.filter(
+                        pedido__dsector_id=kwargs['area'],
+                        materiales_id=request.POST['materials'],
+                        brand_id=request.POST['obrand'],
+                        model_id=request.POST['omodel'],
+                        pedido__status__in=['PE','AP','IN', 'CO'])
+                    sq = sum(s.cantidad for s in dp)
+                    print Decimal(request.POST['psales']).quantize(Decimal('0.01'))
+                    try:
+                        dsmt = DSMetradoTemp.objects.get(
+                            type='D',materials_id=request.POST['materials'],
+                            brand_id=request.POST['obrand'],
+                            model_id=request.POST['omodel'])
+                        dsmt.missingsend = sq
+                        dsmt.quantity = (
+                            float(request.POST['quantity']) - float(sq))
+                        dsmt.save()
+                    except DSMetradoTemp.DoesNotExist as ex:
+                        ob = DSMetradoTemp()
+                        ob.dsector_id=kwargs['area']
+                        ob.materials_id=request.POST['materials']
+                        ob.brand_id=request.POST['obrand']
+                        ob.model_id=request.POST['omodel']
+                        ob.missingsend=Decimal(sq).quantize(Decimal('0.01'))
+                        ob.quantity=Decimal(abs(float(request.POST['quantity'])-sq)).quantize(Decimal('0.01'))
+                        ob.type='D'
+                        ob.symbol='-'
+                        ob.ppurchase=Decimal(request.POST['ppurchase']).quantize(Decimal('0.01'))
+                        ob.psales=Decimal(request.POST['psales']).quantize(Decimal('0.01'))
+                        ob.save()
+                    context['status'] = True
+                if 'delregdel' in request.POST:
+                    for x in json.loads(request.POST['ddel']):
+                        try:
+                            DSMetradoTemp.objects.get(dsector_id=kwargs['area'],
+                                materials_id=x['materials'],
+                                brand_id=x['obrand'],
+                                model_id=x['omodel'],
+                                type='D'
+                            ).delete()
+                        except DSMetradoTemp.DoesNotExist as ex:
+                            print ex
                     context['status'] = True
                 if 'delMM' in request.POST:
                     # remove all section 2016-24-11

@@ -30,9 +30,14 @@ app.factory 'Factory', ($http, $cookies) ->
   obj = new Object()
   frm = (options={}) ->
     f = new FormData()
-    for k, v in options
+    for k, v of options
       f.append k, v
     return f
+  obj.post = (options={}) ->
+    $http.post "",
+      frm(options),
+      transformRequest: angular.identity,
+      headers: 'Content-Type': undefined
   obj.get = (options={}) ->
     $http.get "", params: options
   return obj
@@ -1090,16 +1095,25 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   $scope.enableModify = (index, obj) ->
     $scope.meditindex = index
     $scope.objedit = obj
+    $scope.editm['materials'] = $scope.objedit.fields.materials.pk
+    $scope.editm['quantity'] = $scope.objedit.fields.quantity
+    $scope.editm['brand'] = $scope.objedit.fields.brand.pk
+    $scope.editm['model'] = $scope.objedit.fields.model.pk
+    $scope.editm['obrand'] = $scope.objedit.fields.brand.pk
+    $scope.editm['omodel'] = $scope.objedit.fields.model.pk
+    $scope.editm['missingsend'] = $scope.objedit.fields.qorder
+    $scope.editm['ppurchase'] = $scope.objedit.fields.ppurchase
+    $scope.editm['psales'] = $scope.objedit.fields.psales
     return
 
   $scope.showEdit = () ->
     if Object.keys($scope.objedit).length > 0
-      $scope.editm['quantity'] = $scope.objedit.fields.quantity
-      $scope.editm['brand'] = $scope.objedit.fields.brand.pk
-      $scope.editm['model'] = $scope.objedit.fields.model.pk
-      $scope.editm['obrand'] = $scope.objedit.fields.brand.pk
-      $scope.editm['omodel'] = $scope.objedit.fields.model.pk
-      $scope.editm['missingsend'] = $scope.objedit.fields.qorder
+      # $scope.editm['quantity'] = $scope.objedit.fields.quantity
+      # $scope.editm['brand'] = $scope.objedit.fields.brand.pk
+      # $scope.editm['model'] = $scope.objedit.fields.model.pk
+      # $scope.editm['obrand'] = $scope.objedit.fields.brand.pk
+      # $scope.editm['omodel'] = $scope.objedit.fields.model.pk
+      # $scope.editm['missingsend'] = $scope.objedit.fields.qorder
       angular.element("#msedit").modal 'open'
       setTimeout (->
         angular.element("#edbrand,#edmodel").material_select()
@@ -1119,7 +1133,9 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     f = new FormData()
     for k, v of param
       f.append k, v
-    $http.post "", f, transformRequest: angular.identity, headers: 'Content-Type': undefined
+    $http.post "", f
+      transformRequest: angular.identity
+      headers: 'Content-Type': undefined
     .success (response) ->
       if response.status
         $scope.status = false
@@ -1134,8 +1150,11 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         title: "Realmente desea eliminar?"
         text: """#{$scope.objedit.fields.materials.fields.matnom}
               #{$scope.objedit.fields.materials.fields.matmed}
-              <br><small>Nota: si se han enviado cantidades no
-              se eliminara por completo quedara registrado.</small>"""
+               #{$scope.objedit.fields.brand.fields.brand}
+               #{$scope.objedit.fields.model.fields.model}
+              <br><small>Nota: si se ha realizado pedidos no
+              se eliminara por completo quedara registrado
+              la cantidad pedida.</small>"""
         type: "warning"
         showCancelButton: true
         confirmButtonColor: "#DD6B55"
@@ -1145,10 +1164,37 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         html: true
       , (isConfirm) ->
         if isConfirm
-          console.log isConfirm
+          console.log "Inside confirm delete material", isConfirm
+          param = $scope.editm
+          param['deleteReg'] = true
+          Factory.post param
+          .success (response) ->
+            if reponse.status
+              Materialize.toast '<i class="fa fa-check"></i>&nbsp;Se eliminar el item', 4000
+              $scope.listTemps('D')
     else
       Materialize.toast "<i class='fa fa-warning amber-text'></i>
         &nbsp; Debe de elegir un material para eliminar.", 4400
+    return
+  $scope.delRegdel = ->
+    swal
+      title: 'Realmente desea eliminar?'
+      text: 'Toda la lista de "eliminados"'
+      showButtonCancel: true
+      confirmButtonColor: "#DD6B55"
+      confirmButtonText:"Si! eliminar todo"
+      closeOnCancel: true
+      closeOnConfirm: true
+    , (isConfirm) ->
+      if isConfirm
+        param = $scope.delrg
+        param['delregdel'] = true
+        Factory.post(param)
+        .success (response) ->
+          if response.status
+            Materilize.toast "<i class='fa fa-trash'></i> Se los items seleccionados!", 4000
+            return
+        return
     return
 
   $scope.disableModify = ->

@@ -46,16 +46,27 @@ app.factory('Factory', function($http, $cookies) {
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
   obj = new Object();
   frm = function(options) {
-    var f, i, k, len, v;
+    var f, k, v;
     if (options == null) {
       options = {};
     }
     f = new FormData();
-    for (v = i = 0, len = options.length; i < len; v = ++i) {
-      k = options[v];
+    for (k in options) {
+      v = options[k];
       f.append(k, v);
     }
     return f;
+  };
+  obj.post = function(options) {
+    if (options == null) {
+      options = {};
+    }
+    return $http.post("", frm(options), {
+      transformRequest: angular.identity,
+      headers: {
+        'Content-Type': void 0
+      }
+    });
   };
   obj.get = function(options) {
     if (options == null) {
@@ -1213,15 +1224,18 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   $scope.enableModify = function(index, obj) {
     $scope.meditindex = index;
     $scope.objedit = obj;
+    $scope.editm['materials'] = $scope.objedit.fields.materials.pk;
+    $scope.editm['quantity'] = $scope.objedit.fields.quantity;
+    $scope.editm['brand'] = $scope.objedit.fields.brand.pk;
+    $scope.editm['model'] = $scope.objedit.fields.model.pk;
+    $scope.editm['obrand'] = $scope.objedit.fields.brand.pk;
+    $scope.editm['omodel'] = $scope.objedit.fields.model.pk;
+    $scope.editm['missingsend'] = $scope.objedit.fields.qorder;
+    $scope.editm['ppurchase'] = $scope.objedit.fields.ppurchase;
+    $scope.editm['psales'] = $scope.objedit.fields.psales;
   };
   $scope.showEdit = function() {
     if (Object.keys($scope.objedit).length > 0) {
-      $scope.editm['quantity'] = $scope.objedit.fields.quantity;
-      $scope.editm['brand'] = $scope.objedit.fields.brand.pk;
-      $scope.editm['model'] = $scope.objedit.fields.model.pk;
-      $scope.editm['obrand'] = $scope.objedit.fields.brand.pk;
-      $scope.editm['omodel'] = $scope.objedit.fields.model.pk;
-      $scope.editm['missingsend'] = $scope.objedit.fields.qorder;
       angular.element("#msedit").modal('open');
       setTimeout((function() {
         angular.element("#edbrand,#edmodel").material_select();
@@ -1242,12 +1256,12 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
       v = param[k];
       f.append(k, v);
     }
-    $http.post("", f, {
+    $http.post("", f({
       transformRequest: angular.identity,
       headers: {
         'Content-Type': void 0
       }
-    }).success(function(response) {
+    })).success(function(response) {
       if (response.status) {
         $scope.status = false;
         console.log(response);
@@ -1259,7 +1273,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     if (Object.keys($scope.objedit).length > 0) {
       swal({
         title: "Realmente desea eliminar?",
-        text: $scope.objedit.fields.materials.fields.matnom + "\n" + $scope.objedit.fields.materials.fields.matmed + "\n<br><small>Nota: si se han enviado cantidades no\nse eliminara por completo quedara registrado.</small>",
+        text: $scope.objedit.fields.materials.fields.matnom + "\n" + $scope.objedit.fields.materials.fields.matmed + "\n " + $scope.objedit.fields.brand.fields.brand + "\n " + $scope.objedit.fields.model.fields.model + "\n<br><small>Nota: si se ha realizado pedidos no\nse eliminara por completo quedara registrado\nla cantidad pedida.</small>",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
@@ -1268,13 +1282,44 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         closeOnConfirm: true,
         html: true
       }, function(isConfirm) {
+        var param;
         if (isConfirm) {
-          return console.log(isConfirm);
+          console.log("Inside confirm delete material", isConfirm);
+          param = $scope.editm;
+          param['deleteReg'] = true;
+          return Factory.post(param).success(function(response) {
+            if (reponse.status) {
+              Materialize.toast('<i class="fa fa-check"></i>&nbsp;Se eliminar el item', 4000);
+              return $scope.listTemps('D');
+            }
+          });
         }
       });
     } else {
       Materialize.toast("<i class='fa fa-warning amber-text'></i> &nbsp; Debe de elegir un material para eliminar.", 4400);
     }
+  };
+  $scope.delRegdel = function() {
+    swal({
+      title: 'Realmente desea eliminar?',
+      text: 'Toda la lista de "eliminados"',
+      showButtonCancel: true,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "Si! eliminar todo",
+      closeOnCancel: true,
+      closeOnConfirm: true
+    }, function(isConfirm) {
+      var param;
+      if (isConfirm) {
+        param = $scope.delrg;
+        param['delregdel'] = true;
+        Factory.post(param).success(function(response) {
+          if (response.status) {
+            Materilize.toast("<i class='fa fa-trash'></i> Se los items seleccionados!", 4000);
+          }
+        });
+      }
+    });
   };
   $scope.disableModify = function() {
     $scope.meditindex = -1;

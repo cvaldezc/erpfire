@@ -268,12 +268,12 @@
                       <label for="nothing">Ninguno</label>
                     </p>
                 </p>
-                <table class="table responsive-table floatThead table-withoutApproved">
+                <table class="table responsive-table highlight hovered floatThead table-withoutApproved">
                     <caption ng-show="fmatwoa">
                         <div class="input-field">
                             <i class="prefix fa fa-filter"></i>
                             <input type="text" ng-model="finmwoa">
-                            <label>Buscar material</label>
+                            <label class="active left-align">Filtrar Material</label>
                         </div>
                     </caption>
                     <thead class="amber lighten-4">
@@ -415,7 +415,7 @@
                     <div class="col l12 m12 s12">
                         <ul class="tabs idenred">
                             <li class="tab col s3"><a class="grey-text text-darken-3" href="#vmodify"><i class="fa fa-pencil"></i> <strong>MODIFICACION</strong></a></li>
-                            <li class="tab col s3"><a class="grey-text text-darken-3" href="#vlist"><i class="fa fa-list-alt"></i> <strong>LISTA ACTUAL</strong></a></li>
+                            <li class="tab col s3"><a class="grey-text text-darken-3 active" href="#vlist"><i class="fa fa-list-alt"></i> <strong>LISTA ACTUAL</strong></a></li>
                             <li class="tab col s3"><a class="grey-text text-darken-3" href="#vprices"><i class="fa fa-dollar"></i> <strong>PRECIOS</strong></a></li>
                         </ul>
                     </div>
@@ -434,7 +434,7 @@
                 <ul class="collapsible popout" data-collapsible="expandable">
                     <li ng-class="{'active': mmview}">
                         <div ng-class="{'active': mmview}" class="collapsible-header green-text text-lighten-1">
-                            <i class="fa fa-plus"></i>Agregado
+                            <i class="fa fa-plus"></i> Para agregar
                         </div>
                         <div class="collapsible-body" ng-style="mmview ? {display: 'block'} : {display: 'none'}">
                             <table class="table responsive-table highlight hovered">
@@ -483,7 +483,8 @@
                         </div>
                     </li>
                     <li ng-class="{'active': mmview}">
-                        <div ng-class="{'active': mmview}" class="collapsible-header blue-text text-darken-1"><i class="fa fa-edit"></i>Modificado</div>
+                        <div ng-class="{'active': mmview}" class="collapsible-header blue-text text-darken-1">
+                            <i class="fa fa-edit"></i> Para modificar</div>
                         <div class="collapsible-body" ng-style="mmview ? {display: 'block'} : {display: 'none'}">
                             <table class="table responsive-table highlight hovered">
                                 <thead>
@@ -531,7 +532,8 @@
                         </div>
                     </li>
                     <li ng-class="{'active': mmview}">
-                        <div ng-class="{'active': mmview}" class="collapsible-header red-text"><i class="fa fa-trash"></i>Eliminado</div>
+                        <div ng-class="{'active': mmview}" class="collapsible-header red-text">
+                            <i class="fa fa-trash"></i> Para eliminar</div>
                         <div class="collapsible-body" ng-style="mmview ? {display: 'block'} : {display: 'none'}">
                             <table class="table responsive-table highlight hovered">
                                 <thead>
@@ -542,7 +544,8 @@
                                         <th>Marca</th>
                                         <th>Modelo</th>
                                         <th>Unidad</th>
-                                        <th>Cantidad</th>
+                                        <th>En Pedidos</th>
+                                        <th>Cant. a Eliminar</th>
                                         <th>
                                             <a href="#!lnew" class="blue-text" ng-click="listTemps('n')">
                                                 <i class="fa fa-refresh"></i>
@@ -552,25 +555,17 @@
                                 </thead>
                                 <tbody>
                                     {% verbatim %}
-                                    <tr ng-repeat="x in lstn">
+                                    <tr ng-repeat="x in lstD">
                                         <td>{{$index+1}}</td>
-                                        <td>{{x.pk}}</td>
-                                        <td>{{x.field.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-                                        <td>{{x.field.brand.fields.brand}}</td>
-                                        <td>{{x.fields.model.fields.model}}</td>
-                                        <td>{{x.fields.materials.fields.unidad}}</td>
-                                        <td>{{x.fields.quantity}}</td>
-                                        <td>
-                                            <div class="fixed-action-btn horizontal click-to-toggle">
-                                                <a class="btn-floating red">
-                                                    <i class="fa fa-wrench"></i>
-                                                </a>
-                                                <ul>
-                                                    <li><a href="" class="btn-floating blue"><i class="fa fa-pencil-square-o"></i></a></li>
-                                                    <li><a href="" class="btn-floating red"><i class="fa trash-o"></i></a></li>
-                                                    {% comment %}<li><a href="" class="btn-floating blue"><i class="fa fa-pencil-square-o"></i></a></li>{% endcomment %}
-                                                </ul>
-                                            </div>
+                                        <td class="center-align">{{x.fields.materials.pk}}</td>
+                                        <td class="left-align">{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
+                                        <td class="center-align">{{x.fields.brand.fields.brand}}</td>
+                                        <td class="center-align">{{x.fields.model.fields.model}}</td>
+                                        <td class="center-align">{{x.fields.materials.fields.unidad}}</td>
+                                        <td class="right-align">{{x.fields.missingsend}}</td>
+                                        <td class="right-align">{{x.fields.quantity}}</td>
+                                        <td class="center-align">
+                                            <a href="" class="red-text"><i class="fa fa-trash-o"></i></a>
                                         </td>
                                     </tr>
                                     {% endverbatim %}
@@ -680,14 +675,14 @@
                     </caption>
                     <thead class="amber lighten-4">
                         <tr>
-                            <th class="center-align">
+                            <th class="center-align col-1">
                                 <i class="fa fa-angle-double-up cursor-hand" onClick="$('html, body').animate({scrollTop: 500}, 400);"></i>
                             </th>
-                            <th class="center-align">Código</th>
+                            <th class="center-align col-2">Código</th>
                             <th>Descripción</th>
-                            <th class="center-align">Marca</th>
-                            <th class="center-align">Modelo</th>
-                            <th class="center-align">Unidad</th>
+                            <th class="center-align col-2">Marca</th>
+                            <th class="center-align col-2">Modelo</th>
+                            <th class="center-align col-2">Unidad</th>
                             <th class="right-align">Pendiente</th>
                             <th class="right-align">Vendido</th>
                             <th class="right-align" ng-show="perarea == 'administrator' || perarea == 'ventas'">Compra</th>
