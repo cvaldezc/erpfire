@@ -457,10 +457,14 @@
                                         <th class="col-2">P. Compra</th>
                                         <th class="col-2">P. Venta</th>
                                         <th class="col-2">Cantidad</th>
-                                        <th class="col-1"></th>
                                         <th class="col-1">
                                             <a href="#!lnew" class="blue-text" ng-click="listTemps('N')">
                                                 <i class="fa fa-refresh"></i>
+                                            </a>
+                                        </th>
+                                        <th class="col-1">
+                                            <a href="#!del" class="red-text" ng-click="delModifiedNMD('N')">
+                                                <i class="fa fa-trash"></i>
                                             </a>
                                         </th>
                                     </tr>
@@ -478,9 +482,8 @@
                                         <td class="right-align">{{x.fields.quantity}}</td>
                                         <td class="center-align"><i class="fa fa-long-arrow-up"></i></td>
                                         <td class="center-align">
-                                            <a class="red-text">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                            <input type="checkbox" class="filled-in red" id="filled-in-boxlstn{{$index}}" ng-model="lstN[$index].selected" ng-init="lstN[$index].selected=false" />
+                                            <label for="filled-in-boxlstn{{$index}}"></label>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -505,29 +508,40 @@
                                         <th>Marca</th>
                                         <th>Modelo</th>
                                         <th>Unidad</th>
+                                        <th>P.Compra</th>
+                                        <th>P.Ventas</th>
                                         <th>Pendiente</th>
                                         <th>Cantidad</th>
                                         <th>
-                                            <a href="#!lnew" class="blue-text" ng-click="listTemps('M')">
+                                            <a href="#!reload" class="blue-text" ng-click="listTemps('M')">
                                                 <i class="fa fa-refresh"></i>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="#!del" class="red-text" ng-click="delModifiedNMD('M')">
+                                                <i class="fa fa-trash"></i>
                                             </a>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="x in lstn">
+                                    <tr ng-repeat="x in lstM">
                                         <td>{{$index+1}}</td>
                                         <td>{{x.fields.materials.pk}}</td>
-                                        <td>{{x.field.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-                                        <td>{{x.field.brand.fields.brand}}</td>
+                                        <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
+                                        <td>{{x.fields.brand.fields.brand}}</td>
                                         <td>{{x.fields.model.fields.model}}</td>
                                         <td>{{x.fields.materials.fields.unidad}}</td>
+                                        <td>{{x.fields.ppurchase}}</td>
+                                        <td>{{x.fields.psales}}</td>
                                         <td>{{x.fields.missingsend}}</td>
                                         <td>{{x.fields.quantity}}</td>
                                         <td>
-                                            <a class="red-text">
-                                                <i class="fa fa-wrench"></i>
-                                            </a>
+                                            <i class="fa" ng-class="{'fa-long-arrow-up': x.fields.symbol == '+','fa-long-arrow-down': x.fields.symbol == '-'}"></i>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="filled-in red" id="filled-in-boxlstm{{$index}}" ng-model="lstM[$index].selected" ng-init="lstM[$index].selected=false" />
+                                            <label for="filled-in-boxlstm{{$index}}"></label>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -556,10 +570,14 @@
                                         <th class="right-align">P. Ventas</th>
                                         <th class="right-align">En Pedidos</th>
                                         <th class="right-align">C. Eliminar</th>
-                                        <th></th>
                                         <th>
                                             <a href="#!lnew" class="blue-text" ng-click="listTemps('D')">
                                                 <i class="fa fa-refresh"></i>
+                                            </a>
+                                        </th>
+                                        <th>
+                                            <a href="#!del" class="red-text" ng-click="delModifiedNMD('D')">
+                                                <i class="fa fa-trash"></i>
                                             </a>
                                         </th>
                                     </tr>
@@ -578,7 +596,8 @@
                                         <td class="right-align">{{x.fields.quantity}}</td>
                                         <td class="center-align"><i class="fa fa-long-arrow-down"></i></td>
                                         <td class="center-align">
-                                            <a href="" class="red-text"><i class="fa fa-trash"></i></a>
+                                            <input type="checkbox" class="filled-in red" id="filled-in-boxlstd{{$index}}" ng-model="lstD[$index].selected" ng-init="lstD[$index].selected=false" />
+                                            <label for="filled-in-boxlstd{{$index}}"></label>
                                         </td>
                                     </tr>
                                 </tbody>

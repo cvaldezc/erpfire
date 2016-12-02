@@ -876,6 +876,13 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                 if 'savemmat' in request.POST:
                     def saveAccesory(regt=''):
                         try:
+                            # dp = Detpedido.objects.filter(
+                            #     pedido__dsector_id=kwargs['area'],
+                            #     materiales_id=request.POST['code'],
+                            #     brand_id=request.POST['brand'],
+                            #     model_id=request.POST['model'],
+                            #     pedido__status__in=['PE','AP','IN', 'CO'])
+                            # sq = sum(s.cantidad for s in dp)
                             dsmt = DSMetradoTemp.objects.get(
                                 dsector_id=kwargs['area'],
                                 materials_id=request.POST['code'],
@@ -976,30 +983,45 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         materials_id=request.POST['materials'],
                         brand_id=request.POST['obrand'],
                         model_id=request.POST['omodel'])
-                    qtt = float(request.POST['quantity'])
+                    qtt = abs(float(request.POST['quantity']))
                     symb = '+'
+                    diff = 0
+                    # if quantity misinng send is equal a quantity to remove
                     if qtt > dsm.quantity:
+                        qtt = (qtt - dsm.quantity)
                         symb = '+'
                     else:
                         symb = '-'
+                    if symb == '-': 
+                        # qm not < qs = qv - qs
+                        if qtt < dsm.qorder:
+                            qtt = abs(dsm.quantity - dsm.qorder)
+                        else:
+                            diff = (dsm.quantity - qtt)
+                            if dsm.qorder <= diff and dsm.qorder > 0:
+                                qtt = (diff - dsm.qorder)
+                            elif dsm.qorder == 0:
+                                qtt = 0
+                            else:
+                                qtt = diff
                     try:
                         dsmt = DSMetradoTemp.objects.get(
                             materials_id=request.POST['materials'],
-                            brand_id=requet.POST['brand'],
+                            brand_id=request.POST['brand'],
                             model_id=request.POST['model'],
                             type='M')
-                        dsmt.missingsend = request.POST['missingsend']
-                        dmst.quantity = request.POST['quantity']
-                        dmst.type = 'M'
-                        dmst.symbol = symb
-                        dmst.save()
+                        dsmt.missingsend = dsm.qorder
+                        dsmt.quantity = qtt
+                        dsmt.type = 'M'
+                        dsmt.symbol = symb
+                        dsmt.save()
                     except DSMetradoTemp.DoesNotExist as ex:
                         DSMetradoTemp.objects.create(dsector_id=kwargs['area'],
                             materials_id=request.POST['materials'],
                             brand_id=request.POST['brand'],
                             model_id=request.POST['model'],
-                            missingsend=request.POST['missingsend'],
-                            quantity=request.POST['quantity'],
+                            missingsend=dsm.qorder,
+                            quantity=qtt,
                             ppurchase=request.POST['ppurchase'],
                             psales=Decimal(request.POST['psales']).quantize(Decimal('0.001')),
                             type='M',
@@ -1022,7 +1044,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         model_id=request.POST['omodel'],
                         pedido__status__in=['PE','AP','IN', 'CO'])
                     sq = sum(s.cantidad for s in dp)
-                    print Decimal(request.POST['psales']).quantize(Decimal('0.01'))
+                    # print Decimal(request.POST['psales']).quantize(Decimal('0.01'))
                     try:
                         dsmt = DSMetradoTemp.objects.get(
                             type='D',materials_id=request.POST['materials'],
@@ -1047,13 +1069,11 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         ob.save()
                     context['status'] = True
                 if 'delregdel' in request.POST:
-                    for x in json.loads(request.POST['ddel']):
+                    for x in json.loads(request.POST['data']):
                         try:
-                            DSMetradoTemp.objects.get(dsector_id=kwargs['area'],
-                                materials_id=x['materials'],
-                                brand_id=x['obrand'],
-                                model_id=x['omodel'],
-                                type='D'
+                            DSMetradoTemp.objects.get(
+                                dsector_id=kwargs['area'],
+                                id=x['pk']
                             ).delete()
                         except DSMetradoTemp.DoesNotExist as ex:
                             print ex
@@ -1069,6 +1089,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                 if 'annModify' in request.POST:
                     # this ok, before add support for new table DSMetradoTemp
                     MMetrado.objects.filter(dsector_id=kwargs['area']).delete()
+                    DSMetradoTemp.objects.filter(dsector_id=kwargs['area']).delete()
                     context['status'] = True
                 if 'approvedModify' in request.POST:
                     # remove all 2016-24-11 change function

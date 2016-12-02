@@ -1121,7 +1121,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         ), 600
       console.log $scope.objedit
     else
-      Materialize.toast "<i class='fa fa-warning amber-text'></i>
+      Materialize.toast "<i class='fa fa-exclamation-circle amber-text'></i>
         &nbsp; Debe de elegir un material para modifcar.", 4400
     return
 
@@ -1130,18 +1130,21 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     param = $scope.editm
     param['saveModify'] = true
     console.log param
-    f = new FormData()
-    for k, v of param
-      f.append k, v
-    $http.post "", f
-      transformRequest: angular.identity
-      headers: 'Content-Type': undefined
+    # f = new FormData()
+    # for k, v of param
+    #   f.append k, v
+    Factory.post(param)
     .success (response) ->
+      $scope.status = false
+      angular.element("#msedit").modal('close')
       if response.status
         $scope.status = false
         console.log response
         $scope.disableModify()
+        $scope.listTemps 'M'
         return
+      else
+        console.error "Error ", response
     return
 
   $scope.enableDel = () ->
@@ -1174,30 +1177,85 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
                 &nbsp;Se eliminar el item""", 4000
               $scope.listTemps('D')
     else
-      Materialize.toast "<i class='fa fa-warning amber-text'></i>
+      Materialize.toast "<i class='fa fa-exclamation-circle amber-text'></i>
         &nbsp; Debe de elegir un material para eliminar.", 4400
     return
-  $scope.delRegdel = ->
-    swal
-      title: 'Realmente desea eliminar?'
-      text: 'Toda la lista de "eliminados"'
-      showButtonCancel: true
-      confirmButtonColor: "#DD6B55"
-      confirmButtonText:"Si! eliminar todo"
-      closeOnCancel: true
-      closeOnConfirm: true
-    , (isConfirm) ->
-      if isConfirm
-        param = $scope.delrg
-        param['delregdel'] = true
-        Factory.post(param)
-        .success (response) ->
-          if response.status
-            Materialize.toast """<i class='fa fa-trash'></i>
-               Se los items seleccionados!""", 4000
+  $scope.delModifiedNMD = (type) ->
+    valid = ->
+      defer = $q.defer()
+      promises = []
+      angular.forEach $scope["lst#{type}"], (obj, index) ->
+        if obj.selected
+          promises.push 'pk':obj.pk
+          return
+      $q.all(promises).then (result) ->
+        console.log result
+        defer.resolve result
+        return
+      defer.promise
+    valid().then (result) ->
+      console.info result
+      if result.length > 0
+        swal
+          title: 'Realmente desea eliminar?'
+          text: 'Todos los items seleccionados'
+          showCancelButton: true
+          confirmButtonColor: "#DD6B55"
+          confirmButtonText:"Si! eliminar"
+          closeOnCancel: true
+          closeOnConfirm: true
+        , (isConfirm) ->
+          if isConfirm
+            Materialize.toast """<i class="fa fa-cog fa-spin fa-fw"></i>
+               Procesando Transacción...""", "forever", "toast-kill"
+            param =
+              'delregdel': true
+              'data': JSON.stringify result
+            Factory.post(param)
+            .success (response) ->
+              angular.element('.toast-kill').remove()
+              if response.status
+                $scope.disableModify()
+                $scope.listTemps type
+                Materialize.toast """<i class='fa fa-trash fa-lg red-text'></i>
+                  \S items eliminados!""", 4000
+                return
+              else
+                console.error "Error ", response
+                return
             return
         return
+      else
+        Materialize.toast """<i class="fa fa-exclamation-circle
+           fa-lg amber-text"></i>
+           Se debe de seleccionar al menos un item""", 4000
+        return
     return
+  # $scope.delRegdel = ->
+  #   swal
+  #     title: 'Realmente desea eliminar?'
+  #     text: 'Toda la lista de "eliminados"'
+  #     showButtonCancel: true
+  #     confirmButtonColor: "#DD6B55"
+  #     confirmButtonText:"Si! eliminar todo"
+  #     closeOnCancel: true
+  #     closeOnConfirm: true
+  #   , (isConfirm) ->
+  #     if isConfirm
+  #       param = $scope.delrg
+  #       param['delregdel'] = true
+  #       Factory.post(param)
+  #       .success (response) ->
+  #         if response.status
+  #           $scope.disableModify()
+  #           $scope.listTemps 'D'
+  #           Materialize.toast """<i class='fa fa-trash fa-lg red-text'></i>
+  #             items eliminados!""", 4000
+  #           return
+  #         else
+  #           console.error "Error ", response
+  #       return
+  #   return
 
   $scope.disableModify = ->
     $scope.meditindex = -1

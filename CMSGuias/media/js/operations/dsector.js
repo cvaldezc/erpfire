@@ -1243,30 +1243,25 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
       }), 600);
       console.log($scope.objedit);
     } else {
-      Materialize.toast("<i class='fa fa-warning amber-text'></i> &nbsp; Debe de elegir un material para modifcar.", 4400);
+      Materialize.toast("<i class='fa fa-exclamation-circle amber-text'></i> &nbsp; Debe de elegir un material para modifcar.", 4400);
     }
   };
   $scope.saveModify = function() {
-    var f, k, param, v;
+    var param;
     $scope.status = true;
     param = $scope.editm;
     param['saveModify'] = true;
     console.log(param);
-    f = new FormData();
-    for (k in param) {
-      v = param[k];
-      f.append(k, v);
-    }
-    $http.post("", f({
-      transformRequest: angular.identity,
-      headers: {
-        'Content-Type': void 0
-      }
-    })).success(function(response) {
+    Factory.post(param).success(function(response) {
+      $scope.status = false;
+      angular.element("#msedit").modal('close');
       if (response.status) {
         $scope.status = false;
         console.log(response);
         $scope.disableModify();
+        $scope.listTemps('M');
+      } else {
+        return console.error("Error ", response);
       }
     });
   };
@@ -1297,28 +1292,61 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         }
       });
     } else {
-      Materialize.toast("<i class='fa fa-warning amber-text'></i> &nbsp; Debe de elegir un material para eliminar.", 4400);
+      Materialize.toast("<i class='fa fa-exclamation-circle amber-text'></i> &nbsp; Debe de elegir un material para eliminar.", 4400);
     }
   };
-  $scope.delRegdel = function() {
-    swal({
-      title: 'Realmente desea eliminar?',
-      text: 'Toda la lista de "eliminados"',
-      showButtonCancel: true,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "Si! eliminar todo",
-      closeOnCancel: true,
-      closeOnConfirm: true
-    }, function(isConfirm) {
-      var param;
-      if (isConfirm) {
-        param = $scope.delrg;
-        param['delregdel'] = true;
-        Factory.post(param).success(function(response) {
-          if (response.status) {
-            Materialize.toast("<i class='fa fa-trash'></i>\nSe los items seleccionados!", 4000);
+  $scope.delModifiedNMD = function(type) {
+    var valid;
+    valid = function() {
+      var defer, promises;
+      defer = $q.defer();
+      promises = [];
+      angular.forEach($scope["lst" + type], function(obj, index) {
+        if (obj.selected) {
+          promises.push({
+            'pk': obj.pk
+          });
+        }
+      });
+      $q.all(promises).then(function(result) {
+        console.log(result);
+        defer.resolve(result);
+      });
+      return defer.promise;
+    };
+    valid().then(function(result) {
+      console.info(result);
+      if (result.length > 0) {
+        swal({
+          title: 'Realmente desea eliminar?',
+          text: 'Todos los items seleccionados',
+          showCancelButton: true,
+          confirmButtonColor: "#DD6B55",
+          confirmButtonText: "Si! eliminar",
+          closeOnCancel: true,
+          closeOnConfirm: true
+        }, function(isConfirm) {
+          var param;
+          if (isConfirm) {
+            Materialize.toast("<i class=\"fa fa-cog fa-spin fa-fw\"></i>\nProcesando Transacción...", "forever", "toast-kill");
+            param = {
+              'delregdel': true,
+              'data': JSON.stringify(result)
+            };
+            Factory.post(param).success(function(response) {
+              angular.element('.toast-kill').remove();
+              if (response.status) {
+                $scope.disableModify();
+                $scope.listTemps(type);
+                Materialize.toast("<i class='fa fa-trash fa-lg red-text'></i>\n\S items eliminados!", 4000);
+              } else {
+                console.error("Error ", response);
+              }
+            });
           }
         });
+      } else {
+        Materialize.toast("<i class=\"fa fa-exclamation-circle\nfa-lg amber-text\"></i>\nSe debe de seleccionar al menos un item", 4000);
       }
     });
   };
