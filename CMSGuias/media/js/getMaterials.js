@@ -100,18 +100,18 @@ getSummaryMaterials = function() {
       searchBrandOption();
       autoSearchMaterialGroup(response.list[0].materialesid);
       $("input[name=cantidad]").val(response.list[0].quantity);
-      $("input[name=precio]").val(response.list[0].purchase);
-      $("input[name=sales]").val(response.list[0].sale);
-      $("input[name=sale]").val(response.list[0].sale);
+      $("input[name=precio]").val(parseFloat(response.list[0].purchase));
+      $("input[name=sales]").val(parseFloat(response.list[0].sale));
+      $("input[name=sale]").val(parseFloat(response.list[0].sale));
       $lstp = $("#lstpurchase");
       $lstp.html("");
       if ($lstp.length > 0) {
-        $lstp.append(Mustache.render("{{#purchase}}\n    <option label=\"{{currency}}\" value=\"{{purchase}}\" />\n{{/purchase}}", response));
+        $lstp.append(Mustache.render("{{#purchase}}\n    <option label=\"{{currency}}\" value=\"{{purchase}}\">\n        {{purchase}}</option>\n{{/purchase}}", response));
       }
       $lsts = $("#lstsales");
       $lsts.html("");
       if ($lsts.length > 0) {
-        $lsts.append(Mustache.render("{{#purchase}}\n    <option label=\"{{currency}}\" value=\"{{sales}}\" />\n{{/purchase}}", response));
+        $lsts.append(Mustache.render("{{#purchase}}\n    <option label=\"{{currency}}\" value=\"{{sales}}\">\n        {{sales}}</option>\n{{/purchase}}", response));
       }
       if ($("#unit").length > 0) {
         setTimeout(function() {

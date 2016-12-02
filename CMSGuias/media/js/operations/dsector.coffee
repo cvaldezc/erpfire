@@ -1170,7 +1170,8 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           Factory.post param
           .success (response) ->
             if reponse.status
-              Materialize.toast '<i class="fa fa-check"></i>&nbsp;Se eliminar el item', 4000
+              Materialize.toast """<i class="fa fa-check"></i>
+                &nbsp;Se eliminar el item""", 4000
               $scope.listTemps('D')
     else
       Materialize.toast "<i class='fa fa-warning amber-text'></i>
@@ -1192,7 +1193,8 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         Factory.post(param)
         .success (response) ->
           if response.status
-            Materilize.toast "<i class='fa fa-trash'></i> Se los items seleccionados!", 4000
+            Materialize.toast """<i class='fa fa-trash'></i>
+               Se los items seleccionados!""", 4000
             return
         return
     return
@@ -1208,6 +1210,28 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       $scope.fsl = true
       $scope.fpl = true
       return
+  calcSumTemp = (arr, type) ->
+    if arr isnt undefined
+      $scope["tmlst#{type}"] = [0, 0]
+      $scope["tmlst#{type}"][0] = arr.reduce((sum, obj) ->
+        return sum + (obj.fields.ppurchase * obj.fields.quantity)
+      , 0)
+      $scope["tmlst#{type}"][1] = arr.reduce((sum, obj) ->
+        return sum + (obj.fields.psales * obj.fields.quantity)
+      , 0)
+      return
+  $scope.$watch 'lstN', (nw, old)->
+    if nw isnt undefined
+      calcSumTemp nw, 'N'
+    return
+  $scope.$watch 'lstM', (nw, old)->
+    if nw isnt undefined
+      calcSumTemp nw, 'M'
+    return
+  $scope.$watch 'lstD', (nw, old)->
+    if nw isnt undefined
+      calcSumTemp nw, 'D'
+    return
   $scope.$watch 'dsmaterials', ->
     count = 0
     for k of $scope.dsmaterials

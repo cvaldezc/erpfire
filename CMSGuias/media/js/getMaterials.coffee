@@ -84,15 +84,16 @@ getSummaryMaterials = ->
       searchBrandOption()
       autoSearchMaterialGroup(response.list[0].materialesid)
       $("input[name=cantidad]").val response.list[0].quantity
-      $("input[name=precio]").val response.list[0].purchase
-      $("input[name=sales]").val response.list[0].sale
-      $("input[name=sale]").val response.list[0].sale
+      $("input[name=precio]").val parseFloat(response.list[0].purchase)
+      $("input[name=sales]").val parseFloat(response.list[0].sale)
+      $("input[name=sale]").val parseFloat(response.list[0].sale)
       $lstp = $("#lstpurchase")
       $lstp.html("")
       if $lstp.length > 0
         $lstp.append Mustache.render """
             {{#purchase}}
-                <option label="{{currency}}" value="{{purchase}}" />
+                <option label="{{currency}}" value="{{purchase}}">
+                    {{purchase}}</option>
             {{/purchase}}""", response
 
       $lsts = $("#lstsales")
@@ -100,7 +101,8 @@ getSummaryMaterials = ->
       if $lsts.length > 0
         $lsts.append Mustache.render """
             {{#purchase}}
-                <option label="{{currency}}" value="{{sales}}" />
+                <option label="{{currency}}" value="{{sales}}">
+                    {{sales}}</option>
             {{/purchase}}""", response
       if $("#unit").length > 0
         setTimeout ->

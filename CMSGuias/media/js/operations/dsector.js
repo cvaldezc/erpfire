@@ -80,6 +80,7 @@ app.factory('Factory', function($http, $cookies) {
 });
 
 app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $sce, $q, Factory) {
+  var calcSumTemp;
   $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
   $scope.perarea = "";
@@ -1289,7 +1290,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
           param['deleteReg'] = true;
           return Factory.post(param).success(function(response) {
             if (reponse.status) {
-              Materialize.toast('<i class="fa fa-check"></i>&nbsp;Se eliminar el item', 4000);
+              Materialize.toast("<i class=\"fa fa-check\"></i>\n&nbsp;Se eliminar el item", 4000);
               return $scope.listTemps('D');
             }
           });
@@ -1315,7 +1316,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         param['delregdel'] = true;
         Factory.post(param).success(function(response) {
           if (response.status) {
-            Materilize.toast("<i class='fa fa-trash'></i> Se los items seleccionados!", 4000);
+            Materialize.toast("<i class='fa fa-trash'></i>\nSe los items seleccionados!", 4000);
           }
         });
       }
@@ -1330,6 +1331,32 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     if ($scope.ascsector) {
       $scope.fsl = true;
       $scope.fpl = true;
+    }
+  });
+  calcSumTemp = function(arr, type) {
+    if (arr !== void 0) {
+      $scope["tmlst" + type] = [0, 0];
+      $scope["tmlst" + type][0] = arr.reduce(function(sum, obj) {
+        return sum + (obj.fields.ppurchase * obj.fields.quantity);
+      }, 0);
+      $scope["tmlst" + type][1] = arr.reduce(function(sum, obj) {
+        return sum + (obj.fields.psales * obj.fields.quantity);
+      }, 0);
+    }
+  };
+  $scope.$watch('lstN', function(nw, old) {
+    if (nw !== void 0) {
+      calcSumTemp(nw, 'N');
+    }
+  });
+  $scope.$watch('lstM', function(nw, old) {
+    if (nw !== void 0) {
+      calcSumTemp(nw, 'M');
+    }
+  });
+  $scope.$watch('lstD', function(nw, old) {
+    if (nw !== void 0) {
+      calcSumTemp(nw, 'D');
     }
   });
   $scope.$watch('dsmaterials', function() {
