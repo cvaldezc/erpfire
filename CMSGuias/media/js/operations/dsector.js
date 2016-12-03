@@ -103,6 +103,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     'quantity': 0
   };
   $scope.status = false;
+  $scope.sldm = [[0, 0], [0, 0]];
   angular.element(document).ready(function() {
     var $table, i, len, ref, x;
     angular.element('.modal').modal({
@@ -1338,7 +1339,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
               if (response.status) {
                 $scope.disableModify();
                 $scope.listTemps(type);
-                Materialize.toast("<i class='fa fa-trash fa-lg red-text'></i>\n\S items eliminados!", 4000);
+                Materialize.toast("<i class='fa fa-trash fa-lg red-text'></i>\n\ items eliminados!", 4000);
               } else {
                 console.error("Error ", response);
               }
@@ -1370,6 +1371,37 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
       $scope["tmlst" + type][1] = arr.reduce(function(sum, obj) {
         return sum + (obj.fields.psales * obj.fields.quantity);
       }, 0);
+      if (type === 'M') {
+        $scope.sldm = [[0, 0], [0, 0]];
+        $scope.sldm[0][0] = arr.reduce(function(sum, obj) {
+          if (obj.fields.symbol === '+') {
+            return sum + (obj.fields.ppurchase * obj.fields.quantity);
+          } else {
+            return sum + 0;
+          }
+        }, 0);
+        $scope.sldm[0][1] = arr.reduce(function(sum, obj) {
+          if (obj.fields.symbol === '-') {
+            return sum + (obj.fields.ppurchase * obj.fields.quantity);
+          } else {
+            return sum + 0;
+          }
+        }, 0);
+        $scope.sldm[1][0] = arr.reduce(function(sum, obj) {
+          if (obj.fields.symbol === '+') {
+            return sum + (obj.fields.psales * obj.fields.quantity);
+          } else {
+            return sum + 0;
+          }
+        }, 0);
+        $scope.sldm[1][1] = arr.reduce(function(sum, obj) {
+          if (obj.fields.symbol === '-') {
+            return sum + (obj.fields.psales * obj.fields.quantity);
+          } else {
+            return sum + 0;
+          }
+        }, 0);
+      }
     }
   };
   $scope.$watch('lstN', function(nw, old) {

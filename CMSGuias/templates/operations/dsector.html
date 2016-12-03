@@ -502,25 +502,25 @@
                             <table class="table responsive-table highlight hovered">
                                 <thead>
                                     <tr class="blue lighten-5">
-                                        <th><a href="#!" class="grey-text text-darken-3"><i class="fa fa-filter"></i></a></th>
+                                        <th class="col-1 center-align"><a href="#!" class="grey-text text-darken-3"><i class="fa fa-filter"></i></a></th>
                                         <th>Código</th>
                                         <th>Descripción</th>
                                         <th>Marca</th>
                                         <th>Modelo</th>
-                                        <th>Unidad</th>
-                                        <th>P.Compra</th>
-                                        <th>P.Ventas</th>
-                                        <th>Pendiente</th>
-                                        <th>Cantidad</th>
-                                        <th>
-                                            <a href="#!reload" class="blue-text" ng-click="listTemps('M')">
-                                                <i class="fa fa-refresh"></i>
-                                            </a>
+                                        <th class="col-2">Unidad</th>
+                                        <th class="right-align col-2">P.Compra</th>
+                                        <th class="right-align col-2">P.Ventas</th>
+                                        <th class="right-align col-2">Pendiente</th>
+                                        <th class="right-align col-2">Cantidad</th>
+                                        <th class="col-1">
+                                            <a href="#!reload" clas class="col-1"s="blue-text" ng-click="listTemps('M')">
+                                                <i class="fa fa-ref class="col-1"resh"></i>
+                                            </a class="col-1">
                                         </th>
-                                        <th>
-                                            <a href="#!del" class="red-text" ng-click="delModifiedNMD('M')">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                        <th class="col-1">
+                                            <a href="#!del" class="red-text" ng- class="col-1"click="delModifiedNMD('M')">
+                                                <i class="fa fa-trash"></i class="col-1">
+                                            </a class="col-1">
                                         </th>
                                     </tr>
                                 </thead>
@@ -746,6 +746,57 @@
             <!-- view prices -->
             <div id="vprices" class="col l12 m12 s12">
                 <h4>Precios</h4>
+                {% verbatim %}
+                <div class="card-panel center-align">
+                    <div class="">
+                        <table class="highlight hover table bordered">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th width="200px">COMPRAS</th>
+                                    <th width="200px">VENTAS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th width="150px">VENTA</th>
+                                    <th width="200px">{{amsecp|number:"2"}}</th>
+                                    <th width="200px">{{amsecs|number:"2"}}</th>
+                                </tr>
+                                <tr>
+                                    <th width="150px">SECTOR</th>
+                                    <th>{{amstp|number:"2"}}</th>
+                                    <th>{{amsts|number:"2"}}</th>
+                                </tr>
+                                <tr class="amber lighten-5">
+                                    <th width="150px">PRECIO AREA</th>
+                                    <th>{{amnp|number:"2"}}</th>
+                                    <th>{{amns|number:"2"}}</th>
+                                </tr>
+                                <tr class="green lighten-5">
+                                    <th width="150px">AGREGAR (+)</th>
+                                    <th>{{tmlstN[0]|number:"2"}}</th>
+                                    <th>{{tmlstN[1]|number:"2"}}</th>
+                                </tr>
+                                <tr class="green lighten-5">
+                                    <th width="150px" rowspan="2">MODIFICAR (±)</th>
+                                    <th>+ {{sldm[0][0]|number:"2"}}</th>
+                                    <th>+ {{sldm[1][0]|number:"2"}}</th>
+                                </tr>
+                                <tr class="red lighten-5">
+                                    <th>- {{sldm[0][1]|number:"2"}}</th>
+                                    <th>- {{sldm[1][1]|number:"2"}}</th>
+                                </tr>
+                                <tr class="red lighten-5">
+                                    <th width="150px">ELIMINAR (-)</th>
+                                    <th>{{tmlstD[0]|number:"2"}}</th>
+                                    <th>{{tmlstD[1]|number:"2"}}</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endverbatim %}
             </div>
         {% endif %}
     </div>

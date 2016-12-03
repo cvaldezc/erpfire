@@ -636,7 +636,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             'quantity',
                             field='quantity * ppurchase'),
                             tsales=Sum('quantity', field='quantity * psales'))
-                    print rds
+                    # print rds
                     context['msector'] = dsal
                     context['maarea'] = rds
                     mm = MMetrado.objects.filter(
@@ -661,7 +661,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                 if 'lsttemp' in request.GET:
                     def lists(tp):
                         lst = DSMetradoTemp.objects.filter(dsector_id=kwargs['area'],
-                            type=tp)
+                            type=tp).order_by('materials__matnom')
                         return json.loads(serializers.serialize(
                             'json', lst, relations=('materials', 'brand', 'model')
                         ))
@@ -993,17 +993,15 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     else:
                         symb = '-'
                     if symb == '-': 
-                        # qm not < qs = qv - qs
-                        if qtt < dsm.qorder:
-                            qtt = abs(dsm.quantity - dsm.qorder)
+                        diff = (dsm.quantity - qtt)
+                        if dsm.qorder <= diff and dsm.qorder > 0:
+                            qtt = (diff - dsm.qorder)
+                        elif dsm.qorder > diff and dsm.qorder > 0:
+                            qtt = diff 
+                        elif dsm.qorder == 0:
+                            qtt = 0
                         else:
-                            diff = (dsm.quantity - qtt)
-                            if dsm.qorder <= diff and dsm.qorder > 0:
-                                qtt = (diff - dsm.qorder)
-                            elif dsm.qorder == 0:
-                                qtt = 0
-                            else:
-                                qtt = diff
+                            qtt = diff
                     try:
                         dsmt = DSMetradoTemp.objects.get(
                             materials_id=request.POST['materials'],

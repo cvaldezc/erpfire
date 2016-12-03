@@ -64,6 +64,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     'model': ''
     'quantity': 0
   $scope.status = false
+  $scope.sldm = [[0, 0], [0, 0]]
   angular.element(document).ready ->
     angular.element('.modal').modal 'dismissible': false
     angular.element('ul.tabs').tabs 'onShow': -> window.scrollTo 0, 680
@@ -631,7 +632,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   $scope.delEditM = ($event) ->
     swal
       title: "Eliminar Material?"
-      text: "#{$event.currentTarget.parentElement.parentElement.children[2].innerText}"
+      text: """#{$event.currentTarget.parentElement.parentElement.children[2].innerText}"""
       type: "warning"
       showCancelButton: true
       confirmButtonText: "Si!, eliminar"
@@ -1218,7 +1219,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
                 $scope.disableModify()
                 $scope.listTemps type
                 Materialize.toast """<i class='fa fa-trash fa-lg red-text'></i>
-                  \S items eliminados!""", 4000
+                  \ items eliminados!""", 4000
                 return
               else
                 console.error "Error ", response
@@ -1277,7 +1278,33 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       $scope["tmlst#{type}"][1] = arr.reduce((sum, obj) ->
         return sum + (obj.fields.psales * obj.fields.quantity)
       , 0)
-      return
+      if type == 'M'
+        $scope.sldm = [[0, 0], [0, 0]]
+        $scope.sldm[0][0] = arr.reduce((sum, obj) ->
+          if obj.fields.symbol == '+'
+            sum + (obj.fields.ppurchase * obj.fields.quantity)
+          else
+            sum + 0
+        , 0)
+        $scope.sldm[0][1] = arr.reduce((sum, obj) ->
+          if obj.fields.symbol == '-'
+            sum + (obj.fields.ppurchase * obj.fields.quantity)
+          else
+            sum + 0
+        , 0)
+        $scope.sldm[1][0] = arr.reduce((sum, obj) ->
+          if obj.fields.symbol == '+'
+            sum + (obj.fields.psales * obj.fields.quantity)
+          else
+            sum + 0
+        , 0)
+        $scope.sldm[1][1] = arr.reduce((sum, obj) ->
+          if obj.fields.symbol == '-'
+            sum + (obj.fields.psales * obj.fields.quantity)
+          else
+            sum + 0
+        , 0)
+    return
   $scope.$watch 'lstN', (nw, old)->
     if nw isnt undefined
       calcSumTemp nw, 'N'
