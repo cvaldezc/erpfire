@@ -1,0 +1,39 @@
+
+<html>
+<head>
+{% load static %}
+         <link rel="stylesheet" type="text/css" href="{% static 'boleta/style.css' %}" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title> Cargar Boletas</title>
+
+ <script type="text/javascript" >
+function viewButton(){
+	document.getElementById('divcargar').style.display = 'block';
+}
+ </script>
+
+
+
+</head>
+<body>
+<div align="center">
+<form method="post" action="{% url 'bol:carga' %}" enctype="multipart/form-data"> 
+<fieldset>
+     <legend align="center"><h4>Cargar Boletas</h4></legend>
+      <br/>
+      <div align="center" >
+
+{% csrf_token %}
+    <input type="file" name="files[]" multiple onclick="javascript:viewButton();"/>
+    <br/>
+    <br/>
+    <div id="divcargar" style="display: none">
+    <input type="submit" value="Cargar"/>
+    </div>
+    <a href="{% url 'bol:menu' %}" target="_self" style="float: right;">Menu</a>
+    </div>
+    </fieldset>
+</form>
+</div>
+</body>
+</html>

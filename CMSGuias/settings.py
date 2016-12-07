@@ -167,6 +167,7 @@ INSTALLED_APPS = (
     'CMSGuias.apps.suppliers',
     'CMSGuias.apps.ventas.budget',
     'CMSGuias.apps.reports.templatetags',
+    'CMSGuias.apps.boleta',
 )
 
 SERIALIZATION_MODULES = {

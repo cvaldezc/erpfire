@@ -508,3 +508,35 @@ AFTER UPDATE ON almacen_guiaremision
 FOR EACH ROW WHEN (NEW.status = 'AN')
 EXECUTE PROCEDURE proc_annular_guide_remision();
 /* END ANNULAR GUIDE REMISION*/
+
+
+/* GENERACION DE BOLETAS 2016-12-06 08:38:36 */
+CREATE OR REPLACE FUNCTION sp_boleta2(
+    b_opcion character varying,
+    b_cod character varying,
+    b_per character varying)
+  RETURNS SETOF boleta_cabprinc AS
+$BODY$
+begin
+ IF B_OPCION = 'per' THEN
+	return query select * from boleta_cabprinc
+	WHERE periodo=B_COD;
+ END IF;
+ IF B_OPCION = 'dni' THEN
+	return query select * from boleta_cabprinc
+	WHERE idcabpr=B_COD;	
+ END IF;
+ IF B_OPCION = 'nomb' THEN
+	return query select * from boleta_cabprinc
+	WHERE nombres like '%'||B_COD||'%';
+ END IF;
+ IF B_OPCION = 'pernom' THEN
+	return query select * from boleta_cabprinc
+	WHERE periodo=B_PER and nombres like '%'||B_COD||'%';
+ END IF;
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+/* END BOLETAS*/

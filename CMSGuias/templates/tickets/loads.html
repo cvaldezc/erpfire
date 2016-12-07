@@ -1,0 +1,29 @@
+{% extends "basemd.html" %}
+{% block title %} Cargar archivos {% endblock title %}
+{% block menu %}
+    {% include "menus/ticketsmd.html" %}
+{% endblock menu %}
+{% block content %}
+<form method="post" action="{% url 'tickets_carga_view' %}" enctype="multipart/form-data">
+    <fieldset>
+        <legend align="center">
+            <h4>Cargar Boletas</h4>
+        </legend>
+        <br/>
+        <div align="center">
+            {% csrf_token %}
+            <input type="file" name="files[]" multiple onclick="javascript:viewButton();" />
+            <br/>
+            <br/>
+            <div id="divcargar" style="display: none">
+                <input type="submit" value="Cargar" />
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script type="text/javascript">
+function viewButton(){
+	document.getElementById('divcargar').style.display = 'block';
+}
+ </script>
+ {% endblock content %}

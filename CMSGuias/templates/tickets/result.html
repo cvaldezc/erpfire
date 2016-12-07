@@ -1,0 +1,37 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/ticketsmd.html" %}
+{% endblock menu %}
+{% block content %}
+<form  name="formu" class="formenu">
+    <fieldset>
+        <legend align="center">
+            <strong>Archivos Cargados</strong>
+        </legend>
+        <br>
+        <div class="card">
+            <div class="card-content">
+            {% if status %}
+                <h4>Feliciades se ha procesado los archivos correctamente.</h4>
+            {% else %}
+                <h5>Ha ocurrido un error {{raise}} </h5>
+            {% endif %}
+            </div>
+        </div>
+        <!--<div align="center" class="pdn3">
+            <a href="{#% url 'bol:inicio' %#}" target="_self" 
+                style="text-decoration: none">Cargar mas Boletas</a><br/><br/>
+                <a href="{#% url 'bol:menu' %#}" target="_self">Ir a Menu Principal</a>
+                <br/><br/>
+        </div>-->
+        <div>
+            <ul>
+                <h5>Archivos que ya habian sido cargados:</h5>
+                {% for x in lis %}
+                    <li>{{ x }}</li>
+                {% endfor %} 
+            </ul>
+        </div>
+    </fieldset>
+</form>
+{% endblock content %}

@@ -1,0 +1,178 @@
+{% extends "basemd.html" %}
+{% block title %}
+    Consutar
+{% endblock title %}
+{% block menu %}
+    {% include "menus/ticketsmd.html" %}
+{% endblock menu %}
+{% block content %}
+    <section>
+        <article class="card-panel">
+            <h4>Consultar Boletas</h4>
+            <form action="con" method="post" name="formu">
+                <fieldset>
+                    <legend>
+                        <strong>Buscar Boletas por:</strong>
+                    </legend>
+                    <div>
+                        <script type="text/javascript">
+                            function viewFields(){
+                                if(document.getElementById('p').checked){
+                                    document.getElementById('per').style.display = 'block';
+                                    document.getElementById('dn').style.display = 'none';
+                                    document.getElementById('nom').style.display = 'none';
+                                    document.getElementById('opc').style.display = 'none';
+
+                                }else if(document.getElementById('d').checked){
+                                    document.getElementById('dn').style.display = 'block';
+                                    document.getElementById('per').style.display = 'block';
+                                    document.getElementById('nom').style.display = 'none';
+                                    document.getElementById('opc').style.display = 'none';
+
+                                }else if(document.getElementById('n').checked){
+                                    document.getElementById('opc').style.display = 'block';
+                                    document.getElementById('per').style.display = 'none';
+                                    document.getElementById('dn').style.display = 'none';
+                                    document.getElementById('nom').style.display='none';
+                                }
+                            }
+
+                            function viewOptions(){
+                                if (document.getElementById('sp').checked){
+                                    document.getElementById('per').style.display='block';
+                                    document.getElementById('nom').style.display='block';
+                                    document.getElementById('dn').style.display='none';
+
+                                }else if(document.getElementById('sn').checked){
+                                    document.getElementById('nom').style.display='block';
+                                    document.getElementById('dn').style.display='none';
+                                    document.getElementById('per').style.display='none';
+                                }
+                            }
+
+                        </script>
+                        <div class="pdn">
+                            <input type="radio" onclick="javascript:viewFields();" name="bol" id="p" value="per" />
+                            <label for="p">Periodo</label>
+                            <input type="radio" onclick="javascript:viewFields();" name="bol" id="d" value="dni" />
+                            <label for="d">DNI</label>
+                            <input type="radio" onclick="javascript:viewFields();" name="bol" id="n" value="no" />
+                            <label for="n">Nombres</label>
+                        </div>
+                        <h6>
+                            <div id="opc" style="display: none" class="pdn2">
+                                <input type="radio" onclick="javascript:viewOptions();" name="bol" id="sp" value="pernom"/>
+                                <label for="sp">Periodo y Nombres</label> 
+                                <input type="radio" onclick="javascript:viewOptions();" name="bol" id="sn" value="nomb"/>
+                                <label for="sn">Solo Nombres</label>
+                            </div>
+                        </h6>
+
+                        <div id="per" style="display: none">
+                            <!--<label>Ingresar Periodo: </label>-->
+                            <input type="text" id="mes" name="mes" placeholder="Mes" size="1" /> -
+                            <input type="text" id="a" name="a" placeholder="Año" size="1" />
+                        </div>
+                        <div id="dn" style="display: none">
+                            <!--<label>Ingresar DNI: </label>-->
+                            <input type="text" id="dni" name="dni" placeholder="Dni" size="2" />
+                        </div>
+                        <div id="nom" style="display: none">
+                            <!--<label>Ingresar Nombres: </label>-->
+                            <input type="text" text-align="center" id="nombres" name="nombres" placeholder="Ingresar Nombres" size="30" />
+                        </div>
+
+                        <br/>
+                        <button type="button" name="enviar" class="btn" onclick="consul()">
+                            <i class="fa fa-file-pdf-o"></i>
+                            <span class="hide-on-small-only">Mostrar Boleta</span>
+                        </button>
+                        <!-- <input class="" type="button" name="enviar" value="Mostrar Boleta" onclick="consul()" /> -->
+                        <!-- <a href="{#% url 'tickets_menu_view' %#}" target="_self" style="float: right;">Menu</a> -->
+                    </div>
+                </fieldset>
+            </form>
+        </article>
+    </section>
+<script type="text/javascript" defer>
+        var consul = function (){
+            var rper= document.getElementsByName('bol');
+            var option="";
+            var res;
+            var pe="";
+            //radio button
+            for(var i=0; i<rper.length; i++){
+            if (rper[i].checked) {
+                option=rper[i].value;
+                switch (option) {
+
+                    case (option='per'):
+                        var month= document.getElementById("mes").value;
+                        var year= document.getElementById("a").value;
+                        var my=month+"-"+year;
+                        res=my;
+                        if (month.length!=2){
+                            alert('MES INCORRECTO')
+                            return false
+                        }else if(year.length!=4){
+                            alert('AÑO INCORRECTO')
+                            return false
+                        }
+                        break;
+
+                    case (option='dni'):
+                        var month= document.getElementById("mes").value;
+                        var year= document.getElementById("a").value;
+                        var dn= document.getElementById("dni").value;
+                        res=month+year+dn;
+                        if(month.length!=2){
+                            alert('MES INCORRECTO')
+                            return false
+                        }else if(year.length!=4){
+                            alert('AÑO INCORRECTO')
+                            return false
+                        }else if(dn.length!=8){
+                            alert('DNI INCORRECTO')
+                            return false
+                        }
+                        break;
+
+                    case (option='nomb'):
+                        var name= document.getElementById("nombres").value;
+                        res=name;
+                        if(!/^[a-zA-Z\s]*$/.test(name)){
+                            alert('NOMBRES INCORRECTO')
+                            return false
+                        }
+                        break;
+
+                    case (option='pernom'):
+                        var m= document.getElementById("mes").value;
+                        var a= document.getElementById("a").value;
+                        var n= document.getElementById("nombres").value;
+                        pe=m+"-"+a;
+                        res=n;
+                        if(m.length!=2){
+                            alert('MES INCORRECTO')
+                            return false
+                        }else if(a.length!=4){
+                            alert('AÑO INCORRECTO')
+                            return false
+                        }else if(!/^[a-zA-Z\s]*$/.test(n)){
+                            alert('NOMBRES INCORRECTO')
+                            return false
+                        }
+
+                        break;
+                }
+                window.open("http://"+ location.hostname +":8089/webBoleta/boletas.jsp?op="+option+"&resp="+res+"&perio="+pe,"_blank");
+            }
+            // location.href='cons.jsp?op='+option+'&resp='+res+'&perio='+pe;
+            //window.open('cons.jsp?op='+option+'&resp='+res+'&perio='+pe,'_blank');
+            }
+
+            //window.open('http://localhost:6000/webBoleta2/boletas.jsp?op='+option+'&resp='+res+'&perio='+pe,'_blank');
+        }
+
+</script>
+{% endblock content %}
