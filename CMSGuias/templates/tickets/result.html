@@ -12,9 +12,9 @@
         <div class="card">
             <div class="card-content">
             {% if status %}
-                <h4>Feliciades se ha procesado los archivos correctamente.</h4>
+                <h4><i class="fa fa-check fa-x2 green-text"></i> Feliciades se ha procesado los archivos correctamente.</h4>
             {% else %}
-                <h5>Ha ocurrido un error {{raise}} </h5>
+                <h5><i class="fa fa-times fa-x2 red-text"></i> Ha ocurrido un error {{raise}} </h5>
             {% endif %}
             </div>
         </div>

@@ -4,23 +4,26 @@
 #
 import os
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 # from xml.dom import minidom
 
 from .models import *
 
 
-# url = settings.BASE_DIR + '/proyecto/boleta/templates/boleta/'
-
 class Main(TemplateView):
     """Menu Boleta"""
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         return render(request, 'tickets/main.html', kwargs)
 
+
 class DeleteData(TemplateView):
     """Delete all data of tables"""
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         Rmotsusp1.objects.all().delete()
         Rngreso2.objects.all().delete()
@@ -33,18 +36,21 @@ class DeleteData(TemplateView):
 
 class UploadTickets(TemplateView):
     """load tickets"""
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         return render(request, 'tickets/loads.html')
 
 
 class SearchView(TemplateView):
     """search tickets"""
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         return render(request, 'tickets/search.html', kwargs)
 
 
 class UploadView(TemplateView):
     """load files """
+    @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         try:
             kwargs['li'] = list()
