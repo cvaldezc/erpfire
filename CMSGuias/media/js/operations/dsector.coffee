@@ -65,7 +65,9 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     'quantity': 0
   $scope.status = false
   $scope.sldm = [[0, 0], [0, 0]]
+  $scope.pnp = 0
   angular.element(document).ready ->
+    $scope.mdstatus = false
     angular.element('.modal').modal 'dismissible': false
     angular.element('ul.tabs').tabs 'onShow': -> window.scrollTo 0, 680
     angular.element('.collapsible').collapsible()
@@ -171,6 +173,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       .success (response) ->
         if response.status
           Materialize.toast "Material Agregado", 2600
+          $scope.calcApproved()
           if Boolean $("#modify").length
             $scope.modifyList()
           else
@@ -205,6 +208,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         .success (response) ->
           if response.status
             $scope.getListAreaMaterials()
+            $scope.calcApproved()
             return
         return
     return
@@ -713,6 +717,8 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       closeOnCancel: true
     , (isConfirm) ->
       if isConfirm
+        Materialize.toast """<i class="fa fa-cog fa-spin fa-fw"></i>
+           _Procesando...""", "infinity", "toast-kill"
         $event.currentTarget.disabled = true
         $event.currentTarget.innerHTML = """<i class="fa fa-spinner fa-pulse"></i> Procesando"""
         data =
@@ -1143,6 +1149,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         console.log response
         $scope.disableModify()
         $scope.listTemps 'M'
+        $scope.calcApproved()
         return
       else
         console.error "Error ", response
@@ -1177,6 +1184,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
               Materialize.toast """<i class="fa fa-check"></i>
                 &nbsp;Se eliminar el item""", 4000
               $scope.listTemps('D')
+              $scope.calcApproved()
     else
       Materialize.toast "<i class='fa fa-exclamation-circle amber-text'></i>
         &nbsp; Debe de elegir un material para eliminar.", 4400
@@ -1218,6 +1226,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
               if response.status
                 $scope.disableModify()
                 $scope.listTemps type
+                $scope.calcApproved()
                 Materialize.toast """<i class='fa fa-trash fa-lg red-text'></i>
                   \ items eliminados!""", 4000
                 return
@@ -1257,7 +1266,38 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   #           console.error "Error ", response
   #       return
   #   return
-
+  $scope.calcApproved = ->
+    # calc amount global
+    $scope.pnp = parseFloat($scope.amnp)
+    $scope.pns = parseFloat($scope.amns)
+    #$scope.dgp = (parseFloat($scope.amsecp) - parseFloat($scope.amstp))
+    #$scope.dgs = (parseFloat($scope.amsecs) - parseFloat($scope.amsts))
+    #if type is 'N'
+    $scope.pnp += $scope.tmlstN[0]
+    $scope.pns += $scope.tmlstN[1]
+    #if type is 'M'
+    $scope.pnp += $scope.sldm[0][0]
+    $scope.pnp -= $scope.sldm[0][1]
+    $scope.pns += $scope.sldm[1][0]
+    $scope.pns -= $scope.sldm[1][1]
+    #if type is 'D'
+    $scope.pnp -= $scope.tmlstD[0]
+    $scope.pns -= $scope.tmlstD[1]
+    $scope.pnp = $scope.pnp
+    $scope.pns = $scope.pns
+    # difference area current - area new
+    rdap = (($scope.amstp - $scope.amnp) + $scope.pnp)
+    totalp = ($scope.amsecp - rdap)
+    $scope.pgaa = totalp
+    rdas = (($scope.amsts - $scope.amns) + $scope.pns)
+    totals = ($scope.amsecs - rdas)
+    $scope.pgpa = totalp
+    $scope.pgsa = totals
+    if totalp >= 0
+      $scope.mdstatus = true
+    else
+      $scope.mdstatus = false
+    return
   $scope.disableModify = ->
     $scope.meditindex = -1
     $scope.objedit = {}
@@ -1304,6 +1344,10 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           else
             sum + 0
         , 0)
+      # setTimeout (->
+      #   $scope.calcApproved()
+      #   return
+      #   ), 1200
     return
   $scope.$watch 'lstN', (nw, old)->
     if nw isnt undefined

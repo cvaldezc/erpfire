@@ -977,54 +977,67 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         context['status'] = False
                         context['raise'] = 'Data not found'
                 if 'saveModify' in request.POST:
-                    # time.sleep(6) save
-                    dsm = DSMetrado.objects.get(
-                        dsector_id=kwargs['area'],
-                        materials_id=request.POST['materials'],
-                        brand_id=request.POST['obrand'],
-                        model_id=request.POST['omodel'])
-                    qtt = abs(float(request.POST['quantity']))
-                    symb = '+'
-                    diff = 0
-                    # if quantity misinng send is equal a quantity to remove
-                    if qtt > dsm.quantity:
-                        qtt = (qtt - dsm.quantity)
-                        symb = '+'
-                    else:
-                        symb = '-'
-                    if symb == '-': 
-                        diff = (dsm.quantity - qtt)
-                        if dsm.qorder <= diff and dsm.qorder > 0:
-                            qtt = (diff - dsm.qorder)
-                        elif dsm.qorder > diff and dsm.qorder > 0:
-                            qtt = diff 
-                        elif dsm.qorder == 0:
-                            qtt = 0
-                        else:
-                            qtt = diff
+                    # validate materials if exists in delete
+                    valid = True
                     try:
-                        dsmt = DSMetradoTemp.objects.get(
+                        vdm = DSMetradoTemp.objects.get(
                             materials_id=request.POST['materials'],
-                            brand_id=request.POST['brand'],
-                            model_id=request.POST['model'],
-                            type='M')
-                        dsmt.missingsend = dsm.qorder
-                        dsmt.quantity = qtt
-                        dsmt.type = 'M'
-                        dsmt.symbol = symb
-                        dsmt.save()
+                            brand_id=request.POST['obrand'],
+                            model_id=request.POST['omodel'],
+                            type='D')
+                        valid = False
+                        context['raise'] = 'No se puede modificar el material por que ya esta registrado en "ELIMINADOS"'
+                        context['status'] = False
                     except DSMetradoTemp.DoesNotExist as ex:
-                        DSMetradoTemp.objects.create(dsector_id=kwargs['area'],
+                        pass
+                    if valid:
+                        dsm = DSMetrado.objects.get(
+                            dsector_id=kwargs['area'],
                             materials_id=request.POST['materials'],
-                            brand_id=request.POST['brand'],
-                            model_id=request.POST['model'],
-                            missingsend=dsm.qorder,
-                            quantity=qtt,
-                            ppurchase=request.POST['ppurchase'],
-                            psales=Decimal(request.POST['psales']).quantize(Decimal('0.001')),
-                            type='M',
-                            symbol=symb)
-                    context['status'] = True
+                            brand_id=request.POST['obrand'],
+                            model_id=request.POST['omodel'])
+                        qtt = abs(float(request.POST['quantity']))
+                        symb = '+'
+                        diff = 0
+                        # if quantity misinng send is equal a quantity to remove
+                        if qtt > dsm.quantity:
+                            qtt = (qtt - dsm.quantity)
+                            symb = '+'
+                        else:
+                            symb = '-'
+                        if symb == '-': 
+                            diff = (dsm.quantity - qtt)
+                            if dsm.qorder <= diff and dsm.qorder > 0:
+                                qtt = (diff - dsm.qorder)
+                            elif dsm.qorder > diff and dsm.qorder > 0:
+                                qtt = diff 
+                            elif dsm.qorder == 0:
+                                qtt = 0
+                            else:
+                                qtt = diff
+                        try:
+                            dsmt = DSMetradoTemp.objects.get(
+                                materials_id=request.POST['materials'],
+                                brand_id=request.POST['brand'],
+                                model_id=request.POST['model'],
+                                type='M')
+                            dsmt.missingsend = dsm.qorder
+                            dsmt.quantity = qtt
+                            dsmt.type = 'M'
+                            dsmt.symbol = symb
+                            dsmt.save()
+                        except DSMetradoTemp.DoesNotExist as ex:
+                            DSMetradoTemp.objects.create(dsector_id=kwargs['area'],
+                                materials_id=request.POST['materials'],
+                                brand_id=request.POST['brand'],
+                                model_id=request.POST['model'],
+                                missingsend=dsm.qorder,
+                                quantity=qtt,
+                                ppurchase=request.POST['ppurchase'],
+                                psales=Decimal(request.POST['psales']).quantize(Decimal('0.001')),
+                                type='M',
+                                symbol=symb)
+                        context['status'] = True
                 if 'deleteModify' in request.POST:
                     DSMetradoTemp.objects.get(
                         dsector_id=kwargs['area'],
@@ -1035,37 +1048,51 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     ).delete()
                     context['status'] = True
                 if 'deleteReg' in request.POST:
-                    dp = Detpedido.objects.filter(
-                        pedido__dsector_id=kwargs['area'],
-                        materiales_id=request.POST['materials'],
-                        brand_id=request.POST['obrand'],
-                        model_id=request.POST['omodel'],
-                        pedido__status__in=['PE','AP','IN', 'CO'])
-                    sq = sum(s.cantidad for s in dp)
-                    # print Decimal(request.POST['psales']).quantize(Decimal('0.01'))
+                    # validate materials if exists in modify
+                    valid = True
                     try:
-                        dsmt = DSMetradoTemp.objects.get(
-                            type='D',materials_id=request.POST['materials'],
+                        vdm = DSMetradoTemp.objects.get(
+                            materials_id=request.POST['materials'],
                             brand_id=request.POST['obrand'],
-                            model_id=request.POST['omodel'])
-                        dsmt.missingsend = sq
-                        dsmt.quantity = (
-                            float(request.POST['quantity']) - float(sq))
-                        dsmt.save()
+                            model_id=request.POST['omodel'],
+                            type='M')
+                        valid = False
+                        context['raise'] = 'No se puede modificar el material por que ya esta registrado en "MODIFICADOS"'
+                        context['status'] = False
                     except DSMetradoTemp.DoesNotExist as ex:
-                        ob = DSMetradoTemp()
-                        ob.dsector_id=kwargs['area']
-                        ob.materials_id=request.POST['materials']
-                        ob.brand_id=request.POST['obrand']
-                        ob.model_id=request.POST['omodel']
-                        ob.missingsend=Decimal(sq).quantize(Decimal('0.01'))
-                        ob.quantity=Decimal(abs(float(request.POST['quantity'])-sq)).quantize(Decimal('0.01'))
-                        ob.type='D'
-                        ob.symbol='-'
-                        ob.ppurchase=Decimal(request.POST['ppurchase']).quantize(Decimal('0.01'))
-                        ob.psales=Decimal(request.POST['psales']).quantize(Decimal('0.01'))
-                        ob.save()
-                    context['status'] = True
+                        pass
+                    if valid:
+                        dp = Detpedido.objects.filter(
+                            pedido__dsector_id=kwargs['area'],
+                            materiales_id=request.POST['materials'],
+                            brand_id=request.POST['obrand'],
+                            model_id=request.POST['omodel'],
+                            pedido__status__in=['PE','AP','IN', 'CO'])
+                        sq = sum(s.cantidad for s in dp)
+                        # print Decimal(request.POST['psales']).quantize(Decimal('0.01'))
+                        try:
+                            dsmt = DSMetradoTemp.objects.get(
+                                type='D',materials_id=request.POST['materials'],
+                                brand_id=request.POST['obrand'],
+                                model_id=request.POST['omodel'])
+                            dsmt.missingsend = sq
+                            dsmt.quantity = (
+                                float(request.POST['quantity']) - float(sq))
+                            dsmt.save()
+                        except DSMetradoTemp.DoesNotExist as ex:
+                            ob = DSMetradoTemp()
+                            ob.dsector_id=kwargs['area']
+                            ob.materials_id=request.POST['materials']
+                            ob.brand_id=request.POST['obrand']
+                            ob.model_id=request.POST['omodel']
+                            ob.missingsend=Decimal(sq).quantize(Decimal('0.01'))
+                            ob.quantity=Decimal(abs(float(request.POST['quantity'])-sq)).quantize(Decimal('0.01'))
+                            ob.type='D'
+                            ob.symbol='-'
+                            ob.ppurchase=Decimal(request.POST['ppurchase']).quantize(Decimal('0.01'))
+                            ob.psales=Decimal(request.POST['psales']).quantize(Decimal('0.01'))
+                            ob.save()
+                        context['status'] = True
                 if 'delregdel' in request.POST:
                     for x in json.loads(request.POST['data']):
                         try:
@@ -1090,92 +1117,119 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     DSMetradoTemp.objects.filter(dsector_id=kwargs['area']).delete()
                     context['status'] = True
                 if 'approvedModify' in request.POST:
-                    # remove all 2016-24-11 change function
-                    lm = MMetrado.objects.filter(dsector_id=kwargs['area'])
-                    mn = DSMetrado.objects.filter(
-                            dsector_id=kwargs['area'])
-                    kc = globalVariable.get_Token()
-                    for o in mn:
-                        # save history and delete area
-                        his = HistoryDSMetrado()
-                        his.qcode = kc
-                        his.dsector_id = kwargs['area']
-                        his.materials_id = o.materials_id
-                        his.brand_id = o.brand_id
-                        his.model_id = o.model_id
-                        his.quantity = o.quantity
-                        his.qorder = o.qorder
-                        his.qguide = o.qguide
-                        his.ppurchase = o.ppurchase
-                        his.psales = o.psales
-                        his.comment = o.comment
-                        his.tag = o.tag
-                        his.nipple = o.nipple
-                        his.flag = o.flag
-                        his.save()
+                    def history():
                         try:
-                            m = lm.get(
-                                dsector_id=kwargs['area'],
-                                materials_id=o.materials_id,
-                                brand_id=o.brand_id,
-                                model_id=o.model_id)
-                            ds = DSMetrado()
-                            ds.dsector_id = kwargs['area']
-                            ds.sector_id = kwargs['sec']
-                            ds.materials_id = m.materials_id
-                            ds.brand_id = m.brand_id
-                            ds.model_id = m.model_id
-                            ds.quantity = m.quantity
-                            if m.quantity < o.quantity:
-                                ds.qorder = (m.qorder-(o.quantity-m.quantity))
-                            elif m.quantity > o.quantity:
-                                ds.qorder = ((m.quantity-o.quantity)+m.qorder)
-                            else:
-                                ds.qorder = m.qorder
-                            ds.qguide = m.qguide
-                            ds.ppurchase = m.ppurchase
-                            ds.psales = m.psales
-                            ds.comment = m.comment
-                            if ds.qorder == ds.quantity:
-                                ds.tag = '0'
-                            if (ds.qorder < ds.quantity) and (ds.qorder > 0):
-                                ds.tag = '1'
-                            if ds.qorder <= 0:
-                                ds.qorder = 0
-                                ds.tag = '2'
-                            ds.flag = m.flag
-                            ds.nipple = m.nipple
-                            o.delete()
-                            ds.save()
-                        except ObjectDoesNotExist:
-                            o.delete()
-                    lds = DSMetrado.objects.filter(dsector_id=kwargs['area'])
-                    if lds.count() != lm.count():
-                        for x in lm:
+                            pass
+                        except HistoryDSMetrado.DoesNotExist as ex:
+                            pass
+                    # execute transact
+                    dl = DSMetradoTemp.objects.filter(dsector_id=kwargs['area'], type='D')
+                    if dl:
+                        for xdl in dl:
                             try:
-                                DSMetrado.objects.get(
-                                    dsector_id=kwargs['area'],
-                                    materials_id=x.materials_id,
-                                    brand_id=x.brand_id,
-                                    model_id=x.model_id)
-                            except Exception:
-                                ds = DSMetrado()
-                                ds.dsector_id = kwargs['area']
-                                ds.sector_id = kwargs['sec']
-                                ds.materials_id = x.materials_id
-                                ds.brand_id = x.brand_id
-                                ds.model_id = x.model_id
-                                ds.quantity = x.quantity
-                                ds.qorder = x.quantity
-                                ds.qguide = 0
-                                ds.ppurchase = x.ppurchase
-                                ds.psales = x.psales
-                                ds.comment = x.comment
-                                ds.tag = '0'
-                                ds.flag = x.flag
-                                ds.nipple = x.nipple
-                                ds.save()
-                    lm.delete()
+                                pass
+                            except ObjectDoesNotExist as ex:
+                                pass
+                    md = DSMetradoTemp.objects.filter(dsector_id=kwargs['area'], type='M')
+                    if md:
+                        for xmd in md:
+                            try:
+                                pass
+                            except ObjectDoesNotExist as ex:
+                                pass
+                    nw = DSMetradoTemp.objects.filter(dsector_id=kwargs['area'], type='N')
+                    if nw:
+                        for xnw in nw:
+                            try:
+                                pass
+                            except ObjectDoesNotExist as ex:
+                                pass
+                    # remove all 2016-24-11 change function
+                    # lm = MMetrado.objects.filter(dsector_id=kwargs['area'])
+                    # mn = DSMetrado.objects.filter(
+                    #         dsector_id=kwargs['area'])
+                    # kc = globalVariable.get_Token()
+                    # for o in mn:
+                    #     # save history and delete area
+                    #     his = HistoryDSMetrado()
+                    #     his.qcode = kc
+                    #     his.dsector_id = kwargs['area']
+                    #     his.materials_id = o.materials_id
+                    #     his.brand_id = o.brand_id
+                    #     his.model_id = o.model_id
+                    #     his.quantity = o.quantity
+                    #     his.qorder = o.qorder
+                    #     his.qguide = o.qguide
+                    #     his.ppurchase = o.ppurchase
+                    #     his.psales = o.psales
+                    #     his.comment = o.comment
+                    #     his.tag = o.tag
+                    #     his.nipple = o.nipple
+                    #     his.flag = o.flag
+                    #     his.save()
+                    #     try:
+                    #         m = lm.get(
+                    #             dsector_id=kwargs['area'],
+                    #             materials_id=o.materials_id,
+                    #             brand_id=o.brand_id,
+                    #             model_id=o.model_id)
+                    #         ds = DSMetrado()
+                    #         ds.dsector_id = kwargs['area']
+                    #         ds.sector_id = kwargs['sec']
+                    #         ds.materials_id = m.materials_id
+                    #         ds.brand_id = m.brand_id
+                    #         ds.model_id = m.model_id
+                    #         ds.quantity = m.quantity
+                    #         if m.quantity < o.quantity:
+                    #             ds.qorder = (m.qorder-(o.quantity-m.quantity))
+                    #         elif m.quantity > o.quantity:
+                    #             ds.qorder = ((m.quantity-o.quantity)+m.qorder)
+                    #         else:
+                    #             ds.qorder = m.qorder
+                    #         ds.qguide = m.qguide
+                    #         ds.ppurchase = m.ppurchase
+                    #         ds.psales = m.psales
+                    #         ds.comment = m.comment
+                    #         if ds.qorder == ds.quantity:
+                    #             ds.tag = '0'
+                    #         if (ds.qorder < ds.quantity) and (ds.qorder > 0):
+                    #             ds.tag = '1'
+                    #         if ds.qorder <= 0:
+                    #             ds.qorder = 0
+                    #             ds.tag = '2'
+                    #         ds.flag = m.flag
+                    #         ds.nipple = m.nipple
+                    #         o.delete()
+                    #         ds.save()
+                    #     except ObjectDoesNotExist:
+                    #         o.delete()
+                    # lds = DSMetrado.objects.filter(dsector_id=kwargs['area'])
+                    # if lds.count() != lm.count():
+                    #     for x in lm:
+                    #         try:
+                    #             DSMetrado.objects.get(
+                    #                 dsector_id=kwargs['area'],
+                    #                 materials_id=x.materials_id,
+                    #                 brand_id=x.brand_id,
+                    #                 model_id=x.model_id)
+                    #         except Exception:
+                    #             ds = DSMetrado()
+                    #             ds.dsector_id = kwargs['area']
+                    #             ds.sector_id = kwargs['sec']
+                    #             ds.materials_id = x.materials_id
+                    #             ds.brand_id = x.brand_id
+                    #             ds.model_id = x.model_id
+                    #             ds.quantity = x.quantity
+                    #             ds.qorder = x.quantity
+                    #             ds.qguide = 0
+                    #             ds.ppurchase = x.ppurchase
+                    #             ds.psales = x.psales
+                    #             ds.comment = x.comment
+                    #             ds.tag = '0'
+                    #             ds.flag = x.flag
+                    #             ds.nipple = x.nipple
+                    #             ds.save()
+                    # lm.delete()
                     context['status'] = True
                 if 'saveComment' in request.POST:
                     dm = DSMetrado.objects.get(

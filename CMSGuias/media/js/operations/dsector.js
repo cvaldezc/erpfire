@@ -104,8 +104,10 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   };
   $scope.status = false;
   $scope.sldm = [[0, 0], [0, 0]];
+  $scope.pnp = 0;
   angular.element(document).ready(function() {
     var $table, i, len, ref, x;
+    $scope.mdstatus = false;
     angular.element('.modal').modal({
       'dismissible': false
     });
@@ -232,6 +234,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
       }).success(function(response) {
         if (response.status) {
           Materialize.toast("Material Agregado", 2600);
+          $scope.calcApproved();
           if (Boolean($("#modify").length)) {
             $scope.modifyList();
           } else {
@@ -270,6 +273,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         }).success(function(response) {
           if (response.status) {
             $scope.getListAreaMaterials();
+            $scope.calcApproved();
           }
         });
       }
@@ -857,6 +861,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     }, function(isConfirm) {
       var data;
       if (isConfirm) {
+        Materialize.toast("<i class=\"fa fa-cog fa-spin fa-fw\"></i>\n_Procesando...", "infinity", "toast-kill");
         $event.currentTarget.disabled = true;
         $event.currentTarget.innerHTML = "<i class=\"fa fa-spinner fa-pulse\"></i> Procesando";
         data = {
@@ -1261,6 +1266,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         console.log(response);
         $scope.disableModify();
         $scope.listTemps('M');
+        $scope.calcApproved();
       } else {
         return console.error("Error ", response);
       }
@@ -1287,7 +1293,8 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
           return Factory.post(param).success(function(response) {
             if (reponse.status) {
               Materialize.toast("<i class=\"fa fa-check\"></i>\n&nbsp;Se eliminar el item", 4000);
-              return $scope.listTemps('D');
+              $scope.listTemps('D');
+              return $scope.calcApproved();
             }
           });
         }
@@ -1339,6 +1346,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
               if (response.status) {
                 $scope.disableModify();
                 $scope.listTemps(type);
+                $scope.calcApproved();
                 Materialize.toast("<i class='fa fa-trash fa-lg red-text'></i>\n\ items eliminados!", 4000);
               } else {
                 console.error("Error ", response);
@@ -1350,6 +1358,33 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         Materialize.toast("<i class=\"fa fa-exclamation-circle\nfa-lg amber-text\"></i>\nSe debe de seleccionar al menos un item", 4000);
       }
     });
+  };
+  $scope.calcApproved = function() {
+    var rdap, rdas, totalp, totals;
+    $scope.pnp = parseFloat($scope.amnp);
+    $scope.pns = parseFloat($scope.amns);
+    $scope.pnp += $scope.tmlstN[0];
+    $scope.pns += $scope.tmlstN[1];
+    $scope.pnp += $scope.sldm[0][0];
+    $scope.pnp -= $scope.sldm[0][1];
+    $scope.pns += $scope.sldm[1][0];
+    $scope.pns -= $scope.sldm[1][1];
+    $scope.pnp -= $scope.tmlstD[0];
+    $scope.pns -= $scope.tmlstD[1];
+    $scope.pnp = $scope.pnp;
+    $scope.pns = $scope.pns;
+    rdap = ($scope.amstp - $scope.amnp) + $scope.pnp;
+    totalp = $scope.amsecp - rdap;
+    $scope.pgaa = totalp;
+    rdas = ($scope.amsts - $scope.amns) + $scope.pns;
+    totals = $scope.amsecs - rdas;
+    $scope.pgpa = totalp;
+    $scope.pgsa = totals;
+    if (totalp >= 0) {
+      $scope.mdstatus = true;
+    } else {
+      $scope.mdstatus = false;
+    }
   };
   $scope.disableModify = function() {
     $scope.meditindex = -1;
