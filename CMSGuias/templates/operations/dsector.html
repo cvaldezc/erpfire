@@ -1157,6 +1157,44 @@
             </button>
         </div>
     </div>
+    <div id="mwithout" class="modal modal-fixed-footer" style="width: 90% !important;">
+        <div class="modal-content">
+            <h4>Materiales sin precio</h4>
+            <table class="table hovered highlight responsible-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Descripcón</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>P.Compra</th>
+                        <th>P.Venta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in withoutprices">
+                        <td>{{$index+1}}</td>
+                        <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
+                        <td>{{x.fields.brand.fields.brand}}</td>
+                        <td>{{x.fields.model.fields.model}}</td>
+                        <td class="col-3">
+                            <input type="hidden" ng-model="wout[$index].materials" ng-init="wout[$index].materials=x.fields.materials.pk">
+                            <input type="hidden" ng-model="wout[$index].brand" ng-init="wout[$index].brand=x.fields.brand.pk">
+                            <input type="hidden" ng-model="wout[$index].model" ng-init="wout[$index].model=x.fields.model.pk">
+                            <input type="number" class="right-align" ng-model="wout[$index].pp" min="0" ng-blur="updatePrice($index)"></td>
+                        <td class="col-3">
+                            <input type="number" class="right-align" ng-model="wout[$index].pv" min="0" ng-blur="updatePrice($index)"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 grey-text text-darken-3">
+                <i class="fa fa-times"></i>
+                <span class="hide-on-small-only">SALIR</span>
+            </button>
+        </div>
+    </div>
     {% endverbatim %}
 </div>
 {% csrf_token %}

@@ -14,11 +14,11 @@ Tasks:
             ☐ add field in "detcompra" for convert in of input @storage @critical 
             ☐ change trigger "change status detcompra trigger in detingress" @storage @critical 2016-11-28 08:46:41
         Doing:
-            ☐ Update modify of table dsmetrado -> implement three tables for details (add, edit, del) @Operations @high @critical 2016-11-28 08:38:48 @deliverable 2016-11-29 08:39:31 
     Tasks Complete:
         Apps:
             Sales:
             Operations:
+                ✔ Update modify of table dsmetrado -> implement three tables for details (add, edit, del) @Operations @high @critical 2016-11-28 08:38:48 @deliverable 2016-11-29 08:39:31 @done (12/10/2016, 3:56:35 PM) 
             Logistics:
             Storage:
     Tasks Sugestion:

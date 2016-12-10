@@ -173,7 +173,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       .success (response) ->
         if response.status
           Materialize.toast "Material Agregado", 2600
-          $scope.calcApproved()
+          # $scope.calcApproved()
           if Boolean $("#modify").length
             $scope.modifyList()
           else
@@ -208,7 +208,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         .success (response) ->
           if response.status
             $scope.getListAreaMaterials()
-            $scope.calcApproved()
+            # $scope.calcApproved()
             return
         return
     return
@@ -706,40 +706,76 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         return
     return
   $scope.approvedModify = ($event) ->
-    swal
-      title: "Aprobar modificación?"
-      text: "Desea aprobar las modificaciones del área?"
-      type: "warning"
-      showCancelButton: true
-      confirmButtonColor: "#dd6b55"
-      confirmButtonText: "Si!, Aprobar"
-      closeOnConfirm: true
-      closeOnCancel: true
-    , (isConfirm) ->
-      if isConfirm
-        Materialize.toast """<i class="fa fa-cog fa-spin fa-fw"></i>
-           _Procesando...""", "infinity", "toast-kill"
-        $event.currentTarget.disabled = true
-        $event.currentTarget.innerHTML = """<i class="fa fa-spinner fa-pulse"></i> Procesando"""
-        data =
-          approvedModify: true
-        $http
-          url: ""
-          method: "post"
-          data: $.param data
-        .success (response) ->
-          if response.status
-            Materialize.toast "Se Aprobó!"
-            $timeout (->
-              location.reload()
-              return
-            ), 800
+    validPrice = ->
+      defer = $q.defer()
+      prm =
+        consultingprice: true
+      Factory.get(prm)
+      .success (response) ->
+        if response.status
+          if response.lst.length > 0
+            $scope.withoutprices = response.lst
+            Materialize.toast "Warning #{response.raise}"
+            angular.element("#mwithout").modal("open")
+            defer.resolve false
             return
           else
-            $event.currentTarget.className = "btn red grey-text text-darken-1"
-            $event.currentTarget.innerHTML = """<i class="fa fa-timescircle"></i> Error!"""
+            defer.resolve true
+            return
+        else
+          defer.resolve false
+          return
+      return defer.promise
+    validPrice().then (result) ->
+      if result
+        swal
+          title: "Aprobar modificación?"
+          text: "Desea aprobar las modificaciones del área?"
+          type: "warning"
+          showCancelButton: true
+          confirmButtonColor: "#dd6b55"
+          confirmButtonText: "Si!, Aprobar"
+          closeOnConfirm: true
+          closeOnCancel: true
+        , (isConfirm) ->
+          if isConfirm
+            Materialize.toast """<i class="fa fa-cog fa-spin fa-fw"></i>
+              _Procesando...""", "infinity", "toast-kill"
+            $event.currentTarget.disabled = true
+            $event.currentTarget.innerHTML = """
+            <i class="fa fa-spinner fa-pulse"></i> Procesando"""
+            data =
+              approvedModify: true
+            $http
+              url: ""
+              method: "post"
+              data: $.param data
+            .success (response) ->
+              if response.status
+                Materialize.toast "Se Aprobó!"
+                $timeout (->
+                  location.reload()
+                  return
+                ), 800
+                return
+              else
+                $event.currentTarget.className = "btn red grey-text text-darken-1"
+                $event.currentTarget.innerHTML = """<i class="fa fa-timescircle"></i> Error!"""
+                return
             return
         return
+      else
+        Materialize.toast "Existen item sin precio", 12000
+        return
+    return
+  $scope.updatePrice = (index) ->
+    param = $scope.wout[index]
+    param['updprice'] = true
+    Factory.post(param)
+    .success (response) ->
+      if !response.status
+        Materialize.toast "No se ha podido actualizar los precios.", 2400
+      return
     return
   $scope.showCommentMat = ->
     $("#commentm").modal('open')
@@ -1149,9 +1185,10 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         console.log response
         $scope.disableModify()
         $scope.listTemps 'M'
-        $scope.calcApproved()
+        # $scope.calcApproved()
         return
       else
+        Materialize.toast "Error #{response.raise}", 16000
         console.error "Error ", response
     return
 
@@ -1180,11 +1217,16 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           param['deleteReg'] = true
           Factory.post param
           .success (response) ->
-            if reponse.status
-              Materialize.toast """<i class="fa fa-check"></i>
-                &nbsp;Se eliminar el item""", 4000
+            if response.status
+              Materialize.toast """<i class="fa fa-check text-red"></i>
+                &nbsp;Item registrado para eliminar""", 4000
               $scope.listTemps('D')
-              $scope.calcApproved()
+              # $scope.calcApproved()
+              return
+            else
+              Materialize.toast "Error: #{response.raise}", 16000
+              return
+          return
     else
       Materialize.toast "<i class='fa fa-exclamation-circle amber-text'></i>
         &nbsp; Debe de elegir un material para eliminar.", 4400
@@ -1344,10 +1386,10 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           else
             sum + 0
         , 0)
-      # setTimeout (->
-      #   $scope.calcApproved()
-      #   return
-      #   ), 1200
+      setTimeout (->
+        $scope.calcApproved()
+        return
+        ), 1200
     return
   $scope.$watch 'lstN', (nw, old)->
     if nw isnt undefined

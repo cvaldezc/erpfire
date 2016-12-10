@@ -234,7 +234,6 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
       }).success(function(response) {
         if (response.status) {
           Materialize.toast("Material Agregado", 2600);
-          $scope.calcApproved();
           if (Boolean($("#modify").length)) {
             $scope.modifyList();
           } else {
@@ -273,7 +272,6 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         }).success(function(response) {
           if (response.status) {
             $scope.getListAreaMaterials();
-            $scope.calcApproved();
           }
         });
       }
@@ -849,39 +847,78 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     });
   };
   $scope.approvedModify = function($event) {
-    swal({
-      title: "Aprobar modificación?",
-      text: "Desea aprobar las modificaciones del área?",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#dd6b55",
-      confirmButtonText: "Si!, Aprobar",
-      closeOnConfirm: true,
-      closeOnCancel: true
-    }, function(isConfirm) {
-      var data;
-      if (isConfirm) {
-        Materialize.toast("<i class=\"fa fa-cog fa-spin fa-fw\"></i>\n_Procesando...", "infinity", "toast-kill");
-        $event.currentTarget.disabled = true;
-        $event.currentTarget.innerHTML = "<i class=\"fa fa-spinner fa-pulse\"></i> Procesando";
-        data = {
-          approvedModify: true
-        };
-        $http({
-          url: "",
-          method: "post",
-          data: $.param(data)
-        }).success(function(response) {
-          if (response.status) {
-            Materialize.toast("Se Aprobó!");
-            $timeout((function() {
-              location.reload();
-            }), 800);
+    var validPrice;
+    validPrice = function() {
+      var defer, prm;
+      defer = $q.defer();
+      prm = {
+        consultingprice: true
+      };
+      Factory.get(prm).success(function(response) {
+        if (response.status) {
+          if (response.lst.length > 0) {
+            $scope.withoutprices = response.lst;
+            Materialize.toast("Warning " + response.raise);
+            angular.element("#mwithout").modal("open");
+            defer.resolve(false);
           } else {
-            $event.currentTarget.className = "btn red grey-text text-darken-1";
-            $event.currentTarget.innerHTML = "<i class=\"fa fa-timescircle\"></i> Error!";
+            defer.resolve(true);
+          }
+        } else {
+          defer.resolve(false);
+        }
+      });
+      return defer.promise;
+    };
+    validPrice().then(function(result) {
+      if (result) {
+        swal({
+          title: "Aprobar modificación?",
+          text: "Desea aprobar las modificaciones del área?",
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#dd6b55",
+          confirmButtonText: "Si!, Aprobar",
+          closeOnConfirm: true,
+          closeOnCancel: true
+        }, function(isConfirm) {
+          var data;
+          if (isConfirm) {
+            Materialize.toast("<i class=\"fa fa-cog fa-spin fa-fw\"></i>\n_Procesando...", "infinity", "toast-kill");
+            $event.currentTarget.disabled = true;
+            $event.currentTarget.innerHTML = "<i class=\"fa fa-spinner fa-pulse\"></i> Procesando";
+            data = {
+              approvedModify: true
+            };
+            $http({
+              url: "",
+              method: "post",
+              data: $.param(data)
+            }).success(function(response) {
+              if (response.status) {
+                Materialize.toast("Se Aprobó!");
+                $timeout((function() {
+                  location.reload();
+                }), 800);
+              } else {
+                $event.currentTarget.className = "btn red grey-text text-darken-1";
+                $event.currentTarget.innerHTML = "<i class=\"fa fa-timescircle\"></i> Error!";
+              }
+            });
           }
         });
+      } else {
+        Materialize.toast("Existen item sin precio", 12000);
+      }
+    });
+  };
+  $scope.updatePrice = function(index) {
+    var param;
+    param = $scope.wout[index];
+    param['updprice'] = true;
+    Factory.post(param).success(function(response) {
+      if (!response.status) {
+        Materialize.toast("No se ha podido actualizar los precios.", 2400);
       }
     });
   };
@@ -1266,8 +1303,8 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
         console.log(response);
         $scope.disableModify();
         $scope.listTemps('M');
-        $scope.calcApproved();
       } else {
+        Materialize.toast("Error " + response.raise, 16000);
         return console.error("Error ", response);
       }
     });
@@ -1290,11 +1327,12 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
           console.log("Inside confirm delete material", isConfirm);
           param = $scope.editm;
           param['deleteReg'] = true;
-          return Factory.post(param).success(function(response) {
-            if (reponse.status) {
-              Materialize.toast("<i class=\"fa fa-check\"></i>\n&nbsp;Se eliminar el item", 4000);
+          Factory.post(param).success(function(response) {
+            if (response.status) {
+              Materialize.toast("<i class=\"fa fa-check text-red\"></i>\n&nbsp;Item registrado para eliminar", 4000);
               $scope.listTemps('D');
-              return $scope.calcApproved();
+            } else {
+              Materialize.toast("Error: " + response.raise, 16000);
             }
           });
         }
@@ -1437,6 +1475,9 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
           }
         }, 0);
       }
+      setTimeout((function() {
+        $scope.calcApproved();
+      }), 1200);
     }
   };
   $scope.$watch('lstN', function(nw, old) {
