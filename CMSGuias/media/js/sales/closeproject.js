@@ -368,14 +368,14 @@
       if (options == null) {
         options = {};
       }
-      Materialize.toast('<i class="fa fa-refresh fa-spin fa-2x"></i>&nbsp; Estamos enviado el correo', 'some', 'toast-static');
+      Materialize.toast("<i class=\"fa fa-refresh fa-spin fa-2x\"></i>&nbsp; Estamos enviado el correo", 'some', 'toast-static');
       prm = {
         forsb: options.mails,
         issue: options.issue,
         body: options.body,
         callback: 'JSON_CALLBACK'
       };
-      cpFactory.formCross("", prm).success(function(rescross) {
+      cpFactory.formCross("http://190.41.246.91:3000/mailer/", prm).success(function(rescross) {
         if (rescross.status) {
           angular.element(".toast-static").remove();
           Materialize.toast('<i class="fa fa-paper-plane-o fa-lg"></i>&nbsp; Enviado correntamente!', 4000);

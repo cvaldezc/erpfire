@@ -11,9 +11,9 @@ Tasks:
         TO-DO:
             - Missing Organize
             ☐ add user in note of ingress (Rocio, Mauro) @Storage @low
-            ☐ add field in "detcompra" for convert in of input @storage @critical 
             ☐ change trigger "change status detcompra trigger in detingress" @storage @critical 2016-11-28 08:46:41
         Doing:
+            ☐ add field in "detcompra" for convert in of input @storage @critical @today
     Tasks Complete:
         Apps:
             Sales:

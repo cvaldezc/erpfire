@@ -314,14 +314,14 @@ do ->
                 return
             return
         $scope.sendMail = (options={}) ->
-            Materialize.toast '<i class="fa fa-refresh fa-spin fa-2x"></i>&nbsp; Estamos enviado el correo', 'some', 'toast-static'
+            Materialize.toast """<i class="fa fa-refresh fa-spin fa-2x"></i>&nbsp; Estamos enviado el correo""", 'some', 'toast-static'
             prm =
                 forsb: options.mails
                 issue: options.issue
                 body: options.body
                 callback: 'JSON_CALLBACK'
-            # cpFactory.formCross "http://190.41.246.91:3000/mailer/", prm
-            cpFactory.formCross "", prm
+            cpFactory.formCross "http://190.41.246.91:3000/mailer/", prm
+            # cpFactory.formCross "", prm
             .success (rescross) ->
                 if rescross.status
                     angular.element(".toast-static").remove()

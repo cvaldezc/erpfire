@@ -900,7 +900,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             dsmt.missingsend += Decimal(request.POST['quantity']).quantize(Decimal('0.001'))
                             dsmt.type = regt
                             dsmt.symbol = '+'
-                            dstm.save()
+                            dsmt.save()
                         except DSMetradoTemp.DoesNotExist as ex:
                             print ex
                             DSMetradoTemp.objects.create(dsector_id=kwargs['area'], 

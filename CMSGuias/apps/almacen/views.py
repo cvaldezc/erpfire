@@ -1930,8 +1930,9 @@ class ListDetOrders(JSONResponseMixin, TemplateView):
             # data = simplejson.dumps(data)
             return self.render_to_json_response(data)
 
-# Input order purchase
+
 class InputOrderPurchase(JSONResponseMixin, TemplateView):
+    """Here make input purchase"""
     template_name = 'almacen/inputpurchase.html'
 
     @method_decorator(login_required)

@@ -32,9 +32,11 @@ from .models import (
 from CMSGuias.apps.ventas.models import Proyecto, Subproyecto
 from CMSGuias.apps.operations.models import MetProject
 from CMSGuias.apps.tools import genkeys, globalVariable, uploadFiles, search, number_to_char
-from .forms import (
-                    addTmpCotizacionForm, addTmpCompraForm, CompraForm,
-                    ProveedorForm, ServiceOrderForm)
+from .forms import (addTmpCotizacionForm,
+    addTmpCompraForm,
+    CompraForm,
+    ProveedorForm,
+    ServiceOrderForm)
 
 
 # Class Bases Views generic
