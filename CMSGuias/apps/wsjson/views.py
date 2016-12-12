@@ -91,7 +91,7 @@ def get_resumen_details_materiales(request):
                                         condition = (x.materiales_id == p['materials'])
                                         if condition:
                                             purchase = round(p['purchase'], 2)
-                                            sale = round(p['sale'], 2)
+                                            sales = round(p['sale'], 2)
                                             quantity = p['quantity']
                     if 'lds' in request.GET:
                         try:
@@ -113,7 +113,7 @@ def get_resumen_details_materiales(request):
                             context['status'] = str(ex)
                             purchase, sales = 0, 0
                     else:
-                        if purchase == 0 and sale == 0:
+                        if purchase == 0 and sales == 0:
                             try:
                                 getprices = MetProject.objects.filter(
                                     materiales_id=x.materiales_id).distinct(
@@ -123,14 +123,14 @@ def get_resumen_details_materiales(request):
                                     getprices = getprices[0]
                                     purchase = getprices.precio
                                     # max([p.precio for p in getprices])
-                                    sale = getprices.sales
+                                    sales = getprices.sales
                                     # max([p.sales for p in getprices])
                                 else:
                                     purchase = 0
-                                    sale = 0
+                                    sales = 0
                             except ObjectDoesNotExist, e:
                                 purchase = 0
-                                sale = 0
+                                sales = 0
                     if 'lds' in request.GET:
                         print 'get price dsmetrado'
                         context['purchase'] = [{
@@ -140,24 +140,24 @@ def get_resumen_details_materiales(request):
                         } for pc in DSMetrado.objects.filter(
                             materials_id=x.materiales_id).distinct(
                                 'ppurchase')[:5]]
-
-                    if len(context['purchase']) == 0:
-                        # get list prices suggest
-                        pc = MetProject.objects.filter(
-                            materiales_id=x.materiales_id).order_by(
-                                '-proyecto__registrado')[:5]
-                        print 'get price of metproject'
-                        # if not pc:
-                        #     pp = DetCompra.objects.filter(
-                        #         materiales_id=x.materiales_id).order_by(
-                        #             '-compra__registrado')[:5]
-                        #     context['sales'] = [{
-                        #         'compra': s.precio, 'currency': s.compra.moneda.moneda} for s in pp]
-                        # else:
-                        context['purchase'] = [{
-                            'purchase': p.precio,
-                            'sales': float(p.sales),
-                            'currency': p.proyecto.currency.moneda} for p in pc]
+                    if 'purchase' in context:
+                        if len(context['purchase']) == 0:
+                            # get list prices suggest
+                            pc = MetProject.objects.filter(
+                                materiales_id=x.materiales_id).order_by(
+                                    '-proyecto__registrado')[:5]
+                            print 'get price of metproject'
+                            # if not pc:
+                            #     pp = DetCompra.objects.filter(
+                            #         materiales_id=x.materiales_id).order_by(
+                            #             '-compra__registrado')[:5]
+                            #     context['sales'] = [{
+                            #         'compra': s.precio, 'currency': s.compra.moneda.moneda} for s in pp]
+                            # else:
+                            context['purchase'] = [{
+                                'purchase': p.precio,
+                                'sales': float(p.sales),
+                                'currency': p.proyecto.currency.moneda} for p in pc]
                     context['list'] = [{
                         'materialesid': x.materiales_id,
                         'matnom': x.matnom,
