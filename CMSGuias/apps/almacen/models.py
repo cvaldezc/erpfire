@@ -5,15 +5,7 @@ from django.db import connection, models, transaction
 from CMSGuias.apps.ventas.models import Proyecto, Subproyecto, Sectore
 from CMSGuias.apps.operations.models import DSector
 from CMSGuias.apps.home.models import (
-                                        Materiale,
-                                        Almacene,
-                                        Transportista,
-                                        Transporte,
-                                        Conductore,
-                                        Cliente,
-                                        Brand,
-                                        Model,
-                                        Employee)
+    Materiale, Almacene, Transportista, Transporte, Conductore, Cliente, Brand, Model, Employee)
 from CMSGuias.apps.logistica.models import Compra
 
 
@@ -22,26 +14,22 @@ class Pedido(models.Model):
         ext = filename.split('.')[-1]
         year = self.proyecto.registrado.strftime('%Y')
         ruta = 'storage/projects/%s/%s/orders/%s.%s' % (
-                year,
-                self.proyecto_id,
-                self.pedido_id,
-                ext)
+            year, self.proyecto_id, self.pedido_id, ext)
         return ruta
 
     pedido_id = models.CharField(
-                    primary_key=True, max_length=10, default='PEAA000000')
+        primary_key=True, max_length=10, default='PEAA000000')
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproyecto = models.ForeignKey(
-                    Subproyecto, to_field='subproyecto_id',
-                    blank=True, null=True)
+        Subproyecto, to_field='subproyecto_id', blank=True, null=True)
     sector = models.ForeignKey(
-                Sectore, to_field='sector_id', blank=True, null=True)
+        Sectore, to_field='sector_id', blank=True, null=True)
     dsector = models.ForeignKey(
-                DSector, to_field='dsector_id', blank=True, null=True)
+        DSector, to_field='dsector_id', blank=True, null=True)
     almacen = models.ForeignKey(Almacene, to_field='almacen_id')
     asunto = models.CharField(max_length=160, null=True)
     empdni = models.ForeignKey(
-                Employee, to_field='empdni_id', null=True, default='70492850')
+        Employee, to_field='empdni_id', null=True, default='')
     # models.CharField(max_length=8,null=False)
     registrado = models.DateTimeField(auto_now_add=True)
     traslado = models.DateField()
@@ -60,9 +48,9 @@ class Detpedido(models.Model):
     pedido = models.ForeignKey(Pedido, to_field='pedido_id')
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     brand = models.ForeignKey(
-                Brand, to_field='brand_id', default='BR000', blank=True, null=False)
+        Brand, to_field='brand_id', default='BR000', blank=True, null=False)
     model = models.ForeignKey(
-                Model, to_field='model_id', default='MO000', blank=True, null=False)
+        Model, to_field='model_id', default='MO000', blank=True, null=False)
     cantidad = models.FloatField(null=False)
     cantshop = models.FloatField(default=0, null=False)
     cantguide = models.FloatField(default=0, null=True, blank=True)
@@ -87,9 +75,9 @@ class tmppedido(models.Model):
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     cantidad = models.FloatField(null=False)
     brand = models.ForeignKey(
-                Brand, to_field='brand_id', default='BR000', blank=True, null=False)
+        Brand, to_field='brand_id', default='BR000', blank=True, null=False)
     model = models.ForeignKey(
-                Model, to_field='model_id', default='MO000', blank=True, null=False)
+        Model, to_field='model_id', default='MO000', blank=True, null=False)
 
     def __unicode__(self):
         return '%s %s %f' % (self.empdni, self.materiales, self.cantidad)
@@ -99,18 +87,17 @@ class Niple(models.Model):
     pedido = models.ForeignKey(Pedido, to_field='pedido_id')
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproyecto = models.ForeignKey(
-                    Subproyecto, to_field='subproyecto_id',
-                    blank=True, null=True)
+        Subproyecto, to_field='subproyecto_id', blank=True, null=True)
     sector = models.ForeignKey(
-                Sectore, to_field='sector_id', blank=True, null=True)
+        Sectore, to_field='sector_id', blank=True, null=True)
     dsector = models.ForeignKey(
-                DSector, to_field='dsector_id', blank=True, null=True)
+        DSector, to_field='dsector_id', blank=True, null=True)
     empdni = models.CharField(max_length=8, null=False)
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     brand = models.ForeignKey(
-            Brand, to_field='brand_id', blank=True, default='BR000', null=False)
+        Brand, to_field='brand_id', blank=True, default='BR000', null=False)
     model = models.ForeignKey(
-            Model, to_field='model_id', blank=True, default='MO000', null=False)
+        Model, to_field='model_id', blank=True, default='MO000', null=False)
     cantidad = models.FloatField(null=True, default=1)
     metrado = models.FloatField(null=False, default=0)
     cantshop = models.FloatField(null=True, default=0)
@@ -119,7 +106,7 @@ class Niple(models.Model):
     flag = models.BooleanField(default=True)
     tag = models.CharField(max_length=1, default='0')
     comment = models.CharField(
-                max_length=250, default='', null=True, blank=True)
+        max_length=250, default='', null=True, blank=True)
     related = models.IntegerField(null=True, blank=True, default=0)
 
     audit_log = AuditLog()
@@ -134,22 +121,21 @@ class Niple(models.Model):
 class tmpniple(models.Model):
     empdni = models.ForeignKey(Employee, to_field='empdni_id')
     proyecto = models.ForeignKey(
-                Proyecto, to_field='proyecto_id', null=True, blank=True)
+        Proyecto, to_field='proyecto_id', null=True, blank=True)
     subproyecto = models.ForeignKey(
-                    Subproyecto, to_field='subproyecto_id',
-                    null=True, blank=True)
+        Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     sector = models.ForeignKey(
-                Sectore, to_field='sector_id', null=True, blank=True)
+        Sectore, to_field='sector_id', null=True, blank=True)
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     brand = models.ForeignKey(
-            Brand, to_field='brand_id', blank=True, default='BR000', null=False)
+        Brand, to_field='brand_id', blank=True, default='BR000', null=False)
     model = models.ForeignKey(
-            Model, to_field='model_id', blank=True, default='MO000', null=False)
+        Model, to_field='model_id', blank=True, default='MO000', null=False)
     cantidad = models.FloatField(null=True, default=1)
     metrado = models.FloatField(null=False, default=1)
     tipo = models.CharField(max_length=1)
     comment = models.CharField(
-                max_length=250, null=True, blank=True, default='')
+        max_length=250, null=True, blank=True, default='')
     flag = models.BooleanField(default=True)
 
     def __unicode__(self):
@@ -159,7 +145,7 @@ class tmpniple(models.Model):
 class GuiaRemision(models.Model):
     guia_id = models.CharField(primary_key=True, max_length=12)
     pedido = models.ForeignKey(
-                Pedido, to_field='pedido_id', null=True, blank=True)
+        Pedido, to_field='pedido_id', null=True, blank=True)
     ruccliente = models.ForeignKey(Cliente, to_field='ruccliente_id')
     puntollegada = models.CharField(max_length=200, null=True)
     registrado = models.DateTimeField(auto_now_add=True)
@@ -190,13 +176,13 @@ class DetGuiaRemision(models.Model):
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     cantguide = models.FloatField(default=0, null=True, blank=True)
     brand = models.ForeignKey(
-                Brand, to_field='brand_id', blank=True, default='BR000')
+        Brand, to_field='brand_id', blank=True, default='BR000')
     model = models.ForeignKey(
-                Model, to_field='model_id', blank=True, default='MO000')
+        Model, to_field='model_id', blank=True, default='MO000')
     obrand = models.ForeignKey(
-                Brand, related_name='obrandAsDetGuide', blank=True, default='BR000')
+        Brand, related_name='obrandAsDetGuide', blank=True, default='BR000')
     omodel = models.ForeignKey(
-                Model, related_name='omodelAsDetGuide', blank=True, default='MO000')
+        Model, related_name='omodelAsDetGuide', blank=True, default='MO000')
     observation = models.CharField(max_length=250, null=True, blank=True)
     order = models.ForeignKey(Pedido, to_field='pedido_id', null=True, blank=True)
     flag = models.BooleanField(default=True)
@@ -230,9 +216,9 @@ class NipleGuiaRemision(models.Model):
     guia = models.ForeignKey(GuiaRemision, to_field='guia_id')
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     brand = models.ForeignKey(
-            Brand, to_field='brand_id', blank=True, default='BR000', null=False)
+        Brand, to_field='brand_id', blank=True, default='BR000', null=False)
     model = models.ForeignKey(
-            Model, to_field='model_id', blank=True, default='MO000', null=False)
+        Model, to_field='model_id', blank=True, default='MO000', null=False)
     metrado = models.FloatField(null=False, default=0)
     cantguide = models.FloatField(default=0, null=True, blank=True)
     tipo = models.CharField(max_length=1)
@@ -272,9 +258,9 @@ class DetSuministro(models.Model):
     cantidad = models.FloatField(null=False)
     cantshop = models.FloatField(default=0, null=False)
     brand = models.ForeignKey(
-            Brand, to_field='brand_id', default='BR000', blank=True, null=True)
+        Brand, to_field='brand_id', default='BR000', blank=True, null=True)
     model = models.ForeignKey(
-            Model, to_field='model_id', default='MO000', blank=True, null=True)
+        Model, to_field='model_id', default='MO000', blank=True, null=True)
     tag = models.CharField(max_length=1, default='0', null=False)
     origin = models.CharField(max_length=10, default='NN')
     # orders = models.CharField(max_length=250, blank=True, default='')
@@ -295,7 +281,7 @@ class tmpsuministro(models.Model):
     model = models.ForeignKey(Model, to_field='model_id', default='MO000')
     origin = models.CharField(max_length=2, default='NN', null=True)
     orders = models.ForeignKey(
-                Pedido, to_field='pedido_id', null=True, blank=True)
+        Pedido, to_field='pedido_id', null=True, blank=True)
 
     def __unicode__(self):
         return '%s %s %f' % (self.empdni, self.materiales, self.cantidad)
@@ -313,10 +299,7 @@ class Inventario(models.Model):
     periodo = models.CharField(max_length=4, default='')
     ingreso = models.DateField(auto_now=True)
     compra = models.ForeignKey(
-            'logistica.Compra',
-            to_field='compra_id',
-            null=True,
-            blank=True)
+        'logistica.Compra', to_field='compra_id', null=True, blank=True)
     spptag = models.BooleanField(default=False)
     flag = models.BooleanField(default=True)
 
@@ -408,7 +391,7 @@ class NoteIngress(models.Model):
     register = models.DateTimeField(auto_now=True)
     receive = models.ForeignKey(Employee, related_name='receiveAsEmployee')
     inspection = models.ForeignKey(
-                    Employee, related_name='inspectionAsEmployee')
+        Employee, related_name='inspectionAsEmployee')
     approval = models.ForeignKey(Employee, related_name='approvalAsEmployee')
     observation = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=2, default='IN')
@@ -420,12 +403,13 @@ class NoteIngress(models.Model):
 class DetIngress(models.Model):
     ingress = models.ForeignKey(NoteIngress, to_field='ingress_id')
     materials = models.ForeignKey(Materiale, to_field='materiales_id')
-    quantity = models.FloatField()
+    quantity = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     brand = models.ForeignKey(Brand, to_field='brand_id')
     model = models.ForeignKey(Model, to_field='model_id')
-    purchase = models.FloatField(default=0)
-    sales = models.FloatField(default=0)
+    purchase = models.DecimalField(max_digits=8, decimal_places=3, default=0)
+    sales = models.DecimalField(max_digits=8, decimal_places=3, default=0)
     report = models.CharField(max_length=1, default='0')
+    convertto = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -448,7 +432,8 @@ class Restoration(models.Model):
     restoration_id = models.CharField(max_length=8, primary_key=True)
     almacen = models.ForeignKey(Almacene, to_field='almacen_id', blank=True)
     register = models.DateTimeField(auto_now_add=True)
-    guideout = models.ForeignKey(GuiaRemision, related_name='guideoutAsGuide', null=True, blank=True)
+    guideout = models.ForeignKey(
+        GuiaRemision, related_name='guideoutAsGuide', null=True, blank=True)
     guidein = models.ForeignKey(GuiaRemision, related_name='guideinGuide', null=True, blank=True)
     observation = models.TextField()
     project = models.ForeignKey(Proyecto, to_field='proyecto_id', null=True)
@@ -496,7 +481,7 @@ class ReturnItemsProject(models.Model):
 
 class Balance(models.Model):
     materials = models.ForeignKey(Materiale, to_field='materiales_id')
-    storage = models.ForeignKey(Almacene, to_field='almacen_id',  default='AL01', blank=True)
+    storage = models.ForeignKey(Almacene, to_field='almacen_id', default='AL01', blank=True)
     register = models.DateTimeField(auto_now_add=True)
     brand = models.ForeignKey(Brand, to_field='brand_id')
     model = models.ForeignKey(Model, to_field='model_id')

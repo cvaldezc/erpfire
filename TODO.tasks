@@ -13,7 +13,9 @@ Tasks:
             ☐ add user in note of ingress (Rocio, Mauro) @Storage @low
             ☐ change trigger "change status detcompra trigger in detingress" @storage @critical 2016-11-28 08:46:41
         Doing:
-            ☐ add field in "detcompra" for convert in of input @storage @critical @today
+            ☐ add field in "detcompra" for convert in of input @storage @critical
+            ☐ add support modify add new materials modify price @high 2016-12-13 14:37:35 @operations
+            ☐ remove button erase niple when the niple is send and the quantity missing send is zero @high 2016-12-13 14:44:09 @operations
     Tasks Complete:
         Apps:
             Sales:
