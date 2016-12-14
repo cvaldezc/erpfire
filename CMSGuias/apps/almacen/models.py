@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 from audit_log.models.managers import AuditLog
@@ -409,7 +410,7 @@ class DetIngress(models.Model):
     purchase = models.DecimalField(max_digits=8, decimal_places=3, default=0)
     sales = models.DecimalField(max_digits=8, decimal_places=3, default=0)
     report = models.CharField(max_length=1, default='0')
-    convertto = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    convertto = models.DecimalField(max_digits=6, decimal_places=2, default=1)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()

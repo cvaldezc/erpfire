@@ -95,17 +95,18 @@ class DetCompra(models.Model):
     compra = models.ForeignKey(Compra, to_field='compra_id')
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     unit = models.ForeignKey(
-            Unidade, to_field='unidad_id', null=True, blank=True)
+        Unidade, to_field='unidad_id', null=True, blank=True)
     brand = models.ForeignKey(
-                Brand, to_field='brand_id', default='BR000', blank=True)
+        Brand, to_field='brand_id', default='BR000', blank=True)
     model = models.ForeignKey(
-                Model, to_field='model_id', default='MO000', blank=True)
+        Model, to_field='model_id', default='MO000', blank=True)
     cantidad = models.FloatField()
     precio = models.FloatField()
     discount = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     cantstatic = models.FloatField()
     flag = models.CharField(max_length=1, default='0')
     perception = models.FloatField(default=0, blank=True)
+    convertto = models.DecimalField(max_digits=6, decimal_places=2, default=1)
     observation = models.TextField(blank=True, default='')
 
     class Meta:
@@ -120,11 +121,11 @@ class tmpcompra(models.Model):
     empdni = models.CharField(max_length=8, null=False)
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     unit = models.ForeignKey(
-            Unidade, to_field='unidad_id', null=True, blank=True)
+        Unidade, to_field='unidad_id', null=True, blank=True)
     brand = models.ForeignKey(
-                Brand, to_field='brand_id', blank=True, default='BR000')
+        Brand, to_field='brand_id', blank=True, default='BR000')
     model = models.ForeignKey(
-                Model, to_field='model_id', blank=True, default='MO000')
+        Model, to_field='model_id', blank=True, default='MO000')
     cantidad = models.FloatField(null=False)
     discount = models.PositiveSmallIntegerField(default=0)
     precio = models.FloatField(null=False, default=0)
@@ -188,7 +189,7 @@ class DetCotizacion(models.Model):
         if not self.discount:
             self.discount = 0
         precio = (self.precio - ((self.precio * self.discount) / 100))
-        return (self.cantidad * precio)
+        return self.cantidad * precio
 
 
 class CotKeys(models.Model):
@@ -260,7 +261,7 @@ class ServiceOrder(models.Model):
     serviceorder_id = models.CharField(max_length=10, primary_key=True)
     project = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subprojecto = models.ForeignKey(
-                Subproyecto, to_field='subproyecto_id', null=True, blank=True)
+        Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     supplier = models.ForeignKey(Proveedor, to_field='proveedor_id')
     register = models.DateTimeField(auto_now_add=True)
     quotation = models.CharField(max_length=12, null=True, blank=True)
@@ -273,9 +274,9 @@ class ServiceOrder(models.Model):
     currency = models.ForeignKey(Moneda, to_field='moneda_id')
     deposit = models.FileField(upload_to=url, null=True, blank=True)
     elaborated = models.ForeignKey(
-                    Employee, related_name='elaboratedAsEmployee')
+        Employee, related_name='elaboratedAsEmployee')
     authorized = models.ForeignKey(
-                    Employee, related_name='authorizedAsEmployee')
+        Employee, related_name='authorizedAsEmployee')
     sigv = models.BooleanField(default=True, blank=True)
     status = models.CharField(max_length=2, default='PE')
     flag = models.BooleanField(default=True)

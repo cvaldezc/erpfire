@@ -160,7 +160,26 @@ Input Order Purchase
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                   <span aria-hidden="true"><i class="fa fa-times"></i></span>
               </button>
-              <h4><strong>¡Ten en cuenta!</strong> <small class="text-black"> que algunos materailes se generan con una diferente unidad de medida al registrado inicialmente. Recuerde que para estos casos realize la converción manual he ingrese la cantidad resultante.</small></h4>
+              <h4>
+                  <strong>¡Ten en cuenta!</strong> 
+                  <small class="text-black"> que algunos materailes se generan con una diferente unidad de medida al registrado inicialmente. Recuerde que para estos casos realize la converción manual he ingrese la cantidad resultante.</small></h4>
+                  <p>
+                      Para poder convertir las cantidad correctamente siga el ejemplo:
+                      <p>
+                      - <strong>CI</strong> = CANTIDAD A INGRESAR <br>
+                      - <strong>CTXU</strong> = CANTIDAD TOTAL POR UNIDAD
+                      </p>
+                      <p>x = ((CI) x (CTXU))</p>
+                      <p>e.g:
+                      Si se ha comprado 2 rollos de de cable y se sabe que cada rollo contiene 305 metros, y solo se va a ingresar al inventario 1 rollo.
+                      </p>
+                      <p>
+                      x = (1 x 305) ; x = 305. <br>
+                      Si se ingresara dos rollos. <br>
+                      x = (2 x 305) ; x = 610
+                      </p>
+                  </p>
+                  <strong>Nota: </strong> Solo realizar la converción siempre y cuando las unidades sean diferentes.
             </div>
             <div class="panel panel-primary">
                 <div class="table-responsive">
@@ -194,6 +213,7 @@ Input Order Purchase
                                 <th class="text-center">CANT. Comprado</th>
                                 <th class="text-center">CANT. PEND.</th>
                                 <th class="col-3 text-center">Ingreso</th>
+                                <th class="col-3 text-center">Convertir</th>
                             </tr>
                         </thead>
                         <tbody></tbody>

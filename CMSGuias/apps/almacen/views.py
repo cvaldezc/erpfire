@@ -4,7 +4,7 @@
 import datetime
 import json
 import os
-
+from decimal import Decimal
 from django.shortcuts import (
     render_to_response,
     get_object_or_404,
@@ -18,10 +18,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.db.models import Count, Max, Sum, Q
-from django.utils import simplejson
+# from django.utils import json
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.views.generic import TemplateView, ListView, View
 from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
 
 from openpyxl import load_workbook
 
@@ -47,7 +48,7 @@ class JSONResponseMixin(object):
         )
 
     def convert_context_to_json(self, context):
-        return simplejson.dumps(context, encoding='utf-8')
+        return json.dumps(context, encoding='utf-8', cls=DjangoJSONEncoder)
 
 FORMAT_DATE_STR = '%Y-%m-%d'
 
@@ -112,7 +113,7 @@ def view_pedido(request):
                 data['status'] = True
             else:
                 data['status'] = False
-            return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+            return HttpResponse(json.dumps(data), mimetype='application/json')
     except TemplateDoesNotExist, e:
         raise Http404(e)
 
@@ -140,7 +141,7 @@ def view_keep_customers(request):
                     data['status'] = True
                 except ObjectDoesNotExist, e:
                     data['status'] = False
-                return HttpResponse(simplejson.dumps(data),
+                return HttpResponse(json.dumps(data),
                                     mimetype='application/json')
     except TemplateDoesNotExist, e:
         messages.error(request, str(e))
@@ -246,7 +247,7 @@ def view_keep_project(request):
                         data['status'] = False
                         data['raise'] = e.__str__()
                     return HttpResponse(
-                        simplejson.dumps(data),
+                        json.dumps(data),
                         mimetype='application/json')
     except TemplateDoesNotExist, e:
         messages.error(request, str(e))
@@ -367,7 +368,7 @@ def view_keep_sec_project(request, pid, sid):
                 except ObjectDoesNotExist, e:
                     data['status'] = False
                 return HttpResponse(
-                    simplejson.dumps(data),
+                    json.dumps(data),
                     mimetype='application/json')
     except TemplateDoesNotExist, e:
         messages.error(request, str(e))
@@ -470,7 +471,7 @@ def view_keep_sub_project(request, pid):
                 except ObjectDoesNotExist, e:
                     data['status'] = False
                 return HttpResponse(
-                        simplejson.dumps(data),
+                        json.dumps(data),
                         mimetype='application/json')
     except TemplateDoesNotExist, e:
         messages.error(request, str(e))
@@ -557,7 +558,7 @@ def view_stores(request):
             except ObjectDoesNotExist, e:
                 data['status'] = False
             return HttpResponse(
-                simplejson.dumps(data),
+                json.dumps(data),
                 mimetype='application/json')
     except TemplateDoesNotExist, e:
         messages('Template not found' + str(e))
@@ -660,7 +661,7 @@ def view_carrier(request):
                 except ObjectDoesNotExist, e:
                     data['status'] = False
                 return HttpResponse(
-                    simplejson.dumps(data),
+                    json.dumps(data),
                     mimetype='application/json')
     except TemplateDoesNotExist, e:
         messages('Template not found' + str(e))
@@ -749,7 +750,7 @@ def view_transport(request, ruc):
                 except ObjectDoesNotExist, e:
                     data['status'] = False
                 return HttpResponse(
-                    simplejson.dumps(data),
+                    json.dumps(data),
                     mimetype='application/json')
     except TemplateDoesNotExist, e:
         messages('Template not found' + str(e))
@@ -838,7 +839,7 @@ def view_conductor(request, ruc):
                 except ObjectDoesNotExist, e:
                     data['status'] = False
                 return HttpResponse(
-                    simplejson.dumps(data),
+                    json.dumps(data),
                     mimetype='application/json')
     except TemplateDoesNotExist, e:
         messages('Template not found')
@@ -922,7 +923,7 @@ def view_orders_pending(request):
                     context['raise'] = str(e)
                     context['status'] = False
                 return HttpResponse(
-                    simplejson.dumps(context), mimetype='application/json')
+                    json.dumps(context), mimetype='application/json')
             return render_to_response(
                             'almacen/slopeorders.html',
                             context_instance=RequestContext(request))
@@ -1060,7 +1061,7 @@ def view_attend_order(request, oid):
             except ObjectDoesNotExist, e:
                 data['status'] = False
             return HttpResponse(
-                simplejson.dumps(data),
+                json.dumps(data),
                 mimetype='application/json')
     except TemplateDoesNotExist, e:
         message('Error template not found')
@@ -1189,7 +1190,7 @@ def view_generate_document_out(request, oid):
                     data['status'] = False
                     data['raise'] = 'Form invalid'
                 return HttpResponse(
-                    simplejson.dumps(data),
+                    json.dumps(data),
                     mimetype='application/json')
     except TemplateDoesNotExist, e:
         message('Error: Template not found')
@@ -1250,7 +1251,7 @@ def view_list_guide_referral_success(request):
                     data['status'] = False
                 data['list'] = ls
                 return HttpResponse(
-                    simplejson.dumps(data),
+                    json.dumps(data),
                     mimetype='application/json')
             lst = GuiaRemision.objects.filter(
                     status='GE',
@@ -1361,7 +1362,7 @@ def view_list_guide_referral_success(request):
                 data['raise'] = str(e)
                 data['status'] = False
             return HttpResponse(
-                simplejson.dumps(data), mimetype='application/json')
+                json.dumps(data), mimetype='application/json')
     except TemplateDoesNotExist, e:
         raise Http404(e)
 
@@ -1419,7 +1420,7 @@ def view_list_guide_referral_canceled(request):
                     data['raise'] = str(e)
                 data['list'] = ls
                 return HttpResponse(
-                    simplejson.dumps(data),
+                    json.dumps(data),
                     mimetype='application/json')
             lst = GuiaRemision.objects.filter(
                 status='AN', flag=False).order_by('-guia_id')[:10]
@@ -1516,7 +1517,7 @@ class InventoryView(ListView, JSONResponseMixin):
             if materials.has_next():
                 data['next_page_number'] = materials.next_page_number()
             return HttpResponse(
-                simplejson.dumps(data),
+                json.dumps(data),
                 mimetype='application/json')
         else:
             model = Inventario.objects.filter(
@@ -1709,7 +1710,7 @@ class InventoryView(ListView, JSONResponseMixin):
         except ObjectDoesNotExist, e:
             data['raise'] = str(e)
             data['status'] = False
-        # data = simplejson.dumps(data)
+        # data = json.dumps(data)
         return self.render_to_json_response(data)
 
 class SupplyView(ListView):
@@ -1749,7 +1750,7 @@ class SupplyView(ListView):
                 data['status'] = True
             except ObjectDoesNotExist:
                 data['status'] = False
-            data = simplejson.dumps(data)
+            data = json.dumps(data)
             return HttpResponse(
                 data,
                 mimetype='application/json',
@@ -1793,7 +1794,7 @@ class SupplyView(ListView):
                         data['status'] = True
                     else:
                         data['status'] = False
-                    data = simplejson.dumps(data)
+                    data = json.dumps(data)
                     return HttpResponse(data, mimetype='application/json')
                 if 'generateSupply' in request.POST:
                     # save bedside of supply
@@ -1838,7 +1839,7 @@ class SupplyView(ListView):
             except ObjectDoesNotExist, e:
                 context['raise'] = e.__str__()
                 data['status'] = False
-            data = simplejson.dumps(data)
+            data = json.dumps(data)
             return HttpResponse(
                 data,
                 mimetype='application/json',
@@ -1883,7 +1884,7 @@ class ListOrdersSummary(TemplateView):
             except ObjectDoesNotExist:
                 data['status'] = False
             return HttpResponse(
-                simplejson.dumps(data),
+                json.dumps(data),
                 mimetype='application/json')
 
 class ListDetOrders(JSONResponseMixin, TemplateView):
@@ -1927,7 +1928,7 @@ class ListDetOrders(JSONResponseMixin, TemplateView):
             except ObjectDoesNotExist, e:
                 data['raise'] = e.__str__()
                 data['status'] = False
-            # data = simplejson.dumps(data)
+            # data = json.dumps(data)
             return self.render_to_json_response(data)
 
 
@@ -2001,7 +2002,8 @@ class InputOrderPurchase(JSONResponseMixin, TemplateView):
                             'brand': x.brand.brand,
                             'brand_id': x.brand_id,
                             'model': x.model.model,
-                            'model_id': x.model_id}
+                            'model_id': x.model_id,
+                            'convert': float(x.convertto)}
                             for x in DetCompra.objects.filter(
                                 compra_id=request.GET.get('purchase')
                                 ).order_by(
@@ -2051,7 +2053,7 @@ class InputOrderPurchase(JSONResponseMixin, TemplateView):
                             det = DetIngress()
                             det.ingress_id = ingress
                             det.materials_id = x['materials']
-                            det.quantity = x['quantity']
+                            det.quantity = Decimal(float(x['quantity']) * float(x['convert'])).quantize(Decimal('0.01'))
                             det.brand_id = x[
                                 'brand'] if 'brand' in x else 'BR000'
                             det.model_id = x[
@@ -2059,6 +2061,7 @@ class InputOrderPurchase(JSONResponseMixin, TemplateView):
                             det.report = '0'
                             det.purchase = float(x['price'])
                             det.sales = round(float(x['price']) * 1.15, 2)
+                            det.convertto = x['convert']
                             det.save()
                         #     inv = Inventario.objects.filter(
                         #             materiales_id=x['materials'],

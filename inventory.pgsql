@@ -313,13 +313,17 @@ FOR EACH ROW EXECUTE PROCEDURE proc_add_inventorybrand_detnoteingress();
 
 
 
-/**/
+/* Esto tiene que cambiar por el ingreso de conversion del detalle de compra 2016-12-14 13:02:25*/
+/* Here change the format ingress */
+-- Aqui hay que realizar la convercion manual de las cantidades
+-- @modify 2016-12-14 15:57:55
 CREATE OR REPLACE FUNCTION proc_change_status_detcompra()
   RETURNS TRIGGER AS
 $$
 DECLARE
   reg RECORD;
   quantity NUMERIC;
+  qconvert NUMERIC := 0;
   tag CHAR;
   buy varchar(10);
 BEGIN
@@ -327,7 +331,8 @@ BEGIN
   SELECT INTO reg * FROM logistica_detcompra WHERE compra_id = buy AND materiales_id = NEW.materials_id AND brand_id = NEW.brand_id AND model_id = NEW.model_id;
   IF FOUND THEN
     -- 2016-11-28 08:44:58 Change by implement fields convert in detcompra for not throw exception
-    quantity = ROUND((reg.cantidad - NEW.quantity)::NUMERIC, 2);
+    qconvert := (NEW.quantity  / NEW.convertto);
+    quantity := ROUND((reg.cantidad - qconvert)::NUMERIC, 2);
     CASE WHEN quantity = 0 THEN tag := '2';
           WHEN (quantity >= 0.1) AND (quantity < reg.cantstatic) THEN tag := '1';
           WHEN (quantity = reg.cantstatic) THEN tag := '0';

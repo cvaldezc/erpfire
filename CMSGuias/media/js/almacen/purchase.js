@@ -94,7 +94,7 @@ listTemplate = function(list) {
   $tb = $("table > tbody");
   $tb.empty();
   if (list.length) {
-    template = "<tr>\n    <td>{{ item }}</td>\n    <td>{{ purchase }}</td>\n    <td>{{ reason }}</td>\n    <td>{{ document }}</td>\n    <td>{{ transfer }}</td>\n    <td class=\"text-center\">\n        <button value=\"{{ purchase }}\" data-ruc=\"{{ x.supplier }}\" class=\"btn btn-link btn-xs text-black btn-deposit\"><span class=\"glyphicon glyphicon-credit-card\"></span></button>\n    </td>\n    <td class=\"text-center\">\n        <a href=\"/reports/order/purchase/{{ purchase }}/\" target=\"_blank\" class=\"btn btn-xs btn-link text-black\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>\n    </td>\n    <td class=\"text-center\">\n        <button value=\"{{ purchase }}\" data-ruc=\"{{ x.supplier }}\" class=\"btn btn-link btn-xs text-black btn-action\"><span class=\"glyphicon glyphicon-inbox\"></span></button>\n    </td>\n</tr>";
+    template = "<tr>\n  <td>{{ item }}</td>\n  <td>{{ purchase }}</td>\n  <td>{{ reason }}</td>\n  <td>{{ document }}</td>\n  <td>{{ transfer }}</td>\n  <td class=\"text-center\">\n    <button value=\"{{ purchase }}\" data-ruc=\"{{ x.supplier }}\"\n     class=\"btn btn-link btn-xs text-black btn-deposit\">\n      <span class=\"glyphicon glyphicon-credit-card\"></span></button>\n  </td>\n  <td class=\"text-center\">\n    <a href=\"/reports/order/purchase/{{ purchase }}/\"\n     target=\"_blank\" class=\"btn btn-xs btn-link text-black\">\n      <span class=\"glyphicon glyphicon-eye-open\"></span></a>\n  </td>\n  <td class=\"text-center\">\n    <button value=\"{{ purchase }}\" data-ruc=\"{{ x.supplier }}\"\n     class=\"btn btn-link btn-xs text-black btn-action\">\n      <span class=\"glyphicon glyphicon-inbox\"></span></button>\n  </td>\n</tr>";
     for (x in list) {
       list[x].item = parseInt(x) + 1;
       $tb.append(Mustache.render(template, list[x]));
@@ -120,7 +120,7 @@ showIngressInventory = function(event) {
   $.getJSON("", {
     "purchase": btn
   }, function(response) {
-    var $tb, template, x;
+    var $tb, count, template;
     if (response.status) {
       $(".supplier").html(response.head.supplier);
       $(".quote").html(response.head.quote);
@@ -132,13 +132,23 @@ showIngressInventory = function(event) {
       $(".transfer").html(response.head.transfer);
       $(".contact").html(response.head.contact);
       $(".performed").html(response.head.performed);
-      template = "<tr>\n<td><input type=\"checkbox\" name=\"mats\" value=\"{{ materials }}\"></td>\n<td class='text-center'>{{ item }}</td>\n<td><small>{{ materials }}</small></td>\n<td><small>{{ name }} {{ measure }}</small></td>\n<td class='text-center'>{{ brand }}</td>\n<td class='text-center'>{{ model }}</td>\n<td class='text-center'>{{ dunit }}</td>\n<td class='text-center'>{{ unit }}</td>\n<td class=\"text-center\">{{ static }}</td>\n<td class=\"text-right\">{{ quantity }}</td>\n<td><input type=\"number\" class=\"form-control input-sm text-right\" name=\"{{ materials }}\" value=\"{{ quantity }}\" min=\"1\" max=\"{{ quantity }}\" data-price=\"{{ price }}\" data-brand=\"{{ brand_id }}\" data-model=\"{{ model_id }}\" disabled></td></tr>";
+      count = 1;
+      response['read'] = function() {
+        if (this.dunit === this.unit) {
+          return true;
+        } else if (this.dunit === '') {
+          return true;
+        } else {
+          return false;
+        }
+      };
+      response['index'] = function() {
+        return count++;
+      };
+      template = "{{#details}}\n  <tr>\n  <td><input type=\"checkbox\" name=\"mats\" value=\"{{materials}}\"></td>\n  <td class='text-center'>{{index}}</td>\n  <td><small>{{materials}}</small></td>\n  <td><small>{{name}} {{measure}}</small></td>\n  <td class='text-center'>{{brand}}</td>\n  <td class='text-center'>{{model}}</td>\n  <td class='text-center'>{{dunit}}</td>\n  <td class='text-center'>{{unit}}</td>\n  <td class=\"text-center\">{{static}}</td>\n  <td class=\"text-right\">{{quantity}}</td>\n  <td>\n    <input type=\"number\" class=\"form-control input-sm text-right\"\n    name=\"{{materials}}\" value=\"{{quantity}}\" min=\"1\"\n    max=\"{{quantity}}\" data-price=\"{{price}}\"\n    data-brand=\"{{brand_id}}\" data-model=\"{{model_id}}\" disabled />\n  </td>\n  <td>\n    <input type=\"number\" class=\"form-control input-sm text-right\"\n    id=\"conv{{materials}}\"\n    value=\"{{convert}}\" min=\"1\"\n    {{#read}}readonly=\"{{read}}\"{{/read}} data-read=\"{{read}}\"/>\n  </td>\n  </tr>\n{{/details}}";
       $tb = $("table.table-ingress > tbody");
       $tb.empty();
-      for (x in response.details) {
-        response.details[x].item = parseInt(x) + 1;
-        $tb.append(Mustache.render(template, response.details[x]));
-      }
+      $tb.html(Mustache.render(template, response));
       $(".purchase").html(btn);
       $("[name=purchase]").val(btn);
       $(".maction").modal("hide");
@@ -207,7 +217,7 @@ loadIngress = function(event) {
 };
 
 saveNoteIngress = function(response) {
-  var data, mats, pass;
+  var data, mats, pass, valfield;
   data = new Object();
   mats = new Array();
   pass = false;
@@ -223,28 +233,31 @@ saveNoteIngress = function(response) {
         "price": $("input[name=" + element.value + "]").attr("data-price"),
         "tag": tag,
         "brand": $("input[name=" + element.value + "]").attr("data-brand"),
-        "model": $("input[name=" + element.value + "]").attr("data-model")
+        "model": $("input[name=" + element.value + "]").attr("data-model"),
+        "convert": $("#conv" + element.value).val()
       });
     }
   });
   data.details = JSON.stringify(mats);
+  valfield = {
+    'invoice': 'Factura',
+    'guide': 'Guia Remisión'
+  };
   $(".mingress > div > div > div.modal-body > div.row").find("input, select").each(function(index, element) {
     console.info(element);
-    if (element.name !== "guide") {
-      if ($.trim(element.value !== "")) {
-        pass = true;
-      } else {
-        $().toastmessage("showWarningToast", "Campo vacio, " + element.name);
-        pass = false;
-        return pass;
-      }
+    if (element.value !== "") {
+      pass = true;
+    } else {
+      $().toastmessage("showWarningToast", "Campo vacio, " + valfield[element.name]);
+      pass = false;
+      return pass;
     }
   });
   data['observation'] = $("#observation").trumbowyg("html");
   console.log(pass);
   if (pass) {
     $().toastmessage("showToast", {
-      text: "Desea generar una <q>Nota de Ingreso</q> con los materiales seleccionados?",
+      text: "Desea generar una <q>Nota de Ingreso</q>\ncon los materiales seleccionados?",
       sticky: true,
       type: "confirm",
       buttons: [
@@ -268,13 +281,13 @@ saveNoteIngress = function(response) {
           data.approval = $("[name=approval]").val();
           data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
           console.warn(data);
-          return $.post("", data, function(response) {
+          $.post("", data, function(response) {
             if (response.status) {
               $(".step-second").fadeOut(200);
               $(".step-tree").fadeIn(600);
               $(".modal").modal("hide");
               $(".note").html(response.ingress);
-              return $(".show-note-ingress").attr("href", "/reports/note/ingress/" + response.ingress + "/");
+              $(".show-note-ingress").attr("href", "/reports/note/ingress/" + response.ingress + "/");
             } else {
               $().toastmessage("showWarningToast", "No se a podido generar la Nota de Ingreso. " + response.raise);
             }
