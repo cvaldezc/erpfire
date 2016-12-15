@@ -4,11 +4,13 @@ from django.conf.urls import patterns, url, include
 
 from views import *
 
-urlcrud = patterns('',
+urlcrud = patterns(
+    '',
     url(r'^create/supplier/$', SupplierCreate.as_view(), name='view_create_supplier'),
 )
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'^$', LogisticsHome.as_view(), name='view_logistics'),
     url(r'^supply/status/pending/$', SupplyPending.as_view(),
         name='view_supply_pending'),

@@ -109,6 +109,9 @@
                             </div>
                             <div class="card-panel" ng-hide="!sh.operations">
                                 <strong>Archivo registrado:</strong>
+                                {% verbatim %}
+                                <a href="/media/{{documents.operations}}" target="_blank">Carta de Entrega</a>
+                                {% endverbatim %}
                             </div>
                         </div>
                     </li>
@@ -144,6 +147,12 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="card-panel" ng-hide="!sh.quality">
+                                <strong>Archivo registrado:</strong>
+                                {% verbatim %}
+                                <a href="/media/{{documents.quality}}" target="_blank">Archivos de Calidad</a>
+                                {% endverbatim %}
                             </div>
                         </div>
                     </li>
@@ -200,6 +209,12 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                        <div class="collapsible-body" ng-show="!ctrl.accounting">
+                            <strong>Archivo Registrado: </strong>
+                            {% verbatim %}
+                                <a href="/media/{{documents.accounting}}" target="_blank">Archivos de Contable</a>
+                            {% endverbatim %}
                         </div>
                     </li>
                 </ul>

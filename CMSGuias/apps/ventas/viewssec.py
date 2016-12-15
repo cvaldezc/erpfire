@@ -54,6 +54,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                                     project_id=kwargs['pro'])))
                         kwargs['status'] = True
                     if 'gcomplete' in request.GET:
+                        kwargs['documents'] = dict()
                         kwargs['complete'] = {
                             'storage': False,
                             'operations': False,
@@ -65,10 +66,13 @@ class ClosedProjectView(JSONResponseMixin, View):
                             kwargs['complete']['storage'] = True
                         if cldata.letterdelivery != None and cldata.letterdelivery != '':
                             kwargs['complete']['operations'] = True
+                            kwargs['documents']['operations'] = str(cldata.letterdelivery)
                         if cldata.documents != None and cldata.documents != '':
                             kwargs['complete']['quality'] = True
+                            kwargs['documents']['quality'] = str(cldata.documents)
                         if cldata.accounting != None and cldata.accounting != False:
                             kwargs['complete']['accounting'] = True
+                            kwargs['documents']['accounting'] = str(cldata.fileaccounting)
                         if cldata.status != None and cldata.status != 'PE':
                             kwargs['complete']['sales'] = True
                         kwargs['status'] = True
@@ -86,16 +90,16 @@ class ClosedProjectView(JSONResponseMixin, View):
     def post(self, request, *args, **kwargs):
         if request.is_ajax():
             try:
-                pr = dict()
+                prj = dict()
                 try:
-                    pr = Proyecto.objects.get(proyecto_id=kwargs['pro'])
+                    prj = Proyecto.objects.get(proyecto_id=kwargs['pro'])
                     kwargs['pr'] = {
-                        'pk': pr.proyecto_id,
-                        'name': pr.nompro.upper(),
-                        'customers': pr.ruccliente.razonsocial.upper(),
+                        'pk': prj.proyecto_id,
+                        'name': prj.nompro.upper(),
+                        'customers': prj.ruccliente.razonsocial.upper(),
                         'company': request.session.get('company')}
                     issue = 'APERTURA DE PROYECTO %s %s - %s' % (
-                        pr.proyecto_id, pr.nompro, pr.ruccliente.razonsocial)
+                        prj.proyecto_id, prj.nompro, prj.ruccliente.razonsocial)
                     fsmail = Emails.objects.filter(issue=issue)
                     kwargs['fors'] = fsmail[0].fors if fsmail else ','.join(emails)
                 except Proyecto.DoesNotExist:
@@ -105,7 +109,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                         cldt = CloseProject.objects.get(project_id=kwargs['pro'])
                     except (CloseProject.DoesNotExist) as ex:
                         cldt = CloseProject()
-                        cldt.project_id=kwargs['pro']
+                        cldt.project_id = kwargs['pro']
                     cldt.storageclose = True
                     cldt.datestorage = date_now('datetime')
                     cldt.performedstorage_id = request.user.get_profile().empdni_id
@@ -115,9 +119,9 @@ class ClosedProjectView(JSONResponseMixin, View):
                 if 'operations' in request.POST:
                     try:
                         cldt = CloseProject.objects.get(project_id=kwargs['pro'])
-                    except (CloseProject.DoesNotExist or Exception) as ex:
+                    except (CloseProject.DoesNotExist) as ex:
                         cldt = CloseProject()
-                        cldt.project_id=kwargs['pro']
+                        cldt.project_id = kwargs['pro']
                     cldt.letterdelivery = request.FILES['letter']
                     cldt.dateletter = date_now('datetime')
                     cldt.performedoperations_id = request.user.get_profile().empdni_id
@@ -127,12 +131,12 @@ class ClosedProjectView(JSONResponseMixin, View):
                 if 'quality' in request.POST:
                     try:
                         cldt = CloseProject.objects.get(project_id=kwargs['pro'])
-                    except (CloseProject.DoesNotExist or Exception) as ex:
+                    except (CloseProject.DoesNotExist) as ex:
                         cldt = CloseProject()
-                        cldt.project_id=kwargs['pro']
+                        cldt.project_id = kwargs['pro']
                     cldt.documents = request.FILES['documents']
                     cldt.docregister = date_now('datetime')
-                    cldt.performeddocument_id=request.user.get_profile().empdni_id
+                    cldt.performeddocument_id = request.user.get_profile().empdni_id
                     cldt.save()
                     if get_extension(cldt.documents.name) == '.rar':
                         descompressRAR(cldt.documents)
@@ -177,7 +181,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                     if 'genpin' in request.POST:
                         cldt.closeconfirm = get_pin()
                         cldt.save()
-                        kwargs['pin'] =  cldt.closeconfirm
+                        kwargs['pin'] = cldt.closeconfirm
                         kwargs['company'] = request.session['company']['name']
                         kwargs['name'] = cldt.project.nompro
                         kwargs['mail'] = request.user.get_profile().empdni.email
@@ -194,7 +198,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                             prj.save()
                             kwargs['area'] = 'VENTAS | PROYECTO CERRADO'
                             kwargs['status'] = True
-            except (ObjectDoesNotExist or Exception) as ex:
+            except (ObjectDoesNotExist) as ex:
                 kwargs['raise'] = str(ex)
                 kwargs['status'] = False
             return self.render_to_json_response(kwargs)

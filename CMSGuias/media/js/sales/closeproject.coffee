@@ -83,6 +83,7 @@ do ->
       .success (response) ->
         if response.status
           $scope.sh = response.complete
+          $scope.documents = response.documents
           return
         else
           Materialize.toast "#{response.raise}", 2000
@@ -95,9 +96,8 @@ do ->
         when 'administrator', 'ventas', 'logistica'
           for k, v of $scope.ctrl
             $scope.ctrl[k] = true
-        when 'operaciones'
+        when 'operaciones', 'calidad'
           $scope.ctrl['operations'] = true
-        when 'calidad'
           $scope.ctrl['quality'] = true
         when 'almacen'
           $scope.ctrl['storage'] = true

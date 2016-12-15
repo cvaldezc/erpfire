@@ -115,6 +115,7 @@
       }).success(function(response) {
         if (response.status) {
           $scope.sh = response.complete;
+          $scope.documents = response.documents;
         } else {
           Materialize.toast("" + response.raise, 2000);
           $scope.sh = response.complete;
@@ -134,9 +135,8 @@
           }
           break;
         case 'operaciones':
-          $scope.ctrl['operations'] = true;
-          break;
         case 'calidad':
+          $scope.ctrl['operations'] = true;
           $scope.ctrl['quality'] = true;
           break;
         case 'almacen':

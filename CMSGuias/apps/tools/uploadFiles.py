@@ -110,15 +110,15 @@ def listDir(path):
             path = '%s%s'%(settings.MEDIA_ROOT, path)
         path = urllib.unquote(path)
         for f in os.listdir(path):
-            ff = os.path.join(path,f)
+            ff = os.path.join(path, f)
             if os.path.isdir(ff):
-                r.append('<li class="directory collapsed"><a href="#" rel="%s/">%s</a></li>' % (ff,f))
+                r.append('<li class="directory collapsed"><a href="#" rel="%s/">%s</a></li>' % (ff, f))
             else:
                 e = os.path.splitext(f)[1][1:] # get .ext and remove dot
                 e = e.lower()
                 media = ff.split('/media/')
                 print media
-                r.append('<li class="file ext_%s"><a href="#" rel="/media/%s">%s</a></li>' % (e,media[1],f))
+                r.append('<li class="file ext_%s"><a href="#" rel="/media/%s">%s</a></li>' % (e, media[1], f))
         r.append('</ul>')
     except Exception, e:
         r.append('Could not load directory.')
