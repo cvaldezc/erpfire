@@ -33,10 +33,11 @@ project_urls = patterns(
         ListGuideByProject.as_view(), name='view_list_guide_by_projects'),
     url(r'list/orders/(?P<pro>\w+)/(?P<sub>\w+)/(?P<sec>\w+)/$',
         ListOrdersByProject.as_view(), name='view_orders_by_projects'),
-    url(r'^paint/(?P<pro>\w{7})/$', PaintingView.as_view(), 
+    url(r'^paint/(?P<pro>\w{7})/$', PaintingView.as_view(),
         name='paintingp_view'),
     url(r'^closed/(?P<pro>\w{7})/$', ClosedProjectView.as_view(),
         name='closedproject_view'),
+    url(r'^status/(?P<pk>\w{7})/$', StatusProject.as_view(), name='statusproject_view'),
 )
 
 urlpatterns = patterns(

@@ -322,7 +322,8 @@
                   <i class="fa" ng-class="getClass(r.complete.sales)"></i>
                 </td>
                 <td data-ng-show="tadmin" class="center-align">
-                  <a class="grey-text text-darken-3" href="/almacen/keep/project/{{r.pk}}/edit/" target="popup"><i class="fa fa-edit"></i>
+                  <a ng-show="r.status == 'PE' || r.status == 'AC'" class="grey-text text-darken-3" href="/almacen/keep/project/{{r.pk}}/edit/" target="popup">
+                    <i class="fa fa-edit"></i>
                   </a>
                 </td>
               </tr>

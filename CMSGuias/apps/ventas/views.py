@@ -9,12 +9,12 @@ from django.db.models import Q, Sum
 # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
+from django.core.urlresolvers import reverse
 from django.contrib import messages
 # from django.contrib.auth.mod import User
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, render, redirect
-from django.utils import simplejson
 from django.utils.decorators import method_decorator
 from django.template import RequestContext, TemplateDoesNotExist
 from django.views.generic import TemplateView, View
@@ -25,28 +25,27 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from CMSGuias.apps.home.models import *
 from CMSGuias.apps.operations.models import (
-                                            MetProject,
-                                            Nipple,
-                                            Deductive,
-                                            DeductiveInputs,
-                                            DeductiveOutputs,
-                                            Letter,
-                                            LetterAnexo,
-                                            DSector)
+    MetProject,
+    Nipple,
+    Deductive,
+    DeductiveInputs,
+    DeductiveOutputs,
+    Letter,
+    LetterAnexo,
+    DSector)
 from CMSGuias.apps.almacen.models import (
-                                            Inventario,
-                                            Pedido,
-                                            Detpedido,
-                                            Niple,
-                                            GuiaRemision,
-                                            DetGuiaRemision,
-                                            NipleGuiaRemision)
+    Inventario,
+    Pedido,
+    Detpedido,
+    Niple,
+    GuiaRemision,
+    DetGuiaRemision,
+    NipleGuiaRemision)
 from .models import *
 from .forms import *
 from CMSGuias.apps.logistica.models import *
 from CMSGuias.apps.almacen.forms import addOrdersForm
-from CMSGuias.apps.operations.forms import (NippleForm, LetterForm,
-                                            PreOrdersForm)
+from CMSGuias.apps.operations.forms import (NippleForm, LetterForm, PreOrdersForm)
 from CMSGuias.apps.tools import genkeys, globalVariable, uploadFiles, search
 
 
@@ -62,9 +61,7 @@ class JSONResponseMixin(object):
         )
 
     def convert_context_to_json(self, context):
-        return simplejson.dumps(context,
-                                encoding='utf-8',
-                                cls=DjangoJSONEncoder)
+        return json.dumps(context, encoding='utf-8', cls=DjangoJSONEncoder)
 
 
 class SalesHome(TemplateView):
@@ -85,37 +82,27 @@ class ProjectsList(JSONResponseMixin, TemplateView):
         if request.is_ajax():
             try:
                 if 'lCustomers' in request.GET:
-                    context['customers'] = simplejson.loads(
-                                            serializers.serialize(
-                                                'json',
-                                                Cliente.objects.filter(
-                                                    flag=True)))
+                    context['customers'] = json.loads(serializers.serialize(
+                        'json', Cliente.objects.filter(flag=True)))
                     context['status'] = True
                 if 'getCustomers' in request.GET:
                     if area == 'ventas' or area == 'administrator':
                         proyectos = Proyecto.objects.filter(
-                                            Q(flag=True),
-                                            ~Q(status='DA')
-                                            ).order_by('-proyecto_id')
+                            Q(flag=True), Q(status='AC') | Q(status='PE')
+                            ).order_by('-registrado')
                     elif area == 'operaciones':
                         cnom = request.user.get_profile(
                             ).empdni.charge.cargos.lower()
                         if cnom == 'jefe de operaciones':
                             proyectos = Proyecto.objects.filter(
-                                            Q(flag=True),
-                                            Q(status='AC')).order_by(
-                                            '-proyecto_id')
+                                Q(flag=True), Q(status='AC')).order_by('-registrado')
                         else:
                             proyectos = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status='AC'),
-                                    empdni_id=request.user.get_profile(
-                                        ).empdni_id).order_by('-proyecto_id')
+                                Q(flag=True), Q(status='AC'), empdni_id=request.user.get_profile(
+                                    ).empdni_id).order_by('-registrado')
                     elif area == 'logistica' or area == 'almacen':
                         proyectos = Proyecto.objects.filter(
-                                            Q(flag=True),
-                                            Q(status='AC')).order_by(
-                                            '-proyecto_id')
+                            Q(flag=True), Q(status='AC')).order_by('-registrado')
                     cust = proyectos
                     if area == 'operaciones':
                         if cnom == 'jefe de operaciones':
@@ -127,54 +114,46 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                     elif area == 'logistica' or area == 'almacen':
                         cust = cust.filter(status='AC')
                     # print 'para despacho'
-                    cust = cust.order_by(
-                            'ruccliente__razonsocial').distinct(
-                            'ruccliente__razonsocial')
-                    context['customers'] = simplejson.loads(
-                                            serializers.serialize(
-                                                'json',
-                                                cust,
-                                                indent=4,
-                                                relations=('ruccliente',)))
+                    cust = cust.order_by('ruccliente__razonsocial').distinct(
+                        'ruccliente__razonsocial')
+                    context['customers'] = json.loads(
+                        serializers.serialize(
+                            'json', cust, indent=4, relations=('ruccliente',)))
                     context['status'] = True
                 if 'getProjects' in request.GET:
-                    if area == 'ventas' or area == 'administrator':
-                        projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    ~Q(status='DA'),
-                                    Q(ruccliente_id=request.GET['customer'])
-                                    ).order_by('-proyecto_id')
-                    elif area == 'operaciones':
-                        projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status='AC'),
-                                    Q(ruccliente_id=request.GET['customer']),
-                                    empdni_id=request.user.get_profile(
-                                        ).empdni_id).order_by('-proyecto_id')
-                    elif area == 'logistica' or area == 'almacen':
-                        projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status='AC'),
-                                    Q(ruccliente_id=request.GET['customer'])
-                                    ).order_by('-proyecto_id')
-                    cnom = request.user.get_profile(
-                            ).empdni.charge.cargos.lower()
+                    cnom = request.user.get_profile().empdni.charge.cargos.lower()
                     if cnom == 'jefe de operaciones':
                         projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status='AC'),
-                                    Q(ruccliente_id=request.GET['customer'])
-                                    ).order_by('-proyecto_id')
-                    context['projects'] = simplejson.loads(
-                                            serializers.serialize(
-                                                'json', projects))
+                            Q(flag=True), Q(status='AC'), Q(ruccliente_id=request.GET['customer'])
+                            ).order_by('-proyecto_id')
+                    else:
+                        if area == 'ventas' or area == 'administrator':
+                            projects = Proyecto.objects.filter(
+                                Q(flag=True), Q(flag=True), Q(status='AC') | Q(status='PE'),
+                                Q(ruccliente_id=request.GET['customer'])
+                            ).order_by('-proyecto_id')
+                        elif area == 'operaciones':
+                            projects = Proyecto.objects.filter(
+                                Q(flag=True),
+                                Q(status='AC'),
+                                Q(ruccliente_id=request.GET['customer']),
+                                empdni_id=request.user.get_profile(
+                                    ).empdni_id).order_by('-proyecto_id')
+                        elif area == 'logistica' or area == 'almacen':
+                            projects = Proyecto.objects.filter(
+                                Q(flag=True),
+                                Q(status='AC'),
+                                Q(ruccliente_id=request.GET['customer'])
+                                ).order_by('-proyecto_id')
+                    context['projects'] = json.loads(
+                        serializers.serialize('json', projects))
                     for x in context['projects']:
                         complete = {
-                                'storage': False,
-                                'operations': False,
-                                'quality': False,
-                                'accounting': False,
-                                'sales': False}
+                            'storage': False,
+                            'operations': False,
+                            'quality': False,
+                            'accounting': False,
+                            'sales': False}
                         try:
                             cl = CloseProject.objects.get(project_id=x['pk'])
                             if cl.storageclose != None and cl.storageclose != False:
@@ -192,39 +171,39 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                         x['complete'] = complete
                     context['status'] = True
                 if 'allProjects' in request.GET:
-                    if area == 'ventas' or area == 'administrator':
-                        # print 'Aqui ingresa admin'
-                        projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    ~Q(status='DA'))#.order_by('-proyecto_id')
-                    elif area == 'operaciones':
-                        # print 'Aqui ingresa opera'
-                        projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status='AC'),
-                                    empdni_id=request.user.get_profile(
-                                        ).empdni_id)#.order_by('-proyecto_id')
-                    elif area == 'logistica' or area == 'almacen':
-                        # print 'Aqui ingresa log sto'
-                        projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status='AC'))#.order_by('-proyecto_id')
-                    cnom = request.user.get_profile(
-                            ).empdni.charge.cargos.lower()
+                    cnom = request.user.get_profile().empdni.charge.cargos.lower()
                     if cnom == 'jefe de operaciones':
                         projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status='AC'))#.order_by('-proyecto_id')
+                            Q(flag=True),
+                            Q(status='AC')).order_by('-registrado')
+                    else:
+                        if area == 'ventas' or area == 'administrator':
+                            # print 'Aqui ingresa admin'
+                            projects = Proyecto.objects.filter(
+                                Q(flag=True), Q(status='AC') | Q(status='PE')
+                            ).order_by('-registrado')
+                        elif area == 'operaciones':
+                            # print 'Aqui ingresa opera'
+                            projects = Proyecto.objects.filter(
+                                Q(flag=True),
+                                Q(status='AC'),
+                                empdni_id=request.user.get_profile().empdni_id
+                            ).order_by('-registrado')
+                        elif area == 'logistica' or area == 'almacen':
+                            # print 'Aqui ingresa log sto'
+                            projects = Proyecto.objects.filter(
+                                Q(flag=True),
+                                Q(status='AC')).order_by('-registrado')
                     # print projects.count()
                     # co = 1
                     # for x in projects:
                     #     print co, x.ruccliente_id, x.ruccliente.razonsocial
                     #     co += 1
-                    context['projects'] = simplejson.loads(
-                                            serializers.serialize(
-                                                'json',
-                                                projects.order_by('-proyecto_id'),
-                                                relations=('ruccliente',)))
+                    context['projects'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            projects,
+                            relations=('ruccliente',)))
                     # set status of closed project
                     for x in context['projects']:
                         complete = {
@@ -262,34 +241,35 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                     context['gstatus'] = [{'key': x.status, 'val': globalVariable.status[x.status]} for x in gs] 
                     context['status'] = True
                 if 'sgproject' in request.GET:
-                    if area == 'ventas' or area == 'administrator':
-                        # print 'Aqui ingresa admin'
-                        projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status=request.GET['status']))#.order_by('-proyecto_id')
-                    elif area == 'operaciones':
-                        # print 'Aqui ingresa opera'
-                        projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status=request.GET['status']),
-                                    empdni_id=request.user.get_profile(
-                                        ).empdni_id)#.order_by('-proyecto_id')
-                    elif area == 'logistica' or area == 'almacen':
-                        # print 'Aqui ingresa log sto'
-                        projects = Proyecto.objects.filter(
-                                    Q(flag=True),
-                                    Q(status=request.GET['status']))#.order_by('-proyecto_id')
-                    cnom = request.user.get_profile(
-                            ).empdni.charge.cargos.lower()
+                    cnom = request.user.get_profile().empdni.charge.cargos.lower()
                     if cnom == 'jefe de operaciones':
                         projects = Proyecto.objects.filter(
                                     Q(flag=True),
-                                    Q(status=request.GET['status']))#.order_by('-proyecto_id')
-                    context['projects'] = simplejson.loads(
-                                            serializers.serialize(
-                                                'json',
-                                                projects.order_by('-proyecto_id'),
-                                                relations=('ruccliente',)))
+                                    Q(status=request.GET['status'])).order_by('-registrado')
+                    else:
+                        if area == 'ventas' or area == 'administrator':
+                            # print 'Aqui ingresa admin'
+                            projects = Proyecto.objects.filter(
+                                        flag=True,
+                                        status=request.GET['status']).order_by('-registrado')
+                        elif area == 'operaciones':
+                            # print 'Aqui ingresa opera'
+                            projects = Proyecto.objects.filter(
+                                        Q(flag=True),
+                                        Q(status=request.GET['status']),
+                                        empdni_id=request.user.get_profile(
+                                            ).empdni_id).order_by('-registrado')
+                        elif area == 'logistica' or area == 'almacen':
+                            # print 'Aqui ingresa log sto'
+                            projects = Proyecto.objects.filter(
+                                        Q(flag=True),
+                                        Q(status=request.GET['status'])).order_by('-registrado')
+                    
+                    context['projects'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            projects,
+                            relations=('ruccliente',)))
                     # set status of closed project
                     for x in context['projects']:
                         complete = {
@@ -549,8 +529,9 @@ class ProjectManager(JSONResponseMixin, View):
                     context['raise'] = e.__str__()
                     context['status'] = False
                 return self.render_to_json_response(context)
-            context['project'] = Proyecto.objects.get(
-                                    pk=kwargs['project'], flag=True)
+            context['project'] = Proyecto.objects.get(pk=kwargs['project'], flag=True)
+            if context['project'].status != 'AC':
+                return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['project']}))
             try:
                 context['subpro'] = Subproyecto.objects.filter(
                                         proyecto_id=kwargs['project'],
@@ -574,7 +555,7 @@ class ProjectManager(JSONResponseMixin, View):
             return render_to_response(self.template_name, context, context_instance = RequestContext(request))
         except TemplateDoesNotExist, e:
             messages.error(request, 'Template not Exist %s',e)
-            raise Http404('Page Not Found')
+            raise Http404(e)
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
@@ -1095,6 +1076,8 @@ class SectorManage(JSONResponseMixin, View):
                 return self.render_to_json_response(context)
             # block manager sector global
             context['project'] = Proyecto.objects.get(pk=kwargs['pro'])
+            if context['project'].status != 'AC':
+                return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
             if kwargs['sub'] != unicode(None):
                 context['subproject'] = Subproyecto.objects.get(
                                         proyecto_id=kwargs['pro'],
@@ -2646,6 +2629,8 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
         try:
             context['pro'] = Proyecto.objects.get(
                             proyecto_id=kwargs['pro'])
+            if context['pro'].status != 'AC':
+                return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
             svc = ServiceOrder.objects.filter(project_id=kwargs['pro'])
             dsvc = DetailsServiceOrder.objects.filter(
                 serviceorder_id__in=[x.serviceorder_id for x in svc])

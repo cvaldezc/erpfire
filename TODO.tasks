@@ -12,12 +12,13 @@ Tasks:
             - Missing Organize
             ☐ add user in note of ingress (Rocio, Mauro) @Storage @low
         Doing:
-            ☐ add show documents in the view closed @critical 2016-12-15 08:59:07
-            ☐ add support modify add new materials modify price @high 2016-12-13 14:37:35 @operations
+            ☐ add support modify add new materials modify price in mofidy area @high 2016-12-13 14:37:35 @operations
             ☐ remove button erase niple when the niple is send and the quantity missing send is zero @high 2016-12-13 14:44:09 @operations
     Tasks Complete:
         Apps:
             Sales:
+                ✔ review show project with status closed @sales @high 2016-12-15 16:17:27 @done (12/15/2016, 5:27:54 PM)
+                ✔ add show documents in the view closed @critical 2016-12-15 08:59:07 @sales @done (12/15/2016, 4:15:26 PM)
             Operations:
                 ✔ Update modify of table dsmetrado -> implement three tables for details (add, edit, del) @Operations @high @critical 2016-11-28 08:38:48 @deliverable 2016-11-29 08:39:31 @done (12/10/2016, 3:56:35 PM) 
             Logistics:

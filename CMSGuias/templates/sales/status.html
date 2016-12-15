@@ -1,0 +1,37 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+        {% include "menus/salesmd.html" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'logistica'%}
+        {% include "menus/logisticsmd.htm" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'operaciones' %}
+        {% include "menus/operationsmd.htm" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'almacen' %}
+        {% include "menus/storagemd.htm" %}
+    {% endif %}
+{% endblock menu %}
+{% block content %}
+    <section>
+        <h3>
+            Proyecto {{pro.proyecto_id}} <br>
+            <small>{{pro.nompro}}</small>
+        </h3>
+        <div class="card-panel">
+            <dl>
+                <dt>Estado:</dt>
+                    <dd>{{pro.status}} - {{sts}}</dd>
+                <dt>Inicio: </dt>
+                    <dd>{{pro.comienzo}}</dd>
+                <dt>Fin: </dt>
+                    <dd>{{pro.fin}}</dd>
+                <dt>Dirección: </dt>
+                    <dd>{{pro.direccion}}</dd>
+                <dt>Cliente: </dt>
+                    <dd>{{pro.ruccliente_id}} {{pro.ruccliente.razonsocial}}</dd>
+            </dl>
+        </div>
+    </section>
+{% endblock content %}

@@ -12,7 +12,7 @@
     {% if user.get_profile.empdni.charge.area|lower == 'almacen' %}
         {% include "menus/storagemd.htm" %}
     {% endif %}
-    {% endblock menu %}
+{% endblock menu %}
 {% block content %}
 <section ng-app="cpApp" ng-controller="cpCtrl">
     <div class="row">
