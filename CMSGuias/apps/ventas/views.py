@@ -2681,6 +2681,7 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                 float(context['pro'].aservices) - context['total'])
             return render(request, 'sales/servicesproject.html', context)
         except TemplateDoesNotExist, e:
+            print e
             raise Http404(e)
 
     @method_decorator(login_required)

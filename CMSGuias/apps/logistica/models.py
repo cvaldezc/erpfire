@@ -259,7 +259,7 @@ class ServiceOrder(models.Model):
             globalVariable.get_year, self.serviceorder_id, self.supplier_id)
 
     serviceorder_id = models.CharField(max_length=10, primary_key=True)
-    project = models.ForeignKey(Proyecto, to_field='proyecto_id')
+    project = models.ForeignKey(Proyecto, to_field='proyecto_id', null=True, blank=True)
     subprojecto = models.ForeignKey(
         Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     supplier = models.ForeignKey(Proveedor, to_field='proveedor_id')

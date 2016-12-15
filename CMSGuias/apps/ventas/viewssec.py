@@ -51,7 +51,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                             serializers.serialize(
                                 'json',
                                 CloseProject.objects.filter(
-                                        project_id=kwargs['pro'])))
+                                    project_id=kwargs['pro'])))
                         kwargs['status'] = True
                     if 'gcomplete' in request.GET:
                         kwargs['complete'] = {
@@ -60,21 +60,21 @@ class ClosedProjectView(JSONResponseMixin, View):
                             'quality': False,
                             'accounting': False,
                             'sales': False}
-                        cl = CloseProject.objects.get(project_id=kwargs['pro'])
-                        if cl.storageclose != None and cl.storageclose != False:
+                        cldata = CloseProject.objects.get(project_id=kwargs['pro'])
+                        if cldata.storageclose != None and cldata.storageclose != False:
                             kwargs['complete']['storage'] = True
-                        if cl.letterdelivery != None and cl.letterdelivery != '':
+                        if cldata.letterdelivery != None and cldata.letterdelivery != '':
                             kwargs['complete']['operations'] = True
-                        if cl.documents != None and cl.documents != '':
+                        if cldata.documents != None and cldata.documents != '':
                             kwargs['complete']['quality'] = True
-                        if cl.accounting != None and cl.accounting != False:
+                        if cldata.accounting != None and cldata.accounting != False:
                             kwargs['complete']['accounting'] = True
-                        if cl.status != None and cl.status != 'PE':
+                        if cldata.status != None and cldata.status != 'PE':
                             kwargs['complete']['sales'] = True
                         kwargs['status'] = True
-                except (ObjectDoesNotExist or Exception) as e:
+                except (ObjectDoesNotExist) as ex:
                     kwargs['status'] = False
-                    kwargs['raise'] = str(e)
+                    kwargs['raise'] = str(ex)
                 return self.render_to_json_response(kwargs)
             kwargs['pr'] = Proyecto.objects.get(proyecto_id=kwargs['pro'], flag=True, status='AC')
             return render(request, 'sales/closedproject.html', kwargs)
@@ -94,103 +94,104 @@ class ClosedProjectView(JSONResponseMixin, View):
                         'name': pr.nompro.upper(),
                         'customers': pr.ruccliente.razonsocial.upper(),
                         'company': request.session.get('company')}
-                    issue = 'APERTURA DE PROYECTO %s %s - %s' % (pr.proyecto_id, pr.nompro, pr.ruccliente.razonsocial)
-                    fs = Emails.objects.filter(issue=issue)
-                    kwargs['fors'] = fs[0].fors if fs else ','.join(emails)
+                    issue = 'APERTURA DE PROYECTO %s %s - %s' % (
+                        pr.proyecto_id, pr.nompro, pr.ruccliente.razonsocial)
+                    fsmail = Emails.objects.filter(issue=issue)
+                    kwargs['fors'] = fsmail[0].fors if fsmail else ','.join(emails)
                 except Proyecto.DoesNotExist:
                     pass
                 if 'storage' in request.POST:
                     try:
-                        cl = CloseProject.objects.get(project_id=kwargs['pro'])
+                        cldt = CloseProject.objects.get(project_id=kwargs['pro'])
                     except (CloseProject.DoesNotExist) as ex:
-                        cl = CloseProject()
-                        cl.project_id=kwargs['pro']
-                    cl.storageclose = True
-                    cl.datestorage = date_now('datetime')
-                    cl.performedstorage_id = request.user.get_profile().empdni_id
-                    cl.save()
+                        cldt = CloseProject()
+                        cldt.project_id=kwargs['pro']
+                    cldt.storageclose = True
+                    cldt.datestorage = date_now('datetime')
+                    cldt.performedstorage_id = request.user.get_profile().empdni_id
+                    cldt.save()
                     kwargs['area'] = 'ALMACÉN'
                     kwargs['status'] = True
                 if 'operations' in request.POST:
                     try:
-                        cl = CloseProject.objects.get(project_id=kwargs['pro'])
+                        cldt = CloseProject.objects.get(project_id=kwargs['pro'])
                     except (CloseProject.DoesNotExist or Exception) as ex:
-                        cl = CloseProject()
-                        cl.project_id=kwargs['pro']
-                    cl.letterdelivery = request.FILES['letter']
-                    cl.dateletter = date_now('datetime')
-                    cl.performedoperations_id = request.user.get_profile().empdni_id
-                    cl.save()
+                        cldt = CloseProject()
+                        cldt.project_id=kwargs['pro']
+                    cldt.letterdelivery = request.FILES['letter']
+                    cldt.dateletter = date_now('datetime')
+                    cldt.performedoperations_id = request.user.get_profile().empdni_id
+                    cldt.save()
                     kwargs['area'] = 'OPERACIONES'
                     kwargs['status'] = True
                 if 'quality' in request.POST:
                     try:
-                        cl = CloseProject.objects.get(project_id=kwargs['pro'])
+                        cldt = CloseProject.objects.get(project_id=kwargs['pro'])
                     except (CloseProject.DoesNotExist or Exception) as ex:
-                        cl = CloseProject()
-                        cl.project_id=kwargs['pro']
-                    cl.documents = request.FILES['documents']
-                    cl.docregister = date_now('datetime')
-                    cl.performeddocument_id=request.user.get_profile().empdni_id
-                    cl.save()
-                    if get_extension(cl.documents.name) == '.rar':
-                        descompressRAR(cl.documents)
+                        cldt = CloseProject()
+                        cldt.project_id=kwargs['pro']
+                    cldt.documents = request.FILES['documents']
+                    cldt.docregister = date_now('datetime')
+                    cldt.performeddocument_id=request.user.get_profile().empdni_id
+                    cldt.save()
+                    if get_extension(cldt.documents.name) == '.rar':
+                        descompressRAR(cldt.documents)
                     kwargs['area'] = 'CALIDAD'
                     kwargs['status'] = True
                 if 'accounting' in request.POST:
                     try:
-                        cl = CloseProject.objects.get(project_id=kwargs['pro'])
-                    except (CloseProject.DoesNotExist or Exception) as ex:
-                        cl = CloseProject()
-                        cl.project_id = kwargs['pro']
+                        cldt = CloseProject.objects.get(project_id=kwargs['pro'])
+                    except (CloseProject.DoesNotExist) as ex:
+                        cldt = CloseProject()
+                        cldt.project_id = kwargs['pro']
                     if 'tinvoice' in request.POST:
                         if request.POST['tinvoice'] > -1:
-                            cl.tinvoice = request.POST['tinvoice']
+                            cldt.tinvoice = request.POST['tinvoice']
                     if 'tiva' in request.POST:
                         if request.POST['tiva'] > -1:
-                            cl.tiva = request.POST['tiva']
+                            cldt.tiva = request.POST['tiva']
                     if 'otherin' in request.POST:
                         if request.POST['otherin'] > -1:
-                            cl.otherin = request.POST['otherin']
+                            cldt.otherin = request.POST['otherin']
                     if 'otherout' in request.POST:
                         if request.POST['otherout'] > -1:
-                            cl.otherout = request.POST['otherout']
+                            cldt.otherout = request.POST['otherout']
                     if 'retention' in request.POST:
                         if request.POST['retention'] > -1:
-                            cl.retention = request.POST['retention']
+                            cldt.retention = request.POST['retention']
                     if 'fileaccounting' in request.FILES:
-                        cl.fileaccounting = request.FILES['fileaccounting']
-                    cl.performedaccounting_id = request.user.get_profile().empdni_id
-                    cl.save()
-                    if get_extension(cl.fileaccounting) == '.rar':
-                        descompressRAR(cl.fileaccounting)
+                        cldt.fileaccounting = request.FILES['fileaccounting']
+                    cldt.performedaccounting_id = request.user.get_profile().empdni_id
+                    cldt.save()
+                    if get_extension(cldt.fileaccounting) == '.rar':
+                        descompressRAR(cldt.fileaccounting)
                     kwargs['status'] = True
                 if 'quitaccounting' in request.POST:
-                    cl = CloseProject.objects.get(project_id=kwargs['pro'])
-                    cl.accounting = True
-                    cl.save()
+                    cldt = CloseProject.objects.get(project_id=kwargs['pro'])
+                    cldt.accounting = True
+                    cldt.save()
                     kwargs['area'] = 'CONTABILIDAD'
                     kwargs['status'] = True
                 if 'sales' in request.POST:
-                    cl = CloseProject.objects.get(project_id=kwargs['pro'])
+                    cldt = CloseProject.objects.get(project_id=kwargs['pro'])
                     if 'genpin' in request.POST:
-                        cl.closeconfirm = get_pin()
-                        cl.save()
-                        kwargs['pin'] =  cl.closeconfirm
+                        cldt.closeconfirm = get_pin()
+                        cldt.save()
+                        kwargs['pin'] =  cldt.closeconfirm
                         kwargs['company'] = request.session['company']['name']
-                        kwargs['name'] = cl.project.nompro
+                        kwargs['name'] = cldt.project.nompro
                         kwargs['mail'] = request.user.get_profile().empdni.email
                         kwargs['status'] = True
                     if 'closed' in request.POST:
-                        if request.POST['confirm'] == cl.closeconfirm:
-                            cl.dateclose = date_now('datetime')
-                            cl.performedclose_id = request.user.get_profile().empdni_id
-                            cl.status = 'CO'
-                            cl.save()
-                            pr = Proyecto.objects.get(proyecto_id=kwargs['pro'])
-                            pr.status = 'CL'
-                            pr.flag = False
-                            pr.save()
+                        if request.POST['confirm'] == cldt.closeconfirm:
+                            cldt.dateclose = date_now('datetime')
+                            cldt.performedclose_id = request.user.get_profile().empdni_id
+                            cldt.status = 'CO'
+                            cldt.save()
+                            prj = Proyecto.objects.get(proyecto_id=kwargs['pro'])
+                            prj.status = 'CL'
+                            prj.flag = False
+                            prj.save()
                             kwargs['area'] = 'VENTAS | PROYECTO CERRADO'
                             kwargs['status'] = True
             except (ObjectDoesNotExist or Exception) as ex:

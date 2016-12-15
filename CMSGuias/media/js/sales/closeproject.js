@@ -74,7 +74,6 @@
   };
   app.factory('cpFactory', cpFactories);
   app.controller('cpCtrl', function($rootScope, $scope, $log, cpFactory) {
-    $scope.call = false;
     $scope.mstyle = '';
     $scope.ctrl = {
       'storage': false,
@@ -84,11 +83,13 @@
       'sales': false
     };
     angular.element(document).ready(function() {
-      $scope.validArea();
       angular.element('.collapsible').collapsible();
       angular.element('.scrollspy').scrollSpy();
       $scope.sComplete();
       $scope.loadData();
+      setTimeout((function() {
+        $scope.validArea();
+      }), 2000);
     });
     $scope.loadData = function() {
       var prm;
@@ -121,11 +122,15 @@
       });
     };
     $scope.validArea = function() {
-      var x;
+      var k, ref, v;
       switch ($scope.uarea) {
-        case 'administrator' || 'ventas' || 'logistica':
-          for (x in $scope.ctrl) {
-            $scope.ctrl[x] = true;
+        case 'administrator':
+        case 'ventas':
+        case 'logistica':
+          ref = $scope.ctrl;
+          for (k in ref) {
+            v = ref[k];
+            $scope.ctrl[k] = true;
           }
           break;
         case 'operaciones':
@@ -137,6 +142,7 @@
         case 'almacen':
           $scope.ctrl['storage'] = true;
       }
+      $scope.$apply();
     };
     $scope.storageClosed = function() {
       swal({
@@ -388,7 +394,7 @@
       if (options == null) {
         options = {};
       }
-      return "<p>Operaciones Frecuentes</p>\n<p><strong> CIERRE DE PROYECTO </strong></p>\n<p>\n    <strong>PROYECTO:</strong> " + options.pr.pk + " " + options.pr.name + " <br />\n    <strong>FECHA:</strong> " + (new Date()) + " <br />\n    <strong>AREA CERRADA:</strong> " + options.area + "<br />\n    <br />\n    <b>" + options.pr.company.name + "</b>\n</p>";
+      return "<p>Operaciones Frecuentes</p>\n<p><strong> CIERRE DE PROYECTO </strong></p>\n<p>\n  <strong>PROYECTO:</strong> " + options.pr.pk + " " + options.pr.name + " <br />\n  <strong>FECHA:</strong> " + (new Date()) + " <br />\n  <strong>AREA CERRADA:</strong> " + options.area + "<br />\n  <br />\n  <b>" + options.pr.company.name + "</b>\n</p>";
     };
     $scope.$watch('call', function(nw, old) {
       if (nw !== void 0) {
