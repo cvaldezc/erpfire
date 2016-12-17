@@ -213,14 +213,17 @@ app.controller('proCtrl', function($scope, $http, $cookies) {
   $scope.allprojects = [];
   angular.element(document).ready(function() {
     angular.element('.mselect').material_select();
-    $scope.lCustomersCbox();
     $scope.listCustomers();
     $scope.permission = angular.element("[name=permission]").val();
     $scope.pstatus = 'AC';
     $scope.getstatus();
     if ($scope.permission === 'administrator' || $scope.permission === 'ventas') {
       $scope.tadmin = true;
-      $scope.sfcustomers = true;
+      $scope.sfcustomers = false;
+      $scope.pprojects = true;
+      $scope.pcustomers = false;
+      $scope.sfprojects = true;
+      $scope.sTable();
     }
     if ($scope.permission === 'operaciones') {
       $scope.pprojects = true;

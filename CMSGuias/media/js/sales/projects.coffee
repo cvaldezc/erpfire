@@ -190,14 +190,18 @@ app.controller 'proCtrl', ($scope, $http, $cookies) ->
   $scope.allprojects = []
   angular.element(document).ready ->
     angular.element('.mselect').material_select()
-    $scope.lCustomersCbox()
+    # $scope.lCustomersCbox()
     $scope.listCustomers()
     $scope.permission = angular.element("[name=permission]").val()
     $scope.pstatus = 'AC'
     $scope.getstatus()
     if $scope.permission is 'administrator' or $scope.permission is 'ventas'
       $scope.tadmin = true
-      $scope.sfcustomers = true
+      $scope.sfcustomers = false
+      $scope.pprojects = true
+      $scope.pcustomers = false
+      $scope.sfprojects = true
+      $scope.sTable()
     if $scope.permission is 'operaciones'
       $scope.pprojects = true
       $scope.pcustomers = false

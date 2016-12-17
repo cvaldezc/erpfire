@@ -203,7 +203,14 @@
             'letter': angular.element("#letterup")[0].files[0]
           };
           cpFactory.formData(prm).success(function(response) {
+            var prms;
             if (response.status) {
+              prms = {
+                mails: response.fors,
+                issue: "APERTURA DE PROYECTO " + response.pr.pk + " " + response.pr.name + " - " + response.pr.customers,
+                body: $scope.makeBody(response)
+              };
+              $scope.sendMail(prms);
               $scope.sComplete();
               Materialize.toast("<i class='fa fa-check fa-lg green-text'></i>&nbsp;Archivo subido.", 4000);
             } else {
@@ -235,7 +242,14 @@
             'documents': angular.element("#qualityfile")[0].files[0]
           };
           cpFactory.formData(prm).success(function(response) {
+            var prms;
             if (response.status) {
+              prms = {
+                mails: response.fors,
+                issue: "APERTURA DE PROYECTO " + response.pr.pk + " " + response.pr.name + " - " + response.pr.customers,
+                body: $scope.makeBody(response)
+              };
+              $scope.sendMail(prms);
               $scope.sComplete();
               Materialize.toast("<i class='fa fa-check fa-lg green-text'></i>&nbsp;Archivo subido.", 4000);
             } else {
@@ -297,7 +311,14 @@
             quitaccounting: true
           };
           cpFactory.formData(prm).success(function(response) {
+            var prms;
             if (response.status) {
+              prms = {
+                mails: response.fors,
+                issue: "APERTURA DE PROYECTO " + response.pr.pk + " " + response.pr.name + " - " + response.pr.customers,
+                body: $scope.makeBody(response)
+              };
+              $scope.sendMail(prms);
               $scope.sComplete();
               Materialize.toast("<i class='fa fa-check fa-lg green-text'></i>&nbsp;Contabilidad cerrada.", 4000);
             } else {
@@ -326,7 +347,14 @@
             'confirm': $scope.gpin
           };
           cpFactory.formData(prm).success(function(response) {
+            var prms;
             if (response.status) {
+              prms = {
+                mails: response.fors,
+                issue: "APERTURA DE PROYECTO " + response.pr.pk + " " + response.pr.name + " - " + response.pr.customers,
+                body: $scope.makeBody(response)
+              };
+              $scope.sendMail(prms);
               $scope.sComplete();
               Materialize.toast("<i class='fa fa-check fa-lg green-text'></i>&nbsp;Proyecto cerrado Satisfactoriamente.", 4000);
               setTimeout((function() {

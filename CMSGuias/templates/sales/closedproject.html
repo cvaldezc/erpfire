@@ -22,6 +22,7 @@
                 <br>
                 <small>CLIENTE: {{ pr.ruccliente }}</small><br />
                 <small>RESPONSABLE: {{ pr.empdni.firstname }} {{ pr.empdni.lastname }}</small><br />
+                {{user.get_profile.empdni.address}}
                 <!--<small>
                     <a class="grey-text text-darken-3 right" href="#!" ng-click="call=!call">
                         <i class="fa " ng-class="{'fa-caret-square-o-up': call, 'fa-caret-square-o-down': !call}"></i>
