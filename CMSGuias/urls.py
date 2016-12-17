@@ -1,10 +1,10 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
 from django.conf.urls import patterns, include, url
-import settings
-
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+
 admin.autodiscover()
 
 urlpatterns = patterns(
@@ -22,6 +22,7 @@ urlpatterns = patterns(
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^load/', include('CMSGuias.apps.load.urls')),
     url(r'^tickets/', include('CMSGuias.apps.boleta.urls')),
+    url(r'^rrhh/', include('CMSGuias.apps.rrhh.urls')),
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
