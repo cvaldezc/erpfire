@@ -1,0 +1,53 @@
+{% extends "basemd.html" %}
+{% block menu %}
+  {% include "menus/salesmd.html" %}
+{% endblock menu %}
+{% block content %}
+<section ng-app="appList" ng-controller="ctrlList as vm">
+  <header>
+    <h4>
+      Empleados
+    </h4>
+    <article class="card">
+      <div class="card-content">
+        <div class="input-field">
+          <i class="fa fa-filter prefix"></i>
+          <input type="text" id="search" placeholder="Ingrese un nombre" ng-model="vm.search">
+          <label for="search">Filtar Empleados</label>
+        </div>
+      </div>
+    </article>
+    <aside class="card-panel">
+      <table class="table highlight hovered responsive-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th ng-click="vm.orderlist('id')">ID <i class="right fa" ng-class="{'fa-sort-numeric-asc': vm.order == 'pk', 'fa-sort-numeric-desc': vm.order == '-pk'}"></i></th>
+            <th ng-click="vm.orderlist('lastname')">Descripción <i class="right fa" ng-class="{'fa-sort-alpha-asc': vm.order == 'fields.lastname', 'fa-sort-alpha-desc': vm.order == '-fields.lastname'}"></i></th>
+            <th ng-click="vm.orderlist('cargo')">Cargo <i class="right fa" ng-class="{'fa-sort-alpha-asc': vm.order == 'fields.charge.fields.cargos', 'fa-sort-alpha-desc': vm.order == '-fields.charge.fields.cargos'}"></i></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% verbatim %}
+          <tr ng-repeat="x in vm.list | filter: vm.search | orderBy: vm.order">
+            <td>{{$index+1}}</td>
+            <td>{{x.pk}}</td>
+            <td>{{x.fields.lastname}} {{x.fields.firstname}}</td>
+            <td>{{x.fields.charge.fields.cargos}}</td>
+            <td>
+              <a href="#!">
+                <i class="fa fa-calendar"></i></a>
+            </td>
+          </tr>
+          {% endverbatim %}
+        </tbody>
+      </table>
+    </aside>
+  </header>
+</section>
+<!-- scripts -->
+<script defer src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/rrhh/listemployee.js"></script>
+{% endblock content %}

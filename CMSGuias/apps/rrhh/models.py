@@ -23,10 +23,10 @@ class StatusEmployee(models.Model):
     #     return '%s' % (self)
 
 
-class Asisstance(models.Model):
-    employee = models.ForeignKey(Employee, related_name='AsisstanceEmployee')
-    project = models.ForeignKey(Proyecto, related_name='AsisstanceProject', null=True)
-    stsemp = models.ForeignKey(StatusEmployee, related_name='AsisstanceStatusEmp')
+class Assistance(models.Model):
+    employee = models.ForeignKey(Employee, related_name='AssistanceEmployee')
+    project = models.ForeignKey(Proyecto, related_name='AssistanceProject', null=True)
+    stsemp = models.ForeignKey(StatusEmployee, related_name='AssistanceStatusEmp')
     register = models.DateTimeField(auto_now_add=True)
     asisstance = models.DateField(null=False)
     hourin = models.TimeField(null=False, default='00:00:00')

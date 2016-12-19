@@ -3,3 +3,15 @@
 -- select * from home_materiale where materiales_id = '115100030400040';
 select g.* from almacen_niple g where (select count(*) from almacen_niple n where g.pedido_id = n.pedido_id) > 15;
 --select * from home_materiale where materiales_id = '115100030400037';
+
+-- -1
+-- >>> rn.days=0
+-- Traceback (most recent call last):
+--   File "<stdin>", line 1, in <module>
+-- TypeError: readonly attribute
+-- >>> rn = rn + timedelta(days=1)
+-- >>> rn
+-- datetime.timedelta(0, 30600)
+-- >>> cdt = (datetime.min + rn).time()
+-- >>> cdt
+-- datetime.time(8, 30)
