@@ -16,8 +16,11 @@ class StatusEmployee(models.Model):
 
     audit_log = AuditLog()
 
-    def __unicode__(self):
-        return '%s' % (self)
+    class Meta:
+        ordering = ['-register']
+
+    # def __unicode__(self):
+    #     return '%s' % (self)
 
 
 class Asisstance(models.Model):
@@ -36,8 +39,11 @@ class Asisstance(models.Model):
 
     audit_log = AuditLog()
 
-    def __unicode__(self):
-        return '%s' % (self)
+    class Meta:
+        ordering = ['-register']
+
+    # def __unicode__(self):
+    #     return '%s' % (self)
 
 # INSERT INTO public.almacen_nipleguiaremision(
 #     guia_id, materiales_id, metrado, cantguide, tipo, flag, brand_id, model_id, related, order_id)

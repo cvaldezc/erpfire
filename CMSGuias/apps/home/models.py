@@ -480,3 +480,11 @@ class LogSys(models.Model):
 
     def __unicode__(self):
         return '%s %s' % (self.version, register)
+
+
+class EmployeeSettings(models.Model):
+    register = models.DateTimeField(auto_now_add=True)
+    hextperfirst = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    hextpersecond = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    ngratification = models.SmallIntegerField(default=2)
+    ncts = models.SmallIntegerField(default=1)

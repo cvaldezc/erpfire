@@ -16,3 +16,14 @@ from django.views.generic import View, TemplateView
 from .models import *
 from ..home.models import Employee
 
+
+class AsisstanceEmployee(TemplateView):
+    """this class implement asisstance employee"""
+    template_name = 'rrhh'
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            return  render(request, self.template_name, kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)

@@ -11,5 +11,5 @@ admin.autodiscover()
 
 urlspatterns = patterns(
     '',
-    url(r'^', {}),
+    # url(r'^', {}),
 )
