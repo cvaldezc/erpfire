@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from .models import Assistance, StatusEmployee
+from .models import Assistance, TypesEmployee
 
 
 admin.site.register(Assistance)
-admin.site.register(StatusEmployee)
+admin.site.register(TypesEmployee)

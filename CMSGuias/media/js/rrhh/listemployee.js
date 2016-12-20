@@ -4,10 +4,26 @@
     var vm;
     vm = this;
     vm.order = 'fields.lastname';
+    vm.lprojects = [];
     angular.element(document).ready(function() {
       $log.warn(new Date());
       console.log(vm);
       vm.listEmployee();
+      vm.listProject();
+      angular.element(".modal").modal({
+        dismissible: false
+      });
+      angular.element(".datepicker").pickadate({
+        container: 'body',
+        format: "yyyy-mm-dd",
+        max: new Date(),
+        selectMonths: true,
+        onStart: function() {
+          var date;
+          date = new Date();
+          this.set('select', [date.getFullYear(), date.getMonth(), date.getDate()]);
+        }
+      });
     });
     vm.orderlist = function(order) {
       switch (order) {
@@ -29,6 +45,22 @@
           vm.list = response.employee;
         } else {
           Materialize.tosat("No hay datos para mostrar!", 3000);
+        }
+      });
+    };
+    vm.listProject = function() {
+      cpFactory.get({
+        gproject: true
+      }).success(function(response) {
+        if (response.status) {
+          vm.lprojects = response.projects;
+          return setTimeout((function() {
+            angular.element(".chosen-select").chosen({
+              width: "100%"
+            });
+          }), 800);
+        } else {
+          Materialize.toast("No se cargados los datos " + response.raise, 2600);
         }
       });
     };

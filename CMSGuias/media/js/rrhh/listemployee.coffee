@@ -1,11 +1,24 @@
 do ->
+
   ctrlList = ($scope, $log, $q, cpFactory) ->
     vm = this
     vm.order = 'fields.lastname'
+    vm.lprojects = []
     angular.element(document).ready ->
       $log.warn new Date()
       console.log vm
       vm.listEmployee()
+      vm.listProject()
+      angular.element(".modal").modal dismissible: false
+      angular.element(".datepicker").pickadate
+        container: 'body'
+        format: "yyyy-mm-dd"
+        max: new Date()
+        selectMonths: true
+        onStart: ->
+          date = new Date()
+          this.set('select', [date.getFullYear(), date.getMonth(), date.getDate()])
+          return
       return
     
     vm.orderlist = (order) ->
@@ -26,6 +39,20 @@ do ->
           return
         else
           Materialize.tosat "No hay datos para mostrar!", 3000
+          return
+      return
+
+    vm.listProject = ->
+      cpFactory.get gproject: true
+      .success (response) ->
+        if response.status
+          vm.lprojects = response.projects
+          setTimeout (->
+            angular.element(".chosen-select").chosen width: "100%"
+            return
+            ), 800
+        else
+          Materialize.toast "No se cargados los datos #{response.raise}", 2600
           return
       return
 

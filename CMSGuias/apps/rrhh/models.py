@@ -8,7 +8,7 @@ from ..home.models import Employee
 from ..ventas.models import Proyecto
 
 
-class StatusEmployee(models.Model):
+class TypesEmployee(models.Model):
     status_id = models.CharField(primary_key=True, max_length=4, default='SE00')
     register = models.DateTimeField(auto_now_add=True)
     description = models.CharField(max_length=60)
@@ -26,7 +26,7 @@ class StatusEmployee(models.Model):
 class Assistance(models.Model):
     employee = models.ForeignKey(Employee, related_name='AssistanceEmployee')
     project = models.ForeignKey(Proyecto, related_name='AssistanceProject', null=True)
-    stsemp = models.ForeignKey(StatusEmployee, related_name='AssistanceStatusEmp')
+    stsemp = models.ForeignKey(TypesEmployee, related_name='AssistanceTypeEmpployee')
     register = models.DateTimeField(auto_now_add=True)
     asisstance = models.DateField(null=False)
     hourin = models.TimeField(null=False, default='00:00:00')

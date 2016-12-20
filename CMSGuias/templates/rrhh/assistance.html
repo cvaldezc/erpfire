@@ -1,4 +1,8 @@
 {% extends "basemd.html" %}
+{% block title %} List Employee{% endblock title %}
+{% block style %}
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+{% endblock %}
 {% block menu %}
   {% include "menus/salesmd.html" %}
 {% endblock menu %}
@@ -8,46 +12,83 @@
     <h4>
       Empleados
     </h4>
-    <article class="card">
-      <div class="card-content">
-        <div class="input-field">
-          <i class="fa fa-filter prefix"></i>
-          <input type="text" id="search" placeholder="Ingrese un nombre" ng-model="vm.search">
-          <label for="search">Filtar Empleados</label>
+  </header>
+  <article class="card">
+    <div class="card-content">
+      <div class="input-field">
+        <i class="fa fa-filter prefix"></i>
+        <input type="text" id="search" placeholder="Ingrese un nombre" ng-model="vm.search">
+        <label for="search">Filtar Empleados</label>
+      </div>
+    </div>
+  </article>
+  <aside class="card-panel">
+    <table class="table highlight hovered responsive-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th ng-click="vm.orderlist('id')">ID <i class="right fa" ng-class="{'fa-sort-numeric-asc': vm.order == 'pk', 'fa-sort-numeric-desc': vm.order == '-pk'}"></i></th>
+          <th ng-click="vm.orderlist('lastname')">Descripción <i class="right fa" ng-class="{'fa-sort-alpha-asc': vm.order == 'fields.lastname', 'fa-sort-alpha-desc': vm.order == '-fields.lastname'}"></i></th>
+          <th ng-click="vm.orderlist('cargo')">Cargo <i class="right fa" ng-class="{'fa-sort-alpha-asc': vm.order == 'fields.charge.fields.cargos', 'fa-sort-alpha-desc': vm.order == '-fields.charge.fields.cargos'}"></i></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% verbatim %}
+        <tr ng-repeat="x in vm.list | filter: vm.search | orderBy: vm.order">
+          <td>{{$index+1}}</td>
+          <td>{{x.pk}}</td>
+          <td>{{x.fields.lastname}} {{x.fields.firstname}}</td>
+          <td>{{x.fields.charge.fields.cargos}}</td>
+          <td>
+            <a href="#!">
+              <i class="fa fa-calendar"></i></a>
+          </td>
+        </tr>
+        {% endverbatim %}
+      </tbody>
+    </table>
+  </aside>
+  <!-- modals -->
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+      <strong>REGISTRAR ASISTENCIA</strong>
+      <div class="row">
+        <div class="col l12 m12 s12">
+          <label for="project">Proyecto</label>
+          <select class="browser-default chosen-select" name="project" id="project" ng-model="vm.set.project" ng-options="x.pk as x.fields.nompro for x in vm.lprojects"></select>
+        </div>
+        <div class="input-field col l6 m6 s12">
+          <label for="hini">Hora Entrada</label>
+          <input type="text" maxlength="5" pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$" placeholder="00:00"  id="hini">
+        </div>
+        <div class="input-field col l6 m6 s12">
+          <label for="">Inicio Receso</label>
+          <input type="text" max pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$" placeholder="00:00"  id="">
+        </div>
+        <div class="input-field col l6 m6 s12">
+          <label for="">Fin Receso</label>
+          <input type="text" max pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$" placeholder="00:00"  id="">
+        </div>
+        <div class="input-field col l6 m6 s12">
+          <label for="">Hora Salida</label>
+          <input type="text" max pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$" placeholder="00:00"  id="">
+        </div>
+        <div class="input-field col l6 m6 s12">
+          <input type="text" class="datepicker" maxlength="10" placeholder="aaaa-mm-dd">
+          <label for="">Fecha</label>
+        </div>
+        <div class="input-field col l6 m6 s12">
+          <input type="number" class="right-align">
+          <label for="">Viaticos</label>
         </div>
       </div>
-    </article>
-    <aside class="card-panel">
-      <table class="table highlight hovered responsive-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th ng-click="vm.orderlist('id')">ID <i class="right fa" ng-class="{'fa-sort-numeric-asc': vm.order == 'pk', 'fa-sort-numeric-desc': vm.order == '-pk'}"></i></th>
-            <th ng-click="vm.orderlist('lastname')">Descripción <i class="right fa" ng-class="{'fa-sort-alpha-asc': vm.order == 'fields.lastname', 'fa-sort-alpha-desc': vm.order == '-fields.lastname'}"></i></th>
-            <th ng-click="vm.orderlist('cargo')">Cargo <i class="right fa" ng-class="{'fa-sort-alpha-asc': vm.order == 'fields.charge.fields.cargos', 'fa-sort-alpha-desc': vm.order == '-fields.charge.fields.cargos'}"></i></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% verbatim %}
-          <tr ng-repeat="x in vm.list | filter: vm.search | orderBy: vm.order">
-            <td>{{$index+1}}</td>
-            <td>{{x.pk}}</td>
-            <td>{{x.fields.lastname}} {{x.fields.firstname}}</td>
-            <td>{{x.fields.charge.fields.cargos}}</td>
-            <td>
-              <a href="#!">
-                <i class="fa fa-calendar"></i></a>
-            </td>
-          </tr>
-          {% endverbatim %}
-        </tbody>
-      </table>
-    </aside>
-  </header>
+    </div>
+  </div>
 </section>
 <!-- scripts -->
 <script defer src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>
 <script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
 <script defer src="{{ MEDIA_URL }}js/rrhh/listemployee.js"></script>
 {% endblock content %}

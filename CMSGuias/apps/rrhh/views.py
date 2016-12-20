@@ -13,8 +13,9 @@ from django.utils.decorators import method_decorator
 from django.template import TemplateDoesNotExist
 from django.views.generic import TemplateView
 
-from .models import Assistance, StatusEmployee
+from .models import Assistance, TypesEmployee
 from ..home.models import Employee
+from ..ventas.models import Proyecto
 
 
 class JSONResponseMixin(object):
@@ -35,6 +36,30 @@ class JSONResponseMixin(object):
             cls=DjangoJSONEncoder)
 
 
+class TypeEmployeeView(JSONResponseMixin, TemplateView):
+
+    template_name = 'rrhh/typeemployee.html'
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    if 'ltypes' in request.GET:
+                        kwargs['types'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                TypesEmployee.objects.filter(flag=True)))
+                        kwargs['status'] = True
+                except ObjectDoesNotExist as oex:
+                    kwargs['raise'] = str(oex)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+            return render(request, self.template_name, kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)
+
+
 class AssistanceEmployee(JSONResponseMixin, TemplateView):
     """this class implement asisstance employee"""
     template_name = 'rrhh/assistance.html'
@@ -50,6 +75,12 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
                                 'json',
                                 Employee.objects.filter(flag=True),
                                 relations=('charge')))
+                        kwargs['status'] = True
+                    if 'gproject' in request.GET:
+                        kwargs['projects'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                Proyecto.objects.filter(status='AC', flag=True)))
                         kwargs['status'] = True
                 except ObjectDoesNotExist as oex:
                     kwargs['raise'] = str(oex)
