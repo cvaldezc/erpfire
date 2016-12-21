@@ -530,7 +530,7 @@ class ProjectManager(JSONResponseMixin, View):
                     context['status'] = False
                 return self.render_to_json_response(context)
             context['project'] = Proyecto.objects.get(pk=kwargs['project'], flag=True)
-            if context['project'].status != 'AC':
+            if context['project'].status != 'AC' and context['project'].status != 'PE':
                 return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['project']}))
             try:
                 context['subpro'] = Subproyecto.objects.filter(
@@ -1076,7 +1076,7 @@ class SectorManage(JSONResponseMixin, View):
                 return self.render_to_json_response(context)
             # block manager sector global
             context['project'] = Proyecto.objects.get(pk=kwargs['pro'])
-            if context['project'].status != 'AC':
+            if context['project'].status != 'AC' and context['project'].status != 'PE':
                 return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
             if kwargs['sub'] != unicode(None):
                 context['subproject'] = Subproyecto.objects.get(
@@ -2629,7 +2629,7 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
         try:
             context['pro'] = Proyecto.objects.get(
                             proyecto_id=kwargs['pro'])
-            if context['pro'].status != 'AC':
+            if context['pro'].status != 'AC' and context['project'].status != 'PE':
                 return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
             svc = ServiceOrder.objects.filter(project_id=kwargs['pro'])
             dsvc = DetailsServiceOrder.objects.filter(
@@ -2692,6 +2692,9 @@ class PaintingView(JSONResponseMixin, TemplateView):
                 kwargs['paint'] = Painting.objects.get(project_id=kwargs['pro'])
             except Painting.DoesNotExist:
                 kwargs['paint'] = {'nlayers': 0, 'nfilmb': 0, 'nfilmc': 0}
+
+            if kwargs['paint'].project.status != 'AC' and kwargs['paint'].project.status != 'PE':
+                return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
             return render(request, 'sales/paintingproject.html', kwargs)
         except (TemplateDoesNotExist or Exception) as e:
             raise Http404(e)
