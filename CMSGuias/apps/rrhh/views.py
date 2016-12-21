@@ -16,6 +16,7 @@ from django.views.generic import TemplateView
 from .models import Assistance, TypesEmployee
 from ..home.models import Employee
 from ..ventas.models import Proyecto
+from ..tools.genkeys import TypesEmployeeKeys
 
 
 class JSONResponseMixin(object):
@@ -49,7 +50,7 @@ class TypeEmployeeView(JSONResponseMixin, TemplateView):
                         kwargs['types'] = json.loads(
                             serializers.serialize(
                                 'json',
-                                TypesEmployee.objects.filter(flag=True)))
+                                TypesEmployee.objects.filter(flag=True).order_by('register')))
                         kwargs['status'] = True
                 except ObjectDoesNotExist as oex:
                     kwargs['raise'] = str(oex)
@@ -58,6 +59,27 @@ class TypeEmployeeView(JSONResponseMixin, TemplateView):
             return render(request, self.template_name, kwargs)
         except TemplateDoesNotExist as ext:
             raise Http404(ext)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            try:
+                if 'new' in request.POST:
+                    key = TypesEmployeeKeys()
+                    TypesEmployee.objects.create(
+                        types_id=key, description=request.POST['desc'].upper())
+                if 'modify' in request.POST:
+                    obj = TypesEmployee.objects.get(types_id=request.POST['pk'])
+                    obj.description = request.POST['desc'].upper()
+                    obj.save()
+                if 'delete' in request.POST:
+                    obj = TypesEmployee.objects.get(types_id=request.POST['pk'])
+                    obj.delete()
+                kwargs['status'] = True
+            except ObjectDoesNotExist as oex:
+                kwargs['raise'] = str(oex)
+                kwargs['status'] = False
+            return self.render_to_json_response(kwargs)
 
 
 class AssistanceEmployee(JSONResponseMixin, TemplateView):

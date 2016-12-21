@@ -14,11 +14,12 @@ from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup
 from CMSGuias.apps.operations.models import (
     Deductive, Letter, PreOrders, SGroup, DSector)
 from CMSGuias.apps.ventas.budget.models import AnalysisGroup, Analysis, Budget
+from ..rrhh.models import TypesEmployee
 
 
 # format date str
-__date_str = '%Y-%m-%d'
-__year_str = '%y'
+# __date_str = '%Y-%m-%d'
+# __year_str = '%y'
 
 
 def __init__():
@@ -460,3 +461,13 @@ def keyRestoration():
             return 'D%s%s' % (yn, '{:0>3d}'.format(count))
     except ObjectDoesNotExist:
         return 'D%s%s' % (yn, '{:0>3d}'.format(count))
+
+
+def TypesEmployeeKeys():
+    count = 1
+    try:
+        raw = TypesEmployee.objects.latest('register')
+        count = int(raw.types_id[2:]) + 1
+    except Exception as ex:
+        count = 1
+    return 'TY%s' % ('{:0>2d}'.format(count))

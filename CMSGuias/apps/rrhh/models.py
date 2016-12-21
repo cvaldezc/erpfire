@@ -9,7 +9,8 @@ from ..ventas.models import Proyecto
 
 
 class TypesEmployee(models.Model):
-    status_id = models.CharField(primary_key=True, max_length=4, default='SE00')
+    """  Type of Employee """
+    types_id = models.CharField(primary_key=True, max_length=4, default='TY00')
     register = models.DateTimeField(auto_now_add=True)
     description = models.CharField(max_length=60)
     flag = models.BooleanField(default=True, null=False)

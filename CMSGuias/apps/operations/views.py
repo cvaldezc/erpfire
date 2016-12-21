@@ -663,8 +663,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         lst = DSMetradoTemp.objects.filter(dsector_id=kwargs['area'],
                             type=tp).order_by('materials__matnom')
                         return json.loads(serializers.serialize(
-                            'json', lst, relations=('materials', 'brand', 'model')
-                        ))
+                            'json', lst, relations=('materials', 'brand', 'model')))
                     context['listtmp'] = lists(request.GET['type'])
                     context['status'] = True
                 if 'consultingprice' in request.GET:
