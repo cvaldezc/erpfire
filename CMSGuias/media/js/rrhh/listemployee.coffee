@@ -17,7 +17,8 @@ do ->
         selectMonths: true
         onStart: ->
           date = new Date()
-          this.set('select', [date.getFullYear(), date.getMonth(), date.getDate()])
+          this.set('select',
+            [date.getFullYear(), date.getMonth(), date.getDate()])
           return
       return
     

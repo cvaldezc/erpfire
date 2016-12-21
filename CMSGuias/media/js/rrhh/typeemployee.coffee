@@ -27,7 +27,18 @@ do ->
       return
     
     vm.saveType = ->
-      if Objet
+      prms = new Object()
+      if Object.keys(vm.types).indexOf('pk') isnt -1
+        if vm.types.pk isnt undefined and vm.types.pk isnt ""
+          prms['new'] = true
+      if vm.types.desc is "" or vm.types.desc is undefined
+        Materialize.toast """<i class="fa fa-warning-circle"></i>
+        La descripción no debe estar vacia!""", 4000
+        return false
+      prms['desc'] = vm.types.desc
+      if not prms.hasOwnProperty 'new'
+        prms['modify'] = true
+      cpFactory.post prms
       return
     ## ctrlType
     return
@@ -36,6 +47,18 @@ do ->
     {
       get: (options={}) ->
         $http.get "", params: options
+      
+      post: (options={}) ->
+        $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
+        $http.defaults.headers
+        .post['Content-Type'] = 'application/x-www-form-urlencoded'
+        fd = (options={}) ->
+          form = new FormData()
+          for k, v of options
+            form.append k, v
+          return form
+        $http.post "", fd(options),
+          transformRequest: angular.identity, headers: 'Content-Type': undefined
     }
 
   'use strict'
