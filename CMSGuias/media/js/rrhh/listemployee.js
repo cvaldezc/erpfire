@@ -1,13 +1,30 @@
 (function() {
   var app, cpFactory, ctrlList;
+  cpFactory = function($http, $cookies) {
+    return {
+      get: function(options) {
+        if (options == null) {
+          options = {};
+        }
+        return $http.get("", {
+          params: options
+        });
+      }
+    };
+  };
   ctrlList = function($scope, $log, $q, cpFactory) {
     var vm;
     vm = this;
     vm.order = 'fields.lastname';
     vm.lprojects = [];
+    vm.assistance = {
+      project: '-',
+      type: ''
+    };
     angular.element(document).ready(function() {
       $log.warn(new Date());
       console.log(vm);
+      vm.listtype();
       vm.listEmployee();
       vm.listProject();
       angular.element(".modal").modal({
@@ -25,6 +42,15 @@
         }
       });
     });
+    vm.listtype = function() {
+      cpFactory.get({
+        gettypes: true
+      }).success(function(response) {
+        if (response.status) {
+          vm.ltypes = response.types;
+        }
+      });
+    };
     vm.orderlist = function(order) {
       switch (order) {
         case 'lastname':
@@ -64,22 +90,25 @@
         }
       });
     };
-    vm.main = function() {
-      $log.info('main ctrlList...');
-      $log.info(new Date());
+    vm.openAssistance = function() {
+      angular.element("#modal1").modal('open');
     };
-  };
-  cpFactory = function($http, $cookies) {
-    return {
-      get: function(options) {
-        if (options == null) {
-          options = {};
-        }
-        return $http.get("", {
-          params: options
-        });
+    $scope.$watch('vm.assistance.project', function(nw, old) {
+      var tp;
+      tp = angular.element("#types")[0];
+      if (nw === '-' || nw === null) {
+        tp.removeAttribute('disabled');
+        vm.assistance.type = null;
+      } else {
+        vm.assistance.type = 'TY01';
+        tp.setAttribute('disabled', 'disabled');
       }
-    };
+    });
+    $scope.$watch('vm.assistance.type', function(nw, old) {
+      if (nw === 'TY01' && vm.assistance.project === null) {
+        vm.assistance;
+      }
+    });
   };
   'use strict';
   app = angular.module('appList', ['ngCookies']);
@@ -88,6 +117,7 @@
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
   });
+  app.directive('formattime', valFormatTime);
   app.factory('cpFactory', cpFactory);
   cpFactory.inject = ['$http', '$cookies'];
   app.controller('ctrlList', ctrlList);

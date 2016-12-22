@@ -1,4 +1,4 @@
-var valMinandMax;
+var valFormatTime, valMinandMax;
 
 valMinandMax = function() {
   return {
@@ -49,6 +49,34 @@ valMinandMax = function() {
             element.val(result);
             console.log("change attr");
           }
+        }
+      });
+    }
+  };
+};
+
+valFormatTime = function() {
+  return {
+    restrict: 'AE',
+    require: '?ngModel',
+    scope: '@',
+    link: function(scope, element, attrs, ngModel) {
+      element.bind('keypress', function(event) {
+        var key;
+        key = event.which || event.keyCode;
+        console.info(key);
+        if (key < 48 || key > 58 && key !== 8 || key !== 45) {
+          event.preventDefault();
+          return false;
+        }
+      });
+      element.bind('blur', function(event) {
+        var pattern;
+        pattern = new RegExp(/^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/);
+        if (!pattern.test(element.val())) {
+          Materialize.toast('<i class="fa fa-exclamation-circle amber-text">' + '</i>&nbsp;Formato incorrecto!', 3000);
+          ngModel.$setViewValue('00:00');
+          ngModel.$render();
         }
       });
     }

@@ -1,12 +1,25 @@
 do ->
 
+  cpFactory = ($http, $cookies) ->
+    # $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
+    # $http.defaults.headers.post['Content-Type'] =
+    # 'application/x-www-urlencoded'
+    {
+      get:(options={}) ->
+        return $http.get "", params: options
+    }
+
   ctrlList = ($scope, $log, $q, cpFactory) ->
     vm = this
     vm.order = 'fields.lastname'
     vm.lprojects = []
+    vm.assistance =
+      project: '-'
+      type: ''
     angular.element(document).ready ->
       $log.warn new Date()
       console.log vm
+      vm.listtype()
       vm.listEmployee()
       vm.listProject()
       angular.element(".modal").modal dismissible: false
@@ -21,7 +34,14 @@ do ->
             [date.getFullYear(), date.getMonth(), date.getDate()])
           return
       return
-    
+
+    vm.listtype = ->
+      cpFactory.get gettypes: true
+      .success (response) ->
+        if response.status
+          vm.ltypes = response.types
+          return
+      return
     vm.orderlist = (order) ->
       switch order
         when 'lastname'
@@ -57,23 +77,26 @@ do ->
           return
       return
 
-    vm.main = ->
-      $log.info 'main ctrlList...'
-      $log.info new Date()
+    vm.openAssistance = ->
+      angular.element("#modal1").modal 'open'
       return
-
-    # vm.main()
     ## ctrlList
+    ## watch
+    $scope.$watch 'vm.assistance.project', (nw, old) ->
+      tp = angular.element("#types")[0]
+      if nw is '-' or nw is null
+        tp.removeAttribute 'disabled'
+        vm.assistance.type = null
+        return
+      else
+        vm.assistance.type = 'TY01'
+        tp.setAttribute 'disabled', 'disabled'
+        return
+    $scope.$watch 'vm.assistance.type', (nw, old) ->
+      if nw is 'TY01' and vm.assistance.project is null
+        vm.assistance
+        return
     return
-
-  cpFactory = ($http, $cookies) ->
-    # $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
-    # $http.defaults.headers.post['Content-Type'] =
-    # 'application/x-www-urlencoded'
-    {
-      get:(options={}) ->
-        return $http.get "", params: options
-    }
 
   'use strict'
   app = angular.module('appList', ['ngCookies'])
@@ -82,6 +105,8 @@ do ->
     $httpProvider.defaults.xsrfCookieName = 'csrftoken'
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
     return
+
+  app.directive 'formattime', valFormatTime
 
   app.factory 'cpFactory', cpFactory
   cpFactory.inject = [

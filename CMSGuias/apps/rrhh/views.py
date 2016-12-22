@@ -104,6 +104,12 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
                                 'json',
                                 Proyecto.objects.filter(status='AC', flag=True)))
                         kwargs['status'] = True
+                    if 'gettypes' in request.GET:
+                        kwargs['types'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                TypesEmployee.objects.filter(flag=True).order_by('description')))
+                        kwargs['status'] = True
                 except ObjectDoesNotExist as oex:
                     kwargs['raise'] = str(oex)
                     kwargs['status'] = False
