@@ -1,12 +1,19 @@
 do ->
 
   cpFactory = ($http, $cookies) ->
-    # $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
-    # $http.defaults.headers.post['Content-Type'] =
-    # 'application/x-www-urlencoded'
+    $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
+    $http.defaults.headers.post['Content-Type'] = 'application/x-www-urlencoded'
     {
       get:(options={}) ->
         return $http.get "", params: options
+
+      post: (options={}) ->
+        fd = ->
+          form = new FormData()
+          for k, v of options
+            form.append k, v
+          return form
+        $http.post "", fd(), transformRequest: angular.identity, headers: 'Content-Type': undefined
     }
 
   ctrlList = ($scope, $log, $q, cpFactory) ->
@@ -14,7 +21,7 @@ do ->
     vm.order = 'fields.lastname'
     vm.lprojects = []
     vm.assistance =
-      project: '-'
+      project: null
       type: ''
     angular.element(document).ready ->
       $log.warn new Date()
@@ -77,11 +84,60 @@ do ->
           return
       return
 
-    vm.openAssistance = ->
+    vm.openAssistance = (obj) ->
+      vm.assistance.name = "#{obj.fields.lastname} #{obj.fields.firstname}"
+      vm.assistance.dni = obj.pk
       angular.element("#modal1").modal 'open'
       return
+    vm.saveAssistance = ->
+      if vm.assistance.type is null
+        Materialize.toast "<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe seleccionar un tipo de asistencia", 4000
+        return false
+      if vm.assistance.hasOwnProperty('hin')
+        switch vm.assistance.hin
+          when '00:00', null, ''
+            Materialize.toast "<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de entrada!", 4000
+            return false
+      else
+        Materialize.toast "<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de entrada!", 4000
+        return false
+      if vm.assistance.hasOwnProperty('hout')
+        switch vm.assistance.hout
+          when '00:00', null, ''
+            Materialize.toast "<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de Salida!", 4000
+            return false
+      else
+        Materialize.toast "<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de Salida!", 4000
+        return false
+      if not vm.assistance.hasOwnProperty 'hinb'
+        vm.assistance.hinb = '00:00'
+      if not vm.assistance.hasOwnProperty 'houtb'
+        vm.assistance.houtb = '00:00'
+      if not vm.assistance.hasOwnProperty 'viatical'
+        vm.assistance.viatical = 0
+      else
+        switch vm.assistance.viatical
+          when '', undefined, null
+            vm.assistance.viatical = 0
+      prms = vm.assistance
+      switch prms['project']
+        when null, undefined, ''
+          prms['project'] = '' 
+      prms['saveAssistance'] = true
+      console.info prms
+      cpFactory.post prms
+      .success (response) ->
+        if response.status
+          Materialize.toast "<i class='fa fa-check fa-lg green-text'></i>&nbsp;Asistencia Registrada!"
+          vm.assistance = 'dni':'', 'name': '', 'hin': '', 'hout': ''
+          angular.element("#modal1").modal 'close'
+          return
+        else
+          Materialize.toast "<i class='fa fa-times fa-lg red-text'></i>&nbsp;Error: #{response.rasie}", 4000
+          return
+      return
     ## ctrlList
-    ## watch
+    ## 
     $scope.$watch 'vm.assistance.project', (nw, old) ->
       tp = angular.element("#types")[0]
       if nw is '-' or nw is null
@@ -94,7 +150,7 @@ do ->
         return
     $scope.$watch 'vm.assistance.type', (nw, old) ->
       if nw is 'TY01' and vm.assistance.project is null
-        vm.assistance
+        vm.assistance.type = null
         return
     return
 

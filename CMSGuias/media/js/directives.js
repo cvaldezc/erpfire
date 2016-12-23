@@ -64,8 +64,7 @@ valFormatTime = function() {
       element.bind('keypress', function(event) {
         var key;
         key = event.which || event.keyCode;
-        console.info(key);
-        if (key < 48 || key > 58 && key !== 8 || key !== 45) {
+        if ((key < 48 || key > 58) && key !== 8 && key !== 45) {
           event.preventDefault();
           return false;
         }

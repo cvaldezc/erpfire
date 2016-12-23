@@ -52,8 +52,8 @@ valFormatTime = ->
   link: (scope, element, attrs, ngModel) ->
     element.bind 'keypress', (event) ->
       key = event.which or event.keyCode
-      console.info key
-      if key < 48 or key > 58 and key != 8 or key != 45
+      if (key < 48 or key > 58) and key != 8 and key != 45
+        # console.info key
         event.preventDefault()
         return false
     element.bind 'blur', (event) ->

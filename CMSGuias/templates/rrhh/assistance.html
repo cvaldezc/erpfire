@@ -41,7 +41,7 @@
           <td>{{x.fields.lastname}} {{x.fields.firstname}}</td>
           <td>{{x.fields.charge.fields.cargos}}</td>
           <td>
-            <a href="#!assistance" ng-click="vm.openAssistance()" class="grey-text text-darken-2">
+            <a href="#!assistance" ng-click="vm.openAssistance(x)" class="grey-text text-darken-2">
               <i class="fa fa-calendar"></i></a>
           </td>
         </tr>
@@ -52,7 +52,12 @@
   <!-- modals -->
   <div id="modal1" class="modal modal-fixed-footer">
     <div class="modal-content">
-      <strong>REGISTRAR ASISTENCIA</strong>
+      {% verbatim %}
+      <strong>
+        REGISTRAR ASISTENCIA: {{vm.assistance.name}} -
+        <small>{{vm.assistance.dni}}</small>
+      </strong>
+      {% endverbatim %}
       <div class="row">
         <div class="col l12 m12 s12">
           <label for="project">Proyecto</label>
@@ -62,26 +67,26 @@
           <a href="#!refresh" class="right" ng-click="vm.listProject()"><i class="fa fa-refresh"></i></a>
         </div>
         <div class="col l12 m12 s12">
-          <label for="types">Tipo de Empleado</label>
+          <label for="types">Tipo de Asistencia</label>
           <select class="browser-default" id="types" ng-model="vm.assistance.type" ng-options="x.pk as x.fields.description for x in vm.ltypes" readonly="True">
             <option value="">-- SELECCIONE OBLIGATORIO --</option>
           </select>
           <a href="#!refresh" class="right" ng-click="vm.listtype()"><i class="fa fa-refresh"></i></a>
         </div>
         <div class="input-field col l6 m6 s12">
-          <input type="text" maxlength="5" formattime ng-model="vm.assistance.in" placeholder="00:00"  id="hin">
+          <input type="text" maxlength="5" formattime ng-model="vm.assistance.hin" placeholder="00:00"  id="hin">
           <label for="hin">Hora Entrada</label>
         </div>
         <div class="input-field col l6 m6 s12">
-          <input type="text" maxlength="5" formattime ng-model="vm.assistance.inbr" placeholder="00:00"  id="hinbr">
+          <input type="text" maxlength="5" formattime ng-model="vm.assistance.hinb" placeholder="00:00"  id="hinbr">
           <label for="hinbr">Inicio Receso</label>
         </div>
         <div class="input-field col l6 m6 s12">
-          <input type="text" maxlength="5" formattime ng-model="vm.assistance.outbr" placeholder="00:00"  id="houtbr">
+          <input type="text" maxlength="5" formattime ng-model="vm.assistance.houtb" placeholder="00:00"  id="houtbr">
           <label for="houtbr">Fin Receso</label>
         </div>
         <div class="input-field col l6 m6 s12">
-          <input type="text" maxlength="5" formattime ng-model="vm.assistance.out" placeholder="00:00"  id="hout">
+          <input type="text" maxlength="5" formattime ng-model="vm.assistance.hout" placeholder="00:00"  id="hout">
           <label for="hout">Hora Salida</label>
         </div>
         <div class="input-field col l6 m6 s12">
@@ -89,13 +94,13 @@
           <label for="today">Fecha</label>
         </div>
         <div class="input-field col l6 m6 s12">
-          <input type="number" min="0" class="right-align">
+          <input type="number" min="0" class="right-align" placeholder="0" ng-model="vm.assistance.viatical">
           <label for="">Viaticos</label>
         </div>
       </div><!-- end row -->
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn blue">
+      <button type="button" class="btn blue" ng-click="vm.saveAssistance()">
         <i class="fa fa-floppy-o"></i>
         <span class="hide-on-small-only">GUARDAR</span>
       </button>

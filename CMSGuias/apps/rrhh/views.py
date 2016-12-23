@@ -2,7 +2,8 @@
 #-*- conding: utf-8 -*-
 
 import json
-
+import time
+from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
@@ -117,3 +118,35 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
             return  render(request, self.template_name, kwargs)
         except TemplateDoesNotExist as ext:
             raise Http404(ext)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            try:
+                if 'saveAssistance' in request.POST:
+                    def register():
+                        obj = Assistance()
+                        obj.project_id = kwargs['project'] if '' in kwargs['']
+                        obj.save()
+                    proj = kwargs['project']
+                    exists = None
+                    if proj != '' or proj is None:
+                        exists = Assistance.objects.filter(
+                            assistance=kwargs['date'], employee_id=kwargs['dni'], project_id=proj)
+                    else:
+                        exists = Assistance.objects.filter(
+                            assistance=kwargs['date'],
+                            employee_id=kwargs['dni'])
+                    if len(exists):
+                        obj = exists.latest('register')
+                        hourin = time.strptime(kwargs['hin'], '%H:%M')
+                        if hourin <= obj.hourin:
+                            kwargs['raise'] = 'No se puede por que la hora ingresada '\
+                                'es menor a una ya ingresada para esta fecha'
+                        else:
+                            pass
+                    kwargs['status'] = True
+            except ObjectDoesNotExist as oex:
+                kwargs['status'] = False
+                kwargs['raise'] = str(oex)
+            return self.render_to_json_response(kwargs)

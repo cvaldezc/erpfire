@@ -20,19 +20,20 @@ class TypesEmployee(models.Model):
     class Meta:
         ordering = ['-register']
 
-    # def __unicode__(self):
-    #     return '%s' % (self)
+    def __unicode__(self):
+        return '%s' % (self)
 
 
 class Assistance(models.Model):
+    userregister = models.ForeignKey(Employee, related_name='EmployeeRegister')
     employee = models.ForeignKey(Employee, related_name='AssistanceEmployee')
     project = models.ForeignKey(Proyecto, related_name='AssistanceProject', null=True)
     stsemp = models.ForeignKey(TypesEmployee, related_name='AssistanceTypeEmpployee')
     register = models.DateTimeField(auto_now_add=True)
-    asisstance = models.DateField(null=False)
+    assistance = models.DateField(null=False)
     hourin = models.TimeField(null=False, default='00:00:00')
-    houroutbreak = models.TimeField(null=False, default='00:00:00')
     hourinbreak = models.TimeField(null=False, default='00:00:00')
+    houroutbreak = models.TimeField(null=False, default='00:00:00')
     hourout = models.TimeField(null=False, default='00:00:00')
     hextfirst = models.DecimalField(max_digits=3, decimal_places=1, default=0)
     hextsecond = models.DecimalField(max_digits=3, decimal_places=1, default=0)
@@ -43,8 +44,8 @@ class Assistance(models.Model):
     class Meta:
         ordering = ['-register']
 
-    # def __unicode__(self):
-    #     return '%s' % (self)
+    def __unicode__(self):
+        return '%s' % (self)
 
 # INSERT INTO public.almacen_nipleguiaremision(
 #     guia_id, materiales_id, metrado, cantguide, tipo, flag, brand_id, model_id, related, order_id)

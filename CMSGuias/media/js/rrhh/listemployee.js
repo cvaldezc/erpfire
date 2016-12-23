@@ -1,6 +1,8 @@
 (function() {
   var app, cpFactory, ctrlList;
   cpFactory = function($http, $cookies) {
+    $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+    $http.defaults.headers.post['Content-Type'] = 'application/x-www-urlencoded';
     return {
       get: function(options) {
         if (options == null) {
@@ -8,6 +10,27 @@
         }
         return $http.get("", {
           params: options
+        });
+      },
+      post: function(options) {
+        var fd;
+        if (options == null) {
+          options = {};
+        }
+        fd = function() {
+          var form, k, v;
+          form = new FormData();
+          for (k in options) {
+            v = options[k];
+            form.append(k, v);
+          }
+          return form;
+        };
+        return $http.post("", fd(), {
+          transformRequest: angular.identity,
+          headers: {
+            'Content-Type': void 0
+          }
         });
       }
     };
@@ -18,7 +41,7 @@
     vm.order = 'fields.lastname';
     vm.lprojects = [];
     vm.assistance = {
-      project: '-',
+      project: null,
       type: ''
     };
     angular.element(document).ready(function() {
@@ -90,8 +113,80 @@
         }
       });
     };
-    vm.openAssistance = function() {
+    vm.openAssistance = function(obj) {
+      vm.assistance.name = obj.fields.lastname + " " + obj.fields.firstname;
+      vm.assistance.dni = obj.pk;
       angular.element("#modal1").modal('open');
+    };
+    vm.saveAssistance = function() {
+      var prms;
+      if (vm.assistance.type === null) {
+        Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe seleccionar un tipo de asistencia", 4000);
+        return false;
+      }
+      if (vm.assistance.hasOwnProperty('hin')) {
+        switch (vm.assistance.hin) {
+          case '00:00':
+          case null:
+          case '':
+            Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de entrada!", 4000);
+            return false;
+        }
+      } else {
+        Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de entrada!", 4000);
+        return false;
+      }
+      if (vm.assistance.hasOwnProperty('hout')) {
+        switch (vm.assistance.hout) {
+          case '00:00':
+          case null:
+          case '':
+            Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de Salida!", 4000);
+            return false;
+        }
+      } else {
+        Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de Salida!", 4000);
+        return false;
+      }
+      if (!vm.assistance.hasOwnProperty('hinb')) {
+        vm.assistance.hinb = '00:00';
+      }
+      if (!vm.assistance.hasOwnProperty('houtb')) {
+        vm.assistance.houtb = '00:00';
+      }
+      if (!vm.assistance.hasOwnProperty('viatical')) {
+        vm.assistance.viatical = 0;
+      } else {
+        switch (vm.assistance.viatical) {
+          case '':
+          case void 0:
+          case null:
+            vm.assistance.viatical = 0;
+        }
+      }
+      prms = vm.assistance;
+      switch (prms['project']) {
+        case null:
+        case void 0:
+        case '':
+          prms['project'] = '';
+      }
+      prms['saveAssistance'] = true;
+      console.info(prms);
+      cpFactory.post(prms).success(function(response) {
+        if (response.status) {
+          Materialize.toast("<i class='fa fa-check fa-lg green-text'></i>&nbsp;Asistencia Registrada!");
+          vm.assistance = {
+            'dni': '',
+            'name': '',
+            'hin': '',
+            'hout': ''
+          };
+          angular.element("#modal1").modal('close');
+        } else {
+          Materialize.toast("<i class='fa fa-times fa-lg red-text'></i>&nbsp;Error: " + response.rasie, 4000);
+        }
+      });
     };
     $scope.$watch('vm.assistance.project', function(nw, old) {
       var tp;
@@ -106,7 +201,7 @@
     });
     $scope.$watch('vm.assistance.type', function(nw, old) {
       if (nw === 'TY01' && vm.assistance.project === null) {
-        vm.assistance;
+        vm.assistance.type = null;
       }
     });
   };
