@@ -989,6 +989,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     valid = True
                     try:
                         vdm = DSMetradoTemp.objects.get(
+                            dsector_id=kwargs['area'],
                             materials_id=request.POST['materials'],
                             brand_id=request.POST['obrand'],
                             model_id=request.POST['omodel'],
@@ -1025,6 +1026,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                 qtt = diff
                         try:
                             dsmt = DSMetradoTemp.objects.get(
+                                dsector_id=kwargs['area'],
                                 materials_id=request.POST['materials'],
                                 brand_id=request.POST['brand'],
                                 model_id=request.POST['model'],
@@ -1060,6 +1062,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     valid = True
                     try:
                         vdm = DSMetradoTemp.objects.get(
+                            dsector_id=kwargs['area'],
                             materials_id=request.POST['materials'],
                             brand_id=request.POST['obrand'],
                             model_id=request.POST['omodel'],
