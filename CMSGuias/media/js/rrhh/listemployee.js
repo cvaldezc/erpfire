@@ -213,6 +213,7 @@
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
   });
   app.directive('formattime', valFormatTime);
+  app.directive('valminandmax', valMinandMax);
   app.factory('cpFactory', cpFactory);
   cpFactory.inject = ['$http', '$cookies'];
   app.controller('ctrlList', ctrlList);

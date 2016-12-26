@@ -125,9 +125,18 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
             try:
                 if 'saveAssistance' in request.POST:
                     proj = kwargs['project']
-                    def register():
+                    def registerassistance():
+                        """this function register assistance"""
                         obj = Assistance()
+                        obj.userregister_id = request.get_profile().empdni_id
                         obj.project_id = proj if proj != '' else None
+                        obj.types = request.POST['type']
+                        obj.assistance = request.POST['date']
+                        obj.hourin = ''
+                        obj.hourout = ''
+                        obj.hourinbreak = ''
+                        obj.houroutbreak = ''
+                        obj.tag = True
                         obj.save()
                     exists = None
                     if proj != '' or proj is None:
@@ -135,16 +144,18 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
                             assistance=kwargs['date'], employee_id=kwargs['dni'], project_id=proj)
                     else:
                         exists = Assistance.objects.filter(
-                            assistance=kwargs['date'],
-                            employee_id=kwargs['dni'])
+                            assistance=kwargs['date'], employee_id=kwargs['dni'])
                     if len(exists):
                         obj = exists.latest('register')
                         hourin = time.strptime(kwargs['hin'], '%H:%M')
                         if hourin <= obj.hourin:
                             kwargs['raise'] = 'No se puede por que la hora ingresada '\
                                 'es menor a una ya ingresada para esta fecha'
+                            kwargs['status'] = False
                         else:
-                            pass
+                            registerassistance()
+                    if 'status' in kwargs:
+                        pass
                     kwargs['status'] = True
             except ObjectDoesNotExist as oex:
                 kwargs['status'] = False

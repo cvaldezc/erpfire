@@ -163,6 +163,7 @@ do ->
     return
 
   app.directive 'formattime', valFormatTime
+  app.directive 'valminandmax', valMinandMax
 
   app.factory 'cpFactory', cpFactory
   cpFactory.inject = [

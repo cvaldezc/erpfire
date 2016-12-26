@@ -28,7 +28,7 @@ class Assistance(models.Model):
     userregister = models.ForeignKey(Employee, related_name='EmployeeRegister')
     employee = models.ForeignKey(Employee, related_name='AssistanceEmployee')
     project = models.ForeignKey(Proyecto, related_name='AssistanceProject', null=True)
-    stsemp = models.ForeignKey(TypesEmployee, related_name='AssistanceTypeEmpployee')
+    types = models.ForeignKey(TypesEmployee, related_name='AssistanceTypeEmpployee')
     register = models.DateTimeField(auto_now_add=True)
     assistance = models.DateField(null=False)
     hourin = models.TimeField(null=False, default='00:00:00')

@@ -15,7 +15,6 @@ valMinandMax = function() {
         if (vcurrent === '' || vcurrent === void 0) {
           valid = false;
         }
-        console.log(valid, vcurrent);
         if (valid) {
           vcurrent = parseFloat(vcurrent);
           min = parseFloat(attrs.min);

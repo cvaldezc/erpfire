@@ -13,7 +13,7 @@ valMinandMax = ->
       vcurrent = element.val()
       if vcurrent is '' or vcurrent is undefined
         valid = false
-      console.log valid, vcurrent
+      # console.log valid, vcurrent
       if valid
         vcurrent = parseFloat vcurrent
         min = parseFloat attrs.min
@@ -44,7 +44,7 @@ valMinandMax = ->
           console.log "change attr"
           return
     return
-
+# directive format time
 valFormatTime = ->
   restrict: 'AE'
   require: '?ngModel'
