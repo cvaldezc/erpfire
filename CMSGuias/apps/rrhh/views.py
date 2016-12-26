@@ -124,11 +124,11 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
         if request.is_ajax():
             try:
                 if 'saveAssistance' in request.POST:
+                    proj = kwargs['project']
                     def register():
                         obj = Assistance()
-                        obj.project_id = kwargs['project'] if '' in kwargs['']
+                        obj.project_id = proj if proj != '' else None
                         obj.save()
-                    proj = kwargs['project']
                     exists = None
                     if proj != '' or proj is None:
                         exists = Assistance.objects.filter(
