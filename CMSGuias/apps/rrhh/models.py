@@ -37,6 +37,7 @@ class Assistance(models.Model):
     hourout = models.TimeField(null=False, default='00:00:00')
     hextfirst = models.DecimalField(max_digits=3, decimal_places=1, default=0)
     hextsecond = models.DecimalField(max_digits=3, decimal_places=1, default=0)
+    hwork = models.DecimalField(max_digits=3, decimal_places=1)
     tag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
