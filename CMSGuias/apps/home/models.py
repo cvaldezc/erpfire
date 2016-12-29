@@ -484,8 +484,8 @@ class LogSys(models.Model):
 
 class EmployeeSettings(models.Model):
     register = models.DateTimeField(auto_now_add=True)
-    hextperfirst = models.DecimalField(max_digits=3, decimal_places=2, default=0)
-    hextpersecond = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    hextperfirst = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    hextpersecond = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     ngratification = models.SmallIntegerField(default=2)
     ncts = models.SmallIntegerField(default=1)
     pergratification = models.DecimalField(max_digits=5, decimal_places=2)
@@ -498,4 +498,4 @@ class EmployeeSettings(models.Model):
     audit_log = AuditLog()
 
     def __unicode__(self):
-        return self
+        return '%s %s %s' % (self.register, self.totalhour, self.flag)

@@ -4,6 +4,8 @@
 import json
 import time
 from datetime import datetime
+from decimal import Decimal
+
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,7 +17,7 @@ from django.template import TemplateDoesNotExist
 from django.views.generic import TemplateView
 
 from .models import Assistance, TypesEmployee
-from ..home.models import Employee
+from ..home.models import Employee, EmployeeSettings
 from ..ventas.models import Proyecto
 from ..tools.genkeys import TypesEmployeeKeys
 
@@ -132,10 +134,10 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
                         obj.project_id = proj if proj != '' else None
                         obj.types = request.POST['type']
                         obj.assistance = request.POST['date']
-                        obj.hourin = ''
-                        obj.hourout = ''
-                        obj.hourinbreak = ''
-                        obj.houroutbreak = ''
+                        obj.hourin = request.POST['hin']
+                        obj.hourout = request.POST['hout']
+                        obj.hourinbreak = request.POST['hinb']
+                        obj.houroutbreak = request.POST['houtb']
                         obj.tag = True
                         obj.save()
                     exists = None
@@ -160,4 +162,59 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
             except ObjectDoesNotExist as oex:
                 kwargs['status'] = False
                 kwargs['raise'] = str(oex)
+            return self.render_to_json_response(kwargs)
+
+
+# mantenice settings asisstance
+class EmployeeAsisstanceView(JSONResponseMixin, TemplateView):
+
+    template_name = 'rrhh/mantenice.html'
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    if 'getsettings' in request.GET:
+                        kwargs['settings'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                EmployeeSettings.objects.filter(flag=True)
+                            )
+                        )
+                        kwargs['status'] = True
+                except ObjectDoesNotExist as exo:
+                    kwargs['raise'] = str(exo)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+            return render(request, self.template_name, kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        print request.is_ajax()
+        if request.is_ajax():
+            try:
+                print request.POST
+                if 'savesettings' in request.POST:
+                    EmployeeSettings.objects.filter(flag=True).update(flag=False)
+                    print 'before declare'
+                    emp = EmployeeSettings()
+                    print 'declare'
+                    print request.POST['hextperfirst'], type(request.POST['hextperfirst'])
+                    emp.hextperfirst = Decimal(request.POST['hextperfirst']).quantize(Decimal('0.1'))
+                    emp.hextpersecond = Decimal(request.POST['hextpersecond']).quantize(Decimal('0.1'))
+                    emp.ngratification = request.POST['ngratification']
+                    emp.ncts = request.POST['ncts']
+                    emp.pergratification = Decimal(request.POST['pergratification']).quantize(Decimal('0.1'))
+                    emp.starthourextra = request.POST['starthourextra']
+                    emp.starthourextratwo = request.POST['starthourextratwo']
+                    emp.totalhour = request.POST['totalhour']
+                    emp.timeround = request.POST['timeround']
+                    emp.save()
+                    kwargs['status'] = True
+            except ObjectDoesNotExist as oex:
+                kwargs['raise'] = str(oex)
+                kwargs['status'] = False
             return self.render_to_json_response(kwargs)

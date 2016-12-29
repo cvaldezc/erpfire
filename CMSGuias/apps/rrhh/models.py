@@ -20,8 +20,8 @@ class TypesEmployee(models.Model):
     class Meta:
         ordering = ['-register']
 
-    def __unicode__(self):
-        return '%s' % (self)
+    # def __unicode__(self):
+    #     return '%s' % (self)
 
 
 class Assistance(models.Model):
@@ -46,7 +46,7 @@ class Assistance(models.Model):
         ordering = ['-register']
 
     def __unicode__(self):
-        return '%s' % (self)
+        return '%s %s %s %s' % (self.register, self.employee, self.assistance, self.tag)
 
 # INSERT INTO public.almacen_nipleguiaremision(
 #     guia_id, materiales_id, metrado, cantguide, tipo, flag, brand_id, model_id, related, order_id)

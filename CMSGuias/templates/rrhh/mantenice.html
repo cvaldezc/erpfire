@@ -1,0 +1,76 @@
+{% extends "basemd.html" %}
+{% block title %}
+    Mantenice
+{% endblock title %}
+{% block menu %}
+    {% include "menus/salesmd.html" %}
+{% endblock menu %}
+{% block content %}
+<section ng-app="manApp" ng-controller="ctrl as vm">
+    <header>
+        <h4>Configuración de Empleado</h4>
+    </header>
+    <nav class="card">
+        <aside class="card-action">
+            <button type="button" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-2">
+                <i class="fa fa-mail-reply"></i>
+                <span class="hide-on-small-only">REGRESAR</span>
+            </button>
+            <button type="button" class="waves-affect waves-light btn right" ng-click="vm.saveSettings()">
+                <i class="fa fa-floppy-o"></i>
+                <span class="hide-on-small-only">GUARDAR</span>
+            </button>
+        </aside>
+    </nav>
+    <aside class="card-panel">
+        <div class="row">
+            <div class="input-field col l6 m6 s12">
+                {% verbatim %}
+                <input type="text" id="register" readonly="true" value="{{ vm.settings.register }}">
+                <label for="register">Registrado</label>
+                {% endverbatim %}
+            </div>
+            <div class="input-field col l6 m6 s12">
+                <input type="number" id="perfirsthour" step="0.1" ng-model="vm.settings.hextperfirst">
+                <label for="perfirsthour">Porcentaje Primeras Horas Extra</label>
+            </div>
+            <div class="input-field col l6 m6 s12">
+                <input type="number" id="persecondhour" step="0.1" ng-model="vm.settings.hextpersecond">
+                <label for="persecondhour">Porcentaje Segunda Hora Extra</label>
+            </div>
+            <div class="input-field col l6 m6 s12">
+                <input type="number" id="pergratification" step="0.1" ng-model="vm.settings.pergratification">
+                <label for="pergratification">Porcentaje Gratificación</label>
+            </div>
+            <div class="input-field col l6 m6 s12">
+                <input type="number" id="ngratification" ng-model="vm.settings.ngratification">
+                <label for="">Nro de Gratificaciones</label>
+            </div>
+            <div class="input-field col l6 m6 s12">
+                <input type="number" id="ncts" ng-model="vm.settings.ncts">
+                <label for="ncts">Nro de CTS</label>
+            </div>
+            <div class="input-field col l6 m6 s12">
+                <input type="text" id="inhour" maxlength="6" placeholder="09:00" ng-model="vm.settings.starthourextra">
+                <label for="inhour">Hora de Inicio Primera Hora Extra</label>
+            </div>
+            <div class="input-field col l6 m6 s12">
+                <input type="text" id="twohour" maxlength="6" placeholder="12:00" ng-model="vm.settings.starthourextratwo">
+                <label for="twohour">Hora de Inicio Segunda Hora Extra</label>
+            </div>
+            <div class="input-field col l6 m6 s12">
+                <input type="text" maxlength="6" id="twork" placeholder="08:00" ng-model="vm.settings.totalhour">
+                <label for="twork">Total Hora al Día</label>
+            </div>
+            <div class="input-field col l6 m6 s12">
+                <input type="text" id="hround" placeholder="00:30" ng-model="vm.settings.timeround">
+                <label for="hround">Redondeo de Horas</label>
+            </div>
+        </div>
+    </aside>
+</section>
+<!-- Scripts -->
+<script defer src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/rrhh/mantenice.js"></script>
+{% endblock content %}
