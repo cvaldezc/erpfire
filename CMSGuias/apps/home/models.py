@@ -487,10 +487,13 @@ class EmployeeSettings(models.Model):
     hextperfirst = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     hextpersecond = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     ngratification = models.SmallIntegerField(default=2)
-    pergratification = models.DecimalField(max_digits=5, decimal_places=2)
     ncts = models.SmallIntegerField(default=1)
-    starthourextra = models.DecimalField(max_digits=3, decimal_places=1)
-    totalhours = models.DecimalField(max_digits=3, decimal_places=1)
+    pergratification = models.DecimalField(max_digits=5, decimal_places=2)
+    starthourextra = models.TimeField(default='09:00:00')
+    starthourextratwo = models.TimeField(default='12:00:00')
+    totalhour = models.TimeField(default='08:30:00')
+    timeround = models.TimeField(default='00:30:00')
+    flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
 
