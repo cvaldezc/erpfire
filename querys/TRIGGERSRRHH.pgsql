@@ -3,28 +3,32 @@
 */
 -- FUNCTION TRIGGERs
 -- CALCULATION HOURS EXTRA
-CREATE OR REPLACE FUNCTION proc_calculatehourextra
+CREATE OR REPLACE FUNCTION proc_calculatehourextra()
     RETURNS TRIGGER AS
 $BODY$
 DECLARE
-    inbreak NUMMERIC(2, 1) := 0;
+    inbreak NUMERIC(2, 1) := 0;
     break TIME;
     ndate DATE;
     diff TIME;
     thours NUMERIC(3, 1) := 0;
     config RECORD;
-    first TIME;
-    second TIME:
+    firsttime TIME;
+    secondtime TIME;
+    fvalid BOOLEAN := FALSE;
 BEGIN
     IF NEW.hourin NOTNULL AND NEW.hourout NOTNULL THEN
         -- CALCULATION HOUR BREAK
         IF NEW.hourinbreak NOTNULL AND NEW.houroutbreak NOTNULL THEN
-            break := (NEW.houroutbreak - NEW hourinbreak);
-            inbreak := EXTRACT('hour' FROM break);
+            break := (NEW.houroutbreak - NEW.hourinbreak);
+            inbreak := EXTRACT('hour' FROM break)::NUMERIC;
+            RAISE WARNING 'HERE IF DISCOUNT HOUR BREAK';
             IF inbreak <= 0 THEN
                 inbreak := 1;
             END IF; 
         END IF;
+        -- GET DATA CONFIGURATION
+        SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
         -- EVALUATE IF HOUR OUT IS FOR NEXT DAY
         IF NEW.hourout < NEW.hourin THEN
             ndate := (NEW.asisstance::DATE + 1);
@@ -33,28 +37,40 @@ BEGIN
             diff := (NEW.hourout::TIME - NEW.hourin::TIME);
         END IF;
         -- DISCOUNT HOUR BREAK
-        IF inbreak > 0 THEN
+        IF inbreak > 0 AND diff >= config.totalhour THEN
             diff := (diff - (to_char(inbreak, '00":00:00"'))::TIME);
         END IF;
-        -- GET DATA CONFIGURATION
-        SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
         -- thours := EXTRACT('hour' from diff)::NUMERIC;
-        IF diff >= config.starthourextratwo THEN
-            second := (diff - config.starthourextratwo);
-            NEW.hextsecond := (EXTRACT('hour' FROM second))::NUMERIC;
+        IF diff::TIME >= config.starthourextratwo::TIME THEN
+        	RAISE WARNING 'INSIDE HOURS SECONDTIME EXTRA';
+            secondtime := (diff - config.starthourextratwo::TIME);
+            NEW.hextsecond := (EXTRACT('hour' FROM secondtime))::NUMERIC;
+            RAISE WARNING 'ADDITIONAL SECONDTIME % %', secondtime, NEW.hextsecond;
             -- HERE VERIFY MINUTES ROUND IF MINUTES GREAT VAL ROUND
             -- IF THEN
             -- END IF;
-            first := (config.starthourextratwo - config.starthourxtra);
-            NEW.hextfirst := (EXTRACT('hour' FROM first))::NUMERIC
+            firsttime := (config.starthourextratwo::TIME - config.starthourextra::TIME);
+            NEW.hextfirst := (EXTRACT('hour' FROM firsttime))::NUMERIC;
+            RAISE WARNING 'ADDITIONAL FIRSTTIME % %', firsttime, NEW.hextfirst;
+            diff := (config.totalhour);
+            fvalid := TRUE;
         ELSE
             NEW.hextsecond := 0;
         END IF;
-        IF diff >= config.starthourextra and diff < config.starthourextratwo THEN
-            first := (diff - config.starthourextra);
-            NEW.hextfirst := (EXTRACT('hour' FROM first))::NUMERIC
+        IF NOT fvalid THEN
+            IF diff::TIME >= config.starthourextra::TIME AND diff::TIME < config.starthourextratwo::TIME THEN
+                RAISE WARNING 'INSIDE HOURS FIRST EXTRA';
+                firsttime := (diff - config.starthourextra::TIME);
+                NEW.hextfirst := (EXTRACT('hour' FROM firsttime))::NUMERIC;
+                diff := (config.totalhour);
+            ELSE
+                NEW.hextfirst := 0;
+            END IF;
         END IF;
-        NEW.hwork := (EXTRACT('hour' from diff)) + (EXTRACT('minutes' from diff) / 60);
+        thours := ((EXTRACT('hour' from diff))::NUMERIC + (EXTRACT('minutes' from diff) / 60)::NUMERIC);
+        RAISE WARNING 'HERE twork %', thours;
+        NEW.hwork := thours;
+        -- RAISE WARNING '[AUDIT.IF_MODIFIED_FUNC] - Other action occurred: %, at %',TG_OP,now();
         RETURN NEW;
         -- REQUERIMENTS
         -- INITIALIZE WITH NEXT PARAMETERS
@@ -70,16 +86,19 @@ BEGIN
     END IF;
 EXCEPTION
     WHEN OTHERS THEN
-        RAISE INFO 'ERROR SQLEXCEPTION %', SQLERRM;
+        RAISE WARNING 'ERROR SQLEXCEPTION %', SQLERRM;
         ROLLBACK;
         RETURN NULL;
 END;
 $BODY$
-LANGUAGE PLPGSQL VOLATILE
+LANGUAGE plpgsql VOLATILE
 COST 100;
 
--- EXECUTE TRIGGERs
 
+-- EXECUTE TRIGGERs
+CREATE TRIGGER calc_hours_works
+BEFORE INSERT OR UPDATE ON rrhh_assistance
+FOR EACH ROW EXECUTE PROCEDURE proc_calculatehourextra();
 /* TEST TIMEs */
 -- SELECT DATE '2016-12-28' + DATE '2016-12-31';
 -- SELECT EXTRACT('hour' from '17:30:00'::TIME - '08:00:00'::TIME);

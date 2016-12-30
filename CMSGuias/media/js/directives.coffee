@@ -66,3 +66,12 @@ valFormatTime = ->
       # console.info scope
       return
     return
+# directive set convert number
+convertToNumber = ->
+  restrict: 'AE'
+  require: '?ngModel'
+  scope: '@'
+  link: (scope, element, attrs, ngModel) ->
+    ngModel.$formatters.push (value) ->
+      parseFloat value
+    return

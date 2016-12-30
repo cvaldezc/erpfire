@@ -126,13 +126,16 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
         if request.is_ajax():
             try:
                 if 'saveAssistance' in request.POST:
-                    proj = kwargs['project']
+                    # print request.POST
+                    proj = request.POST['project'] if 'project' in request.POST else ''
+                    proj = '' if proj == 'null' else proj
                     def registerassistance():
                         """this function register assistance"""
                         obj = Assistance()
-                        obj.userregister_id = request.get_profile().empdni_id
+                        obj.userregister_id = request.user.get_profile().empdni_id
+                        obj.employee_id = request.POST['dni']
                         obj.project_id = proj if proj != '' else None
-                        obj.types = request.POST['type']
+                        obj.types_id = request.POST['type']
                         obj.assistance = request.POST['date']
                         obj.hourin = request.POST['hin']
                         obj.hourout = request.POST['hout']
@@ -143,22 +146,28 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
                     exists = None
                     if proj != '' or proj is None:
                         exists = Assistance.objects.filter(
-                            assistance=kwargs['date'], employee_id=kwargs['dni'], project_id=proj)
+                            assistance=request.POST['date'],
+                            employee_id=request.POST['dni'], project_id=proj)
                     else:
                         exists = Assistance.objects.filter(
-                            assistance=kwargs['date'], employee_id=kwargs['dni'])
+                            assistance=request.POST['date'], employee_id=request.POST['dni'])
                     if len(exists):
                         obj = exists.latest('register')
-                        hourin = time.strptime(kwargs['hin'], '%H:%M')
-                        if hourin <= obj.hourin:
+                        hourin = request.POST['hin']
+                        # print 'OBJECT ', type(obj.hourin), obj.hourin
+                        inh = datetime.strptime(hourin, '%H:%M', ).time()
+                        print type(inh), inh
+                        print type(hourin), hourin
+                        if inh <= obj.hourin:
                             kwargs['raise'] = 'No se puede por que la hora ingresada '\
                                 'es menor a una ya ingresada para esta fecha'
                             kwargs['status'] = False
                         else:
                             registerassistance()
-                    if 'status' in kwargs:
-                        pass
-                    kwargs['status'] = True
+                    else:
+                        registerassistance()
+                    if 'status' not in kwargs:
+                        kwargs['status'] = True
             except ObjectDoesNotExist as oex:
                 kwargs['status'] = False
                 kwargs['raise'] = str(oex)

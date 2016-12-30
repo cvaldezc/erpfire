@@ -16,7 +16,7 @@
                 <i class="fa fa-mail-reply"></i>
                 <span class="hide-on-small-only">REGRESAR</span>
             </button>
-            <button type="button" class="waves-affect waves-light btn right" ng-click="vm.saveSettings()">
+            <button type="button" class="waves-affect waves-light btn right red" ng-click="vm.saveSettings()">
                 <i class="fa fa-floppy-o"></i>
                 <span class="hide-on-small-only">GUARDAR</span>
             </button>
@@ -26,29 +26,29 @@
         <div class="row">
             <div class="input-field col l6 m6 s12">
                 {% verbatim %}
-                <input type="text" id="register" readonly="true" value="{{ vm.settings.register }}">
-                <label for="register">Registrado</label>
+                <input type="text" id="register" readonly="true" value="{{ vm.settings.register | date:'yyyy-MM-dd H:mm:ss' }}">
+                <label for="register" ng-class="{'active': vm.settings.register != undefined}">Registrado</label>
                 {% endverbatim %}
             </div>
             <div class="input-field col l6 m6 s12">
-                <input type="number" id="perfirsthour" step="0.1" ng-model="vm.settings.hextperfirst">
-                <label for="perfirsthour">Porcentaje Primeras Horas Extra</label>
+                <input type="number" id="perfirsthour" step="0.1" ng-model="vm.settings.hextperfirst" string-to-number>
+                <label for="perfirsthour" ng-class="{'active': vm.settings.hextperfirst != undefined}">Porcentaje Primeras Horas Extra</label>
             </div>
             <div class="input-field col l6 m6 s12">
-                <input type="number" id="persecondhour" step="0.1" ng-model="vm.settings.hextpersecond">
-                <label for="persecondhour">Porcentaje Segunda Hora Extra</label>
+                <input type="number" id="persecondhour" step="0.1" ng-model="vm.settings.hextpersecond" string-to-number>
+                <label for="persecondhour" ng-class="{'active': vm.settings.hextpersecond != undefined}">Porcentaje Segunda Hora Extra</label>
             </div>
             <div class="input-field col l6 m6 s12">
-                <input type="number" id="pergratification" step="0.1" ng-model="vm.settings.pergratification">
-                <label for="pergratification">Porcentaje Gratificación</label>
+                <input type="number" id="pergratification" step="0.1" ng-model="vm.settings.pergratification" string-to-number>
+                <label for="pergratification" ng-class="{'active': vm.settings.pergratification != undefined}">Porcentaje Gratificación</label>
             </div>
             <div class="input-field col l6 m6 s12">
                 <input type="number" id="ngratification" ng-model="vm.settings.ngratification">
-                <label for="">Nro de Gratificaciones</label>
+                <label for="ngratification" ng-class="{'active': vm.settings.ngratification != undefined}">Nro de Gratificaciones</label>
             </div>
             <div class="input-field col l6 m6 s12">
                 <input type="number" id="ncts" ng-model="vm.settings.ncts">
-                <label for="ncts">Nro de CTS</label>
+                <label for="ncts" ng-class="{'active': vm.settings.ncts != undefined}">Nro de CTS</label>
             </div>
             <div class="input-field col l6 m6 s12">
                 <input type="text" id="inhour" maxlength="6" placeholder="09:00" ng-model="vm.settings.starthourextra">
@@ -72,5 +72,6 @@
 <!-- Scripts -->
 <script defer src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
 <script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/directives.js"></script>
 <script defer src="{{ MEDIA_URL }}js/rrhh/mantenice.js"></script>
 {% endblock content %}

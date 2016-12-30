@@ -31,6 +31,9 @@ do ->
       .success (response) ->
         if response.status
           vm.settings = response.settings[0].fields
+          # vm.settings.hextperfirst = parseFloat vm.settings.hextperfirst
+          # vm.settings.hextpersecond = parseFloat vm.settings.hextpersecond
+          # vm.settings.pergratification = parseFloat vm.settings.pergratification
           return
         else
           console.log "Error: #{response.raise}"
@@ -59,6 +62,8 @@ do ->
     $httpProvider.defaults.xsrfCookieName = 'csrftoken'
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'
     return
+
+  app.directive 'stringToNumber', convertToNumber
 
   app.factory 'cpFactory', cpFactory
   cpFactory.inject = [

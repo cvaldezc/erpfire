@@ -1,4 +1,4 @@
-var valFormatTime, valMinandMax;
+var convertToNumber, valFormatTime, valMinandMax;
 
 valMinandMax = function() {
   return {
@@ -76,6 +76,19 @@ valFormatTime = function() {
           ngModel.$setViewValue('00:00');
           ngModel.$render();
         }
+      });
+    }
+  };
+};
+
+convertToNumber = function() {
+  return {
+    restrict: 'AE',
+    require: '?ngModel',
+    scope: '@',
+    link: function(scope, element, attrs, ngModel) {
+      ngModel.$formatters.push(function(value) {
+        return parseFloat(value);
       });
     }
   };

@@ -120,20 +120,20 @@ do ->
           when '', undefined, null
             vm.assistance.viatical = 0
       prms = vm.assistance
-      switch prms['project']
-        when null, undefined, ''
-          prms['project'] = '' 
       prms['saveAssistance'] = true
       console.info prms
       cpFactory.post prms
       .success (response) ->
         if response.status
-          Materialize.toast "<i class='fa fa-check fa-lg green-text'></i>&nbsp;Asistencia Registrada!"
-          vm.assistance = 'dni':'', 'name': '', 'hin': '', 'hout': ''
+          Materialize.toast "<i class='fa fa-check fa-lg green-text'></i>&nbsp;Asistencia Registrada!", 2600
+          vm.assistance.dni = ''
+          vm.assistance.name = ''
+          vm.assistance.hin = ''
+          vm.assistance.hout = ''
           angular.element("#modal1").modal 'close'
           return
         else
-          Materialize.toast "<i class='fa fa-times fa-lg red-text'></i>&nbsp;Error: #{response.rasie}", 4000
+          Materialize.toast "<i class='fa fa-times fa-lg red-text'></i>&nbsp;Error: #{response.raise}", 8000
           return
       return
     ## ctrlList

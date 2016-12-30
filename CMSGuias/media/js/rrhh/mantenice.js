@@ -76,6 +76,7 @@
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
   });
+  app.directive('stringToNumber', convertToNumber);
   app.factory('cpFactory', cpFactory);
   cpFactory.inject = ['$http', '$cookies'];
   app.controller('ctrl', ctrl);
