@@ -20,7 +20,6 @@
             var drop;
             drop = angular.element('.dropdown-activates');
             angular.forEach(drop, function(elem, index) {
-              console.log(elem);
               elem.setAttribute('data-activates', "dropdown" + index);
             });
             drop.dropdown({
@@ -35,6 +34,7 @@
     vm.showNew = function() {
       vm.types = {
         desc: '',
+        starthour: '',
         pk: ''
       };
       angular.element("#mtypes").modal('open');
@@ -42,7 +42,8 @@
     vm.showModify = function(obj) {
       vm.types = {
         desc: obj.fields.description,
-        pk: obj.pk
+        pk: obj.pk,
+        starthour: obj.fields.starthour
       };
       angular.element("#mtypes").modal('open');
     };
@@ -59,6 +60,7 @@
         return false;
       }
       prms['desc'] = vm.types.desc;
+      prms['starthour'] = vm.types.starthour;
       if (!prms.hasOwnProperty('new')) {
         prms['modify'] = true;
         prms['pk'] = vm.types.pk;

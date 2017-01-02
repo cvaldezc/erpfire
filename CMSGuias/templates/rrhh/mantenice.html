@@ -25,20 +25,26 @@
     <aside class="card-panel">
         <div class="row">
             <div class="input-field col l6 m6 s12">
+                <label for="stype" class="active">Tipo de Proyecto</label>
+                <select class="browser-default" name="stype" id="stype" ng-model="vm.settings.codeproject" ng-options="x.pk as x.fields.description for x in vm.types">
+                    <option value="">-- SELECCIONAR --</option>
+                </select>
+            </div>
+            <div class="input-field col l6 m6 s12">
                 {% verbatim %}
                 <input type="text" id="register" readonly="true" value="{{ vm.settings.register | date:'yyyy-MM-dd H:mm:ss' }}">
                 <label for="register" ng-class="{'active': vm.settings.register != undefined}">Registrado</label>
                 {% endverbatim %}
             </div>
-            <div class="input-field col l6 m6 s12">
+            <div class="input-field col l4 m4 s12">
                 <input type="number" id="perfirsthour" step="0.1" ng-model="vm.settings.hextperfirst" string-to-number>
                 <label for="perfirsthour" ng-class="{'active': vm.settings.hextperfirst != undefined}">Porcentaje Primeras Horas Extra</label>
             </div>
-            <div class="input-field col l6 m6 s12">
+            <div class="input-field col l4 m4 s12">
                 <input type="number" id="persecondhour" step="0.1" ng-model="vm.settings.hextpersecond" string-to-number>
                 <label for="persecondhour" ng-class="{'active': vm.settings.hextpersecond != undefined}">Porcentaje Segunda Hora Extra</label>
             </div>
-            <div class="input-field col l6 m6 s12">
+            <div class="input-field col l4 m4 s12">
                 <input type="number" id="pergratification" step="0.1" ng-model="vm.settings.pergratification" string-to-number>
                 <label for="pergratification" ng-class="{'active': vm.settings.pergratification != undefined}">Porcentaje Gratificación</label>
             </div>

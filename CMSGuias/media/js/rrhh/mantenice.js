@@ -40,6 +40,7 @@
     vm = this;
     vm.settings = {};
     angular.element(document).ready(function() {
+      vm.gettypes();
       vm.getdata();
       console.info("Yes! load data.");
     });
@@ -53,6 +54,19 @@
           vm.settings = response.settings[0].fields;
         } else {
           console.log("Error: " + response.raise);
+        }
+      });
+    };
+    vm.gettypes = function() {
+      var prms;
+      prms = {
+        'gettypes': true
+      };
+      cpFactory.get(prms).success(function(response) {
+        if (response.status) {
+          vm.types = response.types;
+        } else {
+          Materialize.toast("No existen datos. " + response.raise, 3600);
         }
       });
     };

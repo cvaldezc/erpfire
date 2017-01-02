@@ -16,7 +16,7 @@ from CMSGuias.apps import operations
 class Proyecto(models.Model):
     proyecto_id = models.CharField(primary_key=True, max_length=7, null=False)
     ruccliente = models.ForeignKey(
-                    Cliente, to_field='ruccliente_id', null=True)
+        Cliente, to_field='ruccliente_id', null=True)
     nompro = models.CharField(max_length=200)
     registrado = models.DateTimeField(auto_now_add=True, null=False)
     comienzo = models.DateField(null=True)
@@ -29,23 +29,26 @@ class Proyecto(models.Model):
     obser = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=2, null=False, default='00')
     empdni = models.ForeignKey(
-            Employee, related_name='proyectoAsEmployee', null=True, blank=True)
+        Employee, related_name='proyectoAsEmployee', null=True, blank=True)
     approved = models.ForeignKey(
-            Employee, related_name='approvedAsEmployee', null=True, blank=True)
+        Employee, related_name='approvedAsEmployee', null=True, blank=True)
     currency = models.ForeignKey(
-                Moneda, to_field='moneda_id', null=True, blank=True)
+        Moneda, to_field='moneda_id', null=True, blank=True)
     exchange = models.FloatField(null=True, blank=True)
     typep = models.CharField(max_length=3, default='ACI')
     contact = models.CharField(
-                max_length=254, null=True, blank=True, default='')
+        max_length=254, null=True, blank=True, default='')
     phone = models.CharField(max_length=16, blank=True, null=True)
     email = models.EmailField(max_length=254, blank=True, null=True)
     aservices = models.DecimalField(
-                    max_digits=9,
-                    decimal_places=3,
-                    blank=True,
-                    default=0,
-                    null=False)
+        max_digits=9, decimal_places=3, blank=True, default=0, null=False)
+    servicessales = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=False, null=False, default=0)
+    handworkpurchase = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=False, null=False, default=0)
+    handworksales = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=False, null=False, default=0)
+    starthour = models.TimeField(default='07:30:00', blank=True, null=False)
     flag = models.BooleanField(default=True, null=False)
 
     audit_log = AuditLog()
@@ -56,7 +59,7 @@ class Proyecto(models.Model):
     @property
     def itemsPercent(self):
         obj = operations.models.MetProject.objects.filter(
-                proyecto_id=self.proyecto_id)
+            proyecto_id=self.proyecto_id)
         items = obj.count()
         if items:
             attend = obj.filter(tag='2').count()
@@ -72,9 +75,10 @@ class Proyecto(models.Model):
         return False
 
     def __unicode__(self):
-        return '%s %s %s' % (self.proyecto_id,
-                            unicode(self.nompro).encode('ascii', errors='ignore'),
-                            self.ruccliente_id)
+        return '%s %s %s' % (
+            self.proyecto_id,
+            unicode(self.nompro).encode('ascii', errors='ignore'),
+            self.ruccliente_id)
 
 
 class CloseProject(models.Model):

@@ -13,6 +13,7 @@ class TypesEmployee(models.Model):
     types_id = models.CharField(primary_key=True, max_length=4, default='TY00')
     register = models.DateTimeField(auto_now_add=True)
     description = models.CharField(max_length=60)
+    starthour = models.TimeField(default='08:00', null=False)
     flag = models.BooleanField(default=True, null=False)
 
     audit_log = AuditLog()
@@ -20,8 +21,8 @@ class TypesEmployee(models.Model):
     class Meta:
         ordering = ['-register']
 
-    # def __unicode__(self):
-    #     return '%s' % (self)
+    def __unicode__(self):
+        return '%s % s %s' % (self.description, self.starthour, self.flag)
 
 
 class Assistance(models.Model):
@@ -35,10 +36,6 @@ class Assistance(models.Model):
     hourinbreak = models.TimeField(null=False, default='00:00:00')
     houroutbreak = models.TimeField(null=False, default='00:00:00')
     hourout = models.TimeField(null=False, default='00:00:00')
-    hextfirst = models.DecimalField(max_digits=3, decimal_places=1, null=True)
-    hextsecond = models.DecimalField(max_digits=3, decimal_places=1, null=True)
-    hwork = models.DecimalField(max_digits=3, decimal_places=1, null=True)
-    hdelay = models.DecimalField(max_digits=3, decimal_places=1, null=True)
     flag = models.CharField(max_length=1, default='A')
     tag = models.BooleanField(default=True)
 
@@ -49,6 +46,19 @@ class Assistance(models.Model):
 
     def __unicode__(self):
         return '%s %s %s %s' % (self.register, self.employee, self.assistance, self.tag)
+
+
+class BalanceAssistance(models.Model):
+    employee = models.ForeignKey(Employee, related_name='EmployeeasRegister')
+    assistance = models.DateField(null=False)
+    hextfirst = models.DecimalField(max_digits=3, decimal_places=1, null=True)
+    hextsecond = models.DecimalField(max_digits=3, decimal_places=1, null=True)
+    hwork = models.DecimalField(max_digits=3, decimal_places=1, null=True)
+    hdelay = models.DecimalField(max_digits=3, decimal_places=1, null=True)
+    flag = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return '%s %s' % (self.employee_id, self.assistance)
 
 # INSERT INTO public.almacen_nipleguiaremision(
 #     guia_id, materiales_id, metrado, cantguide, tipo, flag, brand_id, model_id, related, order_id)

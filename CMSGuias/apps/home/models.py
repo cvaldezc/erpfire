@@ -434,7 +434,7 @@ class Company(models.Model):
     companyname = models.CharField(max_length=250)
     address = models.CharField(max_length=250)
     phone = models.CharField(
-            max_length=60, null=True, default='000-000', blank=True)
+        max_length=60, null=True, default='000-000', blank=True)
     fax = models.CharField(max_length=60, blank=True, null=True)
 
     def __unicode__(self):
@@ -490,9 +490,10 @@ class EmployeeSettings(models.Model):
     ncts = models.SmallIntegerField(default=1)
     pergratification = models.DecimalField(max_digits=5, decimal_places=2)
     starthourextra = models.TimeField(default='09:00:00')
-    starthourextratwo = models.TimeField(default='12:00:00')
+    starthourextratwo = models.TimeField(default='11:00:00')
     totalhour = models.TimeField(default='08:30:00')
     timeround = models.TimeField(default='00:30:00')
+    codeproject = models.CharField(max_length=4, default='', null=True)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()

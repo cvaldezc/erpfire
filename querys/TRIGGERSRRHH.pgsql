@@ -93,6 +93,56 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION balance_hours_assistance_fn()
+    RETURNS TRIGGER AS
+$BODY$
+DECLARE
+    xa rrhh_assistance;
+    balance RECORD;
+    config RECORD;
+    ndate DATE;
+    break TIME;
+    diff TIME;
+    thours TIME;
+BEGIN
+    FOR xa IN 
+        SELECT * FROM rrhh_assistance WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance
+    LOOP
+        -- OBTAIN SUM HOUR BREAK
+        IF (EXTRACT('hour' FROM xa.hourinbreak) + (EXTRACT('minutes' FROM xa.houroutbreak) / 60)) > 0 THEN
+            IF xa.hourinbreak NOTNULL AND xa.houroutbreak NOTNULL THEN
+                break:= (xa.hourout::TIME - xa.hourinbreak::TIME);
+            END IF;
+        ELSE
+            break := 0;
+        END IF;
+        -- OBTAIN SUM HOUR WORKED
+        IF (xa.houtin NOTNULL AND xa.hourout NOTNULL) THEN
+            IF NEW.hourout < NEW.hourin THEN
+                ndate := (NEW.asisstance::DATE + 1);
+                diff := ((ndate::CHAR || ' ' || NEW.hourout::CHAR):: TIMESTAMP - (NEW.asisstance::CHAR || ' ' || NEW.hourin::CHAR)::TIMESTAMP);
+            ELSE
+                diff := (NEW.hourout::TIME - NEW.hourin::TIME);
+            END IF;
+        END IF;
+    END LOOP;
+    SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
+    SELECT INTO balance * FROM rrhh_balanceassistance WHERE assistance = NEW.employee_id AND assistancce = NEW.assistance;
+    IF FOUND THEN
+    ELSE
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE WARNING 'ERROR SQLEXCEPTION %', SQLERRM;
+        ROLLBACK;
+        RETURN NULL;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE
+COST 100;
+
 
 
 -- EXECUTE TRIGGERs

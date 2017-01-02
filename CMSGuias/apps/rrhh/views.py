@@ -70,10 +70,13 @@ class TypeEmployeeView(JSONResponseMixin, TemplateView):
                 if 'new' in request.POST:
                     key = TypesEmployeeKeys()
                     TypesEmployee.objects.create(
-                        types_id=key, description=request.POST['desc'].upper())
+                        types_id=key,
+                        description=request.POST['desc'].upper(),
+                        starthour=request.POST['starthour'])
                 if 'modify' in request.POST:
                     obj = TypesEmployee.objects.get(types_id=request.POST['pk'])
                     obj.description = request.POST['desc'].upper()
+                    obj.starthour = request.POST['starthour']
                     obj.save()
                 if 'delete' in request.POST:
                     obj = TypesEmployee.objects.get(types_id=request.POST['pk'])
@@ -184,6 +187,14 @@ class EmployeeAsisstanceView(JSONResponseMixin, TemplateView):
         try:
             if request.is_ajax():
                 try:
+                    if 'gettypes' in request.GET:
+                        kwargs['types'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                TypesEmployee.objects.filter()
+                            )
+                        )
+                        kwargs['status'] = True
                     if 'getsettings' in request.GET:
                         kwargs['settings'] = json.loads(
                             serializers.serialize(
@@ -202,21 +213,25 @@ class EmployeeAsisstanceView(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
-        print request.is_ajax()
+        # print request.is_ajax()
         if request.is_ajax():
             try:
                 print request.POST
                 if 'savesettings' in request.POST:
                     EmployeeSettings.objects.filter(flag=True).update(flag=False)
-                    print 'before declare'
+                    # print 'before declare'
                     emp = EmployeeSettings()
-                    print 'declare'
-                    print request.POST['hextperfirst'], type(request.POST['hextperfirst'])
-                    emp.hextperfirst = Decimal(request.POST['hextperfirst']).quantize(Decimal('0.1'))
-                    emp.hextpersecond = Decimal(request.POST['hextpersecond']).quantize(Decimal('0.1'))
+                    # print 'declare'
+                    # print request.POST['hextperfirst'], type(request.POST['hextperfirst'])
+                    emp.hextperfirst = Decimal(
+                        request.POST['hextperfirst']).quantize(Decimal('0.1'))
+                    emp.hextpersecond = Decimal(
+                        request.POST['hextpersecond']).quantize(Decimal('0.1'))
                     emp.ngratification = request.POST['ngratification']
                     emp.ncts = request.POST['ncts']
-                    emp.pergratification = Decimal(request.POST['pergratification']).quantize(Decimal('0.1'))
+                    emp.pergratification = Decimal(
+                        request.POST['pergratification']).quantize(Decimal('0.1'))
+                    emp.codeproject = request.POST['codeproject']
                     emp.starthourextra = request.POST['starthourextra']
                     emp.starthourextratwo = request.POST['starthourextratwo']
                     emp.totalhour = request.POST['totalhour']

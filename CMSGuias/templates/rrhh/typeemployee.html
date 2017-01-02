@@ -25,6 +25,7 @@
                     <th>#</th>
                     <th></th>
                     <th>Descripción</th>
+                    <th>Hora de Inicio</th>
                     <th><a href="#!refresh" ng-click="vm.getTypes()"><i class="fa fa-refresh"></i></a></th>
                 </tr>
             </thead>
@@ -34,6 +35,7 @@
                     <td>{{$index + 1}}</td>
                     <td>{{x.pk}}</td>
                     <td>{{x.fields.description}}</td>
+                    <td>{{x.fields.starthour}}</td>
                     <td>
                         <a class="waves-effect waves-light dropdown-button dropdown-activates grey-text text-darken-2" href="#!">
                             <i class="fa fa-cog"></i></a>
@@ -57,8 +59,12 @@
             <h4>TIPO DE EMPLEADO</h4>
             <div class="row">
                 <div class="input-field col l12 m12 s12">
-                    <input type="text" id="desc" ng-model="vm.types.desc">
+                    <input type="text" id="desc" ng-model="vm.types.desc" placeholder="Descripción">
                     <label for="desc" ng-class="{'active': vm.types['desc'] != ''}">Descripción</label>
+                </div>
+                <div class="input-field col l12 m12 s12">
+                    <input type="text" id="starthour" placeholder="00:00" ng-model="vm.types.starthour">
+                    <label for="starthour" ng-class="{'active': vm.types['starthour'] != ''}">Hora de Inicio</label>
                 </div>
             </div>
         </div>

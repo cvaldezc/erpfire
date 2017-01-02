@@ -16,7 +16,7 @@ do ->
           setTimeout (->
             drop = angular.element('.dropdown-activates')
             angular.forEach drop, (elem, index) ->
-              console.log elem
+              # console.log elem
               elem.setAttribute('data-activates', "dropdown#{index}")
               return
             drop.dropdown
@@ -32,6 +32,7 @@ do ->
     vm.showNew = ->
       vm.types =
         desc: ''
+        starthour: ''
         pk: ''
       angular.element("#mtypes").modal 'open'
       return
@@ -40,6 +41,7 @@ do ->
       vm.types =
         desc: obj.fields.description
         pk: obj.pk
+        starthour: obj.fields.starthour
       angular.element("#mtypes").modal 'open'
       # $scope.$render()
       return
@@ -55,6 +57,7 @@ do ->
           \ La descripción no debe estar vacia!""", 4000
         return false
       prms['desc'] = vm.types.desc
+      prms['starthour'] = vm.types.starthour
       if not prms.hasOwnProperty 'new'
         prms['modify'] = true
         prms['pk'] = vm.types.pk

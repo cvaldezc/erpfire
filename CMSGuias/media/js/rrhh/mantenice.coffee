@@ -21,6 +21,7 @@ do ->
     vm = this
     vm.settings = {}
     angular.element(document).ready ->
+      vm.gettypes()
       vm.getdata()
       console.info "Yes! load data."
       return
@@ -37,6 +38,18 @@ do ->
           return
         else
           console.log "Error: #{response.raise}"
+          return
+      return
+    vm.gettypes = ->
+      prms =
+        'gettypes': true
+      cpFactory.get(prms)
+      .success (response) ->
+        if response.status
+          vm.types = response.types
+          return
+        else
+          Materialize.toast "No existen datos. #{response.raise}", 3600
           return
       return
     vm.saveSettings = ->
