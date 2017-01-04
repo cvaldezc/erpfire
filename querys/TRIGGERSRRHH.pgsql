@@ -105,34 +105,103 @@ DECLARE
     ndate DATE;
     break TIME;
     diff TIME;
-    thours TIME;
+    thours NUMERIC := 0; 
+    ex RECORD;
+    types RECORD;
+    tdelay TIME;
+    delay NUMERIC;
+    fvalid BOOLEAN := FALSE;
+    -- hours extra
+    secondtime TIME;
+    firsttime TIME;
+    st NUMERIC;
+    ft NUMERIC;
 BEGIN
+    SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
     FOR xa IN 
         SELECT * FROM rrhh_assistance WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance
     LOOP
         -- OBTAIN SUM HOUR BREAK
         IF (EXTRACT('hour' FROM xa.hourinbreak) + (EXTRACT('minutes' FROM xa.houroutbreak) / 60)) > 0 THEN
             IF xa.hourinbreak NOTNULL AND xa.houroutbreak NOTNULL THEN
-                break:= (xa.hourout::TIME - xa.hourinbreak::TIME);
+                break:= (xa.houroutbreak::TIME - xa.hourinbreak::TIME);
             END IF;
         ELSE
-            break := 0;
+            break := '00:00:00'::TIME;
         END IF;
         -- OBTAIN SUM HOUR WORKED
-        IF (xa.houtin NOTNULL AND xa.hourout NOTNULL) THEN
+        IF (xa.hourin NOTNULL AND xa.hourout NOTNULL) THEN
+            -- hourstart := ARRAY_APPEND(hourstart, xa.hourin);
             IF NEW.hourout < NEW.hourin THEN
                 ndate := (NEW.asisstance::DATE + 1);
                 diff := ((ndate::CHAR || ' ' || NEW.hourout::CHAR):: TIMESTAMP - (NEW.asisstance::CHAR || ' ' || NEW.hourin::CHAR)::TIMESTAMP);
             ELSE
                 diff := (NEW.hourout::TIME - NEW.hourin::TIME);
             END IF;
+            thours := (thours + (EXTRACT('hour' FROM diff)::NUMERIC) + (EXTRACT('minutes' FROM diff) / 60));
         END IF;
     END LOOP;
-    SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
-    SELECT INTO balance * FROM rrhh_balanceassistance WHERE assistance = NEW.employee_id AND assistancce = NEW.assistance;
+    RAISE WARNING 'VIEW TOTAL HOURS %', thours;
+    SELECT INTO ex * FROM rrhh_assistance WHERE employee_id = NEW.employee_id AND assistance::DATE = NEW.assistance::DATE ORDER BY hourin ASC LIMIT 1 OFFSET 0;
     IF FOUND THEN
-    ELSE
+        RAISE WARNING 'VALUES EX  %', ex;
+        RAISE WARNING 'INSIDE TYPES % %', ex.types_id, config.codeproject;
+        IF ex.types_id::CHAR(4) = config.codeproject::CHAR(4) THEN
+            RAISE WARNING 'INSIDE TYPES EQUAL';
+            SELECT INTO types * FROM ventas_proyecto WHERE proyecto_id = ex.project_id;
+        ELSE
+            RAISE WARNING 'INSIDE TYPES DIFERENT';
+            SELECT INTO types * FROM rrhh_typesemployee WHERE types_id = config.codeproject;
+        END IF;
+        RAISE WARNING 'SHOW TYPES %', types;
+        tdelay := (ex.hourin::TIME - types.starthour::TIME);
+        RAISE WARNING 'TDELAY % % %', tdelay, ex.hourin, types.starthour;
+        RAISE WARNING 'DELAY HOUR %', EXTRACT('hour' FROM tdelay);
+        RAISE WARNING 'DELAY MINUTES %', EXTRACT('minutes' FROM tdelay);
+        delay := (EXTRACT('hour' FROM tdelay)::NUMERIC + (EXTRACT('minutes' FROM tdelay)/60)::NUMERIC);
     END IF;
+    RAISE WARNING 'EXIT TYPES';
+    -- discount hour break
+    IF EXTRACT('hour' FROM break)::NUMERIC > 0 THEN
+        RAISE WARNING 'HERE DISCOUNT HOUR BREAK';
+        thours := (thours - EXTRACT('hour' FROM break)::NUMERIC);
+    END IF;
+    RAISE WARNING 'INSIDE HOURS EXTRA';
+    -- EXTRACT HOURS EXTRAS
+    IF (to_char(thours, '00":00:00"'))::TIME >= config.starthourextratwo::TIME THEN
+        RAISE WARNING 'INSIDE HOURS SECONDTIME EXTRA';
+        secondtime := ((to_char(thours, '00":00:00"'))::TIME - config.starthourextratwo::TIME);
+        st := (EXTRACT('hour' FROM secondtime))::NUMERIC;
+        RAISE WARNING 'ADDITIONAL SECONDTIME % %', secondtime, st;
+        -- HERE VERIFY MINUTES ROUND IF MINUTES GREAT VAL ROUND
+        -- IF THEN
+        -- END IF;
+        firsttime := (config.starthourextratwo::TIME - config.starthourextra::TIME);
+        ft := (EXTRACT('hour' FROM firsttime))::NUMERIC;
+        RAISE WARNING 'ADDITIONAL FIRSTTIME % %', firsttime, ft;
+        thours := EXTRACT('hour' FROM config.totalhour)::NUMERIC;
+        fvalid := TRUE;
+    ELSE
+        st := 0;
+    END IF;
+    IF NOT fvalid THEN
+        IF (to_char(thours, '00":00:00"'))::TIME >= config.starthourextra::TIME AND (to_char(thours, '00":00:00"'))::TIME < config.starthourextratwo::TIME THEN
+            RAISE WARNING 'INSIDE HOURS FIRST EXTRA';
+            firsttime := ((to_char(thours, '00":00:00"'))::TIME - config.starthourextra::TIME);
+            ft := (EXTRACT('hour' FROM firsttime))::NUMERIC;
+            thours := EXTRACT('hour' FROM config.totalhour)::NUMERIC;
+        ELSE
+            ft := 0;
+        END IF;
+    END IF;
+    -- here is perform update or insert
+    SELECT INTO balance * FROM rrhh_balanceassistance WHERE employee_id = NEW.employee_id AND assistance::DATE = NEW.assistance::DATE;
+    IF FOUND THEN
+        UPDATE rrhh_balanceassistance SET hextfirst = ft, hextsecond = st, hwork = thours, hdelay = delay WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance;
+    ELSE
+        INSERT INTO rrhh_balanceassistance(employee_id, assistance, hextfirst, hextsecond, hwork, hdelay, flag) VALUES(NEW.employee_id, NEW.assistance, ft, st, thours, delay, TRUE);
+    END IF;
+    RETURN NEW;
 EXCEPTION
     WHEN OTHERS THEN
         RAISE WARNING 'ERROR SQLEXCEPTION %', SQLERRM;
@@ -146,9 +215,18 @@ COST 100;
 
 
 -- EXECUTE TRIGGERs
+DROP TRIGGER calc_hours_works ON rrhh_assistance;
+DROP FUNCTION proc_calculatehourextra();
 CREATE TRIGGER calc_hours_works
 BEFORE INSERT OR UPDATE ON rrhh_assistance
 FOR EACH ROW EXECUTE PROCEDURE proc_calculatehourextra();
+----------------------------------------------------------
+DROP TRIGGER ext_hours_balance ON rrhh_assistance;
+DROP FUNCTION balance_hours_assistance_fn();
+CREATE TRIGGER ext_hours_balance
+AFTER INSERT OR UPDATE ON rrhh_assistance
+FOR EACH ROW EXECUTE PROCEDURE balance_hours_assistance_fn();
+
 /* TEST TIMEs */
 -- SELECT DATE '2016-12-28' + DATE '2016-12-31';
 -- SELECT EXTRACT('hour' from '17:30:00'::TIME - '08:00:00'::TIME);
