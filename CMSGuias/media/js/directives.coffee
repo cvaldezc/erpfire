@@ -44,6 +44,7 @@ valMinandMax = ->
           console.log "change attr"
           return
     return
+
 # directive format time
 valFormatTime = ->
   restrict: 'AE'
@@ -66,6 +67,7 @@ valFormatTime = ->
       # console.info scope
       return
     return
+
 # directive set convert number
 convertToNumber = ->
   restrict: 'AE'
@@ -75,3 +77,18 @@ convertToNumber = ->
     ngModel.$formatters.push (value) ->
       parseFloat value
     return
+
+# directive for load file in model
+loadFiles = ->
+  restrict: 'AE'
+  require: '?ngModel'
+  scope: '@'
+  link: (scope, element, attrs, ngModel) ->
+    element.bind 'change', (event) ->
+      # formData = new FormData()
+      # for x in element[0].files.length
+      ngModel.$setViewValue element[0].files
+      ngModel.$render()
+      scope.$apply()
+      return
+

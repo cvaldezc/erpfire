@@ -151,7 +151,7 @@ BEGIN
             SELECT INTO types * FROM ventas_proyecto WHERE proyecto_id = ex.project_id;
         ELSE
             RAISE WARNING 'INSIDE TYPES DIFERENT';
-            SELECT INTO types * FROM rrhh_typesemployee WHERE types_id = config.codeproject;
+            SELECT INTO types * FROM rrhh_typesemployee WHERE types_id = ex.types_id;
         END IF;
         RAISE WARNING 'SHOW TYPES %', types;
         tdelay := (ex.hourin::TIME - types.starthour::TIME);

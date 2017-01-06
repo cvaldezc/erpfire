@@ -51,10 +51,10 @@ class Assistance(models.Model):
 class BalanceAssistance(models.Model):
     employee = models.ForeignKey(Employee, related_name='EmployeeasRegister')
     assistance = models.DateField(null=False)
-    hextfirst = models.DecimalField(max_digits=3, decimal_places=1, null=True)
-    hextsecond = models.DecimalField(max_digits=3, decimal_places=1, null=True)
-    hwork = models.DecimalField(max_digits=3, decimal_places=1, null=True)
-    hdelay = models.DecimalField(max_digits=3, decimal_places=1, null=True)
+    hextfirst = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    hextsecond = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    hwork = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    hdelay = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     flag = models.BooleanField(default=True)
 
     def __unicode__(self):
@@ -63,19 +63,3 @@ class BalanceAssistance(models.Model):
 # INSERT INTO public.almacen_nipleguiaremision(
 #     guia_id, materiales_id, metrado, cantguide, tipo, flag, brand_id, model_id, related, order_id)
 # 	VALUES ('001-00022224', '115100030400034', 55, 2, 'A', true, 'BR000', 'MO000', 17869,'PE16002599');
-
-# INSERT INTO public.almacen_nipleguiaremision(
-#     guia_id, materiales_id, metrado, cantguide, tipo, flag, brand_id, model_id, related, order_id)
-# 	VALUES ('001-00022224', '115100030400034', 59, 1, 'A', true, 'BR000', 'MO000', 17868,'PE16002599');
-
-# INSERT INTO public.almacen_nipleguiaremision(
-#     guia_id, materiales_id, metrado, cantguide, tipo, flag, brand_id, model_id, related, order_id)
-# 	VALUES ('001-00022224', '115100030400034', 64, 1, 'A', true, 'BR000', 'MO000', 17867,'PE16002599');
-
-# INSERT INTO public.almacen_nipleguiaremision(
-#     guia_id, materiales_id, metrado, cantguide, tipo, flag, brand_id, model_id, related, order_id)
-# 	VALUES ('001-00022224', '115100030400034', 70, 2, 'A', true, 'BR000', 'MO000', 17866,'PE16002599');
-
-# INSERT INTO public.almacen_nipleguiaremision(
-#     guia_id, materiales_id, metrado, cantguide, tipo, flag, brand_id, model_id, related, order_id)
-# 	VALUES ('001-00022224', '115100030400034', 10, 6, 'A', true, 'BR000', 'MO000', 17865,'PE16002599');

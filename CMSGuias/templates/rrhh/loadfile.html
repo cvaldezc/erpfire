@@ -1,0 +1,37 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/salesmd.html" %}
+{% endblock menu %}
+{% block content %}
+<section ng-app="lapp" ng-controller="ctrload as vm">
+    <header>
+        <h3>Cargar Tareo</h3>
+    </header>
+    <article class="card-panel">
+        <div class="card-action">
+            <button type="button" class="btn green right">
+                <i class="fa fa-cloud-upload fa-lg"></i>
+                <span class="hide-on-small-only">CARGAR LOS DATOS</span>
+            </button>
+        </div>
+        <br>
+        <div class="file-field input-field">
+            <div class="btn blue">
+                <span>SELECCIONAR TAREO(s)</span>
+                <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ng-modal="vm.files" load-files multiple>
+            </div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate" type="text">
+            </div>
+        </div>
+    </article>
+    <div class="card-panel">
+        <strong>Estadisticas:</strong>
+    </div>
+</section>
+<!-- Scripts -->
+<script src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js" defer></script>
+<script src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js" defer></script>
+<script src="{{ MEDIA_URL }}js/directives.js" defer></script>
+<script src="{{ MEDIA_URL }}js/rrhh/loadassistance.js" defer></script>
+{% endblock content %}

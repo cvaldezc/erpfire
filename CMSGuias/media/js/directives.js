@@ -1,4 +1,4 @@
-var convertToNumber, valFormatTime, valMinandMax;
+var convertToNumber, loadFiles, valFormatTime, valMinandMax;
 
 valMinandMax = function() {
   return {
@@ -89,6 +89,21 @@ convertToNumber = function() {
     link: function(scope, element, attrs, ngModel) {
       ngModel.$formatters.push(function(value) {
         return parseFloat(value);
+      });
+    }
+  };
+};
+
+loadFiles = function() {
+  return {
+    restrict: 'AE',
+    require: '?ngModel',
+    scope: '@',
+    link: function(scope, element, attrs, ngModel) {
+      return element.bind('change', function(event) {
+        ngModel.$setViewValue(element[0].files);
+        ngModel.$render();
+        scope.$apply();
       });
     }
   };

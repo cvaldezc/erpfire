@@ -242,3 +242,23 @@ class EmployeeAsisstanceView(JSONResponseMixin, TemplateView):
                 kwargs['raise'] = str(oex)
                 kwargs['status'] = False
             return self.render_to_json_response(kwargs)
+
+
+# load file for Assistance
+class LoadAssistance(JSONResponseMixin, TemplateView):
+
+    template_name = 'rrhh/loadfile.html'
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    pass
+                except ObjectDoesNotExist as oex:
+                    kwargs['raise'] = str(oex)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+            return render(request, self.template_name, kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)
