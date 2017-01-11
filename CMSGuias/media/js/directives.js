@@ -101,9 +101,11 @@ loadFiles = function() {
     scope: '@',
     link: function(scope, element, attrs, ngModel) {
       return element.bind('change', function(event) {
-        ngModel.$setViewValue(element[0].files);
-        ngModel.$render();
-        scope.$apply();
+        if (element[0].files.length) {
+          scope.files = element[0].files;
+        } else {
+          scope.files = [];
+        }
       });
     }
   };

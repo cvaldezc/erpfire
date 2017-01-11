@@ -85,10 +85,10 @@ loadFiles = ->
   scope: '@'
   link: (scope, element, attrs, ngModel) ->
     element.bind 'change', (event) ->
-      # formData = new FormData()
-      # for x in element[0].files.length
-      ngModel.$setViewValue element[0].files
-      ngModel.$render()
-      scope.$apply()
+      # scope.files = element[0].files
+      if element[0].files.length
+        scope.files = element[0].files
+      else
+        scope.files = []
       return
 

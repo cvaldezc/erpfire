@@ -172,7 +172,7 @@ INSTALLED_APPS = (
 )
 
 SERIALIZATION_MODULES = {
- 'json': 'wadofstuff.django.serializers.json'
+    'json': 'wadofstuff.django.serializers.json'
 }
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'

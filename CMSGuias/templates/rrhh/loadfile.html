@@ -7,21 +7,22 @@
     <header>
         <h3>Cargar Tareo</h3>
     </header>
-    <article class="card-panel">
-        <div class="card-action">
-            <button type="button" class="btn green right">
+    <article class="card">
+        <div class="card-action right-align">
+            <button type="button" class="btn red" ng-click="vm.loadfiles()" ng-disabled="vm.lock" disabled="true" availablefile>
                 <i class="fa fa-cloud-upload fa-lg"></i>
                 <span class="hide-on-small-only">CARGAR LOS DATOS</span>
             </button>
         </div>
-        <br>
-        <div class="file-field input-field">
-            <div class="btn blue">
-                <span>SELECCIONAR TAREO(s)</span>
-                <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ng-modal="vm.files" load-files multiple>
-            </div>
-            <div class="file-path-wrapper">
-                <input class="file-path validate" type="text">
+        <div class="card-content">
+            <div class="file-field input-field">
+                <div class="btn blue" ng-disabled="vm.lock">
+                    <span>SELECCIONAR TAREO(s)</span>
+                    <input type="file" id="tareo">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
             </div>
         </div>
     </article>
@@ -29,9 +30,9 @@
         <strong>Estadisticas:</strong>
     </div>
 </section>
+
 <!-- Scripts -->
-<script src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js" defer></script>
-<script src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js" defer></script>
-<script src="{{ MEDIA_URL }}js/directives.js" defer></script>
-<script src="{{ MEDIA_URL }}js/rrhh/loadassistance.js" defer></script>
+<script defer src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/rrhh/loadassistance.js"></script>
 {% endblock content %}

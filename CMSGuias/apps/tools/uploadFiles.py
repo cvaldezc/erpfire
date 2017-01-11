@@ -6,11 +6,13 @@ import urllib
 from openpyxl import load_workbook
 
 
-def upload(absolutePath, archive, options={}):
+def upload(relativepath, archive, options={}):
+    """ this function upload files , the parameter relative path folder,
+        archive only one, options is for change name"""
     #defaults= {"date": False,"time": False}
     try:
         # path absolute
-        path = '%s%s'%(settings.MEDIA_ROOT, absolutePath)
+        path = '%s%s'%(settings.MEDIA_ROOT, relativepath)
         # verify path exists if not exists path makers the folders
         if not os.path.exists(path):
             os.makedirs(path, 0777)
@@ -23,7 +25,7 @@ def upload(absolutePath, archive, options={}):
             ext = ext.lower()
             name = '%s.%s'%(options['name'], ext)
         else:
-          name = archive.name
+            name = archive.name
         filename = '%s%s'%(path, name)
         deleteFile(filename)
         # recover full address of filename
@@ -36,7 +38,7 @@ def upload(absolutePath, archive, options={}):
         # changes file permissions
         os.chmod(filename, 0777)
         return filename
-    except Exception, e:
+    except Exception, exp:
         return False
 
 def removeTmp(absolutePath):
@@ -48,16 +50,17 @@ def removeTmp(absolutePath):
         print e
         return False
 
-def deleteFile(uriPath, partial=False):
+def deleteFile(uripath, partial=False):
+    """ this function delete files parameter path absolute or relative """
     try:
         path = None
         # path absolute
         if partial:
-            if not uriPath.startswith('/'):
-                uriPath = '/%s' % uriPath
-            path = '%s%s'%(settings.MEDIA_ROOT, uriPath)
+            if not uripath.startswith('/'):
+                uripath = '/%s' % uripath
+            path = '%s%s' % (settings.MEDIA_ROOT, uripath)
         else:
-            path = uriPath
+            path = uripath
         if path is not None:
             os.chmod(path, 0777)
             os.remove(path)

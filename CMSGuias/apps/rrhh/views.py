@@ -16,10 +16,13 @@ from django.utils.decorators import method_decorator
 from django.template import TemplateDoesNotExist
 from django.views.generic import TemplateView
 
+from openpyxl import load_workbook
+
 from .models import Assistance, TypesEmployee
 from ..home.models import Employee, EmployeeSettings
 from ..ventas.models import Proyecto
 from ..tools.genkeys import TypesEmployeeKeys
+from ..tools.uploadFiles import upload, deleteFile
 
 
 class JSONResponseMixin(object):
@@ -246,7 +249,7 @@ class EmployeeAsisstanceView(JSONResponseMixin, TemplateView):
 
 # load file for Assistance
 class LoadAssistance(JSONResponseMixin, TemplateView):
-
+    """ upload files for read and load data for the assistance """
     template_name = 'rrhh/loadfile.html'
 
     @method_decorator(login_required)
@@ -262,3 +265,30 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
             return render(request, self.template_name, kwargs)
         except TemplateDoesNotExist as ext:
             raise Http404(ext)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        """ upload file """
+        if request.is_ajax():
+            try:
+                if 'loadfiles' in request.POST:
+                    print 'Files ', request.FILES
+                    # load and validate format file
+                    try:
+                        # upload file in the path
+                        path = 'storage/assistance/'
+                        filename = upload(path, request.FILES['files'])
+                        # validate file is meets with format
+                        wbook = load_workbook(filename, read_only=True)
+                        wsheet = wbook.get_sheet_by_name('Asistencia')
+                        
+                        kwargs['status'] = True
+                        time.sleep(200)
+                        deleteFile(filename)
+                    except Exception as exio:
+                        kwargs['raise'] = str(exio)
+                        kwargs['status'] = True
+            except ObjectDoesNotExist as oex:
+                kwargs['status'] = False
+                kwargs['raise'] = str(oex)
+        return self.render_to_json_response(kwargs)
