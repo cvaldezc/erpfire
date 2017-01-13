@@ -36,6 +36,7 @@ class Assistance(models.Model):
     hourinbreak = models.TimeField(null=False, default='00:00:00')
     houroutbreak = models.TimeField(null=False, default='00:00:00')
     hourout = models.TimeField(null=False, default='00:00:00')
+    viatical = models.DecimalField(max_digits=4, decimal_places=2, default=0)
     flag = models.CharField(max_length=1, default='A')
     tag = models.BooleanField(default=True)
 

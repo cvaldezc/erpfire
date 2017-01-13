@@ -16,7 +16,7 @@ from django.utils.decorators import method_decorator
 from django.template import TemplateDoesNotExist
 from django.views.generic import TemplateView
 
-from openpyxl import load_workbook
+from openpyxl import formula, load_workbook
 
 from .models import Assistance, TypesEmployee
 from ..home.models import Employee, EmployeeSettings
@@ -272,22 +272,105 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
         if request.is_ajax():
             try:
                 if 'loadfiles' in request.POST:
-                    print 'Files ', request.FILES
+                    # print 'Files ', request.FILES
+                    valid = True
                     # load and validate format file
                     try:
                         # upload file in the path
-                        path = 'storage/assistance/'
+                        path = '\\storage\\assistance\\'
                         filename = upload(path, request.FILES['files'])
+                        print filename
                         # validate file is meets with format
-                        wbook = load_workbook(filename, read_only=True)
-                        wsheet = wbook.get_sheet_by_name('Asistencia')
-                        
-                        kwargs['status'] = True
-                        time.sleep(200)
-                        deleteFile(filename)
+                        wbook = load_workbook(filename=filename, data_only=True)
+                        if 'Asistencia' not in wbook.get_sheet_names():
+                            kwargs['raise'] = 'La hoja no existe en el archivo'
+                            valid = False
+                        else:
+                            wsheet = wbook['Asistencia']
+                            nrow = wsheet.max_row
+                            ncol = wsheet.max_column
+                            print 'ROW ', nrow
+                            print 'COLUMN ', ncol
+                            if nrow < 9:
+                                valid = False
+                                kwargs['raise'] = 'El archivo no cumple con el '\
+                                    'numero minimo filas para registrar'
+                            if ncol < 52:
+                                kwargs['raise'] = 'El archivo no cumple con el numero'\
+                                    ' minimo de columnas para registrar'
+                                valid = False
+                            if valid:
+                                # get code project  for employee settings
+                                sett = EmployeeSettings.objects.filter(flag=True)[0]
+                                def registerassistance(parameter):
+                                    """this function register assistance"""
+                                    obj = Assistance()
+                                    obj.userregister_id = request.user.get_profile().empdni_id
+                                    obj.employee_id = parameter['employee']
+                                    obj.project_id = parameter['project']
+                                    obj.types_id = parameter['types']
+                                    obj.assistance = parameter['assistance']
+                                    obj.hourin = parameter['hourin']
+                                    obj.hourout = parameter['hourout']
+                                    obj.hourinbreak = parameter['hourinbreak']
+                                    obj.houroutbreak = parameter['houroutbreak']
+                                    obj.tag = True
+                                    obj.save()
+                                keys = {
+                                    1: 'hourin',
+                                    2: 'hourinbreak',
+                                    3: 'houroutbreak',
+                                    4: 'hourout',
+                                    5: 'viatical',
+                                    6: 'project'}
+                                for xraw in xrange(9, nrow):
+                                    ndta = 3
+                                    dni = wsheet.cell(row=xraw, column=2).internal_value
+                                    if dni is None:
+                                        continue
+                                    dni = str(dni)
+                                    if len(dni) != 8:
+                                        continue
+                                    nreg = 1
+                                    param = dict()
+                                    for xcol in xrange(ndta, ncol):
+                                        if xcol > 44:
+                                            break
+                                        try:
+                                            if xcol % 3 == 0:
+                                                assistance = wsheet.cell(row=7, column=xcol).value
+                                                if assistance is not None:
+                                                    print assistance
+                                                    param['assistance'] = assistance
+                                            cval = wsheet.cell(row=xraw, column=xcol).value
+                                            param[keys[nreg]] = cval
+                                            if nreg == 6:
+                                                if 'project' in param:
+                                                    if len(param['project']) == 7:
+                                                        if len(param['project']) == 4:
+                                                            param['types'] = param['project']
+                                                        else:
+                                                            param['types'] = sett.codeproject
+                                                    else:
+                                                        param['types'] = sett.codeproject
+                                                else:
+                                                    param['project'] = None
+                                                    param['types'] = sett.codeproject
+                                                registerassistance(param)
+                                                nreg = 1
+                                                param = dict()
+                                            else:
+                                                nreg += 1
+                                        except Exception as exp:
+                                            print exp
+                                    print '============================================='
+                        kwargs['status'] = valid
                     except Exception as exio:
                         kwargs['raise'] = str(exio)
-                        kwargs['status'] = True
+                        kwargs['status'] = False
+                    wbook.save(filename)
+                    # time.sleep(30)
+                    deleteFile(filename)
             except ObjectDoesNotExist as oex:
                 kwargs['status'] = False
                 kwargs['raise'] = str(oex)
