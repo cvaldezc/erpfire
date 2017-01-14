@@ -323,6 +323,15 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                     4: 'hourout',
                                     5: 'viatical',
                                     6: 'project'}
+                                def validformat(obj):
+                                    """ Valid format object in and fields null """
+                                    if obj['hourinbreak'] is None:
+                                        obj['hourinbreak'] = '00:00'
+                                    if obj['houroutbreak'] is None:
+                                        obj['houroutbreak'] = '00:00'
+                                    if obj['viatical'] is None:
+                                        obj['viatical'] = 0
+                                    return object
                                 for xraw in xrange(9, nrow):
                                     ndta = 3
                                     dni = wsheet.cell(row=xraw, column=2).internal_value
@@ -343,20 +352,25 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                                     print assistance
                                                     param['assistance'] = assistance
                                             cval = wsheet.cell(row=xraw, column=xcol).value
+                                            # print cval
                                             param[keys[nreg]] = cval
                                             if nreg == 6:
-                                                if 'project' in param:
+                                                npro = ('project' in param
+                                                        and param['project'] is not None)
+                                                if npro:
                                                     if len(param['project']) == 7:
+                                                        param['types'] = sett.codeproject
+                                                    else:
                                                         if len(param['project']) == 4:
                                                             param['types'] = param['project']
                                                         else:
-                                                            param['types'] = sett.codeproject
-                                                    else:
-                                                        param['types'] = sett.codeproject
+                                                            param['types'] = 'TY04'
                                                 else:
                                                     param['project'] = None
-                                                    param['types'] = sett.codeproject
-                                                registerassistance(param)
+                                                    param['types'] = 'TY04'
+                                                if param['hourin'] is not None:
+                                                    registerassistance(validformat(param))
+                                                # print param
                                                 nreg = 1
                                                 param = dict()
                                             else:
