@@ -1,0 +1,67 @@
+{% extends "basemd.html" %}
+{% block titke %}
+Tipos de Descanso para Empleado
+{% endblock titke %}
+{% block menu %}
+    {% include "menus/salesmd.html" %}
+{% endblock menu %}
+{% block content %}
+<section ng-app="statusapp" ng-controller="ctrl as vm">
+    <header>
+        <h2>Estados de Asistencia</h2>
+    </header>
+    <nav class="card">
+        <div class="card-action">
+            <button type="button" class="waves-effect waves-light btn blue">
+                <i class="fa fa-plus"></i>
+                <span class="hide-on-small-only">Agregar</span>
+            </button>
+        </div>
+    </nav>
+    <div class="card-panel">
+        <table class="table highlight hovered responsive-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Código</th>
+                    <th>Descripcion</th>
+                    <th>Registrado</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% verbatim %}
+                <tr>
+                    <td>{{$index+1}}</td>
+                    <td>{{x.pk}}</td>
+                    <td>{{x.fields.description}}</td>
+                    <td>{{x.fields.register}}</td>
+                    <td>
+                        <a href="#!edit" class="blue-text" ng-click="vm.loadmodify(x)"><i class="fa fa-pencil fa-lg"></i></a>
+                    </td>
+                    <td>
+                        <a href="#!delete" class="red-text" ng-click="vm.deleteStatus(x.pk)"><i class="fa fa-trash fa-lg"></i></a>
+                    </td>
+                </tr>
+                {% endverbatim %}
+            </tbody>
+        </table>
+    </div>
+    <!-- block modals -->
+    <div id="mstatus" class="modal">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col l12 m12 s12">
+                    <input type="text" ng-model="vm.status.descripcion">
+                    <label for="description">DESCRIPCION</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- block Scripts -->
+<script defer src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/rrhh/statusemployee.js"></script>
+{% endblock content %}

@@ -75,22 +75,56 @@ class TypeEmployeeView(JSONResponseMixin, TemplateView):
                     TypesEmployee.objects.create(
                         types_id=key,
                         description=request.POST['desc'].upper(),
-                        starthour=request.POST['starthour'])
+                        starthour=request.POST['starthour'],
+                        outsaturday=request.POST['outsaturday'])
+                    kwargs['status'] = True
                 if 'modify' in request.POST:
                     obj = TypesEmployee.objects.get(types_id=request.POST['pk'])
                     obj.description = request.POST['desc'].upper()
                     obj.starthour = request.POST['starthour']
+                    obj.outsaturday = request.POST['outsaturday']
                     obj.save()
+                    kwargs['status'] = True
                 if 'delete' in request.POST:
                     obj = TypesEmployee.objects.get(types_id=request.POST['pk'])
                     obj.delete()
-                kwargs['status'] = True
+                    kwargs['status'] = True
             except ObjectDoesNotExist as oex:
                 kwargs['raise'] = str(oex)
                 kwargs['status'] = False
             return self.render_to_json_response(kwargs)
 
 
+# class for mantenice break employee
+class EmployeeBreakView(JSONResponseMixin, TemplateView):
+    template_name = 'rrhh/breakoemployee.html'
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    pass
+                except ObjectDoesNotExist as oex:
+                    kwargs['raise'] = str(oex)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+            return render(request, self.template_name, kwargs)
+        except TemplateDoesNotExist as extv:
+            raise Http404(extv)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            try:
+                pass
+            except ObjectDoesNotExist as oex:
+                kwargs['raise'] = str(oex)
+                kwargs['status'] = False
+            return self.render_to_json_response(kwargs)
+
+
+# this class register assistenace of employee
 class AssistanceEmployee(JSONResponseMixin, TemplateView):
     """this class implement asisstance employee"""
     template_name = 'rrhh/assistance.html'

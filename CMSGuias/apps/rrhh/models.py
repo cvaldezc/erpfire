@@ -14,6 +14,7 @@ class TypesEmployee(models.Model):
     register = models.DateTimeField(auto_now_add=True)
     description = models.CharField(max_length=60)
     starthour = models.TimeField(default='08:00', null=False)
+    outsaturday = models.TimeField(default='00:00:00', null=True, blank=True)
     flag = models.BooleanField(default=True, null=False)
 
     audit_log = AuditLog()
@@ -24,6 +25,18 @@ class TypesEmployee(models.Model):
     def __unicode__(self):
         return '%s % s %s' % (self.description, self.starthour, self.flag)
 
+class EmployeeBreak(models.Model):
+    """ define the break for employees already break, license, vacation, lack """
+    interval = models.CharField(primary_key=True, max_length=4)
+    description = models.CharField(max_length=60)
+    register = models.DateTimeField(auto_now_add=True)
+    flag = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-register']
+
+    def __unicode__(self):
+        return '%s %s' % (self.interval_id, self.description)
 
 class Assistance(models.Model):
     userregister = models.ForeignKey(Employee, related_name='EmployeeRegister')
@@ -37,6 +50,7 @@ class Assistance(models.Model):
     houroutbreak = models.TimeField(null=False, default='00:00:00')
     hourout = models.TimeField(null=False, default='00:00:00')
     viatical = models.DecimalField(max_digits=4, decimal_places=2, default=0)
+    status = models.ForeignKey(EmployeeBreak, related_name='breakforemployee')
     flag = models.CharField(max_length=1, default='A')
     tag = models.BooleanField(default=True)
 
@@ -56,6 +70,7 @@ class BalanceAssistance(models.Model):
     hextsecond = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     hwork = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     hdelay = models.DecimalField(max_digits=4, decimal_places=2, null=True)
+    hlack = models.DecimalField(max_digits=4, decimal_places=2, default=0, null=True)
     flag = models.BooleanField(default=True)
 
     def __unicode__(self):

@@ -26,6 +26,7 @@
                     <th></th>
                     <th>Descripción</th>
                     <th>Hora de Inicio</th>
+                    <th>Hora de Salida Sabado</th>
                     <th><a href="#!refresh" ng-click="vm.getTypes()"><i class="fa fa-refresh"></i></a></th>
                 </tr>
             </thead>
@@ -36,6 +37,7 @@
                     <td>{{x.pk}}</td>
                     <td>{{x.fields.description}}</td>
                     <td>{{x.fields.starthour}}</td>
+                    <td>{{x.fields.outsaturday}}</td>
                     <td>
                         <a class="waves-effect waves-light dropdown-button dropdown-activates grey-text text-darken-2" href="#!">
                             <i class="fa fa-cog"></i></a>
@@ -65,6 +67,10 @@
                 <div class="input-field col l12 m12 s12">
                     <input type="text" id="starthour" placeholder="00:00" ng-model="vm.types.starthour">
                     <label for="starthour" ng-class="{'active': vm.types['starthour'] != ''}">Hora de Inicio</label>
+                </div>
+                <div class="input-field col l12 m12 s12">
+                    <input type="text" id="outsaturday" placeholder="00:00" ng-model="vm.types.outsaturday">
+                    <label for="outsaturday" ng-class="{'active': vm.types['outsaturday'] != ''}">Hora de Salida Sabado</label>
                 </div>
             </div>
         </div>

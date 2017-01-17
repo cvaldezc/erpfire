@@ -142,6 +142,7 @@ BEGIN
         END IF;
     END LOOP;
     RAISE WARNING 'VIEW TOTAL HOURS %', thours;
+    -- this is for get hour ingress for determinate if have delay (tardanza)
     SELECT INTO ex * FROM rrhh_assistance WHERE employee_id = NEW.employee_id AND assistance::DATE = NEW.assistance::DATE ORDER BY hourin ASC LIMIT 1 OFFSET 0;
     IF FOUND THEN
         RAISE WARNING 'VALUES EX  %', ex;
@@ -160,12 +161,14 @@ BEGIN
         RAISE WARNING 'DELAY MINUTES %', EXTRACT('minutes' FROM tdelay);
         delay := (EXTRACT('hour' FROM tdelay)::NUMERIC + (EXTRACT('minutes' FROM tdelay)/60)::NUMERIC);
     END IF;
+    -- end block get delay for day
     RAISE WARNING 'EXIT TYPES';
-    -- discount hour break
+    -- discount hour break if only have employee to work yo M - F if have break
     IF EXTRACT('hour' FROM break)::NUMERIC > 0 THEN
         RAISE WARNING 'HERE DISCOUNT HOUR BREAK';
         thours := (thours - EXTRACT('hour' FROM break)::NUMERIC);
     END IF;
+    -- end block discount break
     RAISE WARNING 'INSIDE HOURS EXTRA';
     -- EXTRACT HOURS EXTRAS
     IF (to_char(thours, '00":00:00"'))::TIME >= config.starthourextratwo::TIME THEN

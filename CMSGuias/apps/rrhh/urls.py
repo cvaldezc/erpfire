@@ -8,7 +8,8 @@ from .views import (
     AssistanceEmployee,
     TypeEmployeeView,
     EmployeeAsisstanceView,
-    LoadAssistance)
+    LoadAssistance,
+    EmployeeBreakView)
 
 
 admin.autodiscover()
@@ -19,4 +20,5 @@ urlpatterns = patterns(
     url(r'^list/employee/$', AssistanceEmployee.as_view(), name='rrhh_assistancelist'),
     url(r'^settings/employee/$', EmployeeAsisstanceView.as_view(), name='rrhh_settings'),
     url(r'^load/assistance/$', LoadAssistance.as_view(), name='rrhh_load_assistance'),
+    url(r'^status/assistance/$', EmployeeBreakView.as_view(), name='rrhh_status_assistance'),
 )

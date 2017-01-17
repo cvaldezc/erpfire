@@ -49,6 +49,7 @@ class Proyecto(models.Model):
     handworksales = models.DecimalField(
         max_digits=12, decimal_places=2, blank=False, null=False, default=0)
     starthour = models.TimeField(default='07:30:00', blank=True, null=False)
+    outsaturday = models.TimeField(default='13:30:00', null=False, blank=True)
     flag = models.BooleanField(default=True, null=False)
 
     audit_log = AuditLog()

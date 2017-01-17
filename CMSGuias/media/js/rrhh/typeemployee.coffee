@@ -34,6 +34,7 @@ do ->
         desc: ''
         starthour: ''
         pk: ''
+        outsaturday: ''
       angular.element("#mtypes").modal 'open'
       return
 
@@ -42,6 +43,7 @@ do ->
         desc: obj.fields.description
         pk: obj.pk
         starthour: obj.fields.starthour
+        outsaturday: obj.fields.outsaturday
       angular.element("#mtypes").modal 'open'
       # $scope.$render()
       return
@@ -58,6 +60,7 @@ do ->
         return false
       prms['desc'] = vm.types.desc
       prms['starthour'] = vm.types.starthour
+      prms['outsaturday'] = vm.types.outsaturday
       if not prms.hasOwnProperty 'new'
         prms['modify'] = true
         prms['pk'] = vm.types.pk

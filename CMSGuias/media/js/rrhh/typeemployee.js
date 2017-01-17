@@ -35,7 +35,8 @@
       vm.types = {
         desc: '',
         starthour: '',
-        pk: ''
+        pk: '',
+        outsaturday: ''
       };
       angular.element("#mtypes").modal('open');
     };
@@ -43,7 +44,8 @@
       vm.types = {
         desc: obj.fields.description,
         pk: obj.pk,
-        starthour: obj.fields.starthour
+        starthour: obj.fields.starthour,
+        outsaturday: obj.fields.outsaturday
       };
       angular.element("#mtypes").modal('open');
     };
@@ -61,6 +63,7 @@
       }
       prms['desc'] = vm.types.desc;
       prms['starthour'] = vm.types.starthour;
+      prms['outsaturday'] = vm.types.outsaturday;
       if (!prms.hasOwnProperty('new')) {
         prms['modify'] = true;
         prms['pk'] = vm.types.pk;
