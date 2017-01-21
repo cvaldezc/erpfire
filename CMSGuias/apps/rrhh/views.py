@@ -16,12 +16,12 @@ from django.utils.decorators import method_decorator
 from django.template import TemplateDoesNotExist
 from django.views.generic import TemplateView
 
-from openpyxl import formula, load_workbook
+from openpyxl import load_workbook
 
-from .models import Assistance, TypesEmployee
+from .models import Assistance, TypesEmployee, EmployeeBreak
 from ..home.models import Employee, EmployeeSettings
 from ..ventas.models import Proyecto
-from ..tools.genkeys import TypesEmployeeKeys
+from ..tools.genkeys import TypesEmployeeKeys, StatusAssistanceId
 from ..tools.uploadFiles import upload, deleteFile
 
 
@@ -104,7 +104,11 @@ class EmployeeBreakView(JSONResponseMixin, TemplateView):
         try:
             if request.is_ajax():
                 try:
-                    pass
+                    if 'getstatus' in request.GET:
+                        kwargs['lstatus'] = json.loads(serializers.serialize(
+                            'json',
+                            EmployeeBreak.objects.filter(flag=True)))
+                        kwargs['status'] = True
                 except ObjectDoesNotExist as oex:
                     kwargs['raise'] = str(oex)
                     kwargs['status'] = False
@@ -117,7 +121,19 @@ class EmployeeBreakView(JSONResponseMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         if request.is_ajax():
             try:
-                pass
+                if 'savestatus' in request.POST:
+                    obj = None
+                    if 'pk' in request.POST:
+                        obj = EmployeeBreak.objects.get(
+                            status_id=request.POST['pk'])
+                    else:
+                        obj = EmployeeBreak()
+                        obj.status_id = StatusAssistanceId()
+                    obj.description = str(request.POST['description']).upper()
+                    obj.save()
+                    kwargs['status'] = True
+                if 'delete' in request.POST:
+                    kwargs['status'] = True
             except ObjectDoesNotExist as oex:
                 kwargs['raise'] = str(oex)
                 kwargs['status'] = False

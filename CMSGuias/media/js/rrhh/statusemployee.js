@@ -39,19 +39,24 @@
     var vm;
     vm = this;
     angular.element(document).ready(function() {
-      vm.main();
+      angular.element(".modal").modal();
+      vm.loadList();
     });
-    vm.main = function() {
-      console.info('main ctrl...');
+    vm.addStatus = function() {
+      vm.status = {
+        'description': '',
+        'pk': ''
+      };
+      angular.element("#mstatus").modal("open");
     };
     vm.loadList = function() {
-      Materialize.toast("<i class='fa fa-circle-o-notch fa-spin fa-fw fa-3x'></i>", "infinity", "toast-remove");
+      Materialize.toast("<i class='fa fa-circle-o-notch fa-spin fa-fw fa-2x'></i>", "infinity", "toast-remove transparent grey-text text-darken-3");
       cpFactory.get({
         'getstatus': true
       }).success(function(response) {
         angular.element(".toast-remove").remove();
         if (response.status) {
-          vm.lstatus = response.status;
+          vm.lstatus = response.lstatus;
         } else {
           Materialize.toast("Error: " + response.raise, 4000);
         }
@@ -62,9 +67,28 @@
         'description': obj.fields.description,
         'pk': obj.pk
       };
-      angular.element("#mstatus").model("open");
+      angular.element("#mstatus").modal("open");
     };
-    vm.saveStatus = function() {};
+    vm.saveStatus = function() {
+      var params;
+      Materialize.toast("<i class='fa fa-cogs fa-fw fa-spin fa-2x'></i> Procesando...", "infinity", "toast-remove");
+      params = {
+        'description': vm.status.description
+      };
+      if (vm.status.pk !== '') {
+        params['pk'] = vm.status.pk;
+      }
+      params['savestatus'] = true;
+      cpFactory.post(params).success(function(response) {
+        angular.element(".toast-remove").remove();
+        if (response.status) {
+          vm.loadList();
+          angular.element("#mstatus").modal("close");
+        } else {
+          Materialize.toast("Error: " + response.raise, 4000);
+        }
+      });
+    };
     vm.deleteStatus = function(pk) {
       swal({
         title: 'Realmente desea eliminar el Estado?',

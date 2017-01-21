@@ -14,7 +14,7 @@ from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup
 from CMSGuias.apps.operations.models import (
     Deductive, Letter, PreOrders, SGroup, DSector)
 from CMSGuias.apps.ventas.budget.models import AnalysisGroup, Analysis, Budget
-from ..rrhh.models import TypesEmployee
+from ..rrhh.models import TypesEmployee, EmployeeBreak
 
 
 # format date str
@@ -471,3 +471,14 @@ def TypesEmployeeKeys():
     except Exception as ex:
         count = 1
     return 'TY%s' % ('{:0>2d}'.format(count))
+
+
+def StatusAssistanceId():
+    count = 1
+    try:
+        raw = EmployeeBreak.objects.latest('register')
+        count = (int(raw.status_id[2:]) + 1)
+    except Exception as exk:
+        count = 1
+        print exk
+    return 'AS%s' % ('{:0>2d}'.format(count))
