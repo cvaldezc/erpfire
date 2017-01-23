@@ -30,6 +30,7 @@ class EmployeeBreak(models.Model):
     status_id = models.CharField(primary_key=True, max_length=4, null=False)
     description = models.CharField(max_length=60)
     register = models.DateTimeField(auto_now_add=True)
+    payment = models.BooleanField(default=True)
     flag = models.BooleanField(default=True)
 
     class Meta:

@@ -118,6 +118,7 @@ DECLARE
     ft NUMERIC;
 BEGIN
     SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
+    -- sum hour total for day for day
     FOR xa IN 
         SELECT * FROM rrhh_assistance WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance
     LOOP
@@ -141,6 +142,7 @@ BEGIN
             thours := (thours + (EXTRACT('hour' FROM diff)::NUMERIC) + (EXTRACT('minutes' FROM diff) / 60));
         END IF;
     END LOOP;
+    -- end block sun total for day
     RAISE WARNING 'VIEW TOTAL HOURS %', thours;
     -- this is for get hour ingress for determinate if have delay (tardanza)
     SELECT INTO ex * FROM rrhh_assistance WHERE employee_id = NEW.employee_id AND assistance::DATE = NEW.assistance::DATE ORDER BY hourin ASC LIMIT 1 OFFSET 0;
@@ -170,13 +172,16 @@ BEGIN
     END IF;
     -- end block discount break
     RAISE WARNING 'INSIDE HOURS EXTRA';
+    -- HERE SET CONDITIONAL
+
+    -- END BLOCK CONDITIONAL
     -- EXTRACT HOURS EXTRAS
     IF (to_char(thours, '00":00:00"'))::TIME >= config.starthourextratwo::TIME THEN
         RAISE WARNING 'INSIDE HOURS SECONDTIME EXTRA';
         secondtime := ((to_char(thours, '00":00:00"'))::TIME - config.starthourextratwo::TIME);
         st := (EXTRACT('hour' FROM secondtime))::NUMERIC;
         RAISE WARNING 'ADDITIONAL SECONDTIME % %', secondtime, st;
-        -- HERE VERIFY MINUTES ROUND IF MINUTES GREAT VAL ROUND
+        -- HERE VERIFY MINUTES ROUND IF MINUTES GREAT VAL ROUND 
         -- IF THEN
         -- END IF;
         firsttime := (config.starthourextratwo::TIME - config.starthourextra::TIME);

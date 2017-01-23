@@ -30,6 +30,7 @@ do ->
       vm.status =
         'description': ''
         'pk': ''
+        'payment': false
       angular.element("#mstatus").modal "open"
       return
 
@@ -50,6 +51,7 @@ do ->
       vm.status =
         'description': obj.fields.description
         'pk': obj.pk
+        'payment': obj.fields.payment
       angular.element("#mstatus").modal "open"
       return
     
@@ -57,6 +59,7 @@ do ->
       Materialize.toast "<i class='fa fa-cogs fa-fw fa-spin fa-2x'></i> Procesando...", "infinity", "toast-remove"
       params =
         'description': vm.status.description
+        'payment': vm.status.payment
       if vm.status.pk isnt ''
         params['pk'] = vm.status.pk
       params['savestatus'] = true
@@ -85,9 +88,12 @@ do ->
         if isConfirm
           prm =
             'pk': pk
+            'delete': true
           cpFactory.post prm
           .success (response) ->
             if response.status
+              if response.hasOwnProperty('msg')
+                Materialize.toast "#{response.msg}", 12000
               vm.loadList()
               return
             else

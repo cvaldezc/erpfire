@@ -130,9 +130,17 @@ class EmployeeBreakView(JSONResponseMixin, TemplateView):
                         obj = EmployeeBreak()
                         obj.status_id = StatusAssistanceId()
                     obj.description = str(request.POST['description']).upper()
+                    obj.payment = request.POST['payment'] in (True, 'true', 'True')
                     obj.save()
                     kwargs['status'] = True
                 if 'delete' in request.POST:
+                    ebs = EmployeeBreak.objects.get(status_id=request.POST['pk'])
+                    try:
+                        ebs.delete()
+                    except Exception as eex:
+                        ebs.flag = False
+                        ebs.save()
+                        kwargs['msg'] = 'El estado no se ha eliminado %s' % str(eex)
                     kwargs['status'] = True
             except ObjectDoesNotExist as oex:
                 kwargs['raise'] = str(oex)
@@ -287,6 +295,8 @@ class EmployeeAsisstanceView(JSONResponseMixin, TemplateView):
                     emp.codeproject = request.POST['codeproject']
                     emp.starthourextra = request.POST['starthourextra']
                     emp.starthourextratwo = request.POST['starthourextratwo']
+                    emp.shxsaturday = request.POST['shxsaturday']
+                    emp.shxsaturdayt = request.POST['shxsaturdayt']
                     emp.totalhour = request.POST['totalhour']
                     emp.timeround = request.POST['timeround']
                     emp.save()

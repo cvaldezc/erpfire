@@ -45,7 +45,8 @@
     vm.addStatus = function() {
       vm.status = {
         'description': '',
-        'pk': ''
+        'pk': '',
+        'payment': false
       };
       angular.element("#mstatus").modal("open");
     };
@@ -65,7 +66,8 @@
     vm.loadmodify = function(obj) {
       vm.status = {
         'description': obj.fields.description,
-        'pk': obj.pk
+        'pk': obj.pk,
+        'payment': obj.fields.payment
       };
       angular.element("#mstatus").modal("open");
     };
@@ -73,7 +75,8 @@
       var params;
       Materialize.toast("<i class='fa fa-cogs fa-fw fa-spin fa-2x'></i> Procesando...", "infinity", "toast-remove");
       params = {
-        'description': vm.status.description
+        'description': vm.status.description,
+        'payment': vm.status.payment
       };
       if (vm.status.pk !== '') {
         params['pk'] = vm.status.pk;
@@ -102,10 +105,14 @@
         var prm;
         if (isConfirm) {
           prm = {
-            'pk': pk
+            'pk': pk,
+            'delete': true
           };
           cpFactory.post(prm).success(function(response) {
             if (response.status) {
+              if (response.hasOwnProperty('msg')) {
+                Materialize.toast("" + response.msg, 12000);
+              }
               vm.loadList();
             } else {
               Materialize.toast("Error: al eliminar. " + response.raise, 4000);
