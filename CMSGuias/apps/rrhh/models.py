@@ -51,7 +51,8 @@ class Assistance(models.Model):
     houroutbreak = models.TimeField(null=False, default='00:00:00')
     hourout = models.TimeField(null=False, default='00:00:00')
     viatical = models.DecimalField(max_digits=4, decimal_places=2, default=0)
-    status = models.ForeignKey(EmployeeBreak, related_name='breakforemployee', null=True)
+    status = models.ForeignKey(
+        EmployeeBreak, related_name='breakforemployee', null=True, default='AS01')
     flag = models.CharField(max_length=1, default='A')
     tag = models.BooleanField(default=True)
 

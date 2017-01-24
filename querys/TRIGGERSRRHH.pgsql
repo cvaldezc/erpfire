@@ -116,6 +116,9 @@ DECLARE
     firsttime TIME;
     st NUMERIC;
     ft NUMERIC;
+    lack NUMERIC;
+    xhfs TIME;
+    xhts TIME;
 BEGIN
     SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
     -- sum hour total for day for day
@@ -152,9 +155,13 @@ BEGIN
         IF ex.types_id::CHAR(4) = config.codeproject::CHAR(4) THEN
             RAISE WARNING 'INSIDE TYPES EQUAL';
             SELECT INTO types * FROM ventas_proyecto WHERE proyecto_id = ex.project_id;
+            xhfs := types.shxsaturday;
+            xhts := types.shxsaturdayt;
         ELSE
             RAISE WARNING 'INSIDE TYPES DIFERENT';
             SELECT INTO types * FROM rrhh_typesemployee WHERE types_id = ex.types_id;
+            xhfs := config.shxsaturday;
+            xhts := config.shxsaturdayt;
         END IF;
         RAISE WARNING 'SHOW TYPES %', types;
         tdelay := (ex.hourin::TIME - types.starthour::TIME);
@@ -173,41 +180,90 @@ BEGIN
     -- end block discount break
     RAISE WARNING 'INSIDE HOURS EXTRA';
     -- HERE SET CONDITIONAL
-
-    -- END BLOCK CONDITIONAL
-    -- EXTRACT HOURS EXTRAS
-    IF (to_char(thours, '00":00:00"'))::TIME >= config.starthourextratwo::TIME THEN
-        RAISE WARNING 'INSIDE HOURS SECONDTIME EXTRA';
-        secondtime := ((to_char(thours, '00":00:00"'))::TIME - config.starthourextratwo::TIME);
-        st := (EXTRACT('hour' FROM secondtime))::NUMERIC;
-        RAISE WARNING 'ADDITIONAL SECONDTIME % %', secondtime, st;
-        -- HERE VERIFY MINUTES ROUND IF MINUTES GREAT VAL ROUND 
-        -- IF THEN
-        -- END IF;
-        firsttime := (config.starthourextratwo::TIME - config.starthourextra::TIME);
-        ft := (EXTRACT('hour' FROM firsttime))::NUMERIC;
-        RAISE WARNING 'ADDITIONAL FIRSTTIME % %', firsttime, ft;
-        thours := EXTRACT('hour' FROM config.totalhour)::NUMERIC;
-        fvalid := TRUE;
-    ELSE
-        st := 0;
-    END IF;
-    IF NOT fvalid THEN
-        IF (to_char(thours, '00":00:00"'))::TIME >= config.starthourextra::TIME AND (to_char(thours, '00":00:00"'))::TIME < config.starthourextratwo::TIME THEN
-            RAISE WARNING 'INSIDE HOURS FIRST EXTRA';
-            firsttime := ((to_char(thours, '00":00:00"'))::TIME - config.starthourextra::TIME);
+    -- hour extra for day
+    IF (to_char(NEW.assistance::DATE, 'day')::CHAR(7) = 'saturday'::CHAR(7)) THEN
+         -- EXTRACT HOURS EXTRAS if day is saturday
+        IF (to_char(thours, '00":00:00"'))::TIME >= xhts::TIME THEN
+            RAISE WARNING 'INSIDE HOURS SECONDTIME EXTRA';
+            secondtime := ((to_char(thours, '00":00:00"'))::TIME - xhts::TIME);
+            st := (EXTRACT('hour' FROM secondtime))::NUMERIC;
+            RAISE WARNING 'ADDITIONAL SECONDTIME % %', secondtime, st;
+            -- HERE VERIFY MINUTES ROUND IF MINUTES GREAT VAL ROUND 
+            -- IF THEN
+            -- END IF;
+            firsttime := (xhts::TIME - xhfs::TIME);
             ft := (EXTRACT('hour' FROM firsttime))::NUMERIC;
-            thours := EXTRACT('hour' FROM config.totalhour)::NUMERIC;
+            RAISE WARNING 'ADDITIONAL FIRSTTIME % %', firsttime, ft;
+            thours := (EXTRACT('hour' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC + EXTRACT('minutes' FROM (types.outsaturday::TIME - types.starthour::TIME)/60)::NUMERIC);
+            fvalid := TRUE;
         ELSE
-            ft := 0;
+            st := 0;
+        END IF;
+    ELSE
+        -- another day week
+        -- EXTRACT HOURS EXTRAS
+        IF (to_char(thours, '00":00:00"'))::TIME >= config.starthourextratwo::TIME THEN
+            RAISE WARNING 'INSIDE HOURS SECONDTIME EXTRA';
+            secondtime := ((to_char(thours, '00":00:00"'))::TIME - config.starthourextratwo::TIME);
+            st := (EXTRACT('hour' FROM secondtime))::NUMERIC;
+            RAISE WARNING 'ADDITIONAL SECONDTIME % %', secondtime, st;
+            -- HERE VERIFY MINUTES ROUND IF MINUTES GREAT VAL ROUND 
+            -- IF THEN
+            -- END IF;
+            firsttime := (config.starthourextratwo::TIME - config.starthourextra::TIME);
+            ft := (EXTRACT('hour' FROM firsttime))::NUMERIC;
+            RAISE WARNING 'ADDITIONAL FIRSTTIME % %', firsttime, ft;
+            thours := (EXTRACT('hour' FROM config.totalhour)::NUMERIC + (EXTRACT('minutes' FROM config.totalhour)/60)::NUMERIC);
+            fvalid := TRUE;
+        ELSE
+            st := 0;
+        END IF;
+    END IF;
+    -- END BLOCK CONDITIONAL
+    IF NOT fvalid THEN
+        IF (to_char(NEW.assistance::DATE, 'day')::CHAR(7) = 'saturday'::CHAR(7)) THEN
+            IF (to_char(thours, '00":00:00"'))::TIME >= xhfs::TIME AND (to_char(thours, '00":00:00"'))::TIME < xhts::TIME THEN
+                RAISE WARNING 'INSIDE HOURS FIRST EXTRA';
+                firsttime := ((to_char(thours, '00":00:00"'))::TIME - xhfs::TIME);
+                ft := (EXTRACT('hour' FROM firsttime))::NUMERIC;
+                thours := (EXTRACT('hour' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC + EXTRACT('minutes' FROM (types.outsaturday::TIME - types.starthour::TIME)/60)::NUMERIC);
+            ELSE
+                ft := 0;
+            END IF;
+        ELSE
+            IF (to_char(thours, '00":00:00"'))::TIME >= config.starthourextra::TIME AND (to_char(thours, '00":00:00"'))::TIME < config.starthourextratwo::TIME THEN
+                RAISE WARNING 'INSIDE HOURS FIRST EXTRA';
+                firsttime := ((to_char(thours, '00":00:00"'))::TIME - config.starthourextra::TIME);
+                ft := (EXTRACT('hour' FROM firsttime))::NUMERIC;
+                thours := (EXTRACT('hour' FROM config.totalhour)::NUMERIC + (EXTRACT('minutes' FROM config.totalhour)/60)::NUMERIC);
+            ELSE
+                ft := 0;
+            END IF;
+        END IF;
+    END IF;
+    RAISE WARNING 'NAME OF DAY %', to_char(NEW.assistance::DATE, 'day');
+    IF to_char(NEW.assistance::DATE, 'day')::CHAR(7) = 'saturday'::CHAR(7) THEN
+        lack := (EXTRACT('hour' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC + (EXTRACT('minutes' FROM (types.outsaturday::TIME - types.starthour::TIME))/60)::NUMERIC);
+        RAISE WARNING 'TOTAL HOURS % AND HOURS LACK %', thours, lack;
+        IF thours < lack THEN
+            lack := (lack - thours);
+        ELSE
+            lack := 0;
+        END IF;
+    ELSE
+        lack := ((EXTRACT('hour' FROM config.totalhour)::NUMERIC + (EXTRACT('minutes' FROM config.totalhour)/60)::NUMERIC));
+        IF thours < lack THEN
+            lack := (lack - thours);
+        ELSE
+            lack := 0;
         END IF;
     END IF;
     -- here is perform update or insert
     SELECT INTO balance * FROM rrhh_balanceassistance WHERE employee_id = NEW.employee_id AND assistance::DATE = NEW.assistance::DATE;
     IF FOUND THEN
-        UPDATE rrhh_balanceassistance SET hextfirst = ft, hextsecond = st, hwork = thours, hdelay = delay WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance;
+        UPDATE rrhh_balanceassistance SET hextfirst = ft, hextsecond = st, hwork = thours, hdelay = delay, hlack = lack WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance;
     ELSE
-        INSERT INTO rrhh_balanceassistance(employee_id, assistance, hextfirst, hextsecond, hwork, hdelay, flag) VALUES(NEW.employee_id, NEW.assistance, ft, st, thours, delay, TRUE);
+        INSERT INTO rrhh_balanceassistance(employee_id, assistance, hextfirst, hextsecond, hwork, hdelay, flag, hlack) VALUES(NEW.employee_id, NEW.assistance, ft, st, thours, delay, TRUE, lack);
     END IF;
     RETURN NEW;
 EXCEPTION
