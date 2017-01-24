@@ -383,15 +383,15 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                     4: 'hourout',
                                     5: 'viatical',
                                     6: 'project'}
-                                def validformat(obj):
+                                def validformat(oparam):
                                     """ Valid format object in and fields null """
-                                    if obj['hourinbreak'] is None:
-                                        obj['hourinbreak'] = '00:00'
-                                    if obj['houroutbreak'] is None:
-                                        obj['houroutbreak'] = '00:00'
-                                    if obj['viatical'] is None:
-                                        obj['viatical'] = 0
-                                    return object
+                                    if oparam['hourinbreak'] is None:
+                                        oparam['hourinbreak'] = '00:00'
+                                    if oparam['houroutbreak'] is None:
+                                        oparam['houroutbreak'] = '00:00'
+                                    if oparam['viatical'] is None:
+                                        oparam['viatical'] = 0
+                                    return oparam
                                 for xraw in xrange(9, nrow):
                                     ndta = 3
                                     dni = wsheet.cell(row=xraw, column=2).internal_value
@@ -402,6 +402,7 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                         continue
                                     nreg = 1
                                     param = dict()
+                                    param['employee'] = dni
                                     for xcol in xrange(ndta, ncol):
                                         if xcol > 44:
                                             break
@@ -426,13 +427,18 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                                         else:
                                                             param['types'] = 'TY04'
                                                 else:
-                                                    param['project'] = None
-                                                    param['types'] = 'TY04'
+                                                    if len(param['project']) == 4:
+                                                        param['types'] = param['project']
+                                                        param['project'] = None
+                                                    else:
+                                                        param['types'] = 'TY04'
+                                                        param['project'] = None
                                                 if param['hourin'] is not None:
-                                                    registerassistance(validformat(param))
-                                                # print param
-                                                nreg = 1
-                                                param = dict()
+                                                    print param
+                                                    nreg = 1
+                                                    param = validformat(param)
+                                                    registerassistance(param)
+                                                    param = {}
                                             else:
                                                 nreg += 1
                                         except Exception as exp:

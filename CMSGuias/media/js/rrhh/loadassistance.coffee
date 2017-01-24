@@ -33,7 +33,7 @@ do ->
       , (isConfirm) ->
         if isConfirm
           vm.lock = true
-          sMaterialize.toast "<i class='fa fa-circle-o-notch fa-2x fa-spin fa-fw'></i> Cargando archivos", "infinity", "toast-remove"
+          Materialize.toast "<i class='fa fa-circle-o-notch fa-2x fa-spin fa-fw'></i> Cargando archivos", "infinity", "toast-remove"
           prm =
             'loadfiles': true
             'files': angular.element("#tareo")[0].files[0]
