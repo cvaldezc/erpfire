@@ -360,6 +360,7 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                     ' minimo de columnas para registrar'
                                 valid = False
                             if valid:
+                                param = {}
                                 # get code project  for employee settings
                                 sett = EmployeeSettings.objects.filter(flag=True)[0]
                                 def registerassistance(parameter):
@@ -374,6 +375,7 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                     obj.hourout = parameter['hourout']
                                     obj.hourinbreak = parameter['hourinbreak']
                                     obj.houroutbreak = parameter['houroutbreak']
+                                    obj.viatical = parameter['viatical']
                                     obj.tag = True
                                     obj.save()
                                 keys = {
@@ -393,6 +395,7 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                         oparam['viatical'] = 0
                                     return oparam
                                 for xraw in xrange(9, nrow):
+                                    param = {}
                                     ndta = 3
                                     dni = wsheet.cell(row=xraw, column=2).internal_value
                                     if dni is None:
@@ -401,20 +404,26 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                     if len(dni) != 8:
                                         continue
                                     nreg = 1
-                                    param = dict()
-                                    param['employee'] = dni
                                     for xcol in xrange(ndta, ncol):
                                         if xcol > 44:
                                             break
+                                        param['employee'] = dni
                                         try:
                                             if xcol % 3 == 0:
                                                 assistance = wsheet.cell(row=7, column=xcol).value
                                                 if assistance is not None:
                                                     print assistance
                                                     param['assistance'] = assistance
+                                                else:
+                                                    xcol = xcol + 6
+                                                    continue
                                             cval = wsheet.cell(row=xraw, column=xcol).value
                                             # print cval
                                             param[keys[nreg]] = cval
+                                            if nreg == 1:
+                                                if param['hourin'] is None:
+                                                    xcol = xcol + 6
+                                                    continue
                                             if nreg == 6:
                                                 npro = ('project' in param
                                                         and param['project'] is not None)
