@@ -334,11 +334,13 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                 if 'loadfiles' in request.POST:
                     # print 'Files ', request.FILES
                     valid = True
+                    counter = 0
                     # load and validate format file
                     try:
                         # upload file in the path
                         path = '\\storage\\assistance\\'
                         filename = upload(path, request.FILES['files'])
+                        raises = list()
                         print filename
                         # validate file is meets with format
                         wbook = load_workbook(filename=filename, data_only=True)
@@ -355,7 +357,7 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                 valid = False
                                 kwargs['raise'] = 'El archivo no cumple con el '\
                                     'numero minimo filas para registrar'
-                            if ncol < 52:
+                            if ncol < 44:
                                 kwargs['raise'] = 'El archivo no cumple con el numero'\
                                     ' minimo de columnas para registrar'
                                 valid = False
@@ -365,19 +367,29 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                 sett = EmployeeSettings.objects.filter(flag=True)[0]
                                 def registerassistance(parameter):
                                     """this function register assistance"""
-                                    obj = Assistance()
-                                    obj.userregister_id = request.user.get_profile().empdni_id
-                                    obj.employee_id = parameter['employee']
-                                    obj.project_id = parameter['project']
-                                    obj.types_id = parameter['types']
-                                    obj.assistance = parameter['assistance']
-                                    obj.hourin = parameter['hourin']
-                                    obj.hourout = parameter['hourout']
-                                    obj.hourinbreak = parameter['hourinbreak']
-                                    obj.houroutbreak = parameter['houroutbreak']
-                                    obj.viatical = parameter['viatical']
-                                    obj.tag = True
-                                    obj.save()
+                                    try:
+                                        obj = Assistance()
+                                        obj.userregister_id = request.user.get_profile().empdni_id
+                                        obj.employee_id = parameter['employee']
+                                        obj.project_id = parameter['project']
+                                        obj.types_id = parameter['types']
+                                        obj.assistance = parameter['assistance']
+                                        obj.hourin = parameter['hourin']
+                                        obj.hourout = parameter['hourout']
+                                        obj.hourinbreak = parameter['hourinbreak']
+                                        obj.houroutbreak = parameter['houroutbreak']
+                                        obj.viatical = parameter['viatical']
+                                        obj.tag = True
+                                        obj.save()
+                                        print 'OK'
+                                        return 1
+                                    except Exception as oex:
+                                        raises.append({
+                                            'employee': parameter['employee'],
+                                            'assistance': parameter['assistance'],
+                                            'types': parameter['types'],
+                                            'raise': str(oex)})
+                                        return 0
                                 keys = {
                                     1: 'hourin',
                                     2: 'hourinbreak',
@@ -389,14 +401,25 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                     """ Valid format object in and fields null """
                                     if oparam['hourinbreak'] is None:
                                         oparam['hourinbreak'] = '00:00'
+                                    else:
+                                        # print type(oparam['hourinbreak'])
+                                        if isinstance(oparam['hourinbreak'], datetime):
+                                            oparam['hourinbreak'] = oparam['hourinbreak'].time()
                                     if oparam['houroutbreak'] is None:
                                         oparam['houroutbreak'] = '00:00'
+                                    else:
+                                        if isinstance(oparam['houroutbreak'], datetime):
+                                            oparam['houroutbreak'] = oparam['houroutbreak'].time()
+                                    if oparam['hourout'] is not None and isinstance(oparam['hourout'], datetime):
+                                        oparam['hourout'] = oparam['hourout'].time()
+                                    if oparam['hourin'] is not None and isinstance(oparam['hourin'], datetime):
+                                        oparam['hourin'] = oparam['hourin'].time()
                                     if oparam['viatical'] is None:
                                         oparam['viatical'] = 0
                                     return oparam
                                 for xraw in xrange(9, nrow):
                                     param = {}
-                                    ndta = 3
+                                    # ndta = 3
                                     dni = wsheet.cell(row=xraw, column=2).internal_value
                                     if dni is None:
                                         continue
@@ -404,7 +427,9 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                     if len(dni) != 8:
                                         continue
                                     nreg = 1
-                                    for xcol in xrange(ndta, ncol):
+                                    xcol = 2
+                                    while xcol <= 44:
+                                        xcol += 1
                                         if xcol > 44:
                                             break
                                         param['employee'] = dni
@@ -415,14 +440,17 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                                     print assistance
                                                     param['assistance'] = assistance
                                                 else:
-                                                    xcol = xcol + 6
-                                                    continue
+                                                    if nreg == 1:
+                                                        xcol += 5
+                                                        param = {}
+                                                        continue
                                             cval = wsheet.cell(row=xraw, column=xcol).value
                                             # print cval
                                             param[keys[nreg]] = cval
                                             if nreg == 1:
                                                 if param['hourin'] is None:
-                                                    xcol = xcol + 6
+                                                    xcol += 5
+                                                    param = {}
                                                     continue
                                             if nreg == 6:
                                                 npro = ('project' in param
@@ -436,17 +464,20 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                                         else:
                                                             param['types'] = 'TY04'
                                                 else:
-                                                    if len(param['project']) == 4:
-                                                        param['types'] = param['project']
-                                                        param['project'] = None
-                                                    else:
+                                                    if param['project'] is None:
                                                         param['types'] = 'TY04'
-                                                        param['project'] = None
+                                                    else:
+                                                        if len(param['project']) == 4:
+                                                            param['types'] = param['project']
+                                                            param['project'] = None
+                                                        else:
+                                                            param['types'] = 'TY04'
+                                                            param['project'] = None
                                                 if param['hourin'] is not None:
-                                                    print param
                                                     nreg = 1
                                                     param = validformat(param)
-                                                    registerassistance(param)
+                                                    print param
+                                                    counter += registerassistance(param)
                                                     param = {}
                                             else:
                                                 nreg += 1
@@ -460,6 +491,8 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                     wbook.save(filename)
                     # time.sleep(30)
                     deleteFile(filename)
+                    kwargs['raises'] = raises
+                    print counter
             except ObjectDoesNotExist as oex:
                 kwargs['status'] = False
                 kwargs['raise'] = str(oex)

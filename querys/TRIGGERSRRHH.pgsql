@@ -1,100 +1,3 @@
-/*
-# TRIGGER RECURSOS HUMANAS 2016-12-28 08:48:14
-*/
--- FUNCTION TRIGGERs
--- CALCULATION HOURS EXTRA
-CREATE OR REPLACE FUNCTION proc_calculatehourextra()
-    RETURNS TRIGGER AS
-$BODY$
-DECLARE
-    inbreak NUMERIC(2, 1) := 0;
-    break TIME;
-    ndate DATE;
-    diff TIME;
-    thours NUMERIC(3, 1) := 0;
-    config RECORD;
-    firsttime TIME;
-    secondtime TIME;
-    fvalid BOOLEAN := FALSE;
-BEGIN
-    IF NEW.hourin NOTNULL AND NEW.hourout NOTNULL THEN
-        -- CALCULATION HOUR BREAK
-        IF NEW.hourinbreak NOTNULL AND NEW.houroutbreak NOTNULL THEN
-            break := (NEW.houroutbreak - NEW.hourinbreak);
-            inbreak := EXTRACT('hour' FROM break)::NUMERIC;
-            RAISE WARNING 'HERE IF DISCOUNT HOUR BREAK';
-            IF inbreak <= 0 THEN
-                inbreak := 1;
-            END IF; 
-        END IF;
-        -- GET DATA CONFIGURATION
-        SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
-        -- EVALUATE IF HOUR OUT IS FOR NEXT DAY
-        IF NEW.hourout < NEW.hourin THEN
-            ndate := (NEW.asisstance::DATE + 1);
-            diff := ((ndate::CHAR || ' ' || NEW.hourout::CHAR):: TIMESTAMP - (NEW.asisstance::CHAR || ' ' || NEW.hourin::CHAR)::TIMESTAMP);
-        ELSE
-            diff := (NEW.hourout::TIME - NEW.hourin::TIME);
-        END IF;
-        -- DISCOUNT HOUR BREAK
-        IF inbreak > 0 AND diff >= config.totalhour THEN
-            diff := (diff - (to_char(inbreak, '00":00:00"'))::TIME);
-        END IF;
-        -- thours := EXTRACT('hour' from diff)::NUMERIC;
-        IF diff::TIME >= config.starthourextratwo::TIME THEN
-        	RAISE WARNING 'INSIDE HOURS SECONDTIME EXTRA';
-            secondtime := (diff - config.starthourextratwo::TIME);
-            NEW.hextsecond := (EXTRACT('hour' FROM secondtime))::NUMERIC;
-            RAISE WARNING 'ADDITIONAL SECONDTIME % %', secondtime, NEW.hextsecond;
-            -- HERE VERIFY MINUTES ROUND IF MINUTES GREAT VAL ROUND
-            -- IF THEN
-            -- END IF;
-            firsttime := (config.starthourextratwo::TIME - config.starthourextra::TIME);
-            NEW.hextfirst := (EXTRACT('hour' FROM firsttime))::NUMERIC;
-            RAISE WARNING 'ADDITIONAL FIRSTTIME % %', firsttime, NEW.hextfirst;
-            diff := (config.totalhour);
-            fvalid := TRUE;
-        ELSE
-            NEW.hextsecond := 0;
-        END IF;
-        IF NOT fvalid THEN
-            IF diff::TIME >= config.starthourextra::TIME AND diff::TIME < config.starthourextratwo::TIME THEN
-                RAISE WARNING 'INSIDE HOURS FIRST EXTRA';
-                firsttime := (diff - config.starthourextra::TIME);
-                NEW.hextfirst := (EXTRACT('hour' FROM firsttime))::NUMERIC;
-                diff := (config.totalhour);
-            ELSE
-                NEW.hextfirst := 0;
-            END IF;
-        END IF;
-        thours := ((EXTRACT('hour' from diff))::NUMERIC + (EXTRACT('minutes' from diff) / 60)::NUMERIC);
-        RAISE WARNING 'HERE twork %', thours;
-        NEW.hwork := thours;
-        -- RAISE WARNING '[AUDIT.IF_MODIFIED_FUNC] - Other action occurred: %, at %',TG_OP,now();
-        RETURN NEW;
-        -- REQUERIMENTS
-        -- INITIALIZE WITH NEXT PARAMETERS
-        -- HOUR IN := '08:00:00'
-        -- HOUR IN BREAK := '13:00:00'
-        -- HOUR OUT BREAK := '14:00:00'
-        -- HOUR OUT := '17:30:00'
-        -- IF HOUR OUT EXISTS HOUR EXTRA
-        -- HOUR OUT := '20:00:00'
-    ELSE
-        ROLLBACK;
-        RETURN NULL;
-    END IF;
-EXCEPTION
-    WHEN OTHERS THEN
-        RAISE WARNING 'ERROR SQLEXCEPTION %', SQLERRM;
-        ROLLBACK;
-        RETURN NULL;
-END;
-$BODY$
-LANGUAGE plpgsql VOLATILE
-COST 100;
--------------------------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION balance_hours_assistance_fn()
     RETURNS TRIGGER AS
 $BODY$
@@ -120,15 +23,20 @@ DECLARE
     xhfs TIME;
     xhts TIME;
 BEGIN
+    RAISE WARNING 'NEW RECORD %', NEW;
     SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
+    RAISE WARNING 'ROW CONFIG %', config;
     -- sum hour total for day for day
     FOR xa IN 
         SELECT * FROM rrhh_assistance WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance
     LOOP
+        RAISE WARNING 'ROW ASSISTANCE %', xa;
         -- OBTAIN SUM HOUR BREAK
-        IF (EXTRACT('hour' FROM xa.hourinbreak) + (EXTRACT('minutes' FROM xa.houroutbreak) / 60)) > 0 THEN
-            IF xa.hourinbreak NOTNULL AND xa.houroutbreak NOTNULL THEN
+        IF xa.hourinbreak NOTNULL AND xa.houroutbreak NOTNULL THEN
+            IF EXTRACT('hour' FROM xa.hourinbreak)::INT > 0 OR (EXTRACT('hour' FROM xa.houroutbreak))::INT > 0 THEN
                 break:= (xa.houroutbreak::TIME - xa.hourinbreak::TIME);
+            ELSE
+                break := '00:00:00'::TIME;
             END IF;
         ELSE
             break := '00:00:00'::TIME;
@@ -137,8 +45,8 @@ BEGIN
         IF (xa.hourin NOTNULL AND xa.hourout NOTNULL) THEN
             -- hourstart := ARRAY_APPEND(hourstart, xa.hourin);
             IF NEW.hourout < NEW.hourin THEN
-                ndate := (NEW.asisstance::DATE + 1);
-                diff := ((ndate::CHAR || ' ' || NEW.hourout::CHAR):: TIMESTAMP - (NEW.asisstance::CHAR || ' ' || NEW.hourin::CHAR)::TIMESTAMP);
+                ndate := (NEW.assistance::DATE + 1);
+                diff := ((ndate::CHAR(10) || ' ' || NEW.hourout::CHAR(5))::TIMESTAMP - (NEW.assistance::CHAR(10) || ' ' || NEW.hourin::CHAR(5))::TIMESTAMP);
             ELSE
                 diff := (NEW.hourout::TIME - NEW.hourin::TIME);
             END IF;
@@ -164,7 +72,11 @@ BEGIN
             xhts := config.shxsaturdayt;
         END IF;
         RAISE WARNING 'SHOW TYPES %', types;
-        tdelay := (ex.hourin::TIME - types.starthour::TIME);
+        IF ex.hourin::TIME > types.starthour::TIME THEN
+            tdelay := (ex.hourin::TIME - types.starthour::TIME);
+        ELSE
+            tdelay := '00:00:00'::TIME;
+        END IF;
         RAISE WARNING 'TDELAY % % %', tdelay, ex.hourin, types.starthour;
         RAISE WARNING 'DELAY HOUR %', EXTRACT('hour' FROM tdelay);
         RAISE WARNING 'DELAY MINUTES %', EXTRACT('minutes' FROM tdelay);
@@ -241,7 +153,7 @@ BEGIN
             END IF;
         END IF;
     END IF;
-    RAISE WARNING 'NAME OF DAY %', to_char(NEW.assistance::DATE, 'day');
+    RAISE WARNING 'NAME OF DAY %, %', to_char(NEW.assistance::DATE, 'day'), NEW.assistance;
     IF to_char(NEW.assistance::DATE, 'day')::CHAR(7) = 'saturday'::CHAR(7) THEN
         lack := (EXTRACT('hour' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC + (EXTRACT('minutes' FROM (types.outsaturday::TIME - types.starthour::TIME))/60)::NUMERIC);
         RAISE WARNING 'TOTAL HOURS % AND HOURS LACK %', thours, lack;
@@ -251,6 +163,7 @@ BEGIN
             lack := 0;
         END IF;
     ELSE
+        RAISE WARNING 'CALC LACK IN TOTAL HOURS WITH 8 HOUR';
         lack := ((EXTRACT('hour' FROM config.totalhour)::NUMERIC + (EXTRACT('minutes' FROM config.totalhour)/60)::NUMERIC));
         IF thours < lack THEN
             lack := (lack - thours);
@@ -258,17 +171,21 @@ BEGIN
             lack := 0;
         END IF;
     END IF;
+    RAISE WARNING 'CALC LACk (LACK - THOURS) % %', lack, thours;
     -- here is perform update or insert
     SELECT INTO balance * FROM rrhh_balanceassistance WHERE employee_id = NEW.employee_id AND assistance::DATE = NEW.assistance::DATE;
+    RAISE WARNING 'FOUND balance exists or not';
     IF FOUND THEN
         UPDATE rrhh_balanceassistance SET hextfirst = ft, hextsecond = st, hwork = thours, hdelay = delay, hlack = lack WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance;
+        RAISE WARNING 'FINISH UPDATE TABLE BALANCE';
     ELSE
         INSERT INTO rrhh_balanceassistance(employee_id, assistance, hextfirst, hextsecond, hwork, hdelay, flag, hlack) VALUES(NEW.employee_id, NEW.assistance, ft, st, thours, delay, TRUE, lack);
+        RAISE WARNING 'FINISH INSERT TABLE BALANCE';
     END IF;
     RETURN NEW;
 EXCEPTION
-    WHEN OTHERS THEN
-        RAISE WARNING 'ERROR SQLEXCEPTION %', SQLERRM;
+    WHEN others THEN
+        RAISE EXCEPTION 'ERROR SQLEXCEPTION %', SQLERRM;
         ROLLBACK;
         RETURN NULL;
 END;
@@ -277,22 +194,9 @@ LANGUAGE plpgsql VOLATILE
 COST 100;
 
 
-
 -- EXECUTE TRIGGERs
-DROP TRIGGER calc_hours_works ON rrhh_assistance;
-DROP FUNCTION proc_calculatehourextra();
-CREATE TRIGGER calc_hours_works
-BEFORE INSERT OR UPDATE ON rrhh_assistance
-FOR EACH ROW EXECUTE PROCEDURE proc_calculatehourextra();
-----------------------------------------------------------
 DROP TRIGGER ext_hours_balance ON rrhh_assistance;
 DROP FUNCTION balance_hours_assistance_fn();
 CREATE TRIGGER ext_hours_balance
 AFTER INSERT OR UPDATE ON rrhh_assistance
 FOR EACH ROW EXECUTE PROCEDURE balance_hours_assistance_fn();
-
-/* TEST TIMEs */
--- SELECT DATE '2016-12-28' + DATE '2016-12-31';
--- SELECT EXTRACT('hour' from '17:30:00'::TIME - '08:00:00'::TIME);
--- SELECT ('05:00:00'::TIME - '22:30:00'::TIME);
--- SELECT ('2016-12-23 05:00:00'::TIMESTAMP - '2016-12-22 20:30:00'::TIMESTAMP);
