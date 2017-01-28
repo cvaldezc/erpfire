@@ -30,6 +30,7 @@ BEGIN
     FOR xa IN 
         SELECT * FROM rrhh_assistance WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance
     LOOP
+    
         RAISE WARNING 'ROW ASSISTANCE %', xa;
         -- OBTAIN SUM HOUR BREAK
         IF xa.hourinbreak NOTNULL AND xa.houroutbreak NOTNULL THEN
