@@ -2333,11 +2333,8 @@ class GuideSingle(JSONResponseMixin, TemplateView):
                             serializers.serialize(
                                 'json',
                                 Inventario.objects.filter(
-                                    materiales_id=request.GET['code'],
-                                    periodo=globalVariable.get_year)))
-                        det = InventoryBrand.objects.filter(
-                            period=globalVariable.get_year,
-                            materials_id=request.GET['code'])
+                                    materiales_id=request.GET['code'])))
+                        det = InventoryBrand.objects.filter(materials_id=request.GET['code'])
                         context['list'] = json.loads(
                             serializers.serialize(
                                 'json', det, relations=('brand', 'model')))
@@ -2388,7 +2385,10 @@ class GuideSingle(JSONResponseMixin, TemplateView):
                         brand_id=request.POST['brand'],
                         model_id=request.POST['model']).delete()
                     context['status'] = True
-
+                if 'delalltmp' in request.POST:
+                    for x in TmpDetGuia.objects.filter(flag=True):
+                        x.delete()
+                    context['status'] = True
                 if 'valid' in request.POST:
                     code = request.POST['code']
                     try:
@@ -2434,24 +2434,24 @@ class GuideSingle(JSONResponseMixin, TemplateView):
                             add.save()
                             # save details
                             for x in det:
-                                # get Stock Inventory of brand and model
-                                inv = Inventario.objects.get(
-                                        periodo=globalVariable.get_year,
-                                        materiales_id=x.materials_id).order_by(
-                                        '-ingreso')
-                                ibm = InventoryBrand.objects.get(
-                                    period=globalVariable.get_year,
-                                    materials_id=x.materials_id,
-                                    brand_id=x.brand_id,
-                                    model_id=x.model_id).order_by(
-                                        '-ingress')
+                                # # get Stock Inventory of brand and model
+                                # inv = Inventario.objects.get(
+                                #         periodo=globalVariable.get_year,
+                                #         materiales_id=x.materials_id).order_by(
+                                #         '-ingreso')
+                                # ibm = InventoryBrand.objects.get(
+                                #     period=globalVariable.get_year,
+                                #     materials_id=x.materials_id,
+                                #     brand_id=x.brand_id,
+                                #     model_id=x.model_id).order_by(
+                                #         '-ingress')
                                 dg = DetGuiaRemision()
-                                inv.stock = (
-                                    float(inv.stock) - float(x.quantity))
-                                inv.save()
-                                ibm.stock = (
-                                    float(ibm.stock) - float(x.quantity))
-                                ibm.save()
+                                # inv.stock = (
+                                #     float(inv.stock) - float(x.quantity))
+                                # inv.save()
+                                # ibm.stock = (
+                                #     float(ibm.stock) - float(x.quantity))
+                                # ibm.save()
                                 dg.guia_id = code
                                 dg.materiales_id = x.materials_id
                                 dg.cantguide = x.quantity

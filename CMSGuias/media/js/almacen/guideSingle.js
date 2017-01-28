@@ -15,7 +15,6 @@ app.controller('SGuideCtrl', function($scope, $http, $cookies, $timeout) {
       selectMonths: true,
       selectYears: 15,
       format: 'yyyy-mm-dd',
-      min: '0',
       closeOnSelect: true
     });
     $scope.customersList();
@@ -238,6 +237,36 @@ app.controller('SGuideCtrl', function($scope, $http, $cookies, $timeout) {
       }
     });
   };
+  $scope.delallitems = function() {
+    swal({
+      title: "Realmente desea elimnar todo el detalle?",
+      text: '',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dd6b55',
+      confirmButtonText: 'Si!, eliminar',
+      closeOnCancel: true,
+      closeOnConfirm: true
+    }, function(isConfirm) {
+      var data;
+      if (isConfirm) {
+        data = {
+          'delalltmp': true
+        };
+        $http({
+          url: '',
+          data: $.param(data),
+          method: 'post'
+        }).success(function(response) {
+          if (response.status) {
+            location.reload();
+          } else {
+            swal("Error", "No se a eliminado el temporal", "error");
+          }
+        });
+      }
+    });
+  };
   $scope.validExistGuide = function() {
     var data;
     data = {
@@ -356,10 +385,6 @@ app.controller('SGuideCtrl', function($scope, $http, $cookies, $timeout) {
             break;
         }
       }
-    }
-    if (new Date(data.traslado) < new Date()) {
-      swal('Alerta!', 'La fecha ingresada es menor', 'warning');
-      data.save = false;
     }
     if (data.save) {
       data.traslado = (data.traslado.getFullYear()) + "-" + (data.traslado.getMonth() + 1) + "-" + (data.traslado.getDate());
