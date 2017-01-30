@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from .views import *
-from . import views
+# from . import views
 from django.conf.urls import patterns, url, include
 
 TipoInstitucion_urls = patterns(
@@ -110,7 +110,8 @@ ExaDoc_urls = patterns(
 )
 
 urlpatterns = patterns(
-	'CMSGuias.apps.rrhh.views',
+	'',
+    url(r'^$', EmployeeHome.as_view(), name='rrhh_index'),
 	url(r'^empleado/$',Menu.as_view(),name='menu'),
     url(r'^empleado/phone/$',Phone.as_view(),name='rrhhphone_view'),
     url(r'^empleado/cuentacorriente/$',CuentaCorriente.as_view(),name='rrhhcuenta_view'),
@@ -134,5 +135,5 @@ urlpatterns = patterns(
     url(r'^NoActive/',include(EmpleNoActive_urls)),
     url(r'^proyecto/',include(Proyecto_urls)),
     url(r'^exadoc/',include(ExaDoc_urls)),
-	)
+)
 

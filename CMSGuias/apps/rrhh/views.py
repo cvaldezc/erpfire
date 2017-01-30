@@ -32,6 +32,15 @@ class JSONResponseMixin(object):
         return json.dumps(context, encoding='utf-8', cls=DjangoJSONEncoder)
 
 
+class EmployeeHome(TemplateView):
+
+    template_name = 'rrhh/index.html'
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, kwargs)
+
+
 class EmpleDetails(ListView):
 
     template_name = 'rrhh/formviewdetempl.html'
