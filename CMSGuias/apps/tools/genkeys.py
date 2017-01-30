@@ -479,3 +479,182 @@ def GenerateIdTipEmple():
     except ObjectDoesNotExist, e:
         raise e
     return id
+
+def GenerateIdInstituto():
+    id = None
+    try:
+        code = TipoInstitucion.objects.aggregate(max=Max('tipoinst_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('IN', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+
+def GenerateIdCobertura():
+    id = None
+    try:
+        code = CoberturaSalud.objects.aggregate(max=Max('coberturasalud_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('CB', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+
+def GenerateIdRegimenSalud():
+    id = None
+    try:
+        code = RegimenSalud.objects.aggregate(max=Max('regimensalud_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('RS', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+def GenerateIdRegimenPensionario():
+    id = None
+    try:
+        code = RegimenPensionario.objects.aggregate(max=Max('regimenpens_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('RP', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+def GenerateIdExamen():
+    id = None
+    try:
+        code = TipoExamen.objects.aggregate(max=Max('tipoexamen_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('EX', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+def GenerateIdContrato():
+    id = None
+    try:
+        code = TipoContrato.objects.aggregate(max=Max('tipocontrato_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('CT', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+def GenerateIdPago():
+    id = None
+    try:
+        code = TipoPago.objects.aggregate(max=Max('tipopago_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('PA', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+def GenerateIdRubro():
+    id = None
+    try:
+        code = Rubro.objects.aggregate(max=Max('rubro_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('RU', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+
+def GenerateIdDoc():
+    id = None
+    try:
+        code = TipoDocumento.objects.aggregate(max=Max('tipodoc_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('DC', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+def GenerateIdEmpleCampo(dni=None, pr=None):
+    try:
+        row = EmpleCampo.objects.filter(empdni_id=dni, proyecto_id=pr).latest('registro')
+        print dni
+        print pr
+        if row:
+            code = int(row.emplecampo_id[-3:])
+            print code
+            return '%s%s%s' % (dni, pr, '{:0>3d}'.format(code + 1))
+        else:
+            return '%s%s%s' % (dni, pr, '001')
+    except ObjectDoesNotExist:
+        return '%s%s%s' % (dni, pr, '001')
