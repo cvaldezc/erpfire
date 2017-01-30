@@ -17,7 +17,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'erpicrperu',
+        'NAME': 'test',
         # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'postgres',
@@ -168,10 +168,10 @@ INSTALLED_APPS = (
     'CMSGuias.apps.ventas.budget',
     'CMSGuias.apps.reports.templatetags',
     'CMSGuias.apps.boleta',
-)
+    'CMSGuias.apps.rrhh',)
 
 SERIALIZATION_MODULES = {
- 'json': 'wadofstuff.django.serializers.json'
+    'json': 'wadofstuff.django.serializers.json'
 }
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'

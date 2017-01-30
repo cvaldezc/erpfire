@@ -1,0 +1,174 @@
+<!--MODAL PROYECTO-->
+<div class="modal editproyemple" style="width:800px;height:100%;" > 
+  <div class="modal-content">
+          <div class="row">
+              <div class="row">
+                <div>
+                  <label style="display:none;" id="codproy" class="codproy" name="codproy"></label>
+                  <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                  <label style="color:black;font-size: 15px;" class="nameemplepro" id="nameemplepro"></label><label> - </label>
+                  <label style="color:black;font-size: 15px;" class="dniproy" name="dniproy" id="dniempleadoproy">
+                  </label>
+                  <div style="display:none;">
+                  <input  id="accionproyecto" class="accionproyecto" name="accionproyecto">
+                  </div>
+                </div>    
+              </div>
+              <div class="input-field col s0">
+                <p>Proyecto:</p>
+              </div>
+              <div class="input-field col">
+                  <select id="comboproyecto" class="browser-default">
+                    {% for x in lproyecto %}
+                      {% if x.status == 'AC' %}
+                        <option value="{{ x.proyecto_id }}">
+                        {{x.proyecto_id}} - {{x.nompro}}</option>
+                  {% endif %}
+                {% endfor %}
+                  </select>                 
+              </div>
+
+          </div>
+            <div class="row">
+                  <div class="input-field col s3">
+                    <input placeholder="" id="finiproy"  name="finiproy" type="date" class="datepicker">
+                    <label for="finiproy" >FECHA DE INICIO</label>
+                </div>
+            </div>
+          <div class="row">
+              <div class="row">
+              <div class="input-field col s0">
+                <p>Carnet Magnetico:</p>
+              </div>
+              <div class="input-field col s2">
+                  <select id="ccarnetmag" class="browser-default">
+                    <option value="true">SI</option>
+                    <option value="false">NO</option>
+                  </select>                 
+              </div>
+              <div class="input-field col s0">
+                <p>Fotocheck:</p>
+              </div>
+              <div class="input-field col s2">
+                  <select id="combfotocheck" class="browser-default">
+                    <option value="true">SI</option>
+                    <option value="false">NO</option>
+                  </select>                 
+              </div>
+          </div>
+          </div>
+          <div class="row">                 
+                <div class="input-field col s6">
+                  <textarea placeholder="" id="comenobra" name="comenobra" class="materialize-textarea"></textarea>
+                  <label for="comenobra" >COMENTARIO</label>
+                </div>
+          </div>
+          <div class="moda-footer" align="center">
+                <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                  <i class="fa fa-times"></i>
+                  <span>Cancelar</span>
+                </button>
+                <button type="button" class="btn waves-effect green lighten-1 btnsaveproy">
+                  <i class="fa fa-floppy-o"></i>
+                  <span>Guardar Cambios</span>
+                </button>
+          </div> 
+    </div>
+</div>
+<!--MODAL INDUCCION-->
+  <div class="modal editinduccionemple" style="width:800px;height:70%;" > 
+    <div class="modal-content ">
+          <div class="row">
+            <div style="">
+            <label style="display:none;" id="codinduc" class="codinduc" name="codinduc"></label>
+            <label>Obra:</label>
+            <label class="dniinduc" id="dniinduc" name="dniinduc"></label>  
+            </div>
+            <div style="display:none;">
+                <input  id="accioninduccion" class="accioninduccion" name="accioninduccion">
+              </div>
+          </div>
+          <div class="row">
+              <div class="input-field col s5">
+                <input placeholder="" id="finduccion" name="finduccion" type="date" class="datepicker">
+              <label for="finduccion" >FECHA DE INDUCCION</label>
+              </div>
+              <div class="input-field col s5">
+                <input placeholder="" id="fcadinduccion" name="fcadinduccion" type="date" class="datepicker">
+                <label for="fcadinduccion" >FECHA DE CADUCIDAD</label>
+              </div>
+          </div>
+          <div class="row" id="divestinduc">
+              <div class="input-field col s5">
+                <input placeholder="" id="estinduccion" name="estinduccion" type="text" class="estinduccion">
+                <label for="estinduccion" >ESTADO</label>
+              </div>
+          </div>
+          <div class="row">                 
+                <div class="input-field col s10">
+                  <textarea placeholder="" id="cominduccion" name="cominduccion" class="materialize-textarea"></textarea>
+                  <label for="cominduccion" >COMENTARIO</label>
+                </div>
+          </div>
+    </div>
+      <div class="moda-footer" align="center">
+            <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+              <i class="fa fa-times"></i>
+              <span>Cancelar</span>
+            </button>
+            <button type="button" class="btn waves-effect green lighten-1 btnsaveinduc">
+              <i class="fa fa-floppy-o"></i>
+              <span>Guardar Cambios</span>
+            </button>
+      </div> 
+<!--MODAL EPPS-->
+  </div>
+    <div class="modal editeppsemple" style="width:50%;height:100%;" > 
+      <div class="modal-content" >
+          <div class="row">
+            <div style="">
+            <label id="codepps" class="codepps" name="codepps"></label>
+            <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+            <label style="color:black;font-size: 15px;" class="nameempleepps" id="nameempleepps"></label><label> - </label>
+            <label style="color:black;font-size: 15px;" class="dniepps" id="dniepps" name="dniepps"></label>  
+            </div>
+            <div style="display:none;">
+                <input  id="accionepps" class="accionepps" name="accionepps">
+              </div>
+          </div>
+          <div class="row">
+              <div class="input-field col s10">
+                <input placeholder="" id="itemobra" name="itobra" type="text" class="validate">
+                <label for="itemobra" >NOMBRE DE EPPS</label>
+              </div>
+          </div>
+          <div class="row">
+              <div class="input-field col s5">
+                <input placeholder="" id="fechentrepps" name="fentrepps" type="date" class="datepicker">
+                <label for="fechentrepps" >FECHA DE ENTREGA</label>
+              </div>
+              <div class="input-field col s5" id="divfechrec">
+                <input placeholder="" id="fechrecepps" name="frecepps" type="date" class="datepicker">
+                <label for="fechrecepps" >FECHA DE RECEPCION</label>
+              </div>
+          </div>
+          <div class="row">                 
+                <div class="input-field col s10">
+                  <textarea placeholder="" id="comentepps" name="cepps" class="materialize-textarea"></textarea>
+                  <label for="comnetepps" >COMENTARIO</label>
+                </div>
+          </div>
+
+      </div>
+      <div class="moda-footer" align="center">
+            <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+              <i class="fa fa-times"></i>
+              <span>Cancelar</span>
+            </button>
+            <button type="button" class="btn waves-effect green lighten-1 btnsaveep">
+              <i class="fa fa-floppy-o"></i>
+              <span>Guardar Cambios</span>
+            </button>
+      </div> 
+    </div>
+{% csrf_token %}

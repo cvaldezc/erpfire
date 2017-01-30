@@ -1,0 +1,54 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+    <div class="container">
+        <div class="well">
+            <h3>Tipos de Regimen Pensionario</h3>
+            <div class="panel panel-primary">
+                <div class="btn-group">
+                    <a href="{% url 'tiporegimenpens_new' %}" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Nuevo Tipo
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-condensed">
+                        <thead>
+                            <tr class="brand-primary">
+                                <th width="1cm">Item</th><th width="2cm">Código</th>
+                                <th>Nombre Tipo</th>
+                                <th>Tipo de Seguro</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in tiporegimenpens %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ x.regimenpens_id }}</td>
+                                <td>{{ x.regimen }}</td>
+                                <td>{{ x.coberturapension }}</td>
+                                <td>
+                                    <a href="{% url 'tiporegimenpens_edit' x.regimenpens_id %}" class="btn btn-xs btn-link text-green">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'tiporegimenpens_del' x.regimenpens_id %}" class="btn waves-effect red lighten-1">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

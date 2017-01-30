@@ -1,0 +1,52 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+    <div class="container">
+        <div class="well">
+            <h3>Tipos de Institucion</h3>
+            <div class="panel panel-primary">
+                <div class="btn-group">
+                    <a href="{% url 'tipoinst_new' %}" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Nuevo Tipo
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-condensed">
+                        <thead>
+                            <tr class="brand-primary">
+                                <th width="1cm">Item</th><th width="2cm">Código</th>
+                                <th>Nombre Tipo</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in tipos %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ x.tipoinst_id }}</td>
+                                <td>{{ x.tipo }}</td>
+                                <td>
+                                    <a href="{% url 'tipoinst_edit' x.tipoinst_id %}" class="btn btn-xs btn-link text-green">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'tipoinst_del' x.tipoinst_id %}" class="btn waves-effect red lighten-1">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

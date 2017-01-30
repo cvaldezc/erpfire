@@ -1,0 +1,52 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+    <div class="container">
+        <div class="well">
+            <h3>Tipos de Suspension</h3>
+            <div class="panel panel-primary">
+                <div class="btn-group">
+                    <a href="{% url 'tiposuspension_new' %}" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Agregar Tipo
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-condensed">
+                        <thead>
+                            <tr class="brand-primary">
+                                <th width="1cm">Item</th><th width="2cm">Código</th>
+                                <th>Nombre Tipo</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in tiposuspension %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ x.suspension_id }}</td>
+                                <td>{{ x.motivo }}</td>
+                                <td>
+                                    <a href="{% url 'tiposuspension_edit' x.suspension_id %}" class="btn btn-xs btn-link text-green">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'tiposuspension_del' x.suspension_id %}" class="btn waves-effect red lighten-1">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

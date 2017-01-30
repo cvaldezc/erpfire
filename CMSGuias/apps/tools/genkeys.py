@@ -10,7 +10,7 @@ from CMSGuias.apps.almacen.models import (
     Pedido, GuiaRemision, Suministro, NoteIngress, Restoration)
 from CMSGuias.apps.logistica.models import Cotizacion, Compra, ServiceOrder
 from CMSGuias.apps.ventas.models import Proyecto
-from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup
+from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado
 from CMSGuias.apps.operations.models import (
     Deductive, Letter, PreOrders, SGroup, DSector)
 from CMSGuias.apps.ventas.budget.models import AnalysisGroup, Analysis, Budget
@@ -460,3 +460,22 @@ def keyRestoration():
             return 'D%s%s' % (yn, '{:0>3d}'.format(count))
     except ObjectDoesNotExist:
         return 'D%s%s' % (yn, '{:0>3d}'.format(count))
+
+
+def GenerateIdTipEmple():
+    id = None
+    try:
+        code = TipoEmpleado.objects.aggregate(max=Max('tipoemple_id'))
+        id = code['max']
+        print code
+        print id
+        if id is not None:
+            counter = int(id[2:5])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('EM', '{:0>3d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id

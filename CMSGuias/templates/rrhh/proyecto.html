@@ -1,0 +1,68 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+<script src="/media/js/rrhh/empleados.js"></script>
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+
+<link rel="stylesheet" href="/media/css/rrhh/empleado.css">
+<div class="row">
+  <div class="input-field col s0">
+    <h4><strong>Proyecto:</strong></h4>
+  </div>
+  <div class="input-field col s6">
+      <select id="comboproyecto" class="browser-default">
+        {% for x in lproyecto %}
+          <option value="{{ x.proyecto_id }}">
+            {{x.proyecto_id}} - {{x.nompro}}</option>
+    {% endfor %}
+      </select>                 
+  </div>
+</div>
+<div class="row" style="margin-top:20px;margin-left:60px;">
+<div class="input-field col">
+<button style="height:50px;" type="button" name="btnviewemp" class="btn waves-effect green lighten-1 btnviewemp" id="btnviewemp"><strong>Trabajadores Asignados</strong></button>
+<button style="height:50px;" type="button" name="btnviewinduccion" class="btn waves-effect green lighten-1 btnviewinduccion" id="btnviewinduccion"><strong>Inducciones</strong>
+</button>
+</div>
+<div class="input-field col">
+<input class="txtbuscarproy" style="width: 80%;margin-left:400px;" align="center" type="search" placeholder="Buscar Empleado" name="txtbuscarproy" id="txtbuscarproy" >
+</div>
+</div>
+<hr>
+    <table style="display:none;margin-left:20px;width:95%;" id="table-detailproyecto" name="table-princ" class="table-detailproyecto">
+    <caption align="center" style="margin-left:700px;"><h5>Empleados</h5></caption>
+        <thead>
+          <tr>
+            <th style="text-align:center;">N°</th>
+            <th style="text-align:center;">Nombres</th>
+            <th style="text-align:center;">Duracion Proyecto</th>
+            <th style="text-align:center;">F.Entrada al Proyecto</th>
+            <th style="text-align:center;">Carnet - FotoCheck</th>
+          </tr>
+        </thead>
+        <tbody id="fbody" class="tbodyprinc">
+        </tbody>  
+    </table>
+
+    <table style="display:none;margin-left:20px;width:95%;" id="table-indxobra" name="table-princ" class="table-indxobra">
+    <caption align="center" style="margin-left:700px;"><h5>Inducciones</h5></caption>
+        <thead>
+          <tr>
+            <th style="text-align:center;">N°</th>
+            <th style="text-align:center;">Nombres</th>
+            <th style="text-align:center;">DNI</th>
+            <th style="text-align:center;">Cargo</th>
+            <th style="text-align:center;">Fecha de Inicio</th>
+            <th style="text-align:center;">Fecha de Caducidad</th>
+            <th style="text-align:center;">Estado</th>
+          </tr>
+        </thead>
+        <tbody id="fbody" class="tbodyprinc">
+        </tbody>  
+    </table>
+
+{% csrf_token %}
+
+{% endblock %}

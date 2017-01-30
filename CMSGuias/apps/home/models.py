@@ -160,19 +160,51 @@ class Cargo(models.Model):
         return '%s %s - %s' % (self.cargo_id, self.cargos, self.area)
 
 
+class TipoEmpleado(models.Model):
+    tipoemple_id = models.CharField(primary_key=True, max_length=9)
+    descripcion = models.CharField(max_length=100)
+    flag = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return ' %s ' %(self.descripcion)
+
+
 class Employee(models.Model):
+    def url(self, filename):
+        ruta = 'storage/examedic/%s/fichaentrada/%s' % (self.empdni_id, filename)
+        return ruta
+
+    def urlfoto(self, filename):
+        fotoruta = 'storage/examedic/%s/foto/%s' % (self.empdni_id, filename)
+        return fotoruta
+
     empdni_id = models.CharField(primary_key=True, max_length=8)
+    tipoemple = models.ForeignKey(TipoEmpleado, to_field='tipoemple_id', null=True, blank=True)
     firstname = models.CharField(max_length=100)
     lastname = models.CharField(max_length=150)
-    register = models.DateTimeField(auto_now=True)
-    birth = models.DateField(auto_now_add=True)
-    phone = models.CharField(max_length=32, null=True, blank=True)
-    address = models.CharField(max_length=180)
-    charge = models.ForeignKey(Cargo, to_field='cargo_id')
+    sexo = models.BooleanField()
+    estadocivil = models.BooleanField()
+    birth = models.DateField(null=True, blank=True)
+    address = models.CharField(max_length=180, null=True, blank=True)
+    address2 = models.CharField(max_length=180, null=True, blank=True)
     email = models.EmailField(max_length=80, null=True, blank=True)
-    fixed = models.CharField(max_length=26, null=True, blank=True)
-    phonejob = models.CharField(max_length=32, null=True, blank=True)
+    nacionalidad = models.BooleanField(default=True)
+    discapacidad = models.BooleanField(default=False)
+    situacion = models.CharField(max_length=100, default="Activo", null=True, blank=True)
+    feching = models.DateField(null=True, blank=True)
+    estadoplanilla = models.BooleanField(default=False)
+    register = models.DateTimeField(auto_now_add=True)
+    charge = models.ForeignKey(Cargo, to_field='cargo_id', null=True)
     observation = models.TextField(null=True, blank=True)
+    archivo = models.FileField(upload_to=url, null=True, blank=True, max_length=500)
+    foto = models.FileField(upload_to=urlfoto, null=True, blank=True, max_length=300)
+    nacdpt = models.CharField(max_length=20, null=True, blank=True)
+    nacprov = models.CharField(max_length=20, null=True, blank=True)
+    nacdist = models.CharField(max_length=20, null=True, blank=True)
+    tallazap = models.CharField(max_length=6, null=True, blank=True)
+    tallapolo = models.CharField(max_length=6, null=True, blank=True)
+    cargopostula = models.CharField(max_length=30, null=True, blank=True)
+    distrito = models.CharField(max_length=30, null=True, blank=True)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -181,12 +213,7 @@ class Employee(models.Model):
         ordering = ['lastname']
 
     def __unicode__(self):
-        return '%s %s %s %s %s' % (
-                self.empdni_id,
-                self.firstname,
-                self.lastname,
-                self.phone,
-                self.charge)
+        return '%s' % (self.empdni_id)
 
     @property
     def name_complete(self):
@@ -263,8 +290,7 @@ class Cliente(models.Model):
     provincia = models.ForeignKey(Provincia, to_field='provincia_id')
     distrito = models.ForeignKey(Distrito, to_field='distrito_id')
     direccion = models.CharField(max_length=200, null=False)
-    telefono = models.CharField(
-                max_length=30, null=True, blank=True, default='000-000-000')
+    telefono = models.CharField(max_length=30, null=True, blank=True, default='000-000-000')
     contact = models.CharField(max_length=200, default='', blank=True)
     flag = models.BooleanField(default=True)
 
@@ -363,6 +389,12 @@ class TipoCambio(models.Model):
                     self.moneda, self.fecha, self.compra, self.venta)
 
 
+class Rubro(models.Model):
+    rubro_id = models.CharField(primary_key=True, max_length=8)
+    rubro = models.CharField(max_length=50)
+    flag = models.BooleanField(default=True)
+
+
 class Proveedor(models.Model):
     proveedor_id = models.CharField(primary_key=True, max_length=11)
     razonsocial = models.CharField(max_length=200)
@@ -376,10 +408,11 @@ class Proveedor(models.Model):
     origen = models.CharField(max_length=10)
     last_login = models.DateTimeField(auto_now=True, null=True)
     email = models.CharField(
-                max_length=60, default='ejemplo@dominio.com', null=True)
+        max_length=60, default='ejemplo@dominio.com', null=True)
     contact = models.CharField(
-                max_length=200, default='', blank=True, null=True)
+        max_length=200, default='', blank=True, null=True)
     register = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    rubropro = models.ForeignKey(Rubro, to_field='rubro_id', null=True)
     flag = models.BooleanField(default=True)
 
     class Meta:

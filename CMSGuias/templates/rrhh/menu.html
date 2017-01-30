@@ -1,0 +1,213 @@
+{% extends "basemd.html" %}
+{% extends "div.html %"}
+{% block title %}
+  Empleados
+{% endblock %}
+
+{% block menu %}
+  {% include "menus/rrhhmd.html" %}
+{% endblock %}
+
+{% block content %}
+
+<script src="/media/js/rrhh/empleados.js"></script>
+<link rel="stylesheet" href="/media/css/rrhh/empleado.css">
+
+<div>
+<nav class="card">
+  <div class="card-action">
+    <button type="button" name="btnopennewemple" data-emple="btnnewemple" class="btn waves-effect green lighten-1 btnopennewemple">
+      <i class="fa fa-address-card-o"></i>
+      <span>AGREGAR EMPLEADO</span>
+    </button>
+  </div>
+</nav>
+  <div class="card">
+    <div class="card-action">
+        <div class="input-field">
+          <i class="prefix fa fa-search"></i>
+          <input class="txtbuscar col l12 m12 s12" type="text" placeholder="Buscar Empleado" data-table="tabl" name="txtbuscar" id="txtbuscar" >
+        </div>
+    </div>
+  </div>
+  {% comment %}<div class="divbtnactivos">
+      <div class="row">
+         <!--
+         <div style="margin-left:80%;">
+          <input name="group1" type="radio" id="test1" value="Activos"/>
+          <label for="test1" style="color:green;font-weight:bold;">Activos</label>
+          <input name="group1" type="radio" id="test2" value="No Activos" checked="checked"/>
+          <label for="test2" style="color:red;font-weight:bold;">No Activos</label>
+        </div>-->
+
+      </div>
+   </div>{% endcomment %}
+{% include "rrhh/formaddempl.html" %}
+
+    <table class="tabl" id="templeados" name="table-princ">
+
+        <thead>
+          <tr>
+            <th class="col-1">#</th>
+            <th class="col-6">Nombres</th>
+            <th class="col-3">DNI</th>
+            <th class="col-3">Cargo</th>
+            <th class="col-5">Email</th>
+            <th class="col-2">F.Ingreso</th>
+            <!--<th class="colsituacion">Situacion</th>-->
+            <th style="display:none;"></th>
+            <th class="">Editar</th>
+            <th class="col-2">Info</th>
+            <th class="col-3"></th>
+            
+          </tr>
+        </thead>
+        <tbody id="fbody" class="bodydetails">
+          {% for x in list %}                    
+          <tr class="fer">
+            <td class="col-1">{{ forloop.counter }}</td>
+            <td class="left-align col-6">{{x.lastname}} {{x.firstname}}</td>
+            <td class="col-3">{{x.empdni_id}}</td>
+            <td class="col-3">{{x.charge.cargos}}</td>
+            <td class="col-5">{{x.email}}</td>
+            <td class="col-2">{{x.feching}}</td>
+            <!--<td class="colsituacion">{{x.flag}}</td>-->
+            <td class="" style="display:none;">{{x.estadoplanilla}}</td>
+            <td>
+                <a class='dropdown-button btn' style="width:150px;" data-activates='dropdown{{ forloop.counter }}'><i class="fa fa-list" aria-hidden="true"></i></a>
+                <ul id='dropdown{{ forloop.counter }}' class='dropdown-content'>
+                  <li>
+                  <button type="button" name="" style="width:150px;height:50px;color:black;font-weight:bold;" data-emple='btneditemple' value='{{x.empdni_id}}' class="btn transparent btnshowedit"><small>Empleado</small></button>
+                  </li>
+                  <li class="divider"></li>
+                  <li>
+                  <button id="btnidcuenta" type="button" name="btncuenta" style="width:150px;height:50px;color:black;font-weight:bold;" data-cuentadni='{{x.empdni_id}}' data-namecuenta='{{ x.lastname }}' data-est='{{ x.estado }}' value='{{x.empdni_id}}' data-cuenta="btneditcuenta" class="btn transparent btnshoweditcuenta"><small>Cuenta</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidtelef" type="button" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' data-nametel="{{ x.lastname }}" data-telefdni="{{ x.empdni_id }}" data-telefono="btnedittelefono" name="btntelefono" class="btn transparent btnshowedittelef"><small>Telefono</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidestudios" type="button" name="btnestudio" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' data-nameest="{{ x.lastname }}" data-estdni="{{ x.empdni_id }}" data-estudio="btneditestudio" class="btn transparent btnshoweditest"><small>Estudios</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidsusp" type="button" name="btnsuspension" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' data-suspname="{{ x.lastname }}" data-suspdni="{{ x.empdni_id }}" data-suspension="btneditsusp" class="btn transparent btnshoweditsusp"><small>Suspension</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidobra" type="button" name="btnproyecto" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' data-nameobra='{{ x.lastname }}' data-e='{{ x.empdni.emplecampo_id }}' data-proyecto="btneditproyecto" data-obradni="{{ x.empdni_id }}" data-induccion="btneditinduccion" class="btn transparent btnshoweditobra"><small>Obra</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidexadoc" type="button" name="btnexamen" data-nameexadoc="{{ x.lastname }}" data-exadocdni="{{ x.empdni_id }}" data-examen="btneditexamen" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' class="btn transparent btnshoweditexadoc"><small>Exam/Doc.</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidsegsoc" type="button" name="btnsegsocial" data-examen="btnsegsocial" data-estseg="{{ x.estadoplanilla }}" data-namesegsoc="{{ x.lastname }}" data-segsocialdni="{{ x.empdni_id }}" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' class="btn transparent btnshoweditsegsocial"><small>Seg.Social</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidfamilia" type="button" name="btnfamilia" data-namefam="{{ x.lastname }}" data-familia="btnfamilia" data-familiadni="{{ x.empdni_id }}" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' class="btn transparent btnshoweditfamilia"><small>Familiares</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidexplab" type="button" name="btnexplab" data-explab="btnexplab" data-nameexplab="{{ x.lastname }}" data-explabdni="{{ x.empdni_id }}" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' class="btn transparent btnshoweditexplab"><small>Exp.Lab.</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidmedic" type="button" name="btnmedic" data-medic="btnmedic" data-medicname="{{ x.lastname }}" data-medicdni="{{ x.empdni_id }}" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' class="btn transparent btnshoweditmedic"><small>Dat.Medicos</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidemerg" type="button" name="btnemerg" data-emerg="btnemerg" data-emergname="{{ x.lastname }}" data-emergdni="{{ x.empdni_id }}" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' class="btn transparent btnshoweditemerg"><small>Contac.Emerg</small></button>
+                  </li>
+                  <li>
+                  <button id="btnidfamicr" type="button" name="btnfamicr" data-famicr="btnfamicr" data-famicrname="{{ x.lastname }}" data-famicrdni="{{ x.empdni_id }}" style="width:150px;height:50px;color:black;font-weight:bold;" value='{{x.empdni_id}}' class="btn transparent btnshoweditfamicr"><small>Fam.ICR</small></button>
+                  </li>
+                </ul>
+            </td>
+            <td class="col-2">
+                <a type="button" href="{% url 'emple_details' x.empdni_id %}" value='{{x.empdni_id}}' class="btn btn-flat" target="_blank">
+                  <i class="fa fa-info-circle" aria-hidden="true"></i></a>
+            </td>
+            <td class="col-3">
+                <button type="button" style="border:none;color:red;font-weight:bold;" class="transparent btndardebaja" name="nbtndardebaja" data-motrname="{{ x.lastname }}" data-motrdni="{{ x.empdni_id }}">
+                  <i class="fa fa-times"></i>
+                  <small>Dar de Baja</small></button>
+            </td>
+          </tr>
+          {% endfor %}  
+          </tbody>  
+    </table> 
+  
+  </div>
+  <!--bootstrap row table-->
+  <div id="contextMenu" class="dropdown clearfix">
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">
+      <li>
+      <i class="fa fa-graduation-cap"></i>
+      <button type="button" name="btnestudio" class="transparent btnnewestudio" data-estudio="btnnewestudio" style="border:none;">Estudios</button>
+      </li>
+      <li>
+      <li>
+       <i class="fa fa-phone"></i>
+       <button type="button" name="btntelefono" class="transparent btnnewtelefono" data-telefono="btnnewtelefono" style="border:none;">Telefono</button>
+      </li>
+      <li>
+      <i class="fa fa-credit-card" aria-hidden="true"></i>
+      <button type="button" name="btncuenta" class="transparent btnnewcuenta" data-cuenta="btnnewcuenta" style="border:none;">Cuenta Corriente</button>
+      </li>
+
+      <li>
+      <i class="fa fa-times-circle" aria-hidden="true"></i>
+      <button type="button" name="btnsuspension" class="transparent btnnewsuspension" data-suspension="btnnewsusp" style="border:none;">Supensiones</button>
+      </li>
+      <li>
+        <i class="fa fa-file-text" aria-hidden="true"></i>
+      <button type="button" name="btnexamen" class="transparent btnnewexamen" data-examen="btnnewexamen" style="border:none;">Examen</button>
+      </li>
+
+      <li>
+        <i class="fa fa-file" aria-hidden="true"></i>
+      <button type="button" name="btndocumento" class="transparent btnnewdocumento" data-documento="btnnewdocumento" style="border:none;">Documento</button>
+      </li>
+    
+      <li>
+      <i class="fa fa-file-text" aria-hidden="true"></i>
+      <button type="button" name="btnproyecto" class="transparent btnnewproyecto" data-proyecto="btnnewproyecto" style="border:none;">Proyecto</button>
+      </li>
+
+      <li>
+      <i class="fa fa-file-text" aria-hidden="true"></i>
+      <button type="button" name="btnepps" class="transparent btnnewepps" data-epps="btnnewepps" style="border:none;">Epps</button>
+      </li>
+      <li>
+      <i class="fa fa-file-text" aria-hidden="true"></i>
+      <button type="button" name="btnsegsocial" class="transparent btnnewsegsocial" data-segsocial="btnnewsegsocial" style="border:none;">Seguridad Social</button>
+      </li>
+      <li>
+      <i class="fa fa-file-text" aria-hidden="true"></i>
+      <button type="button" name="btnfamilia" class="transparent btnnewfamilia" data-familia="btnnewfam" style="border:none;">Familia</button>
+      </li>
+      <li>
+      <i class="fa fa-file-text" aria-hidden="true"></i>
+      <button type="button" name="btnexplab" class="transparent btnnewexplab" data-explab="btnnewexplab" style="border:none;">Experiencia Laboral</button>
+      </li>
+
+    </ul>
+  </div>
+
+</div>
+{% csrf_token %}
+{% include "rrhh/forms/formeditcuenta.html" %}
+{% include "rrhh/forms/formeditemerg.html" %}
+{% include "rrhh/forms/formeditestudios.html" %}
+{% include "rrhh/forms/formeditexadoc.html" %}
+{% include "rrhh/forms/formeditexamen.html" %}
+{% include "rrhh/forms/formeditexplab.html" %}
+{% include "rrhh/forms/formeditfamicr.html" %}
+{% include "rrhh/forms/formeditfamilia.html" %}
+{% include "rrhh/forms/formeditmedic.html" %}
+{% include "rrhh/forms/formeditobra.html" %}
+{% include "rrhh/forms/formeditproyecto.html" %}
+{% include "rrhh/forms/formeditsegsocial.html" %}
+{% include "rrhh/forms/formeditsuspension.html" %}
+{% include "rrhh/forms/formedittelef.html" %}
+{% include "rrhh/forms/formmodals.html" %}
+
+
+
+
+{% endblock %}

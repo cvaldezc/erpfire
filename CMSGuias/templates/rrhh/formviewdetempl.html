@@ -1,0 +1,462 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+<script src="/media/js/rrhh/empleados.js"></script>
+<link rel="stylesheet" href="/media/css/rrhh/empleado.css">
+
+<div id="container" style="float:left;width:100%;margin-top:20px;margin-left:20px;">
+<div style="float:left;width:80%;">
+
+<div style="">
+  <div class="collapsible-header titempdetails" style="">Datos Personales - Laborales</div>
+    <div id="card-content" class="card-content" style="float:left;width:100%;background-color:white;">
+      <div id="card-content" style="float:left;width:50%;">
+        {% for x in listemple %}
+        <div>
+          <h6 class="lbldetail">Nombres: <label style="margin-left:27px;" class="lbldetailresp">{{ x.lastname }}, {{ x.firstname }}</label></h6> 
+        </div>
+        <div>
+          <h6 class="lbldetail">DNI: <label style="margin-left:75px;" class="lbldetailresp">{{ x.empdni_id }}</label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Email:<label style="margin-left:60px;" class="lbldetailresp"> {{ x.email }}</label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Estado Civil:<label class="lbldetailresp">
+          {% if x.estadocivil == True %}
+              Soltero(a)
+          {% else %}
+              Casado(a)
+          {% endif %}
+        </label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Nacionalidad: <label class="lbldetailresp">
+          {% if x.nacionalidad == True %}
+              Peruana
+          {% else %}
+              Extranjera
+          {% endif %}
+          </label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Direccion 1: <label class="lbldetailresp">{{ x.address }}</label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Direccion 2: <label class="lbldetailresp">{{ x.address2 }}</label></h6>
+        </div>
+      </div>
+      <div id="container" style="float:left;width:50%;">
+        <div>
+          <h6 class="lbldetail">F.Nacimiento: <label class="lbldetailresp" style="margin-left:20px;">{{ x.birth }}</label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Sexo: <label class="lbldetailresp" style="margin-left:95px;">
+          {% if x.sexo == True %}
+              Masculino
+          {% else %}
+              Femenino
+          {% endif %}
+          </label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">F.Ingreso: <label class="lbldetailresp" style="margin-left:55px;" >{{ x.feching }}</label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Planilla: <label class="lbldetailresp" style="margin-left:72px;">
+          {% if x.estadoplanilla == True %}
+              SI
+          {% else %}
+              NO
+          {% endif %}
+          </label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Cargo: <label class="lbldetailresp" style="margin-left:85px;">{{ x.charge.cargos }}</label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Discapacidad: <label class="lbldetailresp" style="margin-left:18px;">
+          {% if x.discapacidad == True %}
+              SI
+          {% else %}
+              NO
+          {% endif %}
+          </label></h6>
+        </div>
+        <div>
+          <h6 class="lbldetail">Tipo Trabajador: <label class="lbldetailresp">{{ x.tipoemple.descripcion }}</label></h6>
+        </div>
+          <a href="{{ MEDIA_URL }}{{ x.archivo }}" target="_blank">ver Archivo</a>
+      </div>
+        {% endfor %}
+    </div>
+  
+</div>
+
+<div style="">
+  <div class="collapsible-header titempdetails">Cuenta Corriente</div>
+  <div class="card-content" style="margin-letf:20px;">
+    <table class="tabl" id="tbldetailscuenta">
+      <thead>
+        <tr>
+          <th style="text-align: center;">N° Cuenta</th>
+          <th style="text-align: center;">Tipo de Pago</th>
+          <th style="text-align: center;">Remuneracion</th>
+          <th style="text-align: center;">Tipo Contrato</th>
+          <th style="text-align: center;">CTS</th>
+          <th style="text-align: center;">Gratificacion</th>
+          <th style="text-align: center;">Remuneracion por Hora</th>
+          <th style="text-align: center;">Estado</th>
+        </tr>
+      </thead>
+    <tbody class="bodydetails" style="height:150px;">
+    {% for x in listcuenta %}
+    <tr class="">
+      <td style="text-align: center;" class="">{{ x.cuenta }}</td>
+      <td style="text-align: center;" class="">{{ x.tipodepago.pago }}</td>
+      <td style="text-align: center;" class="">{{ x.remuneracion }}</td>
+      <td style="text-align: center;" class="">{{ x.tipocontrato.contrato }}</td>
+      <td style="text-align: center;" class="">{{ x.cts }}</td>
+      <td style="text-align: center;" class="">{{ x.gratificacion }}</td>
+      <td style="text-align: center;" class="">{{ x.costxhora }}</td>
+      <td style="text-align: center;" class="colesta">{{ x.estado }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    <div style="margin-top:10px;margin-left:20px;">
+    <div class="divactivo">Activo</div>
+    <div class="divinactivo">Inactivo</div>
+    </div>
+  </div>
+</div>
+<div style="margin-top:50px;">
+    <div class="collapsible-header titempdetails">Suspensiones</div> 
+        <table class="tabl" id="tabldetailssusp">
+          <thead>
+            <tr>
+              <th>Suspension</th>
+              <th style="text-align: center;">Fecha de Inicio</th>
+              <th style="text-align: center;">Fecha de Fin</th>
+              <th style="text-align: center;"></th>
+              <th style="text-align:center;width:100px;">Estado</th>
+            </tr>
+          </thead>
+        
+          <tbody class="bodydetails" style="height:250px;">
+          {% for x in listsusp %}
+          <tr>
+            <td>{{ x.suspension.motivo }}</td>
+            <td style="text-align: center;">{{ x.fechinicio }}</td>
+            <td style="text-align: center;">{{ x.fechfin }}</td>
+            <td style="text-align: center;">
+              {% if x.archivo != '' %}
+              <a href="{{ MEDIA_URL }}{{ x.archivo }}" target="_blank">ver Archivo</a>
+              {% endif %}
+            </td>
+            <td style="text-align:center;width:100px;" class="colestado">{{ x.estado }}</td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        <div style="margin-top:10px;margin-left:20px;">
+        <div class="divactivo">Activo</div>
+        <div class="divinactivo">Inactivo</div>
+        </div>
+
+
+</div>
+<div style="margin-top:50px;">
+  <div class="collapsible-header titempdetails">Telefonos</div>
+      <table>
+        <thead>
+            <tr>
+                <th style="text-align: center;">Numero</th>
+                <th style="text-align: center;">Descripcion</th>
+            </tr>
+        </thead>
+      <tbody>
+      {% for x in listphone %}
+        <tr>
+          <td style="text-align: center;">{{ x.phone }}</td>
+          <td style="text-align: center;">{{ x.descripcion }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+      </table>
+</div>
+<div style="margin-top:50px;">
+    <div class="collapsible-header titempdetails">Estudios</div>
+    <div class="card-content">
+      <table>
+        <thead>
+            <tr>
+                <th>Tipo Institucion</th>
+                <th style="text-align:center;">Institucion</th>
+                <th style="text-align:center;">Duracion</th>
+                <th style="text-align:center;">Carrera</th>
+                <th style="text-align:center;">Sit. Educativa</th>
+                <th style="text-align:center;">Año de Egreso</th>
+            </tr>
+        </thead>
+      
+        <tbody class="bodydetails" style="height:200px;background-color:">
+        {% for x in listestudio %}
+        <tr>
+          <td class="">{{ x.tipoinstitucion.tipo }}</td>
+          <td style="text-align:center;">{{ x.institucion }}</td>
+          <td style="text-align:center;">{{ x.finicio }} - {{ x.ffin }}</td>
+          <td style="text-align:center;">{{ x.carrera }}</td>
+          <td style="text-align:center;">{{ x.situacioneduc }}</td>
+          <td style="text-align:center;">{{ x.anoEgreso }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</div>
+<div style="margin-top:50px;">
+  <div class="collapsible-header titempdetails">Documentos</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Documento</th>
+                <th style="text-align:center">F.Inicio</th>
+                <th style="text-align:center">F.Caduca</th>
+                <th style="text-align:center">Condicion</th>
+                <th style="text-align:center"></th>
+              </tr>
+            </thead>
+            <tbody class="bodydetails" style="height:200px;">
+            {% for x in listdocumentos %}
+            <tr>
+              <td class="">{{ x.documento.descripcion }}</td>
+              <td style="text-align:center">
+                {% if x.fechinicio != None %}
+                {{ x.fechinicio }}
+                {% endif %}
+              </td>
+              <td style="text-align:center">
+                {% if x.fechcaduca != None %}
+                {{ x.fechcaduca }}
+                {% endif %}
+              </td>
+              <td style="text-align:center">{{ x.condicion }}</td>
+              <td style="text-align:center">
+              {% if x.archivo != '' %}
+              <a href="{{ MEDIA_URL }}{{ x.archivo }}" target="_blank">ver Archivo</a></td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+</div>
+
+<div style="margin-top:50px;">
+  <div class="collapsible-header titempdetails">Examenes</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Examen</th>
+              <th style="text-align:center;">F.Inicio</th>
+              <th style="text-align:center;">F.Caduca</th>
+              <th style="text-align:center;">Aptitud</th>
+              <th style="text-align:center;"></th>
+            </tr>
+          </thead>
+        
+        <tbody class="bodydetails" style="height:300px;">
+        {% for x in listexamenes %}
+        <tr>
+            <td>{{ x.tipoexamen.descripcion }}</td>
+            <td style="text-align:center;">{{ x.fechinicio }}</td>
+            <td style="text-align:center;">
+            {% if x.fechcaduca != None %}
+            {{ x.fechcaduca }}
+            {% endif %}
+            </td>
+            <td style="text-align:center;">{{ x.aptitud }}</td>
+            <td style="text-align:center;">
+              {% if x.archivo != '' %}
+              <a href="{{ MEDIA_URL }}{{ x.archivo }}" target="_blank">ver Archivo</a></td>
+              {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+</div>
+
+
+
+<div style="margin-top:50px;">
+    <div class="collapsible-header titempdetails">EPPS</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre de EPPS</th>
+                <th>Fecha Entrega</th>
+                <th>Fecha Recepcion</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody class="bodydetails" style="height:200px;">
+            {% for x in listepps %}
+              <tr>
+                <td class="">{{ x.item }}</td>
+                <td class="">{{ x.fechentrega }}</td>
+                <td class="">
+                {% if x.fechrecepcion != None %}
+                {{ x.fechrecepcion }}
+                {% endif %}
+                </td>
+                <td class="">{{ x.estadoepp }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+</div>
+
+<div style="margin-top:50px;" >
+    <div class="collapsible-header titempdetails">Datos Familiares</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre y Apellidos</th>
+                <th>Parentesco</th>
+                <th>Edad</th>
+                <th>F.Nac.</th>
+              </tr>
+            </thead>
+            <tbody class="">
+            {% for x in listfam %}
+              <tr>
+                <td class="">{{ x.nombres }}</td>
+                <td class="">{{ x.parentesco }}</td>
+                <td class="">{{ x.edad }}</td>
+                <td class="">{{ x.fnac }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+</div>
+
+<div style="margin-top:50px;">
+    <div class="collapsible-header titempdetails">Experiencia Laboral</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Cargo</th>
+                <th>F.Inicio</th>
+                <th>F.Termino</th>
+                <th>Duracion</th>
+                <th>Motivo Retiro</th>
+              </tr>
+            </thead>
+            <tbody class="">
+            {% for x in listexplab %}
+              <tr>
+                <td class="">{{ x.empresa }}</td>
+                <td class="">{{ x.cargo }}</td>
+                <td class="">{{ x.finicio }}</td>
+                <td class="">{{ x.ffin }}</td>
+                <td class="">{{ x.duracion }}</td>
+                <td class="">{{ x.motivoretiro }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+</div>
+
+<div style="margin-top:50px;">
+    <div class="collapsible-header titempdetails">Datos Medicos</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th style="text-align:center;">Descripcion</th>
+                <th style="text-align:center;">Tiempo</th>
+                <th>Comentario</th>
+              </tr>
+            </thead>
+            <tbody class="" style="height:150px;">
+            {% for x in listmedic %}
+              <tr>
+                <td >{{ x.tipo }}</td>
+                <td style="text-align:center;">{{ x.descripcion }}</td>
+                <td style="text-align:center;">{{ x.tiempo }}</td>
+                <td>{{ x.comentario }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+</div>
+
+<div style="margin-top:50px;">
+    <div class="collapsible-header titempdetails">Contacto de Emergencia</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+                <th>Parentesco</th>
+              </tr>
+            </thead>
+            <tbody class="" style="height:150px;">
+            {% for x in listemerg %}
+              <tr>
+                <td class="">{{ x.nombres }}</td>
+                <td class="">{{ x.direccion }}</td>
+                <td class="">{{ x.telefono }}</td>
+                <td class="">{{ x.parentesco }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+</div>
+<div style="margin-top:50px;margin-bottom:100px;">
+    <div class="collapsible-header titempdetails">Familiares en ICR PERU S.A</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre y Apellidos</th>
+                <th>Parentesco</th>
+                <th>Area de Trabajo</th>
+              </tr>
+            </thead>
+            <tbody class="">
+            {% for x in listfamicr %}
+              <tr>
+                <td class="">{{ x.nombres }}</td>
+                <td class="">{{ x.parentesco }}</td>
+                <td class="">{{ x.areatrabajo }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+</div>
+
+
+
+  </div>
+
+
+
+
+<!--FOTO-->
+  <div style="float:left;width:15%;">
+      <div align="">
+      {% for x in listemple %}
+      <img style="width:200px;height:250px;" src="{{ MEDIA_URL }}{{ x.foto }}">
+      {% endfor %}
+      </div>
+  </div>
+</div>
+
+
+
+{% endblock content %}
