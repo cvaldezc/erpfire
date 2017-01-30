@@ -53,17 +53,17 @@
             <th class="col-3">DNI</th>
             <th class="col-3">Cargo</th>
             <th class="col-5">Email</th>
-            <th class="col-2">F.Ingreso</th>
+            <th class="left-align col-2">F.Ingreso</th>
             <!--<th class="colsituacion">Situacion</th>-->
             <th style="display:none;"></th>
-            <th class="">Editar</th>
+            <th class="col-4">Acciones</th>
             <th class="col-2">Info</th>
             <th class="col-3"></th>
-            
+
           </tr>
         </thead>
         <tbody id="fbody" class="bodydetails">
-          {% for x in list %}                    
+          {% for x in list %}
           <tr class="fer">
             <td class="col-1">{{ forloop.counter }}</td>
             <td class="left-align col-6">{{x.lastname}} {{x.firstname}}</td>
@@ -74,7 +74,8 @@
             <!--<td class="colsituacion">{{x.flag}}</td>-->
             <td class="" style="display:none;">{{x.estadoplanilla}}</td>
             <td>
-                <a class='dropdown-button btn' style="width:150px;" data-activates='dropdown{{ forloop.counter }}'><i class="fa fa-list" aria-hidden="true"></i></a>
+                <a class='dropdown-button btn btn-flat col-4' data-activates='dropdown{{ forloop.counter }}'>
+                  <i class="fa fa-ellipsis-v" aria-hidden="true"></i></a>
                 <ul id='dropdown{{ forloop.counter }}' class='dropdown-content'>
                   <li>
                   <button type="button" name="" style="width:150px;height:50px;color:black;font-weight:bold;" data-emple='btneditemple' value='{{x.empdni_id}}' class="btn transparent btnshowedit"><small>Empleado</small></button>
@@ -128,10 +129,10 @@
                   <small>Dar de Baja</small></button>
             </td>
           </tr>
-          {% endfor %}  
-          </tbody>  
-    </table> 
-  
+          {% endfor %}
+          </tbody>
+    </table>
+
   </div>
   <!--bootstrap row table-->
   <div id="contextMenu" class="dropdown clearfix">
@@ -163,7 +164,7 @@
         <i class="fa fa-file" aria-hidden="true"></i>
       <button type="button" name="btndocumento" class="transparent btnnewdocumento" data-documento="btnnewdocumento" style="border:none;">Documento</button>
       </li>
-    
+
       <li>
       <i class="fa fa-file-text" aria-hidden="true"></i>
       <button type="button" name="btnproyecto" class="transparent btnnewproyecto" data-proyecto="btnnewproyecto" style="border:none;">Proyecto</button>
