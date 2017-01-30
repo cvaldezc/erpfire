@@ -1,4 +1,10 @@
+"""
+This models is for apps rrhh
+"""
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from django.db import models
+from audit_log.models.managers import AuditLog
 
 from CMSGuias.apps.home.models import Employee, Proveedor
 from CMSGuias.apps.ventas.models import Proyecto
@@ -10,6 +16,8 @@ class PhoneEmple(models.Model):
     descripcion = models.CharField(max_length=150, null=True, blank=True)
     flag = models.BooleanField(default=True)
 
+    audit_log = AuditLog()
+
     def __unicode__(self):
         return '%s' % (
             self.phone)
@@ -19,10 +27,16 @@ class TipoContrato(models.Model):
     contrato = models.CharField(max_length=50)
     flag = models.BooleanField(default=True)
 
+    audit_log = AuditLog()
+
+
 class TipoPago(models.Model):
     tipopago_id = models.CharField(primary_key=True, max_length=9)
     pago = models.CharField(max_length=90)
     flag = models.BooleanField(default=True)
+
+    audit_log = AuditLog()
+
 
 class CuentaEmple(models.Model):
     empdni = models.ForeignKey(Employee, to_field='empdni_id')
@@ -37,11 +51,15 @@ class CuentaEmple(models.Model):
     registro = models.DateTimeField(auto_now_add=True)
     flag = models.BooleanField(default=True)
 
+    audit_log = AuditLog()
+
 
 class TipoExamen(models.Model):
     tipoexamen_id = models.CharField(primary_key=True, max_length=9)
     descripcion = models.CharField(max_length=200)
     flag = models.BooleanField(default=True)
+
+    audit_log = AuditLog()
 
     def __unicode__(self):
         return self.descripcion
@@ -63,11 +81,15 @@ class ExamenEmple(models.Model):
     archivo = models.FileField(upload_to=url, null=True, blank=True, max_length=400)
     registro = models.DateTimeField(auto_now_add=True)
 
+    audit_log = AuditLog()
+
 
 class TipoDocumento(models.Model):
     tipodoc_id = models.CharField(primary_key=True, max_length=9)
     descripcion = models.CharField(max_length=200)
     flag = models.BooleanField(default=True)
+
+    audit_log = AuditLog()
 
 
 class DocumentoEmple(models.Model):
@@ -85,6 +107,8 @@ class DocumentoEmple(models.Model):
     observaciones = models.CharField(max_length=200, null=True, blank=True)
     registro = models.DateTimeField(auto_now_add=True)
 
+    audit_log = AuditLog()
+
 
 class EmpleCampo(models.Model):
     emplecampo_id = models.CharField(primary_key=True, max_length=20)
@@ -96,11 +120,15 @@ class EmpleCampo(models.Model):
     registro = models.DateTimeField(auto_now_add=True)
     comentario = models.CharField(max_length=200, null=True, blank=True)
 
+    audit_log = AuditLog()
+
 
 class Suspension(models.Model):
     suspension_id = models.CharField(primary_key=True, max_length=9)
     motivo = models.CharField(max_length=200)
     flag = models.BooleanField(default=True)
+
+    audit_log = AuditLog()
 
     def __unicode__(self):
         return self.motivo
@@ -121,6 +149,8 @@ class detSuspension(models.Model):
     estado = models.CharField(max_length=20, blank=True, null=True)
     comentario = models.CharField(max_length=250, null=True, blank=True)
 
+    audit_log = AuditLog()
+
 
 class Epps(models.Model):
     empdni = models.ForeignKey(Employee, to_field='empdni_id')
@@ -131,6 +161,8 @@ class Epps(models.Model):
     estadoepp = models.CharField(max_length=50, null=True, blank=True)
     fechrecepcion = models.DateField(null=True, blank=True)
 
+    audit_log = AuditLog()
+
 
 class Induccion(models.Model):
     emplecampo = models.ForeignKey(EmpleCampo, to_field='emplecampo_id')
@@ -140,11 +172,16 @@ class Induccion(models.Model):
     registro = models.DateTimeField(auto_now_add=True)
     comentario = models.CharField(max_length=200, null=True, blank=True)
 
+    audit_log = AuditLog()
+
 
 class CoberturaSalud(models.Model):
     coberturasalud_id = models.CharField(primary_key=True, max_length=9)
     cobertura = models.CharField(max_length=50)
     flag = models.BooleanField(default=True)
+
+    audit_log = AuditLog()
+
     def __unicode__(self):
         return self.cobertura
 
@@ -156,11 +193,16 @@ class detCobSaludEmple(models.Model):
     fechfin = models.DateField(null=True, blank=True)
     registro = models.DateTimeField(auto_now_add=True)
 
+    audit_log = AuditLog()
+
 
 class RegimenSalud(models.Model):
     regimensalud_id = models.CharField(primary_key=True, max_length=9)
     regimen = models.CharField(max_length=50)
     flag = models.BooleanField(default=True)
+
+    audit_log = AuditLog()
+
     def __unicode__(self):
         return self.regimen
 
@@ -173,6 +215,8 @@ class detSaludEmple(models.Model):
     entidad = models.CharField(max_length=150, blank=True, null=True)
     registro = models.DateTimeField(auto_now_add=True)
 
+    audit_log = AuditLog()
+
 
 class RegimenPensionario(models.Model):
     regimenpens_id = models.CharField(primary_key=True, max_length=9)
@@ -180,8 +224,11 @@ class RegimenPensionario(models.Model):
     coberturapension = models.CharField(max_length=100)
     flag = models.BooleanField(default=True)
 
+    audit_log = AuditLog()
+
     def __unicode__(self):
         return self.regimen
+
 
 class detPensEmple(models.Model):
     regimenpens = models.ForeignKey(RegimenPensionario, to_field='regimenpens_id')
@@ -192,11 +239,15 @@ class detPensEmple(models.Model):
     sctr = models.BooleanField(default=True)
     registro = models.DateTimeField(auto_now_add=True)
 
+    audit_log = AuditLog()
+
 
 class TipoInstitucion(models.Model):
     tipoinst_id = models.CharField(primary_key=True, max_length=9)
     tipo = models.CharField(max_length=50)
     flag = models.BooleanField(default=True)
+
+    audit_log = AuditLog()
 
     def __unicode__(self):
         return self.tipo
@@ -215,6 +266,8 @@ class detEstudioEmple(models.Model):
     ffin = models.CharField(max_length=10, null=True, blank=True)
     registro = models.DateTimeField(auto_now_add=True)
 
+    audit_log = AuditLog()
+
 
 class FamiliaEmple(models.Model):
     empdni = models.ForeignKey(Employee, to_field='empdni_id')
@@ -222,6 +275,8 @@ class FamiliaEmple(models.Model):
     parentesco = models.CharField(max_length=20, null=True, blank=True)
     edad = models.CharField(max_length=2, null=True, blank=True)
     fnac = models.DateField(null=True, blank=True)
+
+    audit_log = AuditLog()
 
 
 class ExperienciaLab(models.Model):
@@ -233,6 +288,8 @@ class ExperienciaLab(models.Model):
     duracion = models.CharField(max_length=10, null=True, blank=True)
     motivoretiro = models.CharField(max_length=50, null=True, blank=True)
 
+    audit_log = AuditLog()
+
 
 class DatoMedico(models.Model):
     empdni = models.ForeignKey(Employee, to_field='empdni_id')
@@ -240,6 +297,8 @@ class DatoMedico(models.Model):
     descripcion = models.CharField(max_length=50, null=True, blank=True)
     tiempo = models.CharField(max_length=20, null=True, blank=True)
     comentario = models.CharField(max_length=250, null=True, blank=True)
+
+    audit_log = AuditLog()
 
 
 class CasoEmergencia(models.Model):
@@ -249,12 +308,16 @@ class CasoEmergencia(models.Model):
     telefono = models.CharField(max_length=12, null=True, blank=True)
     parentesco = models.CharField(max_length=20, null=True, blank=True)
 
+    audit_log = AuditLog()
+
 
 class FamiliaIcr(models.Model):
     empdni = models.ForeignKey(Employee, to_field='empdni_id')
     nombres = models.CharField(max_length=100, null=True, blank=True)
     parentesco = models.CharField(max_length=20, null=True, blank=True)
     areatrabajo = models.CharField(max_length=50, null=True, blank=True)
+
+    audit_log = AuditLog()
 
 
 class RenunciaEmple(models.Model):
@@ -268,3 +331,6 @@ class RenunciaEmple(models.Model):
     ultimodiatrab = models.DateField(null=True, blank=True)
     archivo = models.FileField(upload_to=url, null=True, blank=True, max_length=500)
     registro = models.DateTimeField(auto_now_add=True)
+
+    audit_log = AuditLog()
+
