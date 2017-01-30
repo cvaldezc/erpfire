@@ -41,11 +41,11 @@ class Proyecto(models.Model):
     phone = models.CharField(max_length=16, blank=True, null=True)
     email = models.EmailField(max_length=254, blank=True, null=True)
     aservices = models.DecimalField(
-                    max_digits=9,
-                    decimal_places=3,
-                    blank=True,
-                    default=0,
-                    null=False)
+        max_digits=9,
+        decimal_places=3,
+        blank=True,
+        default=0,
+        null=False)
     flag = models.BooleanField(default=True, null=False)
 
     audit_log = AuditLog()
@@ -55,8 +55,7 @@ class Proyecto(models.Model):
 
     @property
     def itemsPercent(self):
-        obj = operations.models.MetProject.objects.filter(
-                proyecto_id=self.proyecto_id)
+        obj = operations.models.MetProject.objects.filter(proyecto_id=self.proyecto_id)
         items = obj.count()
         if items:
             attend = obj.filter(tag='2').count()
