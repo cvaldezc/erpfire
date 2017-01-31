@@ -64,10 +64,8 @@ def generate_pdf(html):
 
 def view_test_pdf(request):
     # view of poseable result pdf
-    html = render_to_string(
-            'report/test.html',
-            {'pagesize': 'A4'},
-            context_instance=RequestContext(request))
+    html = render_to_string('report/test.html',
+        {'pagesize': 'A4'}, context_instance=RequestContext(request))
     return generate_pdf(html)
 
 """
@@ -300,6 +298,7 @@ class RptPurchase(TemplateView):
 
     def get(self, request, *args, **kwargs):
         try:
+            rounded = '0.01'
             context = dict()
             context['bedside'] = Compra.objects.get(pk=kwargs['pk'], flag=True)
             lista = DetCompra.objects.filter(compra_id=kwargs['pk'])
@@ -325,14 +324,14 @@ class RptPurchase(TemplateView):
                 dataset = lista[counter:counter+21]
                 tmp = list()
                 for x in dataset:
-                    discountm = ((x.precio*float(x.discount))/100)
-                    disc += (x.precio*(float(x.discount)/100))
+                    discountm = ((Decimal(x.precio).quantize(Decimal(rounded))*Decimal(x.discount).quantize(Decimal(rounded)))/100)
+                    disc += (Decimal(x.precio).quantize(Decimal(rounded))*(Decimal(x.discount).quantize(Decimal(rounded))/100))
                     if x.perception:
-                        amount = (x.cantstatic * (
-                            (x.precio-discountm)+(
-                                x.precio*(conf.perception/100))))
+                        amount = (Decimal(x.cantstatic).quantize(Decimal(rounded)) * (
+                            (Decimal(x.precio-discountm).quantize(Decimal(rounded)))+(
+                                Decimal(x.precio).quantize(Decimal(rounded))*(conf.perception/100))))
                     else:
-                        amount = (x.cantstatic * (x.precio-discountm))
+                        amount = (Decimal(x.cantstatic).quantize(Decimal(rounded)) * (Decimal(x.precio).quantize(Decimal(rounded))-Decimal(discountm).quantize(Decimal(rounded))))
                     subt += amount
                     unit = None
                     if x.unit_id:
@@ -348,9 +347,9 @@ class RptPurchase(TemplateView):
                         'unit': x.unit_id if x.unit_id else x.materiales.unidad_id,
                         'brand': x.brand.brand,
                         'model': x.model.model,
-                        'quantity': x.cantstatic,
+                        'quantity': Decimal(x.cantstatic).quantize(Decimal(rounded)),
                         'price': x.precio,
-                        'discount': float(x.discount),
+                        'discount': x.discount,
                         'perception': x.perception,
                         'amount': amount})
                     counter += 1
@@ -361,17 +360,17 @@ class RptPurchase(TemplateView):
             context['subtotal'] = subt
             # print context['bedside'].discount, 'DISCOUNT'
             if context['bedside'].discount:
-                discount = ((subt * context['bedside'].discount) / 100)
+                discount = ((Decimal(subt).quantize(Decimal(rounded)) * Decimal(context['bedside'].discount).quantize(Decimal(rounded))) / 100)
                 ns = (subt - discount)
                 # if disc:
                 #     discount += disc
             else:
-                discount = disc
-                ns = subt
+                discount = Decimal(disc).quantize(Decimal(rounded))
+                ns = Decimal(subt).quantize(Decimal(rounded))
             # print discount
             context['discount'] = discount
             if context['bedside'].sigv:
-                context['igvval'] = ((igv * ns) / 100)
+                context['igvval'] = ((Decimal(igv).quantize(Decimal(rounded)) * ns) / 100)
                 context['igv'] = igv
             else:
                 context['igvval'] = 0
@@ -382,9 +381,9 @@ class RptPurchase(TemplateView):
             context['conf'] = conf
             context['pagesize'] = 'A4'
             html = render_to_string(
-                    self.template_name,
-                    context,
-                    context_instance=RequestContext(request))
+                self.template_name,
+                context,
+                context_instance=RequestContext(request))
             return generate_pdf(html)
         except TemplateDoesNotExist, e:
             raise Http404(e)
