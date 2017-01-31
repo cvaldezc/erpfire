@@ -10,10 +10,13 @@ from CMSGuias.apps.almacen.models import (
     Pedido, GuiaRemision, Suministro, NoteIngress, Restoration)
 from CMSGuias.apps.logistica.models import Cotizacion, Compra, ServiceOrder
 from CMSGuias.apps.ventas.models import Proyecto
-from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado
+from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado, Rubro
 from CMSGuias.apps.operations.models import (
     Deductive, Letter, PreOrders, SGroup, DSector)
 from CMSGuias.apps.ventas.budget.models import AnalysisGroup, Analysis, Budget
+from ..rrhh.models import (
+    TipoInstitucion, CoberturaSalud, RegimenSalud, RegimenPensionario, TipoExamen,
+    TipoContrato, TipoPago, TipoDocumento, EmpleCampo)
 
 
 # format date str

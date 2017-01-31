@@ -20,14 +20,15 @@ from CMSGuias.apps.rrhh.forms import *
 from CMSGuias.apps.tools import genkeys, uploadFiles
 from ..tools.globalVariable import *
 
+
 class JSONResponseMixin(object):
     def render_to_json_response(self, context, **response_kwargs):
         return HttpResponse(
             self.convert_context_to_json(context),
             content_type='application/json',
             mimetype='application/json',
-            **response_kwargs
-        )
+            **response_kwargs)
+
     def convert_context_to_json(self, context):
         return json.dumps(context, encoding='utf-8', cls=DjangoJSONEncoder)
 
