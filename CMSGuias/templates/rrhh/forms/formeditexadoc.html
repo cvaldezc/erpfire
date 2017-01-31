@@ -1,0 +1,62 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<div class="modal editexadoc" style="width:70%;height:100%;">
+    <div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s3"><a href="#editexamenes">Examenes</a></li>
+        <li class="tab col s3"><a href="#editdocumentos">Documentos</a></li>
+        <li class="tab col s3"><div style="display: none;"><input  id="accion" class="accion" name="accion"></div></li>
+      </ul>
+    </div>
+
+    <div  id="editexamenes">
+          <div class="modal-content">
+        <button type="button" name="btnexamen" data-examen="btnnewexamen" class="btn waves-effect green lighten-1 btnnewexamen">
+                <i class="fa fa-file"></i>
+                <span>Nuevo</span>
+        </button>
+            <table class="table-detailsexa" >
+                <thead>
+                    <tr class="brand-primary">
+                        <th style="text-align: center;">Exa.</th>
+                        <th style="text-align: center;">Lugar</th>
+                        <th style="text-align: center;">F.Inicio</th>
+                        <th style="text-align: center;">F.Caduc</th>
+                        <th style="text-align: center;">Aptitud</th>
+                        <th style="text-align: center;"></th> 
+                        <th style="text-align: center;"></th> 
+                    </tr>
+                </thead>
+                <tbody class="bodydetails" style="height:290px;"></tbody>
+            </table>
+          </div>
+    </div>
+    <div  id="editdocumentos">
+          <div class="modal-content">
+        <button type="button" name="btndocumento" data-documento="btnnewdocumento" class="btn waves-effect green lighten-1 btnnewdocumento">
+                <i class="fa fa-file"></i>
+                <span>Nuevo</span>
+        </button>
+            <table class="table-detailsdoc" >
+                <thead>
+                    <tr class="brand-primary">
+                        <th style="text-align: center;">Nombre</th>
+                        <th style="text-align: center;">F.Inicio</th>    
+                        <th style="text-align: center;">F.Caducidad</th>
+                        <th style="text-align: center;">Condicion</th>
+                        <th style="text-align: center;">Observ.</th>
+                        <th style="text-align: center;"></th> 
+                        <th style="text-align: center;"></th> 
+                    </tr>
+                </thead>
+                <tbody class="bodydetails" style="height:290px;"></tbody>
+            </table>
+          </div>
+    </div>
+    <div align="right" style="">
+        <button style="margin-top:20px; margin-right:20px; width:200px;height:50px; background-color:black; color:white; font-weight:bold;" type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">SALIR</button>
+    </div>
+</div>
+{% csrf_token %}

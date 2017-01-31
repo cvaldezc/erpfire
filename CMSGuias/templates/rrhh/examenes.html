@@ -1,0 +1,114 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+<script src="/media/js/rrhh/empleados.js"></script>
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+
+<link rel="stylesheet" href="/media/css/rrhh/empleado.css">
+         <div style="margin-top:50px;" align="center">
+          <input onclick="javascript:viewexadoc();" name="group1" type="radio" id="rexa" value="exa" class="rexamen" />
+          <label for="rexa" style="font-size:25px;font-weight:bold;color:black;">Examenes       </label>
+          <input onclick="javascript:viewexadoc();" name="group1" type="radio" id="rdoc" value="doc"/>
+          <label for="rdoc" style="font-size:25px;font-weight:bold;color:black;">Documentos</label>
+          </div>
+
+
+<div id="zoneexamenes" style="display:none;margin-top:50px;">
+  <div class="row">
+    <div class="input-field col s0">
+      <h4><strong>Examenes:</strong></h4>
+    </div>
+    <div class="input-field col s6">
+        <select id="coempexamen" class="browser-default">
+          {% for x in lexa %}
+            <option value="{{ x.tipoexamen_id }}">{{x.descripcion}}</option>
+      {% endfor %}
+        </select>                 
+    </div>
+  </div>
+  <div class="row" style="margin-top:20px; margin-left:60px;">
+        <button style="height:50px;" type="button" name="btnempexa" class="btn waves-effect green lighten-1 btnempexa" id="btnempexa"><strong>Listar</strong></button>
+         <input class="txtbuscarexa" style="width: 40%;margin-left:700px;" align="center" type="search" placeholder="Buscar Empleado" name="txtbuscarexa" id="txtbuscarexa" >
+         <i class="fa fa-search"></i>
+
+  </div>
+  <hr>
+      <table style="display:none;" id="table-detailsexamenes" name="table-princ" class="table-detailsexamenes">
+      <div style="background-color:#bdbdbd;text-align:center;"><h2><label style="font-size:50px;color:white;" class="tittleexa"></label></h2>
+      </div>
+          <thead>
+          <div style="display:none;" id="cantempexa">
+          Empleados con <label style="color:black;" class="tittleexa"></label>:  <label style="color:black;" class="tamlistexa"></label>
+          </div>
+            <tr>
+              <th style="text-align:center;">N°</th>
+              <th style="">Nombres y Apellidos</th>
+              <th style="text-align:center;">Lugar</th>
+              <th style="text-align:center;">F.Inicio</th>
+              <th style="text-align:center;">F.Vencimiento</th>
+              <th style="text-align:center;">Condicion</th>
+            </tr>
+          </thead>
+          <tbody id="fbody" class="tbodyprinc">
+          </tbody>  
+      </table>
+</div>
+
+<div id="zonedocumento" style="display:none;margin-top:50px;">
+  <div class="row">
+    <div class="input-field col s0">
+      <h4><strong>Documento:</strong></h4>
+    </div>
+    <div class="input-field col s6">
+        <select id="coempdoc" class="browser-default">
+          {% for x in ldoc %}
+            <option value="{{ x.tipodoc_id }}">{{x.descripcion}}</option>
+      {% endfor %}
+        </select>                 
+    </div>
+  </div>
+  <div class="row" style="margin-top:20px; margin-left:60px;">
+  <button style="height:50px;" type="button" name="btnempdoc" class="btn waves-effect green lighten-1 btnempdoc" id="btnempdoc"><strong>Listar</strong></button>
+ <input class="txtbuscardoc" style="width: 40%;margin-left:700px;" align="center" type="search" placeholder="Buscar Empleado" name="txtbuscardoc" id="txtbuscardoc" >
+<i class="fa fa-search"></i>
+  </div>
+  <hr>
+      <table style="display:none;" id="table-detaildocumento" name="table-princ" class="table-detaildocumento">
+      <div style="background-color:#bdbdbd;text-align:center;"><h2><label style="font-size:50px;color:white;" class="tittledoc"></label></h2>
+      </div>
+          <thead>
+          <div style="display:none;" id="cantempdoc">
+          Empleados con <label style="color:black;" class="tittledoc"></label>:  <label style="color:black;" class="tamlistdoc"></label>
+          </div>
+            <tr>
+              <th style="text-align:center;">N°</th>
+              <th style="text-align:center;">Nombres y Apellidos</th>
+              <th style="text-align:center;">F.Caducidad</th>
+              <th style="text-align:center;">Condicion</th>
+            </tr>
+          </thead>
+          <tbody id="fbody" class="tbodyprinc">
+          </tbody>  
+      </table>
+</div>
+<!--
+    <table style="" id="table-indxobra" name="table-princ" class="table-indxobra">
+    <caption align="center" style="margin-left:700px;"><h5>Inducciones</h5></caption>
+        <thead>
+          <tr>
+            <th style="text-align:center;">Nombres</th>
+            <th style="text-align:center;">Fecha de Inicio</th>
+            <th style="text-align:center;">Fecha de Caducidad</th>
+            <th style="text-align:center;">Estado</th>
+          </tr>
+        </thead>
+        <tbody id="fbody" class="tbodyprinc">
+        </tbody>  
+    </table>
+    -->
+
+{% csrf_token %}
+
+{% endblock %}

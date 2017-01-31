@@ -1,0 +1,298 @@
+  
+  <div id="addemployee" class="modal bottom-sheet editemple">
+    <div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s3"><a href="#tabaddempl1">Datos Personales</a></li>
+        <li class="tab col s3"><a href="#tabaddempl2">Datos Laborales</a></li>
+      </ul>
+    </div>
+    <div style="display:none;"><input  id="accion" class="accion" name="accion"></div>
+
+  <!-- DATOS PERSONALES -->
+    <div id="tabaddempl1" class="modal-content foraddempl"> 
+        <div class="row">
+	        <div class="input-field col s3">
+	          <input placeholder="" id="name" type="text" class="validate name" name="name">
+	          <label for="name">Nombres</label>
+	        </div>
+	        <div class="input-field col s3">
+	          <input placeholder="" id="apellidos" type="text" class="validate apellidos" name="apellidos" >
+	          <label for="apellidos">Apellidos</label>
+	        </div>
+	        <div class="input-field col s2" id="divdni">
+	          <input length="8" placeholder="" id="dni" type="text" class="dni" name="dni">
+	          <label for="dni">DNI</label>
+	        </div>
+	         
+	        <div class="input-field col s3">
+	          <input placeholder="" id="email" type="email" class="validate email" name="email">
+	          <label for="email">Email</label>
+	        </div>
+	    </div>
+
+	    <div class="row">
+	        <div class="input-field col s3">
+	          <input placeholder="" id="direc1" type="text" class="validate direc1" name="direc1">
+	          <label for="direc1">Direccion 1</label>
+	        </div>
+	        <div class="input-field col s3">
+	          <input placeholder="" id="direc2" type="text" class="validate direc2" name="direc2">
+	          <label for="direc2">Direccion 2</label>
+	        </div>
+          <div class="input-field col s2">
+            <input placeholder="" id="distrito" type="text" class="distrito" name="distrito">
+            <label for="distrito">Distrito</label>
+          </div>
+          <div class="input-field col s2" >
+            <input placeholder="" id="fechnac" type="date" class="datepi fechnac" name="fechnac">
+            <label for="fechnac">Fecha de Nacimiento</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col">
+                <p>Nacionalidad:</p>
+          </div>
+          <div class="input-field col s2">
+              <select id="combonac" class="browser-default nacionalidad">
+                <option value="true">Peruana</option>
+                <option value="false">Extranjera</option>
+              </select>                 
+          </div>
+            <div class="input-field col s2">
+                <select id="combosexo" name="combosexo" class="browser-default sexo">
+                <option value="true">Masculino</option>
+                <option value="false">Femenino</option>
+                </select> 
+            </div>
+          <div class="input-field col s2">
+              <select id="comboestcivil" class="browser-default estadocivil">
+              <option value="true">Soltero(a)</option>
+              <option value="false">Casado(a)</option>
+              </select>                 
+            </div>
+          <div class="input-field col s2">
+            <input placeholder="" id="tallazapatos" type="text" class="tallazapatos" name="tallazapatos">
+            <label for="tallazapatos">Talla Zapatos</label>
+          </div>
+          <div class="input-field col s2">
+            <input placeholder="" id="tallapolo" type="text" class="tallapolo" name="tallapolo">
+            <label for="tallapolo">Talla Polo</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col">
+                <p>Lugar Nacimiento:</p>
+          </div>
+          <div class="input-field col s3">
+            <input placeholder="" id="dptonac" type="text" class="dptonac" name="dptonac">
+            <label for="dptonac">Departamento</label>
+          </div>
+          <div class="input-field col s3">
+            <input placeholder="" id="provnac" type="text" class="provnac" name="provnac">
+            <label for="provnac">Provincia</label>
+          </div>
+          <div class="input-field col s3">
+            <input placeholder="" id="distnac" type="text" class="distnac" name="distnac">
+            <label for="distnac">Distrito</label>
+          </div>
+        </div>
+        
+         
+    </div>
+    <!-- DATOS LABORALES -->
+    <div id="tabaddempl2" class="modal-content foraddempl">
+          <div class="row">
+        <div class="input-field col s2">
+          <input placeholder="" id="feching" type="date" name="feching" class="datepicker feching">
+          <label for="feching">Fecha de Ingreso</label>
+        </div>
+              <div class="input-field col">
+                <p>Planilla:</p>
+          </div>
+          <div class="input-field col s1">
+              <select id="comboplanilla" class="browser-default planilla">
+                <option value="true">SI</option>
+                <option value="false">NO</option>
+              </select>                 
+          </div>
+
+              <div class="input-field col">
+                <p>Cargo:</p>
+              </div>
+              <div class="input-field col s2 combocargo">
+                  <select name="item_id" id="combocargo" class="browser-default cargo">
+                    {% for x in lcargos %}
+                  <option value="{{ x.cargo_id }}">{{ x.cargos }}</option>
+                    {% endfor %}
+                  </select>                 
+              </div>
+              <div class="input-field col">
+                <p>Discapacidad:</p>
+              </div>
+              <div class="input-field col s1">
+                  <select id="combodiscapacidad" class="browser-default discapacidad">
+                    <option value="true">SI</option>
+                    <option value="false">NO</option>
+                  </select>                 
+              </div>
+              <div class="input-field col">
+                <p>Tipo de Trab:</p>
+              </div>
+              <div class="input-field col s2">
+                <select id="combotipotrabajo" class="browser-default tiptrab">
+                {% for x in ltipemp %}
+                  <option value="{{ x.tipoemple_id }}">{{ x.descripcion }}</option>
+                {% endfor %}
+                </select>                 
+              </div>
+              </div> 
+              <div class="row">
+                <div class="input-field col s2">
+                  <input placeholder="" id="postula" type="text" class="postula" name="postula">
+                  <label for="postula">Puesto que postula</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="file-field input-field" id="divfileficha">
+                  <div class="btn">
+                    <span>Subir Ficha de Datos</span>
+                    <input type="file" name="cambficha" id="cambficha" accept="application/pdf">
+                  </div>
+                  <div class="file-path-wrapper col s3" style="">
+                    <input disabled class="file-path txtchangeficha" type="text" name="textoficha">
+                  </div>
+                  <div class="input-field col s3">
+                    <label class="archificha" id="archificha"></label>    
+                  </div>
+                </div>
+              </div> 
+              <div class="row">
+                <div class="file-field input-field" id="divfilefoto">
+                  <div class="btn">
+                    <span>Subir Foto</span>
+                    <input type="file" name="cambfoto" id="cambfoto" accept="image/*">
+                  </div>
+                  <div class="file-path-wrapper col s4" style="">
+                    <input disabled class="file-path txtchangefoto" type="text" name="textofoto">
+                  </div>
+                  <div class="input-field col s3">
+                    <label class="archifoto" id="archifoto"></label>    
+                  </div>
+                </div>
+              </div>    
+      
+    </div>
+      <div class="moda-footer" align="center">
+            <button type="button" class="btn waves-effect green lighten-1 btnsaveemple" name="btnsaveemple" id="btnsavemp">
+              <i class="fa fa-check"></i>
+              <span>GUARDAR</span>
+            </button>
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat btnemployeecancel">CANCELAR</a>
+      </div>
+</div>
+
+<!-- SEGURO SOCIAL -->
+<div id="" class="modal bottom-sheet addsegsocial">
+  <div id="" class="modal-content">
+            <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+            <label style="color:black;font-size: 15px;" class="nameemplesegsoc" id="nameemplesegsoc"></label><label> - </label>
+            <label style="color:black;font-size: 15px;" class="dnisegsocial" id="dnisegsocial" name="dnisegsocial"></label>
+            <div class="row">
+              <br/>
+                <div class="subtit">Regimen de Aseguramiento de Salud</div>
+                <div class="input-field col s0">
+                  <p>Regimen de Salud:</p>
+                </div>
+                <div class="input-field col s3">
+                    <select id="comboregsalud" class="browser-default regsalud">
+                    {% for x in lregsalud %}
+                      <option value="{{x.regimensalud_id}}">{{ x.regimen }}</option>
+                    {% endfor %}
+                    </select>                 
+                </div>
+                <div class="input-field col s2">
+                  <input placeholder="" id="regsalfechini" name="regsalfechini" type="date" class="datepicker fechiniregsalud">
+                  <label for="regsalfechini">Fecha de Inicio</label>
+                </div>
+                <div class="input-field col s2">
+                  <input placeholder="" id="regsalfechfin" name="regsalfechfin" type="date" class="datepicker fechfinregsalud">
+                  <label for="regsalfechfin">Fecha de Fin</label>
+                </div>
+                  
+                  <div class="input-field col s2">
+                    <input class="entregsalud" placeholder="" id="regsalentidad" name="regsalentidad" type="text" class="validate">
+                    <label for="regsalentidad">Entidad Prestadora de Salud</label>
+                  </div>
+            </div>
+
+            <div class="row">
+                <div class="subtit">Regimen Pensionario</div>
+                <div class="input-field col s0">
+                  <p>Regimen Pensionario:</p>
+                </div>
+                <div class="input-field col s2">
+                    <select id="comboregpens" class="browser-default regpens">
+                    {% for x in lregpens %}
+                      <option value="{{ x.regimenpens_id }}">{{ x.regimen }}</option>
+                    {% endfor %}
+                    </select>                 
+                </div>
+                <div class="input-field col s2">
+                  <input placeholder="" id="regpensfechini" name="regpensfechini" type="date" class="datepicker regpensfechini">
+                  <label for="regpensfechini">Fecha de Inicio</label>
+                </div>
+                <div class="input-field col s2">
+                  <input placeholder="" id="regpensfechfin" name="regpensfechfin" type="date" class="datepicker regpensfechfin">
+                  <label for="regpensfechfin">Fecha de Fin</label>
+                </div>
+                <div class="input-field col s2">
+                  <input placeholder="" id="regpenscuspp" name="regpenscuspp" type="text" class="validate regpenscuspp">
+                  <label for="regpenscuspp">CUSPP</label>
+                </div>
+                <div class="input-field col s0">
+                  <p>Aporte al SCTR:</p>
+                </div>
+                <div class="input-field col s1">
+                    <select id="combosctr" class="browser-default regpenssctr">
+                      <option value="true">SI</option>
+                      <option value="false">NO</option>
+                    </select>                 
+                </div>
+         
+            </div>
+            <div class="row">
+              <div class="subtit">Cobertura de Salud</div>
+              <div class="input-field col s0">
+                  <p>Cobertura de Salud:</p>
+                </div>
+                <div class="input-field col s2">
+                    <select id="combocobsalud" class="browser-default cobsalud">
+                    {% for x in lcobsalud %}
+                      <option value="{{ x.coberturasalud_id}}">{{ x.cobertura }}</option>
+                    {% endfor %}
+                    </select>                 
+                </div>
+
+                <div class="input-field col s2">
+                  <input placeholder="" id="cobsalfechini" name="cobsalfechini" type="date" class="datepicker cobsalfechini">
+                  <label for="cobsalfechini">Fecha de Inicio</label>
+                </div>
+
+                <div class="input-field col s2">
+                  <input placeholder="" id="cobsalfechfin" name="cobsalfechfin" type="date" class="datepicker cobsalfechfin">
+                  <label for="cobsalfechfin">Fecha de Fin</label>
+                </div>
+                         
+            </div>
+         
+    </div>
+    <div class="moda-footer" align="center">
+          <button type="button" class="btn waves-effect green lighten-1 btnsavesegsocial" name="btnsavesegsocial" id="btnsavesegsocial">
+            <i class="fa fa-check"></i>
+            <span>GUARDAR</span>
+          </button>
+          <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat btnsegsocialcancel">CANCELAR</a>
+    </div>
+</div>
+
+{% csrf_token %}

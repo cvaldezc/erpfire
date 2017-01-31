@@ -1,0 +1,52 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+<script src="/media/js/rrhh/empleados.js"></script>
+<link rel="stylesheet" href="/media/css/rrhh/empleado.css">
+
+  <div class="divbtnactivos">
+      <div class="row">
+         <input class="txtbuscar" style="width: 30%;" align="center" type="search" placeholder="Buscar Empleado" data-table="tabl" name="txtbuscar" id="txtbuscar" >
+         <i class="fa fa-search"></i>
+      </div>
+   </div>
+    <table class="tabl" id="templeados" name="table-princ">
+
+        <thead>
+          <tr>
+            <th class="colnum">N°</th>
+            <th class="colname">Nombres</th>
+            <th class="coldni">DNI</th>
+            <th class="coltable">Cargo</th>
+            <th style="text-align:center">Motivo Renuncia</th>
+            <th style="text-align:center;">Laboro Hasta</th>
+            <th class="colmant">Info</th>
+            <th></th>
+            
+          </tr>
+        </thead>
+        <tbody id="fbody" class="tbodyprinc">
+          {% for x in lnoactive %}                   
+          <tr class="fer">
+            <td class="colnum">{{ forloop.counter }}</td>
+            <td class="colname">{{x.empdni.lastname}} {{x.empdni.firstname}}</td>
+            <td class="coldni">{{x.empdni_id}}</td>
+            <td class="coltable">{{x.empdni.charge}}</td>
+            <td style="text-align:center;">{{x.motivo}}</td>
+            <td style="text-align:center;">{{x.ultimodiatrab}}</td>
+            <td class="colmant">
+                <a type="button" href="{% url 'emple_details' x.empdni_id %}" value='{{x.empdni_id}}' class="btn"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
+            </td>
+            <td>
+                <button type="button" value="{{ x.empdni_id }}" style="border:none;color:green;font-weight:bold;" class="transparent btnactivemple"><small>Activar</small></button>
+            </td>
+          </tr>
+          {% endfor %}  
+          </tbody>  
+    </table>
+{% csrf_token %}
+{% endblock %}
+
+

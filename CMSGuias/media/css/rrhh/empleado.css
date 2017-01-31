@@ -1,0 +1,222 @@
+.divactivo{
+text-align:center;
+background-color:#aed581;
+width:100px;
+color:#66bb6a;
+font-weight:bold;
+}
+.divinactivo{
+text-align:center;
+background-color:#ef9a9a;
+width:100px;
+color: #ef5350;
+font-weight: bold;
+}
+
+.titempdetails{
+font-weight:bold;
+background-color:#bdbdbd;
+letter-spacing: 2px;
+}
+
+.lbldetail{
+	color: black;
+	font-weight: bold;
+	font-size: 18px;
+	letter-spacing: 1px;
+}
+.lbldetailresp{
+	color: black;
+	letter-spacing: 1px;
+}
+
+.divq{
+	background-color: black;
+}
+tbody tr:hover {
+  background-color: #e0e0e0;
+  cursor: pointer;
+}
+
+
+#toast-container {
+top: 15%;
+right: 40%;
+} 
+
+.colnumcuenta{
+	width: 220px;
+}
+.modal.bottom-sheet{
+	max-height: 75%;
+}
+
+.formaddsusp{
+	height: 460px;
+}
+.foraddempl{
+	height: 450px;	
+}
+.foraddempl4{
+	height: 420px;
+}
+.formaddobra{
+	height: 400px;
+}
+.formaddexamen{
+	height: 450px;
+}
+.divsub{
+	background-color: black;
+	color: white;
+	font-weight: bold;
+	font-size: 15px;
+}
+.btnguardar{
+	color: white;
+	font-weight: bold;
+}
+.telefbody{
+	display:block;
+    height:80px;
+    overflow:auto;
+}
+
+.bodydetails tr:hover {
+  background-color: #e0e0e0;
+  cursor: pointer;
+}
+.bodydetails{
+	display:block;
+	height:450px;
+	overflow:auto;
+}
+
+/*tbody {
+    display:block;
+    height:450px;
+    overflow:auto;
+}*/
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}
+.subtit{
+	background-color: black;
+	font-size: 15px;
+	font-weight: bold;
+	color: white;
+}
+
+.divsubphone{
+	background-color: black;
+	color: white;
+	font-weight: bold;
+	font-size: 15px;
+	margin-left: 70px;
+}
+.columdesc{
+	width: 5px;
+}
+
+.btnaddempleado{
+	margin-top: 20px;
+	margin-left: 250px;
+	width: 250px;
+	font-weight: bold;
+}
+.coltable{
+	text-align: center;
+	width: 210px;
+}
+.colname{
+	text-align: center;
+	width: 350px;
+}
+
+.colsituacion{
+	text-align: center;
+	width: 90px;
+}
+.colmant{
+	text-align: center;
+}
+.colnum{
+	width: 40px;
+	text-align: center;
+}
+.coltitemail{
+	width: 250px;
+	text-align: center;
+}
+.colemail{
+	width: 250px;
+}
+.coldni{
+	width: 100px;
+	text-align: center;
+}
+.colingreso{
+	width: 100px;
+	text-align: center;
+}
+#contextMenu {
+  position: absolute;
+  display:none;
+  font-size: 15px;
+  color: #2196f3;  
+}
+.fieldsphone{
+	margin-left: 60px;
+}
+
+.modal{
+	height: 100%;
+}
+
+.input-field3{
+	width: 10px;
+
+}
+.validate{
+	width: 500px;
+}
+.tabl{
+	width:95%;
+	margin-top: 5px;
+	margin-left: 30px;
+	height: 10px;
+	overflow: scroll;
+}
+.form_addemple{
+	width: 80%;
+	margin-left:100px;
+	margin-top: 10px;
+}
+
+.navinicio{
+	background-color: white;
+}
+.txtbuscar{
+	background-color: black;
+}
+
+.divbtnactivos{
+	margin-top: 30px;
+	margin-left: 150px;
+	
+}
+.btnactivo{
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.btninactivo{
+	background-color: #f44336;
+	font-size: 10px;
+	font-weight: bold;
+}
+.txtbuscar{
+	margin-left: 1500;
+}

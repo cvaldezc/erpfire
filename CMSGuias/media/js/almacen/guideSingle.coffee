@@ -11,11 +11,11 @@ app.controller 'SGuideCtrl', ($scope, $http, $cookies, $timeout) ->
     $scope.mat = {}
     angular.element(document).ready ->
         # pickdate
+        # Creates a dropdown to control month
         $('.datepicker').pickadate
-            selectMonths: true # Creates a dropdown to control month
+            selectMonths: true
             selectYears: 15
             format: 'yyyy-mm-dd'
-            min: '0'
             closeOnSelect: true
         $scope.customersList()
         $scope.carrierList()
@@ -204,6 +204,33 @@ app.controller 'SGuideCtrl', ($scope, $http, $cookies, $timeout) ->
                         return
                 return
         return
+    $scope.delallitems = ->
+        swal
+            title: "Realmente desea elimnar todo el detalle?"
+            text: ''
+            type: 'warning'
+            showCancelButton: true
+            confirmButtonColor: '#dd6b55'
+            confirmButtonText: 'Si!, eliminar'
+            closeOnCancel: true
+            closeOnConfirm: true
+        , (isConfirm) ->
+            if isConfirm
+                data = 
+                    'delalltmp': true
+                $http
+                    url: ''
+                    data: $.param data
+                    method: 'post'
+                .success (response) ->
+                    if response.status
+                        location.reload()
+                        return
+                    else
+                        swal "Error", "No se a eliminado el temporal", "error"
+                        return
+                return
+        return
     $scope.validExistGuide = ->
         data =
             valid: true
@@ -309,9 +336,9 @@ app.controller 'SGuideCtrl', ($scope, $http, $cookies, $timeout) ->
                         swal 'Alerta!', 'Transporte invalido.','warning'
                         data.save = false
                         break
-        if new Date(data.traslado) < new Date()
-            swal 'Alerta!', 'La fecha ingresada es menor', 'warning'
-            data.save = false
+        # if new Date(data.traslado) < new Date()
+        #     swal 'Alerta!', 'La fecha ingresada es menor', 'warning'
+        #     data.save = false
         if data.save
             data.traslado = "#{data.traslado.getFullYear()}-#{data.traslado.getMonth()+1}-#{data.traslado.getDate()}"
             data.genGuide = true

@@ -1,0 +1,96 @@
+<div class="navbar-fixed">
+  
+  <ul id="user-setting" class="dropdown-content">
+    <li><a class="black-text">Cargo: {{ user.get_profile.empdni.charge.cargos }}</a></li>
+    <li class="divider"></li>
+    <li>
+      <a class="black-text" href="{% url 'vista_logout' %}">
+        <span class="fa fa-sign-out"></span> Cerrar Session
+      </a>
+    </li>
+  </ul>
+  <ul id="mantenimiento" class="dropdown-content">
+    <li><a href="{% url 'tiposuspension_new' %}">Suspensiones</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'tipoinst_new' %}">Instituciones</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'tipoemple_new' %}">Empleado</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'tipocobertura_new' %}">Cobertura</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'tiporegimen_new' %}">Regimen Salud</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'tiporegimenpens_new' %}">Regimen Pensionario</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'tipoexamen_new' %}">Examen</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'tipocontrato_new' %}">Contrato</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'tipopago_new' %}">Pago</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'rubropro_new' %}">Rubro</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'tipdoc_new' %}">Documento</a></li>
+    
+  </ul>
+
+  <ul id="empleado" class="dropdown-content">
+  <li><a href="{% url 'menu' %}">Activos</a></li>
+  <li><a href="{% url 'noactive' %}">No Activos</a></li>
+  <li><a href="{% url 'emple_proy' %}">Proyectos</a></li>
+  <li><a href="{% url 'exadoc' %}">Exa-Doc</a></li>
+  </ul>
+
+  <nav class="grey darken-3">
+    <!-- <div class="nav-warpper"> -->
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <li>
+        <a href="/rrhh/"><span class="fa fa-home fa-lg"></span></a>
+        </li>
+        <!--<li><a href="{% url 'menu' %}">Empleados</a></li>-->
+        <li>
+          <a class="dropdown-button" href="#!" data-hover="true" data-activates="empleado" data-gutter="0" data-beloworigin="true">
+            Empleados <b class="fa fa-caret-down"></b>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-button" href="#!" data-hover="true" data-activates="mantenimiento" data-gutter="0" data-beloworigin="true">
+            Mantenimiento <b class="fa fa-caret-down"></b>
+          </a>
+        </li>
+
+        <li>
+          <a class="dropdown-button" href="#!" data-hover="true" data-activates="user-setting" data-gutter="0" data-beloworigin="true">
+            {{ user.get_profile.empdni.firstname }}, {{ user.get_profile.empdni.lastname }} <b class="fa fa-caret-down"></b>
+          </a>
+        </li>
+      </ul>
+       <ul id="slide-out" class="side-nav">
+        <li><a href="#!">First Sidebar Link</a></li>
+        <li><a href="#!">Second Sidebar Link</a></li>
+        <li class="no-padding">
+          <ul class="collapsible collapsible-accordion">
+            <li>
+              <a class="collapsible-header">Dropdown<i class="mdi-navigation-arrow-drop-down"></i></a>
+              <div class="collapsible-body">
+                <ul>
+                  <li><a href="#!">First</a></li>
+                  <li><a href="#!">Second</a></li>
+                  <li><a href="#!">Third</a></li>
+                  <li><a href="#!">Fourth</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <a class="brand-logo" href="/">Recursos Humanos</a>
+      <a href="#" data-activates="slide-out" class="button-collapse">
+        <span class="fa fa-bars fa-2x"></span>
+      </a>
+    <!-- </div> -->
+  </nav>
+</div>
+<script type="text/javascript">
+  $(".button-collapse").sideNav();
+</script>

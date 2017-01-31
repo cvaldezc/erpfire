@@ -1,0 +1,274 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<!-- LISTA -->
+<div class="modal editsegsocial" style="width:70%;">
+    <div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s3"><a href="#editregsalud">Regimen de Salud</a></li>
+        <li class="tab col s3"><a href="#editpensionario">Regimen Pensionario</a></li>
+        <li class="tab col s3"><a href="#editcobsalud">Cobertura de Salud</a></li>
+        <li class="tab col s3"><div style="display: none;"><input  id="accion" class="accion" name="accion"></div></li>
+      </ul>
+    </div>
+    <div style="margin-top:10px;margin-left:10px;">
+        <button type="button" name="btnsegsocial" data-segsocial="btnnewsegsocial" class="btn waves-effect green lighten-1 btnnewsegsocial">
+                <i class="fa fa-address-card-o"></i>
+                <span>Nuevo</span>
+        </button>
+    </div>
+<label style="display:none;" id="segso" class="segsoci">b</label>
+
+    <div  id="editregsalud">
+          <div class="modal-content">
+            <table class="table-detailsregsalud" >
+                <thead>
+                    <tr class="brand-primary">
+                        <th style="text-align: center;">Regimen</th>
+                        <th style="text-align: center;">F.Inicio</th>
+                        <th style="text-align: center;">F.Fin</th>
+                        <th style="text-align: center;">Entidad</th>
+                        <th style="text-align: center;"></th> 
+                        <th style="text-align: center;"></th> 
+                    </tr>
+                </thead>
+                <tbody style="height:300px;"></tbody>
+            </table>
+          </div>
+    </div>
+    <div  id="editpensionario">
+          <div class="modal-content">
+            <table class="table-detailsregpensionario" >
+                <thead>
+                    <tr class="brand-primary">
+                        <th style="text-align: center;">Regimen</th>
+                        <th style="text-align: center;">F.Inicio</th>    
+                        <th style="text-align: center;">F.Fin</th>
+                        <th style="text-align: center;">Cuspp</th>
+                        <th style="text-align: center;">SCTR</th>
+                        <th style="text-align: center;"></th> 
+                        <th style="text-align: center;"></th> 
+                    </tr>
+                </thead>
+                <tbody style="height:300px;"></tbody>
+            </table>
+          </div>
+    </div>
+    <div  id="editcobsalud">
+          <div class="modal-content">
+            <table class="table-detailscobsalud" >
+                <thead>
+                    <tr class="brand-primary">
+                        <th style="text-align: center;">Cobertura</th>
+                        <th style="text-align: center;">F.Inicio</th>    
+                        <th style="text-align: center;">F.Fin</th>
+                        <th style="text-align: center;"></th> 
+                        <th style="text-align: center;"></th> 
+                    </tr>
+                </thead>
+                <tbody style="height:300px;"></tbody>
+            </table>
+          </div>
+    </div>
+    <div align="right" style="">
+        <button style="margin-top:20px; margin-right:20px; width:200px;height:50px;color:white; font-weight:bold;" type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">SALIR</button>
+    </div>
+</div>
+
+<!--EDICIONES-->
+<!-- REGIMEN SALUD -->
+  <div class="modal editregsalud" style="width:60%;height:100%;" >
+    <div class="modal-content">
+          <div class="row">
+            <div style="">
+            <label style="display:none;" id="codregsal" class="codregsal" name="codregsal"></label>
+            <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+            <label style="color:black;font-size: 15px;" id="nameempleregsalud"></label><label> - </label>
+            <label style="color:black;font-size: 15px;" class="dniregsal" id="dniregsal" name="dniregsal"></label>  
+            </div>
+            <!--<div style="">
+            <input  id="accionregsalud" class="accionregsalud" name="accionregsalud">
+            </div>-->
+          </div>
+          <div class="row">
+              <div class="input-field col s0">
+                <p>Regimen de Salud:</p>
+              </div>
+              <div class="input-field col s3">
+                  <select id="combregsalud" class="browser-default">
+                  {% for x in lregsalud  %}
+                    <option value="{{ x.regimensalud_id }}">{{ x.regimen }}</option>
+                  {% endfor %}
+                  </select>                 
+              </div>
+          </div>
+          <div class="row">
+              <div class="input-field col s0">
+                <p>Fecha de Inicio:</p>
+              </div>
+              <div class="input-field col s3">
+                <input id="finicioregsalud" name="finicioregsalud" type="date" class="datepicker">
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s0">
+                <p>Fecha de Fin:</p>
+              </div>
+              <div class="input-field col s3">
+                <input id="ffinregsalud" name="ffinregsalud" type="date" class="datepicker">
+              </div>
+            </div>
+     
+          <div class="row">
+                <div class="input-field col s0">
+                <p>Entidad Prestadora de Salud:</p>
+              </div>
+              <div class="input-field col s3">
+                <input id="entregsalud" name="entregsalud" type="text" class="validate">
+              </div>
+          </div>
+          <div class="moda-footer" align="center">
+            <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+              <i class="fa fa-times"></i>
+              <span>Cancelar</span>
+            </button>
+            <button type="button" class="btn waves-effect green lighten-1 btnsaveeditregsalud">
+              <i class="fa fa-floppy-o"></i>
+              <span>Guardar Cambios</span>
+            </button>
+        </div>
+    </div>
+  </div>
+
+  <!-- REGIMEN PENSIONARIO -->
+  <div class="modal editregpensionario" style="width:60%;height:100%;" >
+    <div class="modal-content">
+          <div class="row">
+            <div style="">
+            <label style="display:none;" id="codregpensionario" class="codregpensionario" name="codregpensionario"></label>
+            <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+            <label style="color:black;font-size: 15px;" id="nameempleregpens"></label><label> - </label>
+            <label style="color:black;font-size: 15px;" class="dniregpensionario" id="dniregpensionario" name="dniregpensionario"></label>  
+            </div>
+            <!--<div style="">
+            <input  id="accionregpensionario" class="accionregpensionario" name="accionregpensionario">
+            </div>-->
+          </div>
+          <div class="row">
+              <div class="input-field col s0">
+                <p>Regimen Pensionario:</p>
+              </div>
+              <div class="input-field col s3">
+                  <select id="combregpensionario" class="browser-default">
+                  {% for x in lregpens  %}
+                    <option value="{{ x.regimenpens_id }}">{{ x.regimen }}</option>
+                  {% endfor %}
+                  </select>                 
+              </div>
+          </div>
+          <div class="row">
+              <div class="input-field col s0">
+                <p>Fecha de Inicio:</p>
+              </div>
+              <div class="input-field col s3">
+                <input id="finicioregpensionario" name="finiciopensionario" type="date" class="datepicker">
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s0">
+                <p>Fecha de Fin:</p>
+              </div>
+              <div class="input-field col s3">
+                <input id="ffinregpensionario" name="ffinpensionario" type="date" class="datepicker">
+              </div>
+            </div>
+     
+          <div class="row">
+                <div class="input-field col s0">
+                <p>CUSPP</p>
+              </div>
+              <div class="input-field col s3">
+                <input id="regpensiocuspp" name="regpensiocuspp" type="text" class="validate">
+              </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s0">
+                  <p>Aporte al SCTR:</p>
+                </div>
+                <div class="input-field col s3">
+                    <select id="combsctr" class="browser-default">
+                      <option value="true">SI</option>
+                      <option value="false">NO</option>
+                    </select>                 
+                </div>
+            </div>
+          <div class="moda-footer" align="center">
+            <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+              <i class="fa fa-times"></i>
+              <span>Cancelar</span>
+            </button>
+            <button type="button" class="btn waves-effect green lighten-1 btnsaveeditregpensionario">
+              <i class="fa fa-floppy-o"></i>
+              <span>Guardar Cambios</span>
+            </button>
+        </div>
+    </div>
+  </div>
+
+    <!-- COBERTURA SALUD -->
+  <div class="modal editcobsalud" style="width:60%;height:100%;" >
+    <div class="modal-content">
+          <div class="row">
+            <div style="">
+            <label style="display:none;" id="codcobsalud" class="codcobsalud" name="codcobsalud"></label>
+            <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+            <label style="color:black;font-size: 15px;" id="nameemplecobsal"></label><label> - </label>
+            <label style="color:black;font-size: 15px;" class="dnicobsalud" id="dnicobsalud" name="dnicobsalud"></label>  
+            </div>
+            <!--<div style="">
+            <input  id="accioncobsalud" class="accioncobsalud" name="accioncobsalud">
+            </div>-->
+          </div>
+          <div class="row">
+              <div class="input-field col s0">
+                <p>Cobertura de Salud:</p>
+              </div>
+              <div class="input-field col s3">
+                  <select id="combcobsalud" class="browser-default">
+                  {% for x in lcobsalud  %}
+                    <option value="{{ x.coberturasalud_id }}">{{ x.cobertura }}</option>
+                  {% endfor %}
+                  </select>                 
+              </div>
+          </div>
+          <div class="row">
+              <div class="input-field col s0">
+                <p>Fecha de Inicio:</p>
+              </div>
+              <div class="input-field col s3">
+                <input id="finiciocobsalud" name="finiciocobsalud" type="date" class="datepicker">
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s0">
+                <p>Fecha de Fin:</p>
+              </div>
+              <div class="input-field col s3">
+                <input id="ffincobsalud" name="ffincobsalud" type="date" class="datepicker">
+              </div>
+            </div>
+     
+          <div class="moda-footer" align="center">
+            <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+              <i class="fa fa-times"></i>
+              <span>Cancelar</span>
+            </button>
+            <button type="button" class="btn waves-effect green lighten-1 btnsaveeditcobsalud">
+              <i class="fa fa-floppy-o"></i>
+              <span>Guardar Cambios</span>
+            </button>
+        </div>
+    </div>
+  </div>
+{% csrf_token %}

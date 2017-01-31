@@ -1,0 +1,651 @@
+<!--MODAL CUENTA-->
+<div class="modal editcuentaemple" id="formcuenta" style="width:800px;height:100%;" >
+              <div class="modal-content">
+                  <div class="row">
+                      <div class="row">
+                        <div>
+                        <label style="display:none;" id="codt" class="codt" name="codt"></label>
+                        <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                        <label style="color:black;font-size: 15px;" class="nameemplecu" id="nameemplecu"></label><label> - </label>
+                        <label style="color:black;font-size: 15px;" class="dnicuenta" name="dnicuenta" id="dniempleadocuenta">
+                        </label>
+                        <div style="display:none;">
+                        <input  id="accioncuenta" class="accioncuenta" name="accioncuenta">
+                        </div>
+                        </div>
+                      </div>
+                      <div class="input-field col s6">
+                        <input placeholder="" id="numcuenta" name="numcuenta" type="text" length="16" class="validate numcuenta">
+                        <label for="numcuenta" >NUMERO DE CUENTA</label>
+                      </div>
+                      <div class="input-field col s6">
+                      <input placeholder="" id="remuneracion" name="remuneracion" type="text" class="validate remunera">
+                      <label for="remuneracion" >REMUNERACION</label>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="input-field col s0">
+                    <button type="button" style="color:blue;font-weight:bold;" class="transparent btncalcular"><small>Calcular</small></button>
+                    </div>
+                    <div class="input-field col s3">
+                      <input  placeholder="" id="costoxhora" name="costoxhora" type="text" class="validate costxhora">
+                      <label for="costoxhora" >REMUNERACION POR HORA</label>
+                    </div>
+                    <div class="input-field col s3">
+                      <input placeholder="" id="gratificacion" name="gratificacion" type="text" class="validate grati">
+                      <label for="gratificacion" >GRATIFICACION</label>
+                    </div>
+                    <div class="input-field col s3">
+                      <input placeholder="" id="cts" name="cts" type="text" class="validate cts">
+                      <label for="cts" >CTS</label>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="input-field col s0">
+                      <p>Tipo de contrato:</p>
+                    </div>
+                  <div class="input-field col s4">
+                    <select id="combotipocontrato" class="browser-default tipcontrato">
+                    {% for x in ltipocontrato %}
+                      <option value="{{ x.tipocontrato_id }}">{{ x.contrato }}</option>
+                    {% endfor %}
+                    </select>                 
+                  </div>
+                  <div class="input-field col s0">
+                        <p>Tipo de Pago:</p>
+                      </div>
+                      <div class="input-field col s3">
+                        <select id="combotipopago" class="browser-default tpago">
+                        {% for x in ltipopago %}
+                          <option data-tipopago="{{ x.pago }}" value="{{ x.tipopago_id }}">{{ x.pago }}</option>
+                        {% endfor %}
+                        </select>                 
+                      </div>
+                  </div>
+                  <div class="moda-footer" align="center" style="margin-top:120px;">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsavecuenta">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+                  </div>
+            </div>
+                     
+</div>
+
+<!-- MODAL ESTUDIO-->
+<div class="modal editestudioemple" id="formestudio" style="width:800px;height:700px;" >  
+    <div class="modal-content">
+      <div class="row">
+            <div class="row">
+              <div>
+                <label style="display:none;" id="codest" class="codest" name="codest"></label>
+                <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                <label style="color:black;font-size: 15px;" class="nameempleest" id="nameempleest"></label><label> - </label>
+                <label style="color:black;font-size: 15px;" class="dniempleado" id="dniempleadoestudio"></label>
+                <div style="display:none;">
+                <input  id="accionestudio" class="accionestudio" name="accionestudio">
+              </div>  
+              </div>
+            </div>
+              <div class="input-field col">
+                <p>Tipo de Institucion:</p>
+              </div>
+              <div class="input-field col">
+                  <select id="idcombotipoinst" class="browser-default tipouniv">
+                    {% for x in ltipinst %}
+                  <option value="{{ x.tipoinst_id }}">{{x.tipo}}</option>
+                {% endfor %}
+                  </select>                 
+              </div>
+              <div class="input-field col s6">
+                <input placeholder="" id="inst" type="text" class="validate institucion" name="instituto">
+                <label for="inst">INSTITUCION</label>
+              </div>
+        </div>
+              <div class="row">
+                  <div class="input-field col">
+                    <p>Desde:</p>
+                  </div>
+                  <div class="input-field col s2">
+                    <input placeholder="" id="finiest" type="text" class="validate finiestudio" name="finiestudio">
+                  </div>
+                  <div class="input-field col">
+                    <p>Hasta:</p>
+                  </div>
+                  <div class="input-field col s2">
+                    <input placeholder="" id="ffinest" type="text" class="validate ffinest" name="ffinest">
+                  </div>
+                  <div class="input-field col s5">
+                    <input placeholder="" id="instreg" type="text" class="validate estregimen" name="ninstreg">
+                    <label for="instreg">REGIMEN DE INSTITUCION<small>(Privada, Estatal)</small></label>
+                  </div>
+              </div>
+              <hr>
+              <label> Llenar si es estudio superior</label>
+              <div class="row">
+                    <div class="input-field col s6">
+                    <input placeholder="" id="carrera" type="text" class="validate carrera" name="ncarrera">
+                    <label for="carrera">CARRERA</label>
+                  </div>
+                  <div class="input-field col">
+                    <p>Estudios en el Peru:</p>
+                  </div>
+                  <div class="input-field col s2">
+                      <select id="idcomboestpais" class="browser-default estpais">
+                        <option value="true">SI</option>
+                        <option value="false">NO</option>
+                      </select>                 
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="input-field col s5">
+                    <input placeholder="" id="siteduc" type="text" class="validate situeduc" name="nsiteduc">
+                    <label for="siteduc">SITUACION EDUCATIVA<small>(Egresado(a), Estudiante, etc.)</small></label>
+                  </div>
+                  <div class="input-field col s3">
+                    <input placeholder="" id="aegreso" type="text" class="validate aegreso" name="naegreso">
+                    <label for="aegreso">Año de Egreso</label>
+                  </div>
+              </div>   
+              <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsaveestudio">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+              </div>         
+</div>
+</div>
+<!--MODAL TELEFONO-->
+<div id="formtelefono" class="modal ed" style="width:30%;height: 50%;">
+            <div class="modal-content">
+                        <label style="display:none;" id="codtel" class="codtel" name="codtel"></label>
+                        <div style="display:none;">
+                          <input  id="acciontelefono" class="acciontelefono" name="acciontelefono">
+                        </div>       
+                  <div class="row">
+                      <div class="row">
+                        <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                        <label style="color:black;font-size: 15px;" class="nameemple" id="nameemple"></label><label> - </label>
+                        <label style="color:black;font-size: 15px;" id="dniempleadotel" class="dniempleadotel"></label>
+                  
+                      </div>
+                      <div class="row">
+                      <div class="input-field col s0" style="margin-left:70px;">
+                        <i class="fa fa-phone"></i>                  
+                      </div>
+                      <div class="input-field col s6">
+                        <input id="telef" name="telef" type="text" class="validate telef">
+                      </div>
+                      </div>
+                      <div class="row" align="center">
+                      <div class="input-field col s0">
+                        <p>Descripcion:</p>
+                      </div>
+                      <div class="input-field col s6">
+                        <input id="teldes" name="teldes" type="text" class="validate teldes">
+                      </div>
+                      </div>
+                  </div>
+                  
+                  <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Salir</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsavetelef">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+
+                  </div>
+            </div>
+</div>
+
+<!--MODAL SUSPENSION-->
+<div id="formsuspension" class="modal editsuspension" style="width:50%;height:700px;padding:15px;">
+            <div class="modal-content formaddsusp">
+                  <div class="row">
+                  <label style="display:none;" id="codsusp" class="codsusp" name="codsusp"></label>
+                  <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                  <label style="color:black;font-size: 15px;" class="nameemplesusp" id="nameemplesusp"></label><label> - </label>
+                  <label style="color:black;font-size: 15px;" class="dniempleado" id="dniempleadosusp"></label>
+                  <div style="display:none;">
+                    <input  id="accionsuspension" class="accionsuspension" name="accionsuspension">
+                    </div> 
+                  </div>
+                  <div class="row">
+                      <div class="input-field col s0">
+                        <p>Motivo:</p>
+                      </div>
+                      <div class="input-field col s10">
+                        <select id="combotiposuspension" class="browser-default">
+                        {% for x in ltiposuspension %}
+                          <option value="{{ x.suspension_id }}">{{ x.motivo }}</option>
+                        {% endfor %}
+                        </select>                 
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="input-field col s6">
+                        <input placeholder="" id="fechinisusp" name="fechinisusp" type="date" class="datepicker">
+                        <label for="fechinisusp">FECHA DE INICIO</label>
+                      </div>
+                      <div class="input-field col s6">
+                        <input placeholder="" id="fechfinsusp" name="fechfinsusp" type="date" class="datepicker">
+                        <label for="fechfinsusp">FECHA DE FIN</label>
+                      </div>
+                  </div>
+                  <div class="row">
+                  <div class="file-field input-field">
+                    <div class="btn">
+                      <span>Subir Archivo</span>
+                      <input type="file" name="cambsusp" id="" accept="application/pdf">
+                    </div>
+                    <div class="file-path-wrapper col s4">
+                      <input disabled class="file-path txtchangesusp" type="text" name="textosuspen">
+                    </div>
+                    <div class="input-field col s4">
+                      <label id="archisusp" class="archisusp"></label>    
+                    </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                      <div class="input-field col s12">
+                        <textarea placeholder="" id="txtcomentsusp" name="txtcomentsusp" class="materialize-textarea txtcomentsusp"></textarea>
+                        <label for="txtcomentsusp">COMENTARIO</label>
+                      </div> 
+                  </div>
+            
+                  <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsavesuspension">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+                  </div>
+        </div>
+</div>
+
+
+<!-- DETALLE SUSPENSIONES
+<div id="formsuspension" class="modal detailsusp" style="width:50%;height:700px;padding:15px;">
+            <div class="modal-content formaddsusp">
+                  <div class="row">
+                  <label style="display:none;" id="codsusp" class="codsusp" name="codsusp"></label>
+                  <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                  <label style="color:black;font-size: 15px;" id="nameemplesusp"></label><label> - </label>
+                  <label style="color:black;font-size: 15px;" class="dniempleado" id="dniempleadosusp"></label>
+                  <div style="display:none;">
+                    <input  id="accionsuspension" class="accionsuspension" name="accionsuspension">
+                    </div> 
+                  </div>
+                  <div class="row">
+                      <div class="input-field col s0">
+                        <p>Motivo:</p>
+                      </div>
+                      <div class="input-field col s10">
+                        <select id="combotiposuspension" class="browser-default">
+                        {% for x in ltiposuspension %}
+                          <option value="{{ x.suspension_id }}">{{ x.motivo }}</option>
+                        {% endfor %}
+                        </select>                 
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="input-field col s6">
+                        <input placeholder="" id="fechinisusp" name="fechinisusp" type="date" class="datepicker">
+                        <label for="fechinisusp">FECHA DE INICIO</label>
+                      </div>
+                      <div class="input-field col s6">
+                        <input placeholder="" id="fechfinsusp" name="fechfinsusp" type="date" class="datepicker">
+                        <label for="fechfinsusp">FECHA DE FIN</label>
+                      </div>
+                  </div>
+                  <div class="row">
+                  <div class="file-field input-field">
+                    <div class="btn">
+                      <span>Subir Archivo</span>
+                      <input type="file" name="cambsusp" id="" accept="application/pdf">
+                    </div>
+                    <div class="file-path-wrapper col s4">
+                      <input disabled class="file-path txtchangesusp" type="text" name="textosuspen">
+                    </div>
+                    <div class="input-field col s4">
+                      <label id="archisusp" class="archisusp"></label>    
+                    </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                      <div class="input-field col s12">
+                        <textarea placeholder="" id="txtcomentsusp" name="txtcomentsusp" class="materialize-textarea txtcomentsusp"></textarea>
+                        <label for="txtcomentsusp">COMENTARIO</label>
+                      </div> 
+                  </div>
+            
+                  <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsavesuspension">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+                  </div>
+        </div>
+</div>
+-->
+<!-- MODAL DATOS FAMILIA-->
+<div class="modal editfamilia" id="formfamilia" style="width:600px;height:550px;" >  
+    <div class="modal-content">
+      <div class="row">
+            <div class="row">
+            <div>
+            <label style="display:none;" id="codfam" class="codfam" name="codfam"></label>
+            <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+            <label style="color:black;font-size: 15px;" class="nameemplefam" id="nameemplefam"></label><label> - </label>
+            <label style="color:black;font-size: 15px;" class="dniempleadofam" id="dniempleadofamilia"></label>
+            <div style="display:none;">
+            <input  id="accionfamilia" class="accionfamilia" name="accionfamilia">
+            </div>  
+            </div>
+            </div>
+        <div class="input-field col s12">
+          <input placeholder="" id="namefam" type="text" class="validate namefam" name="namefam">
+          <label for="inst">Nombres y Apellidos</label>
+        </div>
+        </div>
+              <div class="row">
+                  <div class="input-field col s6">
+                    <input placeholder="" id="parentfam" type="text" class="validate parentfam" name="parentfam">
+                    <label for="inst">Parentesco</label>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="input-field col s6">
+                    <input placeholder="" id="edadfam" type="text" class="validate edadfam" name="edadfam">
+                    <label for="edadfam">Edad</label>
+                  </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <input placeholder="" id="fnacfam" name="fnacfam" type="date" class="datepi fnacfam">
+                  <label for="fnacfam">Fecha de Nacimiento</label>
+                </div>
+              </div>
+              <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsavefamilia">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+              </div>         
+</div>
+</div>
+
+<!-- MODAL EXPERIENCIA LABORAL-->
+<div class="modal editexplaboral" id="" style="width:800px;max-height:75%;" >  
+    <div class="modal-content">
+      <div class="row">
+            <div class="row">
+            <div>
+            <label style="display:none;" id="codexplab" class="codexplab" name="codexplab"></label>
+            <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+            <label style="color:black;font-size: 15px;" class="nameempleexplab" id="nameempleexplab"></label><label> - </label>
+            <label style="color:black;font-size: 15px;" class="dniexplab" id="dniexplab"></label>
+            <div style="display:none;">
+            <input  id="accionexplab" class="accionexplab" name="accionexplab">
+            </div>  
+            </div>
+            </div>
+        <div class="input-field col s6">
+          <input placeholder="" id="empexplab" type="text" class="validate empexplab" name="empexplab">
+          <label for="inst">Empresa</label>
+        </div>
+        <div class="input-field col s6">
+          <input placeholder="" id="cargoexplab" type="text" class="validate cargoexplab" name="cargoexplab">
+          <label for="cargoexplab">Cargo</label>
+        </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input placeholder="" id="iniexplab" type="text" class="validate iniexplab" name="iniexplab">
+            <label for="iniexplab">Inicio</label>
+          </div>
+          <div class="input-field col s6">
+            <input placeholder="" id="finexplab" type="text" class="validate finexplab" name="finexplab">
+            <label for="finexplab">Termino</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input placeholder="" id="durexplab" type="text" class="validate durexplab" name="durexplab">
+            <label for="durexplab">Duracion</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s8">
+            <textarea placeholder="" id="motivretlab" type="text" class="materialize-textarea" name="motivretlab"></textarea>
+            <label for="motivretlab">Motivo de retiro</label>
+          </div>
+        </div>
+              <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsaveexplab">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+              </div>         
+</div>
+</div>
+
+<!-- DETALLE DATOS MEDICOS -->
+<div class="modal editmedic" style="width:35%;height:700px;padding:15px;">
+            <div class="modal-content">
+                  <div class="row">
+                  <label style="display:none;" id="codmedic" class="codmedic"></label>
+                  <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                  <label style="color:black;font-size: 15px;" class="namemedic"></label><label> - </label>
+                  <label style="color:black;font-size: 15px;" class="dnimedic" id="dnimedic"></label>
+                  <div style="display:none;">
+                    <input class="accionmedic" name="accionmedic" id="accionmedic">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input placeholder="" type="text" class="tipomedic" name="tipomedic">
+                      <label for="tipomedic">TIPO <small> (Enfermedad, Alergico a un Medicamento, Trat. Medico, Interv.Quirurgica)</small></label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input placeholder="" type="text" class="descmedic" name="descmedic">
+                      <label for="descmedic">Cual es</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s6">
+                      <input placeholder="" type="text" class="timemedic" name="timemedic">
+                      <label for="timemedic">Tiempo</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                      <div class="input-field col s12">
+                        <textarea placeholder="" name="txtcommedic" class="materialize-textarea txtcommedic"></textarea>
+                        <label for="txtcommedic">COMENTARIO</label>
+                      </div> 
+                  </div>
+            
+                  <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsavemedic">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+                  </div>
+        </div>
+</div>
+
+<!-- DETALLE CASO EMERGENCIA -->
+<div class="modal editemergencia" style="width:35%;height:700px;padding:15px;">
+            <div class="modal-content">
+                  <div class="row">
+                  <label style="display:none;" id="codemerg" class="codemerg"></label>
+                  <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                  <label style="color:black;font-size: 15px;" class="nameemergencia"></label><label> - </label>
+                  <label style="color:black;font-size: 15px;" class="dniemerg" id="dniemerg"></label>
+                  <div style="display:none;">
+                    <input class="accionemerg" name="accionemerg" id="accionemerg">
+                    </div> 
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s8">
+                      <input placeholder="" type="text" class="nameemerg" name="nameemerg">
+                      <label for="nameemerg">Nombres</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s6">
+                      <input placeholder="" type="text" class="direcemerg" name="direcemerg">
+                      <label for="direcemerg">Direccion</label>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="input-field col s4">
+                      <input placeholder="" type="text" class="telemerg" name="telemerg">
+                      <label for="telemerg">Telefono</label>
+                    </div>
+                    <div class="input-field col s4">
+                      <input placeholder="" type="text" class="parentemerg" name="parentemerg">
+                      <label for="parentemerg">Parentesco</label>
+                    </div>
+                  </div>
+            
+                  <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsaveemerg">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+                  </div>
+        </div>
+</div>
+
+<!-- FAMLIA ICR -->
+<div class="modal familiaicr" style="width:35%;height:700px;padding:15px;">
+            <div class="modal-content">
+                  <div class="row">
+                  <label style="display:none;" id="codfamicr" class="codfamicr"></label>
+                  <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                  <label style="color:black;font-size: 15px;" class="namefamicr"></label><label> - </label>
+                  <label style="color:black;font-size: 15px;" class="dnifamicr" id="dnifamicr"></label>
+                  <div style="display:none;">
+                    <input class="accionfamicr" name="accionfamicr" id="accionfamicr">
+                    </div> 
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input placeholder="" type="text" class="namefamicr" name="namefamicr">
+                      <label for="namefamicr">Nombres y Apellidos</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input placeholder="" type="text" class="parentfamicr" name="parentfamicr">
+                      <label for="parentfamicr">Parentesco</label>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input placeholder="" type="text" class="areatrabfamicr" name="areatrabfamicr">
+                      <label for="areatrabfamicr">Area de Trabajo</label>
+                    </div>
+                  </div>
+            
+                  <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsavefamicr">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+                  </div>
+        </div>
+</div>
+
+<!-- MOTIVO RENUNCIA -->
+<div class="modal addrenuncia" style="width:35%;height:700px;padding:15px;">
+            <div class="modal-content">
+                  <div class="row">
+                  <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
+                  <label style="color:black;font-size: 15px;" class="namemotr"></label><label> - </label>
+                  <label style="color:black;font-size: 15px;" class="dnimotr" id="dnimotr"></label>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <textarea placeholder="" id="motrenuncia" name="motrenuncia" class="materialize-textarea motrenuncia"></textarea>
+                      <label for="motrenuncia">Motivo de Renuncia</label>
+                    </div> 
+                  </div>
+                  <div class="row">
+                      <div class="input-field col s12">
+                        <input placeholder="" name="ulttrabj" type="date" class="datepicker ulttrabj">
+                        <label for="fechinisusp">Ultimo dia trabajo</label>
+                      </div>
+                  </div>
+                  <div class="row">
+                  <div class="file-field input-field">
+                    <div class="btn">
+                      <span>Subir Carta Renuncia</span>
+                      <input type="file" name="docrenuncia" id="" accept="application/pdf">
+                    </div>
+                    <div class="file-path-wrapper col s4">
+                      <input disabled class="file-path txtdocrenuncia" type="text" name="txtdocrenuncia">
+                    </div>
+                    </div>
+                  </div>
+            
+                  <div class="moda-footer" align="center">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect green lighten-1 btnsavemotrenuncia">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+                  </div>
+        </div>
+</div>
+
+
+{% csrf_token %}

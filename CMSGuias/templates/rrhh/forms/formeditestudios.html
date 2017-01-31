@@ -1,0 +1,31 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+<div class="modal editest" style="width:80%; height:55%;">
+      <div class="modal-content">
+        <button type="button" name="btnestudio" data-estudio="btnnewestudio" class="btn waves-effect green lighten-1 btnnewestudio">
+                <i class="fa fa-graduation-cap"></i>
+                <span>Nuevo</span>
+        </button>
+        <table class="table-detailsest" >
+            <thead>
+                <tr class="brand-primary">
+                    <th style="text-align: center;">Institucion</th>
+                    <th style="text-align: center;">Tipo de Inst</th>
+                    <th style="text-align: center;">Carrera</th>
+                    <th style="text-align: center;">Est. Peru</th>
+                    <th style="text-align: center;">Año de egreso</th>
+                    <th style="text-align: center;">Sit. Educ.</th>
+                    <th style="text-align: center;">Regimen</th>
+                    <th style="text-align: center;"></th> 
+                    <th style="text-align: center;"></th> 
+                </tr>
+            </thead>
+            <tbody class="bodydetails" style="height:200px;"></tbody>
+        </table>
+        <div align="right" style="">
+        <button style="margin-top:40px; width:200px;height:50px; background-color:black; color:white; font-weight:bold;" type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">SALIR</button>
+        </div>
+      </div>
+</div>
+{% csrf_token %}

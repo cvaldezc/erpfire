@@ -1,0 +1,84 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<div class="modal editobra" style="width:85%;height:100%;">
+    <div class="col s12">
+      <ul class="tabs">
+        <li class="tab col s3"><a href="#editproyecto">Proyecto</a></li>
+        <li class="tab col s3"><a href="#editepps">EPPS</a></li>
+        <li class="tab col s3"><div style="display: none;"><input  id="accion" class="accion" name="accion"></div></li>
+      </ul>
+    </div>
+    <div  id="editproyecto">
+          <div class="modal-content">
+        <button type="button" name="btnproyecto" data-proyecto="btnnewproyecto" class="btn waves-effect green lighten-1 btnnewproyecto">
+                <i class="fa fa-file-text" aria-hidden="true"></i>
+                <span>Nuevo</span>
+        </button>
+            <table class="table-detailsobra" >
+                <thead>
+                    <tr class="brand-primary">
+                        <th style="text-align: center; width:250px;">Proyecto</th>
+                        <th style="text-align: center;">F.Inicio</th>
+                        <th style="text-align: center;">C.Magnetico</th>
+                        <th style="text-align: center;">Fotocheck</th>
+                        <th style="text-align: center;"></th> 
+                        <th style="text-align: center;"></th>
+                        <th style="text-align: center;">Inducciones</th>
+                    </tr>
+                </thead>
+                <tbody class="bodydetails" style="height:300px;"></tbody>
+            </table>
+          </div>
+    </div>
+    <div  id="editepps">
+          <div class="modal-content">
+        <button type="button" name="btnepps" data-epps="btnnewepps" class="btn waves-effect green lighten-1 btnnewepps">
+                <i class="fa fa-address-card-o"></i>
+                <span>Nuevo</span>
+        </button>
+            <table class="table-detailsepps" >
+                <thead>
+                    <tr class="brand-primary">
+                        <th style="text-align: center;">Epps</th>
+                        <th style="text-align: center;">F.Entrega</th>
+                        <th style="text-align: center;">F.Recepcion</th>
+                        <th style="text-align: center;"></th> 
+                        <th style="text-align: center;"></th> 
+                    </tr>
+                </thead>
+                <tbody class="bodydetails" style="height:250px;"></tbody>
+            </table>
+          </div>
+    </div>
+    <div align="right" style="">
+        <button style="margin-bottom:10px; margin-right:20px; width:200px;height:50px;color:white; font-weight:bold;" type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">SALIR</button>
+    </div>
+</div>
+
+<div class="modal editinduc">
+    <div  id="editinduccion">
+      <div class="modal-content">
+      <label>Cod: </label>
+      <label class="proyid" id="proyid"></label>
+        <table class="table-detailsinduccion" >
+            <thead>
+                <tr class="brand-primary">
+                    <th style="text-align: center;">F.Induccion</th>
+                    <th style="text-align: center;">F.Caducidad</th>
+                    <th style="text-align: center;">Comentario</th>
+                    <th style="text-align: center;"></th> 
+                    <th style="text-align: center;"></th> 
+                </tr>
+            </thead>
+            <tbody class="bodydetails" style="height:300px;"></tbody>
+        </table>
+        <div align="right" style="">
+            <button style="margin-top:20px; margin-right:20px; width:200px;height:50px;color:white; font-weight:bold;" type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">SALIR</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% csrf_token %}
