@@ -298,7 +298,8 @@ class RptPurchase(TemplateView):
 
     def get(self, request, *args, **kwargs):
         try:
-            rounded = '0.01'
+            rounded = '0.001'
+            rtwo = '0.01'
             context = dict()
             context['bedside'] = Compra.objects.get(pk=kwargs['pk'], flag=True)
             lista = DetCompra.objects.filter(compra_id=kwargs['pk'])
@@ -347,7 +348,7 @@ class RptPurchase(TemplateView):
                         'unit': x.unit_id if x.unit_id else x.materiales.unidad_id,
                         'brand': x.brand.brand,
                         'model': x.model.model,
-                        'quantity': Decimal(x.cantstatic).quantize(Decimal(rounded)),
+                        'quantity': Decimal(x.cantstatic).quantize(Decimal(rtwo)),
                         'price': x.precio,
                         'discount': x.discount,
                         'perception': x.perception,
@@ -370,11 +371,11 @@ class RptPurchase(TemplateView):
             # print discount
             context['discount'] = discount
             if context['bedside'].sigv:
-                context['igvval'] = ((Decimal(igv).quantize(Decimal(rounded)) * ns) / 100)
+                context['igvval'] = Decimal((Decimal(igv).quantize(Decimal(rounded)) * ns) / 100).quantize(Decimal(rtwo))
                 context['igv'] = igv
             else:
                 context['igvval'] = 0
-            total = (context['igvval'] + ns)
+            total = Decimal((context['igvval'] + ns)).quantize(Decimal(rtwo))
             context['total'] = total
             context['literal'] = number_to_char.numero_a_letras(total)
             context['status'] = globalVariable.status
