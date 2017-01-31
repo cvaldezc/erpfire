@@ -94,7 +94,7 @@ class Materiale(models.Model):
     @property
     def complete_name(self):
         return '%s %s' % (self.matnom, self.matmed)
-    
+
     def __unicode__(self):
         return '%s %s %s %s' % (
                                 self.materiales_id, self.matnom,
