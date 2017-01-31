@@ -80,15 +80,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'home', ['Materiale'])
 
-        # Adding model 'MNiple'
-        db.create_table(u'home_mniple', (
-            ('ktype', self.gf('django.db.models.fields.CharField')(max_length=1, primary_key=True)),
-            ('ntype', self.gf('django.db.models.fields.CharField')(max_length=80)),
-            ('ncount', self.gf('django.db.models.fields.CharField')(max_length=6, null=True)),
-            ('flag', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'home', ['MNiple'])
-
         # Adding model 'TypeGroup'
         db.create_table(u'home_typegroup', (
             ('tgroup_id', self.gf('django.db.models.fields.CharField')(max_length=7, primary_key=True)),
@@ -128,43 +119,16 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'home', ['Cargo'])
 
-        # Adding model 'TipoEmpleado'
-        db.create_table(u'home_tipoempleado', (
-            ('tipoemple_id', self.gf('django.db.models.fields.CharField')(max_length=9, primary_key=True)),
-            ('descripcion', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('flag', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'home', ['TipoEmpleado'])
-
         # Adding model 'EmployeeAuditLogEntry'
         db.create_table(u'home_employeeauditlogentry', (
             ('empdni_id', self.gf('django.db.models.fields.CharField')(max_length=8, db_index=True)),
-            ('tipoemple', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['home.TipoEmpleado'], null=True, blank=True)),
             ('firstname', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('lastname', self.gf('django.db.models.fields.CharField')(max_length=150)),
-            ('sexo', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('estadocivil', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('birth', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('address', self.gf('django.db.models.fields.CharField')(max_length=180, null=True, blank=True)),
-            ('address2', self.gf('django.db.models.fields.CharField')(max_length=180, null=True, blank=True)),
-            ('email', self.gf('django.db.models.fields.EmailField')(max_length=80, null=True, blank=True)),
-            ('nacionalidad', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('discapacidad', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('situacion', self.gf('django.db.models.fields.CharField')(default='Activo', max_length=100, null=True, blank=True)),
-            ('feching', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('estadoplanilla', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('register', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('charge', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['home.Cargo'], null=True)),
-            ('observation', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('archivo', self.gf('django.db.models.fields.files.FileField')(max_length=500, null=True, blank=True)),
-            ('foto', self.gf('django.db.models.fields.files.FileField')(max_length=300, null=True, blank=True)),
-            ('nacdpt', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('nacprov', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('nacdist', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('tallazap', self.gf('django.db.models.fields.CharField')(max_length=6, null=True, blank=True)),
-            ('tallapolo', self.gf('django.db.models.fields.CharField')(max_length=6, null=True, blank=True)),
-            ('cargopostula', self.gf('django.db.models.fields.CharField')(max_length=30, null=True, blank=True)),
-            ('distrito', self.gf('django.db.models.fields.CharField')(max_length=30, null=True, blank=True)),
+            ('register', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('birth', self.gf('django.db.models.fields.DateField')(auto_now_add=True, blank=True)),
+            ('phone', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
+            ('address', self.gf('django.db.models.fields.CharField')(max_length=180)),
+            ('charge', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['home.Cargo'])),
             ('flag', self.gf('django.db.models.fields.BooleanField')(default=True)),
             (u'action_user', self.gf('audit_log.models.fields.LastUserField')(related_name=u'_employee_audit_log_entry', to=orm['auth.User'])),
             (u'action_id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -176,32 +140,13 @@ class Migration(SchemaMigration):
         # Adding model 'Employee'
         db.create_table(u'home_employee', (
             ('empdni_id', self.gf('django.db.models.fields.CharField')(max_length=8, primary_key=True)),
-            ('tipoemple', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['home.TipoEmpleado'], null=True, blank=True)),
             ('firstname', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('lastname', self.gf('django.db.models.fields.CharField')(max_length=150)),
-            ('sexo', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('estadocivil', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('birth', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('address', self.gf('django.db.models.fields.CharField')(max_length=180, null=True, blank=True)),
-            ('address2', self.gf('django.db.models.fields.CharField')(max_length=180, null=True, blank=True)),
-            ('email', self.gf('django.db.models.fields.EmailField')(max_length=80, null=True, blank=True)),
-            ('nacionalidad', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('discapacidad', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('situacion', self.gf('django.db.models.fields.CharField')(default='Activo', max_length=100, null=True, blank=True)),
-            ('feching', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('estadoplanilla', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('register', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('charge', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['home.Cargo'], null=True)),
-            ('observation', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('archivo', self.gf('django.db.models.fields.files.FileField')(max_length=500, null=True, blank=True)),
-            ('foto', self.gf('django.db.models.fields.files.FileField')(max_length=300, null=True, blank=True)),
-            ('nacdpt', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('nacprov', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('nacdist', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('tallazap', self.gf('django.db.models.fields.CharField')(max_length=6, null=True, blank=True)),
-            ('tallapolo', self.gf('django.db.models.fields.CharField')(max_length=6, null=True, blank=True)),
-            ('cargopostula', self.gf('django.db.models.fields.CharField')(max_length=30, null=True, blank=True)),
-            ('distrito', self.gf('django.db.models.fields.CharField')(max_length=30, null=True, blank=True)),
+            ('register', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('birth', self.gf('django.db.models.fields.DateField')(auto_now_add=True, blank=True)),
+            ('phone', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
+            ('address', self.gf('django.db.models.fields.CharField')(max_length=180)),
+            ('charge', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['home.Cargo'])),
             ('flag', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
         db.send_create_signal(u'home', ['Employee'])
@@ -355,20 +300,12 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('moneda', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['home.Moneda'])),
             ('fecha', self.gf('django.db.models.fields.DateField')(auto_now=True, blank=True)),
-            ('registrado', self.gf('django.db.models.fields.TimeField')(auto_now_add=True, blank=True)),
+            ('registrado', self.gf('django.db.models.fields.TimeField')(auto_now=True, blank=True)),
             ('compra', self.gf('django.db.models.fields.FloatField')()),
             ('venta', self.gf('django.db.models.fields.FloatField')()),
             ('flag', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
         db.send_create_signal(u'home', ['TipoCambio'])
-
-        # Adding model 'Rubro'
-        db.create_table(u'home_rubro', (
-            ('rubro_id', self.gf('django.db.models.fields.CharField')(max_length=8, primary_key=True)),
-            ('rubro', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('flag', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'home', ['Rubro'])
 
         # Adding model 'Proveedor'
         db.create_table(u'home_proveedor', (
@@ -383,10 +320,8 @@ class Migration(SchemaMigration):
             ('tipo', self.gf('django.db.models.fields.CharField')(max_length=8)),
             ('origen', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('last_login', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True)),
-            ('email', self.gf('django.db.models.fields.CharField')(default='ejemplo@dominio.com', max_length=60, null=True)),
-            ('contact', self.gf('django.db.models.fields.CharField')(default='', max_length=200, null=True, blank=True)),
-            ('register', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, blank=True)),
-            ('rubropro', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['home.Rubro'], null=True)),
+            ('email', self.gf('django.db.models.fields.CharField')(default='ejemplo@dominio.com', max_length=60)),
+            ('contact', self.gf('django.db.models.fields.CharField')(default='', max_length=200, blank=True)),
             ('flag', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
         db.send_create_signal(u'home', ['Proveedor'])
@@ -404,10 +339,9 @@ class Migration(SchemaMigration):
         db.create_table(u'home_configuracion', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('periodo', self.gf('django.db.models.fields.CharField')(default='', max_length=4)),
-            ('registrado', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('registrado', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('moneda', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['home.Moneda'])),
-            ('igv', self.gf('django.db.models.fields.FloatField')(default=18)),
-            ('perception', self.gf('django.db.models.fields.FloatField')(default=2)),
+            ('igv', self.gf('django.db.models.fields.IntegerField')(default=10)),
         ))
         db.send_create_signal(u'home', ['Configuracion'])
 
@@ -487,74 +421,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'home', ['Tools'])
 
-        # Adding model 'LogSysAuditLogEntry'
-        db.create_table(u'home_logsysauditlogentry', (
-            (u'id', self.gf('django.db.models.fields.IntegerField')(db_index=True, blank=True)),
-            ('version', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('register', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('flag', self.gf('django.db.models.fields.CharField')(default='1', max_length=1)),
-            ('log', self.gf('django.db.models.fields.TextField')()),
-            (u'action_user', self.gf('audit_log.models.fields.LastUserField')(related_name=u'_logsys_audit_log_entry', to=orm['auth.User'])),
-            (u'action_id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            (u'action_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            (u'action_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-        ))
-        db.send_create_signal(u'home', ['LogSysAuditLogEntry'])
-
-        # Adding model 'LogSys'
-        db.create_table(u'home_logsys', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('version', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('register', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('flag', self.gf('django.db.models.fields.CharField')(default='1', max_length=1)),
-            ('log', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal(u'home', ['LogSys'])
-
-        # Adding model 'EmployeeSettingsAuditLogEntry'
-        db.create_table(u'home_employeesettingsauditlogentry', (
-            (u'id', self.gf('django.db.models.fields.IntegerField')(db_index=True, blank=True)),
-            ('register', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('hextperfirst', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=5, decimal_places=2)),
-            ('hextpersecond', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=5, decimal_places=2)),
-            ('ngratification', self.gf('django.db.models.fields.SmallIntegerField')(default=2)),
-            ('ncts', self.gf('django.db.models.fields.SmallIntegerField')(default=1)),
-            ('pergratification', self.gf('django.db.models.fields.DecimalField')(max_digits=5, decimal_places=2)),
-            ('starthourextra', self.gf('django.db.models.fields.TimeField')(default='09:00:00')),
-            ('starthourextratwo', self.gf('django.db.models.fields.TimeField')(default='11:00:00')),
-            ('shxsaturday', self.gf('django.db.models.fields.TimeField')(default='15:00:00')),
-            ('shxsaturdayt', self.gf('django.db.models.fields.TimeField')(default='17:00:00')),
-            ('totalhour', self.gf('django.db.models.fields.TimeField')(default='08:30:00')),
-            ('timeround', self.gf('django.db.models.fields.TimeField')(default='00:30:00')),
-            ('codeproject', self.gf('django.db.models.fields.CharField')(default='', max_length=4, null=True)),
-            ('flag', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            (u'action_user', self.gf('audit_log.models.fields.LastUserField')(related_name=u'_employeesettings_audit_log_entry', to=orm['auth.User'])),
-            (u'action_id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            (u'action_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            (u'action_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-        ))
-        db.send_create_signal(u'home', ['EmployeeSettingsAuditLogEntry'])
-
-        # Adding model 'EmployeeSettings'
-        db.create_table(u'home_employeesettings', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('register', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('hextperfirst', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=5, decimal_places=2)),
-            ('hextpersecond', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=5, decimal_places=2)),
-            ('ngratification', self.gf('django.db.models.fields.SmallIntegerField')(default=2)),
-            ('ncts', self.gf('django.db.models.fields.SmallIntegerField')(default=1)),
-            ('pergratification', self.gf('django.db.models.fields.DecimalField')(max_digits=5, decimal_places=2)),
-            ('starthourextra', self.gf('django.db.models.fields.TimeField')(default='09:00:00')),
-            ('starthourextratwo', self.gf('django.db.models.fields.TimeField')(default='11:00:00')),
-            ('shxsaturday', self.gf('django.db.models.fields.TimeField')(default='15:00:00')),
-            ('shxsaturdayt', self.gf('django.db.models.fields.TimeField')(default='17:00:00')),
-            ('totalhour', self.gf('django.db.models.fields.TimeField')(default='08:30:00')),
-            ('timeround', self.gf('django.db.models.fields.TimeField')(default='00:30:00')),
-            ('codeproject', self.gf('django.db.models.fields.CharField')(default='', max_length=4, null=True)),
-            ('flag', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'home', ['EmployeeSettings'])
-
 
     def backwards(self, orm):
         # Deleting model 'Pais'
@@ -578,9 +444,6 @@ class Migration(SchemaMigration):
         # Deleting model 'Materiale'
         db.delete_table(u'home_materiale')
 
-        # Deleting model 'MNiple'
-        db.delete_table(u'home_mniple')
-
         # Deleting model 'TypeGroup'
         db.delete_table(u'home_typegroup')
 
@@ -592,9 +455,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Cargo'
         db.delete_table(u'home_cargo')
-
-        # Deleting model 'TipoEmpleado'
-        db.delete_table(u'home_tipoempleado')
 
         # Deleting model 'EmployeeAuditLogEntry'
         db.delete_table(u'home_employeeauditlogentry')
@@ -647,9 +507,6 @@ class Migration(SchemaMigration):
         # Deleting model 'TipoCambio'
         db.delete_table(u'home_tipocambio')
 
-        # Deleting model 'Rubro'
-        db.delete_table(u'home_rubro')
-
         # Deleting model 'Proveedor'
         db.delete_table(u'home_proveedor')
 
@@ -676,18 +533,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Tools'
         db.delete_table(u'home_tools')
-
-        # Deleting model 'LogSysAuditLogEntry'
-        db.delete_table(u'home_logsysauditlogentry')
-
-        # Deleting model 'LogSys'
-        db.delete_table(u'home_logsys')
-
-        # Deleting model 'EmployeeSettingsAuditLogEntry'
-        db.delete_table(u'home_employeesettingsauditlogentry')
-
-        # Deleting model 'EmployeeSettings'
-        db.delete_table(u'home_employeesettings')
 
 
     models = {
@@ -804,11 +649,10 @@ class Migration(SchemaMigration):
         u'home.configuracion': {
             'Meta': {'object_name': 'Configuracion'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'igv': ('django.db.models.fields.FloatField', [], {'default': '18'}),
+            'igv': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
             'moneda': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Moneda']"}),
-            'perception': ('django.db.models.fields.FloatField', [], {'default': '2'}),
             'periodo': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '4'}),
-            'registrado': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+            'registrado': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'home.departamento': {
             'Meta': {'ordering': "['depnom']", 'object_name': 'Departamento'},
@@ -855,34 +699,15 @@ class Migration(SchemaMigration):
         },
         u'home.employee': {
             'Meta': {'ordering': "['lastname']", 'object_name': 'Employee'},
-            'address': ('django.db.models.fields.CharField', [], {'max_length': '180', 'null': 'True', 'blank': 'True'}),
-            'address2': ('django.db.models.fields.CharField', [], {'max_length': '180', 'null': 'True', 'blank': 'True'}),
-            'archivo': ('django.db.models.fields.files.FileField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
-            'birth': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'cargopostula': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
-            'charge': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Cargo']", 'null': 'True'}),
-            'discapacidad': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'distrito': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '80', 'null': 'True', 'blank': 'True'}),
+            'address': ('django.db.models.fields.CharField', [], {'max_length': '180'}),
+            'birth': ('django.db.models.fields.DateField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'charge': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Cargo']"}),
             'empdni_id': ('django.db.models.fields.CharField', [], {'max_length': '8', 'primary_key': 'True'}),
-            'estadocivil': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'estadoplanilla': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'feching': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'firstname': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'foto': ('django.db.models.fields.files.FileField', [], {'max_length': '300', 'null': 'True', 'blank': 'True'}),
             'lastname': ('django.db.models.fields.CharField', [], {'max_length': '150'}),
-            'nacdist': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
-            'nacdpt': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
-            'nacionalidad': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'nacprov': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
-            'observation': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'register': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'sexo': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'situacion': ('django.db.models.fields.CharField', [], {'default': "'Activo'", 'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'tallapolo': ('django.db.models.fields.CharField', [], {'max_length': '6', 'null': 'True', 'blank': 'True'}),
-            'tallazap': ('django.db.models.fields.CharField', [], {'max_length': '6', 'null': 'True', 'blank': 'True'}),
-            'tipoemple': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.TipoEmpleado']", 'null': 'True', 'blank': 'True'})
+            'phone': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
+            'register': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'home.employeeauditlogentry': {
             'Meta': {'ordering': "(u'-action_date',)", 'object_name': 'EmployeeAuditLogEntry'},
@@ -890,74 +715,15 @@ class Migration(SchemaMigration):
             u'action_id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             u'action_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             u'action_user': ('audit_log.models.fields.LastUserField', [], {'related_name': "u'_employee_audit_log_entry'", 'to': u"orm['auth.User']"}),
-            'address': ('django.db.models.fields.CharField', [], {'max_length': '180', 'null': 'True', 'blank': 'True'}),
-            'address2': ('django.db.models.fields.CharField', [], {'max_length': '180', 'null': 'True', 'blank': 'True'}),
-            'archivo': ('django.db.models.fields.files.FileField', [], {'max_length': '500', 'null': 'True', 'blank': 'True'}),
-            'birth': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'cargopostula': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
-            'charge': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Cargo']", 'null': 'True'}),
-            'discapacidad': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'distrito': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '80', 'null': 'True', 'blank': 'True'}),
+            'address': ('django.db.models.fields.CharField', [], {'max_length': '180'}),
+            'birth': ('django.db.models.fields.DateField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'charge': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Cargo']"}),
             'empdni_id': ('django.db.models.fields.CharField', [], {'max_length': '8', 'db_index': 'True'}),
-            'estadocivil': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'estadoplanilla': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'feching': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'firstname': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'foto': ('django.db.models.fields.files.FileField', [], {'max_length': '300', 'null': 'True', 'blank': 'True'}),
             'lastname': ('django.db.models.fields.CharField', [], {'max_length': '150'}),
-            'nacdist': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
-            'nacdpt': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
-            'nacionalidad': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'nacprov': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
-            'observation': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'register': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'sexo': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'situacion': ('django.db.models.fields.CharField', [], {'default': "'Activo'", 'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'tallapolo': ('django.db.models.fields.CharField', [], {'max_length': '6', 'null': 'True', 'blank': 'True'}),
-            'tallazap': ('django.db.models.fields.CharField', [], {'max_length': '6', 'null': 'True', 'blank': 'True'}),
-            'tipoemple': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.TipoEmpleado']", 'null': 'True', 'blank': 'True'})
-        },
-        u'home.employeesettings': {
-            'Meta': {'object_name': 'EmployeeSettings'},
-            'codeproject': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '4', 'null': 'True'}),
-            'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'hextperfirst': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '5', 'decimal_places': '2'}),
-            'hextpersecond': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '5', 'decimal_places': '2'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ncts': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'}),
-            'ngratification': ('django.db.models.fields.SmallIntegerField', [], {'default': '2'}),
-            'pergratification': ('django.db.models.fields.DecimalField', [], {'max_digits': '5', 'decimal_places': '2'}),
-            'register': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'shxsaturday': ('django.db.models.fields.TimeField', [], {'default': "'15:00:00'"}),
-            'shxsaturdayt': ('django.db.models.fields.TimeField', [], {'default': "'17:00:00'"}),
-            'starthourextra': ('django.db.models.fields.TimeField', [], {'default': "'09:00:00'"}),
-            'starthourextratwo': ('django.db.models.fields.TimeField', [], {'default': "'11:00:00'"}),
-            'timeround': ('django.db.models.fields.TimeField', [], {'default': "'00:30:00'"}),
-            'totalhour': ('django.db.models.fields.TimeField', [], {'default': "'08:30:00'"})
-        },
-        u'home.employeesettingsauditlogentry': {
-            'Meta': {'ordering': "(u'-action_date',)", 'object_name': 'EmployeeSettingsAuditLogEntry'},
-            u'action_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            u'action_id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            u'action_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            u'action_user': ('audit_log.models.fields.LastUserField', [], {'related_name': "u'_employeesettings_audit_log_entry'", 'to': u"orm['auth.User']"}),
-            'codeproject': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '4', 'null': 'True'}),
-            'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'hextperfirst': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '5', 'decimal_places': '2'}),
-            'hextpersecond': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '5', 'decimal_places': '2'}),
-            u'id': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'blank': 'True'}),
-            'ncts': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'}),
-            'ngratification': ('django.db.models.fields.SmallIntegerField', [], {'default': '2'}),
-            'pergratification': ('django.db.models.fields.DecimalField', [], {'max_digits': '5', 'decimal_places': '2'}),
-            'register': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'shxsaturday': ('django.db.models.fields.TimeField', [], {'default': "'15:00:00'"}),
-            'shxsaturdayt': ('django.db.models.fields.TimeField', [], {'default': "'17:00:00'"}),
-            'starthourextra': ('django.db.models.fields.TimeField', [], {'default': "'09:00:00'"}),
-            'starthourextratwo': ('django.db.models.fields.TimeField', [], {'default': "'11:00:00'"}),
-            'timeround': ('django.db.models.fields.TimeField', [], {'default': "'00:30:00'"}),
-            'totalhour': ('django.db.models.fields.TimeField', [], {'default': "'08:30:00'"})
+            'phone': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
+            'register': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'home.formapago': {
             'Meta': {'object_name': 'FormaPago'},
@@ -1015,26 +781,6 @@ class Migration(SchemaMigration):
             'supplier': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Proveedor']"}),
             'username': ('django.db.models.fields.CharField', [], {'max_length': '16'})
         },
-        u'home.logsys': {
-            'Meta': {'object_name': 'LogSys'},
-            'flag': ('django.db.models.fields.CharField', [], {'default': "'1'", 'max_length': '1'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'log': ('django.db.models.fields.TextField', [], {}),
-            'register': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'version': ('django.db.models.fields.CharField', [], {'max_length': '10'})
-        },
-        u'home.logsysauditlogentry': {
-            'Meta': {'ordering': "(u'-action_date',)", 'object_name': 'LogSysAuditLogEntry'},
-            u'action_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            u'action_id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            u'action_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            u'action_user': ('audit_log.models.fields.LastUserField', [], {'related_name': "u'_logsys_audit_log_entry'", 'to': u"orm['auth.User']"}),
-            'flag': ('django.db.models.fields.CharField', [], {'default': "'1'", 'max_length': '1'}),
-            u'id': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'blank': 'True'}),
-            'log': ('django.db.models.fields.TextField', [], {}),
-            'register': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'version': ('django.db.models.fields.CharField', [], {'max_length': '10'})
-        },
         u'home.materiale': {
             'Meta': {'ordering': "['matnom']", 'object_name': 'Materiale'},
             'matacb': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True'}),
@@ -1056,13 +802,6 @@ class Migration(SchemaMigration):
             'matmed': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'matnom': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'unidad': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Unidade']"})
-        },
-        u'home.mniple': {
-            'Meta': {'ordering': "['ktype']", 'object_name': 'MNiple'},
-            'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'ktype': ('django.db.models.fields.CharField', [], {'max_length': '1', 'primary_key': 'True'}),
-            'ncount': ('django.db.models.fields.CharField', [], {'max_length': '6', 'null': 'True'}),
-            'ntype': ('django.db.models.fields.CharField', [], {'max_length': '80'})
         },
         u'home.model': {
             'Meta': {'object_name': 'Model'},
@@ -1086,11 +825,11 @@ class Migration(SchemaMigration):
         },
         u'home.proveedor': {
             'Meta': {'ordering': "['razonsocial']", 'object_name': 'Proveedor'},
-            'contact': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'null': 'True', 'blank': 'True'}),
+            'contact': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             'departamento': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Departamento']"}),
             'direccion': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'distrito': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Distrito']"}),
-            'email': ('django.db.models.fields.CharField', [], {'default': "'ejemplo@dominio.com'", 'max_length': '60', 'null': 'True'}),
+            'email': ('django.db.models.fields.CharField', [], {'default': "'ejemplo@dominio.com'", 'max_length': '60'}),
             'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'last_login': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
             'origen': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
@@ -1098,8 +837,6 @@ class Migration(SchemaMigration):
             'proveedor_id': ('django.db.models.fields.CharField', [], {'max_length': '11', 'primary_key': 'True'}),
             'provincia': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Provincia']"}),
             'razonsocial': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'register': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
-            'rubropro': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Rubro']", 'null': 'True'}),
             'telefono': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'tipo': ('django.db.models.fields.CharField', [], {'max_length': '8'})
         },
@@ -1111,12 +848,6 @@ class Migration(SchemaMigration):
             'pronom': ('django.db.models.fields.CharField', [], {'max_length': '56'}),
             'provincia_id': ('django.db.models.fields.CharField', [], {'max_length': '3', 'primary_key': 'True'})
         },
-        u'home.rubro': {
-            'Meta': {'object_name': 'Rubro'},
-            'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'rubro': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'rubro_id': ('django.db.models.fields.CharField', [], {'max_length': '8', 'primary_key': 'True'})
-        },
         u'home.tipocambio': {
             'Meta': {'object_name': 'TipoCambio'},
             'compra': ('django.db.models.fields.FloatField', [], {}),
@@ -1124,14 +855,8 @@ class Migration(SchemaMigration):
             'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'moneda': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Moneda']"}),
-            'registrado': ('django.db.models.fields.TimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'registrado': ('django.db.models.fields.TimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'venta': ('django.db.models.fields.FloatField', [], {})
-        },
-        u'home.tipoempleado': {
-            'Meta': {'object_name': 'TipoEmpleado'},
-            'descripcion': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'tipoemple_id': ('django.db.models.fields.CharField', [], {'max_length': '9', 'primary_key': 'True'})
         },
         u'home.tools': {
             'Meta': {'ordering': "['name']", 'object_name': 'Tools'},
