@@ -5,7 +5,6 @@ from django.conf.urls import patterns, url
 from django.conf.urls import patterns, url, include
 from .views import *
 
-admin.autodiscover()
 
 TipoInstitucion_urls = patterns(
     '',

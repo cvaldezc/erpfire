@@ -14,13 +14,10 @@ from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, T
 from CMSGuias.apps.operations.models import (
     Deductive, Letter, PreOrders, SGroup, DSector)
 from CMSGuias.apps.ventas.budget.models import AnalysisGroup, Analysis, Budget
-<<<<<<< HEAD
-from ..rrhh.models import TypesEmployee, EmployeeBreak
-=======
+
 from ..rrhh.models import (
     TipoInstitucion, CoberturaSalud, RegimenSalud, RegimenPensionario, TipoExamen,
-    TipoContrato, TipoPago, TipoDocumento, EmpleCampo)
->>>>>>> master
+    TipoContrato, TipoPago, TipoDocumento, EmpleCampo, TypesEmployee, EmployeeBreak)
 
 
 # format date str
@@ -469,7 +466,6 @@ def keyRestoration():
         return 'D%s%s' % (yn, '{:0>3d}'.format(count))
 
 
-<<<<<<< HEAD
 def TypesEmployeeKeys():
     count = 1
     try:
@@ -489,7 +485,8 @@ def StatusAssistanceId():
         count = 1
         print exk
     return 'AS%s' % ('{:0>2d}'.format(count))
-=======
+
+
 def GenerateIdTipEmple():
     id = None
     try:
@@ -686,4 +683,3 @@ def GenerateIdEmpleCampo(dni=None, pr=None):
             return '%s%s%s' % (dni, pr, '001')
     except ObjectDoesNotExist:
         return '%s%s%s' % (dni, pr, '001')
->>>>>>> master

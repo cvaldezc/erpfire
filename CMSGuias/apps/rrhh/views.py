@@ -19,6 +19,7 @@ from openpyxl import load_workbook
 from ..home.models import *
 from ..rrhh.models import *
 from ..ventas.models import Proyecto
+from .forms import *
 from .models import *
 from ..tools.globalVariable import *
 
