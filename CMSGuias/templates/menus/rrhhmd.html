@@ -31,9 +31,16 @@
     <li><a href="{% url 'rubropro_new' %}">Rubro</a></li>
     <li class="divider"></li>
     <li><a href="{% url 'tipdoc_new' %}">Documento</a></li>
-    
   </ul>
-
+  <ul id="assistance" class="dropdown-content">
+    <li><a href="{% url 'rrhh_load_assistance' %}">Cargar Asistencia</a></li>
+    <li><a href="{% url 'rrhh_typeemp_view' %}">Tipos de Empleado</a></li>
+    <li><a href="{% url 'rrhh_status_assistance' %}">Break</a></li>
+    <li class="divider"></li>
+    <li><a href="#">Asistencia</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'rrhh_assistancelist' %}">Simple Asistencia</a></li>
+  </ul>
   <ul id="empleado" class="dropdown-content">
   <li><a href="{% url 'menu' %}">Activos</a></li>
   <li><a href="{% url 'noactive' %}">No Activos</a></li>
@@ -51,6 +58,11 @@
         <li>
           <a class="dropdown-button" href="#!" data-hover="true" data-activates="empleado" data-gutter="0" data-beloworigin="true">
             Empleados <b class="fa fa-caret-down"></b>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-button" href="#!" data-hover="true" data-activates="assistance" data-gutter="0" data-beloworigin="true">
+            Asistencia <b class="fa fa-caret-down"></b>
           </a>
         </li>
         <li>

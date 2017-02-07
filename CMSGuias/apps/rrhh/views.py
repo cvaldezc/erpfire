@@ -2426,6 +2426,7 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                     if dni is None:
                                         continue
                                     dni = str(dni)
+                                    print dni
                                     if len(dni) != 8:
                                         continue
                                     nreg = 1
