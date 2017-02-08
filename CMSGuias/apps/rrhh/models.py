@@ -297,6 +297,7 @@ class RegimenPensionario(models.Model):
     regimenpens_id = models.CharField(primary_key=True, max_length=9)
     regimen = models.CharField(max_length=95)
     coberturapension = models.CharField(max_length=100)
+    percent = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()

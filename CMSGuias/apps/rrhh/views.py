@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 import json
+from decimal import Decimal
+from datetime import datetime
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.shortcuts import render_to_response
@@ -2209,6 +2212,7 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
                         obj.houroutbreak = request.POST['houtb']
                         obj.tag = True
                         obj.save()
+                        return 1
                     exists = None
                     if proj != '' or proj is None:
                         exists = Assistance.objects.filter(
@@ -2401,23 +2405,27 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                     6: 'project'}
                                 def validformat(oparam):
                                     """ Valid format object in and fields null """
+                                    print 'inside valid format '
                                     if oparam['hourinbreak'] is None:
                                         oparam['hourinbreak'] = '00:00'
                                     else:
                                         # print type(oparam['hourinbreak'])
-                                        if isinstance(oparam['hourinbreak'], datetime):
+                                        if type(oparam['hourinbreak']) is datetime:
                                             oparam['hourinbreak'] = oparam['hourinbreak'].time()
                                     if oparam['houroutbreak'] is None:
                                         oparam['houroutbreak'] = '00:00'
                                     else:
-                                        if isinstance(oparam['houroutbreak'], datetime):
+                                        if type(oparam['houroutbreak']) is datetime:
                                             oparam['houroutbreak'] = oparam['houroutbreak'].time()
-                                    if oparam['hourout'] is not None and isinstance(oparam['hourout'], datetime):
-                                        oparam['hourout'] = oparam['hourout'].time()
-                                    if oparam['hourin'] is not None and isinstance(oparam['hourin'], datetime):
-                                        oparam['hourin'] = oparam['hourin'].time()
+                                    if oparam['hourout'] is not None:
+                                        if type(oparam['hourout']) is datetime:
+                                            oparam['hourout'] = oparam['hourout'].time()
+                                    if oparam['hourin'] is not None:
+                                        if type(oparam['hourin']) is datetime:
+                                            oparam['hourin'] = oparam['hourin'].time()
                                     if oparam['viatical'] is None:
                                         oparam['viatical'] = 0
+                                    print 'end format'
                                     return oparam
                                 for xraw in xrange(9, nrow):
                                     param = {}
