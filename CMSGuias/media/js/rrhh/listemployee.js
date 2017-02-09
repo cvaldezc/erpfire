@@ -192,7 +192,7 @@
       }
     });
     $scope.$watch('vm.assistance.type', function(nw, old) {
-      if (nw === 'TY01' && vm.assistance.project === null) {
+      if (nw === 'TY02' && vm.assistance.project === null) {
         vm.assistance.type = null;
       }
     });

@@ -323,7 +323,7 @@ class Proyectos(JSONResponseMixin, TemplateView):
 
 
 class Examenes(JSONResponseMixin, TemplateView):
-    
+
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         context = dict()
@@ -1371,7 +1371,7 @@ class ObraEmpleado(JSONResponseMixin, TemplateView):
 ##CRUDS##
 class TipInstList(ListView):
     template_name = 'rrhh/crud/tipoinst.html'
-    
+
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         context = dict()
@@ -2508,3 +2508,142 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                 kwargs['status'] = False
                 kwargs['raise'] = str(oex)
         return self.render_to_json_response(kwargs)
+
+
+# Class for view assistance loaded
+class ViewAssistance(JSONResponseMixin, TemplateView):
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    if 'gtypes' in request.GET:
+                        kwargs['types'] = json.loads(serializers.serialize(
+                            'json',
+                            TypesEmployee.objects.filter(flag=True)))
+                        kwargs['status'] = True
+                    if 'filterAssistance' in request.GET:
+                        ass = BalanceAssistance.objects.filter(
+                            assistance__gte=request.GET['weekstart'],
+                            assistance__lte=request.GET['weekend']).order_by('assistance')
+                        week = []
+                        for x in ass:
+                            count = 0
+                            index = 0
+                            for sw in xrange(0, len(week)):
+                                if week[sw]['dni'] != x.employee_id:
+                                    count += 1
+                                    continue
+                                else:
+                                    index = sw
+                                    break
+                            if count == len(week):
+                                week.append({
+                                    'dni': x.employee_id,
+                                    'days': {x.assistance.strftime('%A'): {
+                                        'day': x.assistance,
+                                        'hour': x.hwork,
+                                        'extra': (x.hextfirst + x.hextsecond),
+                                        'delay': x.hdelay,
+                                        'lack': x.hlack}},
+                                    'count': 1})
+                            else:
+                                week[index]['days'][x.assistance.strftime('%A')] = {
+                                    'day': x.assistance,
+                                    'hour': x.hwork,
+                                    'extra': (x.hextfirst + x.hextsecond),
+                                    'delay': x.hdelay,
+                                    'lack': x.hlack}
+                                week[index]['count'] += 1
+                        nweek = [
+                            'Monday',
+                            'Tuesday',
+                            'Wednesday',
+                            'Thursday',
+                            'Friday',
+                            'Saturday',
+                            'Sunday']
+                        for x in week:
+                            for w in nweek:
+                                if w not in x['days']:
+                                    x['days'][w] = {'day': None}
+                        kwargs['week'] = week
+                        name = {}
+                        day = datetime.datetime.strptime(request.GET['weekstart'], '%Y-%m-%d')
+                        traslate = {
+                            'Monday': 'Lunes',
+                            'Tuesday': 'Martes',
+                            'Wednesday': 'Miercoles',
+                            'Thursday': 'Jueves',
+                            'Friday': 'Viernes',
+                            'Saturday': 'Sabado',
+                            'Sunday': 'Domingo'}
+                        for x in xrange(0, 7):
+                            name[x] = {
+                                'nmo': day.strftime('%A'),
+                                'nmt': traslate[day.strftime('%A')],
+                                'nm': day.strftime('%m/%d')}
+                            day = day + datetime.timedelta(days=1)
+                        kwargs['names'] = name
+                        kwargs['status'] = True
+                except ObjectDoesNotExist as oex:
+                    kwargs['raise'] = str(oex)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+            return render(request, 'rrhh/viewassistance.html', kwargs)
+        except TemplateDoesNotExist as ext:
+            return Http404(ext)
+
+# class load data test
+class LoadRe(TemplateView):
+
+    def get(self, request, *args, **kwargs):
+        import  random
+        # import date
+        dni = ['10278772','09434564','43504371','47403858','70015965','09279015','19242694','71744452','43572763','44684519','45576052','09164147','43179067','40472915','17589085','41452883','23392439','47720073','10659544','42492201','40894066','43402155','45505146','42661096','00000000','46377134','77498386','44488336','44263241','46296730','42577451','43402156','46279300','47431405','44463959','42333571','72604244','70921414','77070893','70492850','46824555','43414194','42825437','41822143','44322016','40080344','05406738','47542298','43378121','70266206','43316178','44969405','42310463','43984365','40990712','40143637','43598455','40043764','45768794','47999575','71251518','43869036','46879331','48022378','73585896','25798318','44363536']
+        if 'pensionary' in request.GET:
+            afp = ['RP001', 'RP002', 'RP003', 'RP004', 'RP005']
+            name = {'RP001':'HABITAT', 'RP002':'ONP', 'RP003':'PROFUTURO', 'RP004':'PRIMA', 'RP005':'INTEGRA'}
+            percent = {'RP001':12.58, 'RP002':13.00, 'RP003': 12.53, 'RP004': 12.58, 'RP005': 12.53}
+            count = 0
+            for x in dni:
+                try:
+                    fc = datetime.datetime.today()
+                    ds = detPensEmple()
+                    ds.empdni_id = x
+                    ds.regimenpens_id = afp[random.randrange(5)]
+                    ds.fechinicio = fc
+                    ds.fechfin = fc.replace(fc.year + 1)
+                    ds.cuspp = '%s' % '{:0>20d}'.format(random.randint(10000, 100000))
+                    ds.sctr = random.randrange(2)
+                    ds.save()
+                    count += 1
+                except ObjectDoesNotExist as oex:
+                    print oex
+            kwargs['affected'] = 'LOAD REGIMENS'
+        if 'accounts' in request.GET:
+            account = None
+            count = 0
+            for x in dni:
+                try:
+                    CuentaEmple.objects.get(empdni_id=x)
+                except ObjectDoesNotExist as oex:
+                    account = '%i-%s-%i' % (random.randint(100, 999), '{:0>8d}'.format(random.randint(100, 9999)), random.randint(100, 999))
+                    amount = random.randint(150, 500)
+                    ce = CuentaEmple()
+                    ce.empdni_id = x
+                    ce.cuenta = account
+                    ce.tipodepago_id = 'PA002'
+                    ce.estado = 'ACTIVO'
+                    ce.remuneracion = amount
+                    ce.tipocontrato_id = 'CT001'
+                    ce.cts = amount
+                    ce.gratificacion = amount * 2
+                    ce.costxhora = (amount / 7) / 8
+                    ce.flag = True
+                    ce.save()
+                    count+=1
+            kwargs['affected'] = 'LOAD ACCOUNTS'
+        kwargs['transact'] = count
+        return render(request, 'rrhh/test.html', kwargs)

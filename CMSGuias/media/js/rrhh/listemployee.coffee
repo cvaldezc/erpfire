@@ -149,7 +149,7 @@ do ->
         tp.setAttribute 'disabled', 'disabled'
         return
     $scope.$watch 'vm.assistance.type', (nw, old) ->
-      if nw is 'TY01' and vm.assistance.project is null
+      if nw is 'TY02' and vm.assistance.project is null
         vm.assistance.type = null
         return
     return

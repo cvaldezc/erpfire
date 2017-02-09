@@ -1,0 +1,67 @@
+{% extends "basemd.html" %}
+{% block title %}
+    View Assistance
+{% endblock title %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+<section ng-app="assApp" ng-controller="assCtrl as vm">
+    <header>
+        <h4>
+            Vista de Asistencia Semanal
+            <button type="button" class="right btn" ng-click="vm.getAssistance()">
+                <small>Filtrar</small>
+            </button>
+        </h4>
+        <div class="card">
+            <div class="card-action">
+                <div class="row">
+                    <div class="input-field col l2 m2 s12">
+                        <input type="text" class="datepick" placeholder="yyyy-mm-dd" maxlength="10" ng-model="vm.search.fi" ng-change="vm.changerange()" readonly>
+                        <label for="">Fecha de Inicio</label>
+                    </div>
+                    <div class="input-field col l2 m2 s12">
+                        <input type="text" class="datepickt" placeholder="yyyy-mm-dd" maxlength="10" ng-model="vm.search.ff" readonly>
+                        <label for="">Fecha de Fin</label>
+                    </div>
+                    <div class="input-field col l2 m3 s12">
+                        <select class="make_select" ng-model="vm.search.types" ng-options="x.pk as x.fields.description for x in vm.ltypes">
+                            <option value="">--TODOS--</option>
+                        </select>
+                        <label for="">Tipo personal</label>
+                    </div>
+                    <div class="input-field col l6 m5 s12">
+                        <input type="text">
+                        <label for="">Filtar</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <article>
+        <table class="table responsive-table">
+            <thead>
+                <th>#</th>
+                <th>DNI</th>
+                {% verbatim %}
+                <th ng-repeat="n in vm.dnames">{{ n.nmt }} <br />{{n.nm}}</th>
+                {% endverbatim %}
+            </thead>
+        </table>
+        <tbody>
+            {% verbatim %}
+            <tr ng-repeat="x in vm.bdata">
+                <td>{{$index}}</td>
+                <td>{{x.dni}}</td>
+                <td ng-repeat="n in vm.dnames"></td>
+            </tr>
+            {% endverbatim %}
+        </tbody>
+    </article>
+</section>
+<!-- scripts -->
+<script defer src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/rrhh/viewassistance.js"></script>
+{% endblock content %}
