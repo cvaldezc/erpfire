@@ -11,6 +11,7 @@ from django.template import RequestContext, TemplateDoesNotExist
 from django.conf import settings
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Sum
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -2521,12 +2522,20 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
                     if 'gtypes' in request.GET:
                         kwargs['types'] = json.loads(serializers.serialize(
                             'json',
-                            TypesEmployee.objects.filter(flag=True)))
+                            TipoEmpleado.objects.filter(flag=True)))
                         kwargs['status'] = True
                     if 'filterAssistance' in request.GET:
-                        ass = BalanceAssistance.objects.filter(
-                            assistance__gte=request.GET['weekstart'],
-                            assistance__lte=request.GET['weekend']).order_by('assistance')
+                        if 'type' in request.GET:
+                            ass = BalanceAssistance.objects.filter(
+                                assistance__range=(
+                                    request.GET['weekstart'],
+                                    request.GET['weekend']),
+                                employee__tipoemple_id=request.GET['type']).order_by('assistance')
+                        else:
+                            ass = BalanceAssistance.objects.filter(
+                                assistance__range=(
+                                    request.GET['weekstart'],
+                                    request.GET['weekend'])).order_by('assistance')
                         week = []
                         for x in ass:
                             count = 0
@@ -2541,13 +2550,17 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
                             if count == len(week):
                                 week.append({
                                     'dni': x.employee_id,
+                                    'name': '%s %s' % (x.employee.lastname, x.employee.firstname),
                                     'days': {x.assistance.strftime('%A'): {
                                         'day': x.assistance,
                                         'hour': x.hwork,
                                         'extra': (x.hextfirst + x.hextsecond),
                                         'delay': x.hdelay,
                                         'lack': x.hlack}},
-                                    'count': 1})
+                                    'count': 1,
+                                    'twork': x.hwork,
+                                    'textra': (x.hextfirst + x.hextsecond),
+                                    'discount': x.discount})
                             else:
                                 week[index]['days'][x.assistance.strftime('%A')] = {
                                     'day': x.assistance,
@@ -2556,6 +2569,9 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
                                     'delay': x.hdelay,
                                     'lack': x.hlack}
                                 week[index]['count'] += 1
+                                week[index]['twork'] += x.hwork
+                                week[index]['textra'] += (x.hextfirst + x.hextsecond)
+                                week[index]['discount'] += x.discount
                         nweek = [
                             'Monday',
                             'Tuesday',
@@ -2568,6 +2584,11 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
                             for w in nweek:
                                 if w not in x['days']:
                                     x['days'][w] = {'day': None}
+                                else:
+                                    x['viatical'] = Assistance.objects.filter(
+                                        assistance=x['days'][w]['day'],
+                                        employee_id=x['dni']).aggregate(
+                                            Sum('viatical'))['viatical__sum']
                         kwargs['week'] = week
                         name = {}
                         day = datetime.datetime.strptime(request.GET['weekstart'], '%Y-%m-%d')
@@ -2585,6 +2606,8 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
                                 'nmt': traslate[day.strftime('%A')],
                                 'nm': day.strftime('%m/%d')}
                             day = day + datetime.timedelta(days=1)
+                        conf = EmployeeSettings.objects.get(flag=True)
+                        kwargs['thour'] = (conf.totalhour.hour) + ((conf.totalhour.minute)/60.0)
                         kwargs['names'] = name
                         kwargs['status'] = True
                 except ObjectDoesNotExist as oex:

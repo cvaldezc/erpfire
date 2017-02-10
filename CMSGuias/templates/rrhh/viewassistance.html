@@ -26,13 +26,13 @@
                         <label for="">Fecha de Fin</label>
                     </div>
                     <div class="input-field col l2 m3 s12">
-                        <select class="make_select" ng-model="vm.search.types" ng-options="x.pk as x.fields.description for x in vm.ltypes">
+                        <select class="make_select" ng-model="vm.search.types" ng-options="x.pk as x.fields.descripcion for x in vm.ltypes">
                             <option value="">--TODOS--</option>
                         </select>
                         <label for="">Tipo personal</label>
                     </div>
                     <div class="input-field col l6 m5 s12">
-                        <input type="text">
+                        <input type="text" ng-model="vm.search.text">
                         <label for="">Filtar</label>
                     </div>
                 </div>
@@ -40,25 +40,61 @@
         </div>
     </header>
     <article>
-        <table class="table responsive-table">
+        {% verbatim %}
+        <table class="table responsive-table striped hovered highlight">
             <thead>
-                <th>#</th>
-                <th>DNI</th>
-                {% verbatim %}
-                <th ng-repeat="n in vm.dnames">{{ n.nmt }} <br />{{n.nm}}</th>
-                {% endverbatim %}
+                <th>#</thdni
+                <th ng-click="vm.order='dni'">DNI</th>
+                <th ng-click="vm.order='name'">Nombres</th>
+                <th ng-repeat="n in vm.dnames" class="center-align">{{ n.nmt }} <br />{{n.nm}}</th>
+                <th>TOTAL <br />HORAS</th>
+                <th>TOTAL <br />EXTRAS</th>
+                <th>T.OTROS<br /> GASTOS</th>
+                <th>TOTAL <br />DESCUENTO</th>
             </thead>
-        </table>
-        <tbody>
-            {% verbatim %}
-            <tr ng-repeat="x in vm.bdata">
-                <td>{{$index}}</td>
-                <td>{{x.dni}}</td>
-                <td ng-repeat="n in vm.dnames"></td>
+            <tbody>
+            <tr ng-repeat="x in vm.bdata | filter : vm.search.text | orderBy: vm.order">
+                <td>{{$index+1}}</td>
+                <td><b><small>{{x.dni}}</small></b></td>
+                <td><small>{{x.name}}</small></td>
+                <td ng-repeat="n in vm.dnames" ng-class="{'red lighten-3 center-align': x['days'][n.nmo]['day'] == null}">
+                    <small ng-if="(x['days'][n.nmo]['hour'] != null)">
+                    <a href="#" ng-click="vm.showEdit(x)">
+                        <i class="fa fa-square-o fa-2x right grey-text text-darken-3" ng-class="{'yellow lighten-2': x['days'][n.nmo]['hour'] < vm.settings.tth, 
+                        'green lighten-2': x['days'][n.nmo]['hour'] >= vm.settings.tth}"></i>
+                    </a>
+                    <br>
+                    Hora: {{x['days'][n.nmo]['hour']}} <br>
+                    Tardanza: {{x['days'][n.nmo]['delay']}} <br>
+                    Debe h: {{x['days'][n.nmo]['lack']}} <br>
+                    H. Extra: {{x['days'][n.nmo]['extra']}}</small>
+                    <small ng-if="x['days'][n.nmo]['day'] == null">
+                        <a href="#" ng-click="vm.showEdit(x)"><i class="fa fa-square-o fa-2x right grey-text text-darken-3"></i></a>
+                        No Registrado</small>
+                </td>
+                <td class="right-align">{{x.twork}}</td>
+                <td class="right-align">{{x.textra}}</td>
+                <td class="right-align">{{x.viatical}}</td>
+                <td class="right-align">{{x.discount}}</td>
             </tr>
-            {% endverbatim %}
         </tbody>
+        </table>
+        {% endverbatim %}
     </article>
+    <!-- modals -->
+    <div class="modal" id="medit">
+        <div class="modal-content">
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn grey lighten-5 text-grey text-darken-3">
+                <span>GUARDAR</span>
+            </button>
+            <button type="button" class="btn grey lighten-5 text-grey text-darken-3">
+                <span>SALIR</span>
+            </button>
+        </div>
+    </div>
 </section>
 <!-- scripts -->
 <script defer src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>

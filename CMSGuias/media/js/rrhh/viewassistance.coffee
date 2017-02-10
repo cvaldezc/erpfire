@@ -3,8 +3,11 @@ do ->
   ctrlType = ($scope, cpFactory) ->
     vm = this
     vm.bdata = []
+    vm.settings = {}
+    vm.order = 'name'
     angular.element(document).ready ->
         console.info "I am ready!"
+        angular.element(".modal").modal()
         angular.element(".datepick").pickadate
             selectMonths: true
             selectYears: 5
@@ -47,10 +50,15 @@ do ->
             if response.status
                 vm.bdata = response.week
                 vm.dnames = response.names
+                vm.settings.tth = response.thour
                 return
             else
                 Materialize.toast "Error: #{response.raise}"
                 return
+        return
+    vm.showEdit = (obj) ->
+        console.info obj
+        angular.element("#medit").modal('open')
         return
     ## ctrlType
     return

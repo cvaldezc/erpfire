@@ -75,6 +75,7 @@ class BalanceAssistance(models.Model):
     hwork = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     hdelay = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     hlack = models.DecimalField(max_digits=4, decimal_places=2, default=0, null=True)
+    discount = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     flag = models.BooleanField(default=True)
 
     def __unicode__(self):

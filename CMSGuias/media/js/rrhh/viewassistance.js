@@ -4,8 +4,11 @@
     var vm;
     vm = this;
     vm.bdata = [];
+    vm.settings = {};
+    vm.order = 'name';
     angular.element(document).ready(function() {
       console.info("I am ready!");
+      angular.element(".modal").modal();
       angular.element(".datepick").pickadate({
         selectMonths: true,
         selectYears: 5,
@@ -48,10 +51,15 @@
         if (response.status) {
           vm.bdata = response.week;
           vm.dnames = response.names;
+          vm.settings.tth = response.thour;
         } else {
           Materialize.toast("Error: " + response.raise);
         }
       });
+    };
+    vm.showEdit = function(obj) {
+      console.info(obj);
+      angular.element("#medit").modal('open');
     };
   };
   cpFactory = function($http, $cookies) {
