@@ -43,7 +43,7 @@
         {% verbatim %}
         <table class="table responsive-table striped hovered highlight">
             <thead>
-                <th>#</thdni
+                <th>#</th>
                 <th ng-click="vm.order='dni'">DNI</th>
                 <th ng-click="vm.order='name'">Nombres</th>
                 <th ng-repeat="n in vm.dnames" class="center-align">{{ n.nmt }} <br />{{n.nm}}</th>
@@ -59,9 +59,9 @@
                 <td><small>{{x.name}}</small></td>
                 <td ng-repeat="n in vm.dnames" ng-class="{'red lighten-3 center-align': x['days'][n.nmo]['day'] == null}">
                     <small ng-if="(x['days'][n.nmo]['hour'] != null)">
-                    <a href="#" ng-click="vm.showEdit(x)">
-                        <i class="fa fa-square-o fa-2x right grey-text text-darken-3" ng-class="{'yellow lighten-2': x['days'][n.nmo]['hour'] < vm.settings.tth, 
-                        'green lighten-2': x['days'][n.nmo]['hour'] >= vm.settings.tth}"></i>
+                    <a href="#" ng-click="vm.showEdit(x, n)">
+                        <i class="fa fa-circle bordered-icon icon-round fa-2x right" ng-class="{'yellow-text text-lighten-1': x['days'][n.nmo]['hour'] < vm.settings.tth, 
+                        'green-text text-lighten-1': x['days'][n.nmo]['hour'] >= vm.settings.tth}"></i>
                     </a>
                     <br>
                     Hora: {{x['days'][n.nmo]['hour']}} <br>
@@ -69,7 +69,7 @@
                     Debe h: {{x['days'][n.nmo]['lack']}} <br>
                     H. Extra: {{x['days'][n.nmo]['extra']}}</small>
                     <small ng-if="x['days'][n.nmo]['day'] == null">
-                        <a href="#" ng-click="vm.showEdit(x)"><i class="fa fa-square-o fa-2x right grey-text text-darken-3"></i></a>
+                        <a href="#" ng-click="vm.showEdit(x, n)"><i class="fa fa-circle bordered-icon icon-round fa-2x right red-text text-lighten-2"></i></a>
                         No Registrado</small>
                 </td>
                 <td class="right-align">{{x.twork}}</td>
@@ -81,20 +81,125 @@
         </table>
         {% endverbatim %}
     </article>
-    <!-- modals -->
-    <div class="modal" id="medit">
+    <!-- modals  show list assistance saved-->
+    {% verbatim %}
+    <div class="modal width-80" id="medit">
         <div class="modal-content">
-
+            <h4>{{vm.showlist.dni}} {{vm.showlist.name}} / {{vm.showlist['date']}}</h4>
+            <table class="striped hovered responsive-table highlight">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Ingreso</th>
+                        <th>Inicio Break</th>
+                        <th>Fin Break</th>
+                        <th>Salida</th>
+                        <th>Proyecto</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Viaticos</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in vm.hoursload">
+                        <td>{{$index+1}}</td>
+                        <td>{{x.fields.hourin}}</td>
+                        <td>{{x.fields.hourinbreak}}</td>
+                        <td>{{x.fields.houroutbreak}}</td>
+                        <td>{{x.fields.hourout}}</td>
+                        <td>{{x.fields.project.pk}}</td>
+                        <td>{{x.fields.types.fields.description}}</td>
+                        <td>{{x.fields.status.fields.description}}</td>
+                        <td class="right-align">{{x.fields.viatical}}</td>
+                        <td>
+                            <a href="#!edit" class="grey-text text-darken-3">
+                                <i class="fa fa-pencil fa-lg"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="#!remove" class="red-text">
+                                <i class="fa fa-trash fa-lg"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn grey lighten-5 text-grey text-darken-3">
-                <span>GUARDAR</span>
+            <button type="button" ng-if="(vm.hoursload.length == 0)" ng-click="vm.openControls()" class="left waves-effect waves-ligth btn green lighten-1 grey-text text-darken-3">
+                <i class="fa fa-plus"></i>
+                <span>AGREGAR</span>
             </button>
-            <button type="button" class="btn grey lighten-5 text-grey text-darken-3">
+            <button type="button" class="waves-effect waves-ligth modal-action modal-close btn grey lighten-5 grey-text text-darken-3">
+                <i class="fa fa-times"></i>
                 <span>SALIR</span>
             </button>
         </div>
     </div>
+    <!-- modals form controls  -->
+    <div class="modal modal-fixed-footer height-80" id="mcontrols">
+        <div class="modal-content">
+            <h5>Datos de Asistencia</h5>
+            <div class="row">
+                <div class="col l12 m12 s12">
+                    <label for="project">Proyecto</label>
+                    <select class="browser-default chosen-select" name="project" id="project" ng-model="vm.assistance.project" ng-options="x.pk as x.fields.nompro for x in vm.lprojects">
+                        <option value="">-- NINGUNO --</option>
+                    </select>
+                    <a href="#!refresh" class="right" ng-click="vm.listProject()"><i class="fa fa-refresh"></i></a>
+                </div>
+                <div class="col l12 m12 s12">
+                <label for="types">Tipo de Asistencia</label>
+                    <select class="browser-default" id="types" ng-model="vm.assistance.type" ng-options="x.pk as x.fields.description for x in vm.ltypes" readonly="True">
+                        <option value="">-- SELECCIONE OBLIGATORIO --</option>
+                    </select>
+                    <a href="#!refresh" class="right" ng-click="vm.listtype()"><i class="fa fa-refresh"></i></a>
+                </div>
+                <div class="input-field col l6 m6 s12">
+                    <input type="text" maxlength="5" formattime ng-model="vm.assistance.hin" placeholder="00:00" id="hin">
+                    <label for="hin">Hora Entrada</label>
+                </div>
+                <div class="input-field col l6 m6 s12">
+                    <input type="text" maxlength="5" formattime ng-model="vm.assistance.hinb" placeholder="00:00" id="hinbr">
+                    <label for="hinbr">Inicio Receso</label>
+                </div>
+                <div class="input-field col l6 m6 s12">
+                    <input type="text" maxlength="5" formattime ng-model="vm.assistance.houtb" placeholder="00:00" id="houtbr">
+                    <label for="houtbr">Fin Receso</label>
+                </div>
+                <div class="input-field col l6 m6 s12">
+                    <input type="text" maxlength="5" formattime ng-model="vm.assistance.hout" placeholder="00:00" id="hout">
+                    <label for="hout">Hora Salida</label>
+                </div>
+                <div class="input-field col l6 m6 s12">
+                    <input type="text" id="today" class="datepicker" maxlength="10" placeholder="aaaa-mm-dd" ng-model="vm.assistance.date" readonly="True">
+                    <label for="today">Fecha</label>
+                </div>
+                <div class="input-field col l6 m6 s12">
+                    <input type="number" min="0" class="right-align" placeholder="0" ng-model="vm.assistance.viatical" valminandmax>
+                    <label for="">Viaticos</label>
+                </div>
+                <hr>
+                <div class="input-field col l6 m6 s12">
+                    <input type="number" min="0" class="right-align" placeholder="0" ng-model="vm.assistance.discount" valminandmax>
+                    <label for="">DESCUENTOS POR DIA</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="buttom" class="waves-effect waves-light btn blue">
+                <i class="fa fa-floppy-o"></i>
+                <span>GUARDAR</span>
+            </button>
+            <button type="buttom" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+                <i class="fa fa-ban"></i>
+                <span>CANCELAR</span>
+            </button>
+        </div>
+    </div>
+    {% endverbatim %}
 </section>
 <!-- scripts -->
 <script defer src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>

@@ -1,5 +1,43 @@
 (function() {
   var app, cpFactory, ctrlType;
+  cpFactory = function($http, $cookies) {
+    return {
+      get: function(options) {
+        if (options == null) {
+          options = {};
+        }
+        return $http.get("", {
+          params: options
+        });
+      },
+      post: function(options) {
+        var fd;
+        if (options == null) {
+          options = {};
+        }
+        $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+        $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+        fd = function(options) {
+          var form, k, v;
+          if (options == null) {
+            options = {};
+          }
+          form = new FormData();
+          for (k in options) {
+            v = options[k];
+            form.append(k, v);
+          }
+          return form;
+        };
+        return $http.post("", fd(options), {
+          transformRequest: angular.identity,
+          headers: {
+            'Content-Type': void 0
+          }
+        });
+      }
+    };
+  };
   ctrlType = function($scope, cpFactory) {
     var vm;
     vm = this;
@@ -8,7 +46,9 @@
     vm.order = 'name';
     angular.element(document).ready(function() {
       console.info("I am ready!");
-      angular.element(".modal").modal();
+      angular.element(".modal").modal({
+        dismissible: false
+      });
       angular.element(".datepick").pickadate({
         selectMonths: true,
         selectYears: 5,
@@ -57,47 +97,32 @@
         }
       });
     };
-    vm.showEdit = function(obj) {
-      console.info(obj);
+    vm.getRegisterAssistance = function(dni, day) {
+      var params;
+      params = {
+        'getday': true,
+        'day': day,
+        'dni': dni
+      };
+      cpFactory.get(params).success(function(response) {
+        if (response.status) {
+          vm.hoursload = response.hours;
+        } else {
+          Materialize.toast("Error: " + response.raise);
+        }
+      });
+    };
+    vm.showEdit = function(obj, nob) {
+      var dt;
+      vm.showlist = obj;
+      vm.showlist['nameday'] = nob.nmo;
+      dt = obj['days'][nob.nmo]['day'] !== null ? obj['days'][nob.nmo]['day'] : nob.date;
+      vm.showlist['date'] = dt;
+      vm.getRegisterAssistance(obj.dni, dt);
       angular.element("#medit").modal('open');
     };
-  };
-  cpFactory = function($http, $cookies) {
-    return {
-      get: function(options) {
-        if (options == null) {
-          options = {};
-        }
-        return $http.get("", {
-          params: options
-        });
-      },
-      post: function(options) {
-        var fd;
-        if (options == null) {
-          options = {};
-        }
-        $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
-        $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-        fd = function(options) {
-          var form, k, v;
-          if (options == null) {
-            options = {};
-          }
-          form = new FormData();
-          for (k in options) {
-            v = options[k];
-            form.append(k, v);
-          }
-          return form;
-        };
-        return $http.post("", fd(options), {
-          transformRequest: angular.identity,
-          headers: {
-            'Content-Type': void 0
-          }
-        });
-      }
+    vm.openControls = function() {
+      angular.element("#mcontrols").modal("open");
     };
   };
   'use strict';

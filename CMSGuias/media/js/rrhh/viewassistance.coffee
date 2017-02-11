@@ -1,5 +1,23 @@
 do ->
 
+  cpFactory = ($http, $cookies) ->
+    {
+      get: (options={}) ->
+        $http.get "", params: options
+
+      post: (options={}) ->
+        $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
+        $http.defaults.headers
+        .post['Content-Type'] = 'application/x-www-form-urlencoded'
+        fd = (options={}) ->
+          form = new FormData()
+          for k, v of options
+            form.append k, v
+          return form
+        $http.post "", fd(options),
+          transformRequest: angular.identity, headers: 'Content-Type': undefined
+    }
+
   ctrlType = ($scope, cpFactory) ->
     vm = this
     vm.bdata = []
@@ -7,7 +25,7 @@ do ->
     vm.order = 'name'
     angular.element(document).ready ->
         console.info "I am ready!"
-        angular.element(".modal").modal()
+        angular.element(".modal").modal dismissible: false
         angular.element(".datepick").pickadate
             selectMonths: true
             selectYears: 5
@@ -56,30 +74,37 @@ do ->
                 Materialize.toast "Error: #{response.raise}"
                 return
         return
-    vm.showEdit = (obj) ->
-        console.info obj
+
+    vm.getRegisterAssistance = (dni, day) ->
+        params =
+            'getday': true
+            'day': day
+            'dni': dni
+        cpFactory.get params
+        .success (response) ->
+            if response.status
+                vm.hoursload = response.hours
+                return
+            else
+                Materialize.toast "Error: #{response.raise}"
+                return
+        return
+
+    vm.showEdit = (obj, nob) ->
+        # console.info obj
+        vm.showlist = obj
+        vm.showlist['nameday'] = nob.nmo
+        dt = if obj['days'][nob.nmo]['day'] isnt null then obj['days'][nob.nmo]['day'] else nob.date
+        vm.showlist['date'] = dt
+        vm.getRegisterAssistance(obj.dni, dt)
         angular.element("#medit").modal('open')
+        return
+
+    vm.openControls = ->
+        angular.element("#mcontrols").modal "open"
         return
     ## ctrlType
     return
-
-  cpFactory = ($http, $cookies) ->
-    {
-      get: (options={}) ->
-        $http.get "", params: options
-
-      post: (options={}) ->
-        $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
-        $http.defaults.headers
-        .post['Content-Type'] = 'application/x-www-form-urlencoded'
-        fd = (options={}) ->
-          form = new FormData()
-          for k, v of options
-            form.append k, v
-          return form
-        $http.post "", fd(options),
-          transformRequest: angular.identity, headers: 'Content-Type': undefined
-    }
 
   'use strict'
   app = angular.module('assApp', ['ngCookies'])

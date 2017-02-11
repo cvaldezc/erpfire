@@ -187,7 +187,7 @@
         tp.removeAttribute('disabled');
         vm.assistance.type = null;
       } else {
-        vm.assistance.type = 'TY01';
+        vm.assistance.type = 'TY02';
         tp.setAttribute('disabled', 'disabled');
       }
     });

@@ -2524,6 +2524,14 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
                             'json',
                             TipoEmpleado.objects.filter(flag=True)))
                         kwargs['status'] = True
+                    if 'getday' in request.GET:
+                        kwargs['hours'] = json.loads(serializers.serialize(
+                            'json',
+                            Assistance.objects.filter(
+                                employee_id=request.GET['dni'],
+                                assistance=request.GET['day']).order_by('hourin'),
+                            relations=('project', 'types', 'status')))
+                        kwargs['status'] = True
                     if 'filterAssistance' in request.GET:
                         if 'type' in request.GET:
                             ass = BalanceAssistance.objects.filter(
@@ -2604,13 +2612,14 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
                             name[x] = {
                                 'nmo': day.strftime('%A'),
                                 'nmt': traslate[day.strftime('%A')],
-                                'nm': day.strftime('%m/%d')}
+                                'nm': day.strftime('%m/%d'),
+                                'date': day.strftime('%Y-%m-%d')}
                             day = day + datetime.timedelta(days=1)
                         conf = EmployeeSettings.objects.get(flag=True)
                         kwargs['thour'] = (conf.totalhour.hour) + ((conf.totalhour.minute)/60.0)
                         kwargs['names'] = name
                         kwargs['status'] = True
-                except ObjectDoesNotExist as oex:
+                except (ObjectDoesNotExist or Exception) as oex:
                     kwargs['raise'] = str(oex)
                     kwargs['status'] = False
                 return self.render_to_json_response(kwargs)

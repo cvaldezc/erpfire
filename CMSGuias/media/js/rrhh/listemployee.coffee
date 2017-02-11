@@ -145,7 +145,7 @@ do ->
         vm.assistance.type = null
         return
       else
-        vm.assistance.type = 'TY01'
+        vm.assistance.type = 'TY02'
         tp.setAttribute 'disabled', 'disabled'
         return
     $scope.$watch 'vm.assistance.type', (nw, old) ->
