@@ -144,6 +144,7 @@ urlpatterns = patterns(
     url(r'^load/assistance/$', LoadAssistance.as_view(), name='rrhh_load_assistance'),
     url(r'^status/assistance/$', EmployeeBreakView.as_view(), name='rrhh_status_assistance'),
     url(r'^view/assistance/$', ViewAssistance.as_view(), name='rrhh_view_assistance'),
+    url(r'^exportar/assistance/$', ExportarAssistance.as_view(), name='rrhh_exportar_view'),
     ###
     url(r'^test/$', LoadRe.as_view(), name='rrhh_test'),
 )

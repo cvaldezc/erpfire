@@ -19,6 +19,7 @@
                             <tr class="brand-primary">
                                 <th width="1cm">Item</th><th width="2cm">Código</th>
                                 <th>Nombre Tipo</th>
+                                <th>Valor</th>
                                 <th></th>
                                 <th></th>
                             </tr>
@@ -29,6 +30,7 @@
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ x.tipopago_id }}</td>
                                 <td>{{ x.pago }}</td>
+                                <td>{{ x.value }}</td>
                                 <td>
                                     <a href="{% url 'tipopago_edit' x.tipopago_id %}" class="btn btn-xs btn-link text-green">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>

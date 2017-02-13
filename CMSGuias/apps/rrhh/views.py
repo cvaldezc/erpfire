@@ -18,7 +18,8 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook, cell
+from openpyxl.styles import Alignment, Style
 
 from ..home.models import *
 from ..rrhh.models import *
@@ -813,7 +814,8 @@ class CuentaCorriente(JSONResponseMixin, TemplateView):
                             'cts': x.cts,
                             'gratificacion': x.gratificacion,
                             'costxhora': x.costxhora,
-                            'estado': x.estado})
+                            'estado': x.estado,
+                            'setfamily': x.setfamily})
                         context['lcuenta'] = listacuenta
                     context['status'] = True
             except ObjectDoesNotExist, e:
@@ -844,6 +846,7 @@ class CuentaCorriente(JSONResponseMixin, TemplateView):
                             gratificacion=request.POST.get('gratificacion'),
                             cts=request.POST.get('cts'),
                             costxhora=request.POST.get('costoxhora'),
+                            setfamily=request.POST['setfamily'],
                             tipocontrato_id=request.POST.get('tipocontrato'))
                         context['status'] = True
                     if 'editcuenta' in request.POST:
@@ -858,6 +861,7 @@ class CuentaCorriente(JSONResponseMixin, TemplateView):
                         ce.cts = request.POST['cts']
                         ce.costxhora = request.POST['costoxhora']
                         ce.tipocontrato_id = request.POST['tipocontrato']
+                        ce.setfamily = request.POST['setfamily']
                         ce.save()
                         context['status'] = True
                     if 'cambestadocuenta' in request.POST:
@@ -2730,7 +2734,8 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
                                     assistance=request.POST['date']).delete()
                             else:
                                 asl = Assistance.objects.filter(
-                                    employee_id=request.POST['dni'], assistance=request.POST['date'])
+                                    employee_id=request.POST['dni'],
+                                    assistance=request.POST['date'])
                                 asl[0].viatical = asl[0].viatical
                                 asl[0].save()
                         except Exception as bex:
@@ -2740,6 +2745,148 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
                 kwargs['status'] = False
                 kwargs['raise'] = str(oex)
             return self.render_to_json_response(kwargs)
+
+
+class ExportarAssistance(JSONResponseMixin, TemplateView):
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                if 'gettypes' in request.GET:
+                    kwargs['types'] = json.loads(serializers.serialize(
+                        'json',
+                        TipoEmpleado.objects.filter(flag=True)))
+                    kwargs['status'] = True
+                if 'getpayment' in request.GET:
+                    kwargs['payment'] = json.loads(serializers.serialize(
+                        'json',
+                        TipoPago.objects.filter(flag=True)))
+                    kwargs['status'] = True
+                return self.render_to_json_response(kwargs)
+            if 'exportdata' in request.GET:
+                kwargs['status'] = True
+                if 'type' in request.GET:
+                    ass = BalanceAssistance.objects.filter(
+                        assistance__range=(
+                            request.GET['din'],
+                            request.GET['dout']),
+                        employee__tipoemple_id=request.GET['type']).order_by('employee__lastname')
+                else:
+                    ass = BalanceAssistance.objects.filter(
+                        assistance__range=(
+                            request.GET['din'],
+                            request.GET['dout'])).order_by('employee__lastname')
+                week = []
+                for x in ass:
+                    count = 0
+                    index = 0
+                    for sw in xrange(0, len(week)):
+                        if week[sw]['dni'] != x.employee_id:
+                            count += 1
+                            continue
+                        else:
+                            index = sw
+                            break
+                    if count == len(week):
+                        repen = detPensEmple.objects.get(empdni_id=x.employee_id)
+                        cuenta = CuentaEmple.objects.filter(
+                            empdni_id=x.employee_id).order_by('-registro')[0]
+                        week.append({
+                            'dni': x.employee_id,
+                            'name': '%s %s' % (x.employee.lastname, x.employee.firstname),
+                            'pensionario': repen.regimenpens.regimen,
+                            'percent': repen.regimenpens.percent,
+                            'cuenta': cuenta.cuenta,
+                            'remuneracion': cuenta.remuneracion,
+                            'setfamily': cuenta.setfamily,
+                            # 'days': {x.assistance.strftime('%A'): {
+                            #     'day': x.assistance,
+                            #     'hour': x.hwork,
+                            #     'extra': (x.hextfirst + x.hextsecond),
+                            #     'delay': x.hdelay,
+                            #     'lack': x.hlack}},
+                            'count': 1,
+                            'twork': x.hwork,
+                            'textra': (x.hextfirst + x.hextsecond),
+                            'discount': x.discount})
+                    else:
+                        # week[index]['days'][x.assistance.strftime('%A')] = {
+                        #     'day': x.assistance,
+                        #     'hour': x.hwork,
+                        #     'extra': (x.hextfirst + x.hextsecond),
+                        #     'delay': x.hdelay,
+                        #     'lack': x.hlack}
+                        week[index]['count'] += 1
+                        week[index]['twork'] += x.hwork
+                        week[index]['textra'] += (x.hextfirst + x.hextsecond)
+                        week[index]['discount'] += x.discount
+                # Create File ExportarAssistance
+                if 'hour' in request.GET:
+                    response = HttpResponse(
+                        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                    response['Content-Disposition'] = 'attachment; filename=PLANILLA-%s-%s.xlsx' % (request.GET['din'], request.GET['dout'])
+                    wb = Workbook()
+                    ws = wb.active
+                    ws.title = 'PANILLA %s AL %s' % (request.GET['din'][:5], request.GET['dout'][:5])
+                    ws.sheet_properties.tabColor = '1072BA'
+                    # set title
+                    ws.cell(column=1, row=3).value = 'PLANILLA DE %s AL %s' % (request.GET['din'], request.GET['dout'])
+                    #ws.cell['A3:K3'].alignment = Alignment(mergeCell=True)
+                    #set Header
+                    ws.cell(column=2, row=4).value = 'Apellidos y Nombres'
+                    ws.cell(column=3, row=4).value = 'Sistema de Pensiones'
+                    ws.cell(column=4, row=4).value = '%'
+                    ws.cell(column=5, row=4).value = 'Jornal'
+                    ws.cell(column=6, row=4).value = 'Dominical'
+                    ws.cell(column=7, row=4).value = 'Asig. Familiar'
+                    ws.cell(column=8, row=4).value = 'Total Rem.'
+                    ws.cell(column=9, row=4).value = 'Horas Laboradas'
+                    ws.cell(column=10, row=4).value = 'Horas Extra'
+                    ws.cell(column=11, row=4).value = 'Rem. Total'
+                    ws.cell(column=12, row=4).value = 'AFP/ONP'
+                    ws.cell(column=13, row=4).value = 'Otros Dsct'
+                    ws.cell(column=14, row=4).value = 'Total Dsct'
+                    ws.cell(column=15, row=4).value = 'Total a Pagar'
+                    # set data body
+                    count = 5
+                    total = 0
+                    reminv = 85
+                    for x in week:
+                        dom = 0
+                        setfamily = 0
+                        dom = Decimal(x['remuneracion'] / float(request.GET['payment'])).quantize(Decimal('0.01'))
+                        if x['setfamily'] == True:
+                            setfamily = Decimal((reminv/30) * float(request.GET['payment'])).quantize(Decimal('0.01'))
+                        ws.cell(column=1, row=count).value = (count - 4)
+                        ws.cell(column=2, row=count).value = x['name']
+                        ws.cell(column=3, row=count).value = x['pensionario']
+                        ws.cell(column=4, row=count).value = Decimal(x['percent']).quantize(Decimal('0.01'))
+                        ws.cell(column=5, row=count).value = ((Decimal(x['remuneracion']) - dom) - setfamily) if x['setfamily'] else (Decimal(x['remuneracion']) - dom)
+                        ws.cell(column=6, row=count).value = dom
+                        ws.cell(column=7, row=count).value = setfamily
+                        ws.cell(column=8, row=count).value = x['remuneracion']
+                        ## to here performed calc hours
+                        calchour = Decimal((x['remuneracion'] / 7) / 8.5).quantize(Decimal('0.0001'))
+                        ws.cell(column=9, row=count).value = x['twork']
+                        ws.cell(column=10, row=count).value = x['textra']
+                        tworked = Decimal(calchour * (x['twork'] + x['textra'])).quantize(Decimal('0.01'))
+                        ws.cell(column=11, row=count).value = tworked + dom
+                        seg = Decimal(tworked * (x['percent'] / 100)).quantize(Decimal('0.01'))
+                        ws.cell(column=12, row=count).value = seg
+                        ws.cell(column=13, row=count).value = x['discount']
+                        ws.cell(column=14, row=count).value = (x['discount'] + seg)
+                        tot = ((tworked + dom) - (x['discount'] + seg))
+                        ws.cell(column=15, row=count).value = tot
+                        total += tot
+                        count += 1
+                    ws.cell(column=15, row=count).value = total
+                    wb.save(response)
+                    return response
+            else:
+                return render(request, 'rrhh/exportar.html', kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)
 
 # class load data test
 class LoadRe(TemplateView):

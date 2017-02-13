@@ -109,6 +109,7 @@ class TipoContrato(models.Model):
 class TipoPago(models.Model):
     tipopago_id = models.CharField(primary_key=True, max_length=9)
     pago = models.CharField(max_length=90)
+    value = models.SmallIntegerField(default=7)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -125,6 +126,7 @@ class CuentaEmple(models.Model):
     gratificacion = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
     costxhora = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
     registro = models.DateTimeField(auto_now_add=True)
+    setfamily = models.BooleanField(default=False)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()

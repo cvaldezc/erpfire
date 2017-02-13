@@ -1,5 +1,5 @@
 <!--MODAL CUENTA-->
-<div class="modal editcuentaemple" id="formcuenta" style="width:800px;height:100%;" >
+<div class="modal editcuentaemple modal-fixed-footer" id="formcuenta" style="width:800px;" >
               <div class="modal-content">
                   <div class="row">
                       <div class="row">
@@ -23,7 +23,7 @@
                       <label for="remuneracion" >REMUNERACION</label>
                     </div>
                   </div>
-                  
+
                   <div class="row">
                     <div class="input-field col s0">
                     <button type="button" style="color:blue;font-weight:bold;" class="transparent btncalcular"><small>Calcular</small></button>
@@ -41,7 +41,7 @@
                       <label for="cts" >CTS</label>
                     </div>
                   </div>
-                  
+
                   <div class="row">
                     <div class="input-field col s0">
                       <p>Tipo de contrato:</p>
@@ -51,7 +51,7 @@
                     {% for x in ltipocontrato %}
                       <option value="{{ x.tipocontrato_id }}">{{ x.contrato }}</option>
                     {% endfor %}
-                    </select>                 
+                    </select>
                   </div>
                   <div class="input-field col s0">
                         <p>Tipo de Pago:</p>
@@ -61,25 +61,28 @@
                         {% for x in ltipopago %}
                           <option data-tipopago="{{ x.pago }}" value="{{ x.tipopago_id }}">{{ x.pago }}</option>
                         {% endfor %}
-                        </select>                 
+                        </select>
                       </div>
                   </div>
-                  <div class="moda-footer" align="center" style="margin-top:120px;">
-                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
-                      <i class="fa fa-times"></i>
-                      <span>Cancelar</span>
-                    </button>
-                    <button type="button" class="btn waves-effect green lighten-1 btnsavecuenta">
-                      <i class="fa fa-floppy-o"></i>
-                      <span>Guardar</span>
-                    </button>
+                  <div class="input-field col l2 m3 s12">
+                    <input type="checkbox" id="setfamily">
+                    <label for="setfamily">Asignación Familiar</label>
                   </div>
             </div>
-                     
+            <div class="modal-footer" align="center">
+              <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                <i class="fa fa-times"></i>
+                <span>Cancelar</span>
+              </button>
+              <button type="button" class="btn waves-effect green lighten-1 btnsavecuenta">
+                <i class="fa fa-floppy-o"></i>
+                <span>Guardar</span>
+              </button>
+            </div>
 </div>
 
 <!-- MODAL ESTUDIO-->
-<div class="modal editestudioemple" id="formestudio" style="width:800px;height:700px;" >  
+<div class="modal editestudioemple" id="formestudio" style="width:800px;height:700px;" >
     <div class="modal-content">
       <div class="row">
             <div class="row">
@@ -90,7 +93,7 @@
                 <label style="color:black;font-size: 15px;" class="dniempleado" id="dniempleadoestudio"></label>
                 <div style="display:none;">
                 <input  id="accionestudio" class="accionestudio" name="accionestudio">
-              </div>  
+              </div>
               </div>
             </div>
               <div class="input-field col">
@@ -101,7 +104,7 @@
                     {% for x in ltipinst %}
                   <option value="{{ x.tipoinst_id }}">{{x.tipo}}</option>
                 {% endfor %}
-                  </select>                 
+                  </select>
               </div>
               <div class="input-field col s6">
                 <input placeholder="" id="inst" type="text" class="validate institucion" name="instituto">
@@ -140,7 +143,7 @@
                       <select id="idcomboestpais" class="browser-default estpais">
                         <option value="true">SI</option>
                         <option value="false">NO</option>
-                      </select>                 
+                      </select>
                   </div>
               </div>
               <div class="row">
@@ -152,7 +155,7 @@
                     <input placeholder="" id="aegreso" type="text" class="validate aegreso" name="naegreso">
                     <label for="aegreso">Año de Egreso</label>
                   </div>
-              </div>   
+              </div>
               <div class="moda-footer" align="center">
                     <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
                       <i class="fa fa-times"></i>
@@ -162,7 +165,7 @@
                       <i class="fa fa-floppy-o"></i>
                       <span>Guardar</span>
                     </button>
-              </div>         
+              </div>
 </div>
 </div>
 <!--MODAL TELEFONO-->
@@ -171,17 +174,17 @@
                         <label style="display:none;" id="codtel" class="codtel" name="codtel"></label>
                         <div style="display:none;">
                           <input  id="acciontelefono" class="acciontelefono" name="acciontelefono">
-                        </div>       
+                        </div>
                   <div class="row">
                       <div class="row">
                         <label style="color:black;font-weight:bold;font-size: 15px;">Empleado:</label>
                         <label style="color:black;font-size: 15px;" class="nameemple" id="nameemple"></label><label> - </label>
                         <label style="color:black;font-size: 15px;" id="dniempleadotel" class="dniempleadotel"></label>
-                  
+
                       </div>
                       <div class="row">
                       <div class="input-field col s0" style="margin-left:70px;">
-                        <i class="fa fa-phone"></i>                  
+                        <i class="fa fa-phone"></i>
                       </div>
                       <div class="input-field col s6">
                         <input id="telef" name="telef" type="text" class="validate telef">
@@ -196,7 +199,7 @@
                       </div>
                       </div>
                   </div>
-                  
+
                   <div class="moda-footer" align="center">
                     <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
                       <i class="fa fa-times"></i>
@@ -221,7 +224,7 @@
                   <label style="color:black;font-size: 15px;" class="dniempleado" id="dniempleadosusp"></label>
                   <div style="display:none;">
                     <input  id="accionsuspension" class="accionsuspension" name="accionsuspension">
-                    </div> 
+                    </div>
                   </div>
                   <div class="row">
                       <div class="input-field col s0">
@@ -232,7 +235,7 @@
                         {% for x in ltiposuspension %}
                           <option value="{{ x.suspension_id }}">{{ x.motivo }}</option>
                         {% endfor %}
-                        </select>                 
+                        </select>
                       </div>
                   </div>
                   <div class="row">
@@ -255,7 +258,7 @@
                       <input disabled class="file-path txtchangesusp" type="text" name="textosuspen">
                     </div>
                     <div class="input-field col s4">
-                      <label id="archisusp" class="archisusp"></label>    
+                      <label id="archisusp" class="archisusp"></label>
                     </div>
                     </div>
                   </div>
@@ -263,9 +266,9 @@
                       <div class="input-field col s12">
                         <textarea placeholder="" id="txtcomentsusp" name="txtcomentsusp" class="materialize-textarea txtcomentsusp"></textarea>
                         <label for="txtcomentsusp">COMENTARIO</label>
-                      </div> 
+                      </div>
                   </div>
-            
+
                   <div class="moda-footer" align="center">
                     <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
                       <i class="fa fa-times"></i>
@@ -290,7 +293,7 @@
                   <label style="color:black;font-size: 15px;" class="dniempleado" id="dniempleadosusp"></label>
                   <div style="display:none;">
                     <input  id="accionsuspension" class="accionsuspension" name="accionsuspension">
-                    </div> 
+                    </div>
                   </div>
                   <div class="row">
                       <div class="input-field col s0">
@@ -301,7 +304,7 @@
                         {% for x in ltiposuspension %}
                           <option value="{{ x.suspension_id }}">{{ x.motivo }}</option>
                         {% endfor %}
-                        </select>                 
+                        </select>
                       </div>
                   </div>
                   <div class="row">
@@ -324,7 +327,7 @@
                       <input disabled class="file-path txtchangesusp" type="text" name="textosuspen">
                     </div>
                     <div class="input-field col s4">
-                      <label id="archisusp" class="archisusp"></label>    
+                      <label id="archisusp" class="archisusp"></label>
                     </div>
                     </div>
                   </div>
@@ -332,9 +335,9 @@
                       <div class="input-field col s12">
                         <textarea placeholder="" id="txtcomentsusp" name="txtcomentsusp" class="materialize-textarea txtcomentsusp"></textarea>
                         <label for="txtcomentsusp">COMENTARIO</label>
-                      </div> 
+                      </div>
                   </div>
-            
+
                   <div class="moda-footer" align="center">
                     <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
                       <i class="fa fa-times"></i>
@@ -349,7 +352,7 @@
 </div>
 -->
 <!-- MODAL DATOS FAMILIA-->
-<div class="modal editfamilia" id="formfamilia" style="width:600px;height:550px;" >  
+<div class="modal editfamilia" id="formfamilia" style="width:600px;height:550px;" >
     <div class="modal-content">
       <div class="row">
             <div class="row">
@@ -360,7 +363,7 @@
             <label style="color:black;font-size: 15px;" class="dniempleadofam" id="dniempleadofamilia"></label>
             <div style="display:none;">
             <input  id="accionfamilia" class="accionfamilia" name="accionfamilia">
-            </div>  
+            </div>
             </div>
             </div>
         <div class="input-field col s12">
@@ -395,12 +398,12 @@
                       <i class="fa fa-floppy-o"></i>
                       <span>Guardar</span>
                     </button>
-              </div>         
+              </div>
 </div>
 </div>
 
 <!-- MODAL EXPERIENCIA LABORAL-->
-<div class="modal editexplaboral" id="" style="width:800px;max-height:75%;" >  
+<div class="modal editexplaboral" id="" style="width:800px;max-height:75%;" >
     <div class="modal-content">
       <div class="row">
             <div class="row">
@@ -411,7 +414,7 @@
             <label style="color:black;font-size: 15px;" class="dniexplab" id="dniexplab"></label>
             <div style="display:none;">
             <input  id="accionexplab" class="accionexplab" name="accionexplab">
-            </div>  
+            </div>
             </div>
             </div>
         <div class="input-field col s6">
@@ -454,7 +457,7 @@
                       <i class="fa fa-floppy-o"></i>
                       <span>Guardar</span>
                     </button>
-              </div>         
+              </div>
 </div>
 </div>
 
@@ -492,9 +495,9 @@
                       <div class="input-field col s12">
                         <textarea placeholder="" name="txtcommedic" class="materialize-textarea txtcommedic"></textarea>
                         <label for="txtcommedic">COMENTARIO</label>
-                      </div> 
+                      </div>
                   </div>
-            
+
                   <div class="moda-footer" align="center">
                     <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
                       <i class="fa fa-times"></i>
@@ -518,7 +521,7 @@
                   <label style="color:black;font-size: 15px;" class="dniemerg" id="dniemerg"></label>
                   <div style="display:none;">
                     <input class="accionemerg" name="accionemerg" id="accionemerg">
-                    </div> 
+                    </div>
                   </div>
                   <div class="row">
                     <div class="input-field col s8">
@@ -543,7 +546,7 @@
                       <label for="parentemerg">Parentesco</label>
                     </div>
                   </div>
-            
+
                   <div class="moda-footer" align="center">
                     <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
                       <i class="fa fa-times"></i>
@@ -567,7 +570,7 @@
                   <label style="color:black;font-size: 15px;" class="dnifamicr" id="dnifamicr"></label>
                   <div style="display:none;">
                     <input class="accionfamicr" name="accionfamicr" id="accionfamicr">
-                    </div> 
+                    </div>
                   </div>
                   <div class="row">
                     <div class="input-field col s12">
@@ -588,7 +591,7 @@
                       <label for="areatrabfamicr">Area de Trabajo</label>
                     </div>
                   </div>
-            
+
                   <div class="moda-footer" align="center">
                     <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
                       <i class="fa fa-times"></i>
@@ -614,7 +617,7 @@
                     <div class="input-field col s12">
                       <textarea placeholder="" id="motrenuncia" name="motrenuncia" class="materialize-textarea motrenuncia"></textarea>
                       <label for="motrenuncia">Motivo de Renuncia</label>
-                    </div> 
+                    </div>
                   </div>
                   <div class="row">
                       <div class="input-field col s12">
@@ -633,7 +636,7 @@
                     </div>
                     </div>
                   </div>
-            
+
                   <div class="moda-footer" align="center">
                     <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
                       <i class="fa fa-times"></i>

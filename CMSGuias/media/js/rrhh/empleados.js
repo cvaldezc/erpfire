@@ -996,7 +996,7 @@ listcuenta = function(){
       if (response.status) {
         $tb = $("table.table-detailscuenta > tbody");
         $tb.empty();
-        template = "<tr><td style=\"text-align: center;\" class=\"colnumcuenta\">{{ cuenta }}</td><td style=\"text-align: center;\">{{ tipodepago }}</td><td style=\"text-align: center;\">{{ remuneracion }}</td><td style=\"text-align: center;\">{{ gratificacion }}</td><td style=\"text-align: center;\">{{ cts }}</td><td style=\"text-align: center;\">{{ costxhora }}</td><td style=\"text-align: center;\">{{ tipocontrato }}</td><td style=\"text-align: center;\" class=\"estcuenta\">{{ estado }}</td><td style=\"text-align: center;\"><button type=\"button\" class=\"btn btn-xs btn-link text-green btn-editcuenta\" data-namecuen=\"{{ namecuen }}\" value=\"{{ empdni_id }}\" data-dnicuenta=\"{{ empdni_id }}\" data-numcuenta=\"{{ cuenta }}\" data-tipopago=\"{{ tipodepago_id }}\" data-estado=\"{{ estado }}\" data-remuneracion=\"{{ remuneracion }}\" data-grati=\"{{ gratificacion }}\" data-cts=\"{{ cts }}\" data-costxhora=\"{{ costxhora }}\" data-tipocontrato=\"{{ tipocontrato_id }}\" data-cod=\"{{ id }}\"><i class=\"fa fa-pencil\"></i><span class=\"glyphicon glyphicon-edit\"></span></button></td><td class=\"text-center\"><button type=\"button\" class=\"btn red btndelcuenta\" value=\"{{ empdni_id }}\" data-delcuenta=\"{{ cuenta }}\"><i class=\"fa fa-trash-o\"></i></button></td><td class=\"text-center\"><button type=\"button\" style=\"border:none;color:blue;font-weight:bold;\" class=\"transparent btnshowcambest\"  value=\"{{ empdni_id }}\" data-cmbnumcuenta=\"{{ id }}\" data-estcuenta=\"{{ estado }}\" ><small>Cambiar de Estado</small></button></td></tr>";
+        template = "<tr><td style=\"text-align: center;\" class=\"colnumcuenta\">{{ cuenta }}</td><td style=\"text-align: center;\">{{ tipodepago }}</td><td style=\"text-align: center;\">{{ remuneracion }}</td><td style=\"text-align: center;\">{{ gratificacion }}</td><td style=\"text-align: center;\">{{ cts }}</td><td style=\"text-align: center;\">{{ costxhora }}</td><td style=\"text-align: center;\">{{ tipocontrato }}</td><td style=\"text-align: center;\" class=\"estcuenta\">{{ estado }}</td><td style=\"text-align: center;\"><button type=\"button\" class=\"btn btn-xs btn-link text-green btn-editcuenta\" data-namecuen=\"{{ namecuen }}\" value=\"{{ empdni_id }}\" data-dnicuenta=\"{{ empdni_id }}\" data-numcuenta=\"{{ cuenta }}\" data-tipopago=\"{{ tipodepago_id }}\" data-estado=\"{{ estado }}\" data-remuneracion=\"{{ remuneracion }}\" data-setfamily=\"{{ setfamily }}\" data-grati=\"{{ gratificacion }}\" data-cts=\"{{ cts }}\" data-costxhora=\"{{ costxhora }}\" data-tipocontrato=\"{{ tipocontrato_id }}\" data-cod=\"{{ id }}\"><i class=\"fa fa-pencil\"></i><span class=\"glyphicon glyphicon-edit\"></span></button></td><td class=\"text-center\"><button type=\"button\" class=\"btn red btndelcuenta\" value=\"{{ empdni_id }}\" data-delcuenta=\"{{ cuenta }}\"><i class=\"fa fa-trash-o\"></i></button></td><td class=\"text-center\"><button type=\"button\" style=\"border:none;color:blue;font-weight:bold;\" class=\"transparent btnshowcambest\"  value=\"{{ empdni_id }}\" data-cmbnumcuenta=\"{{ id }}\" data-estcuenta=\"{{ estado }}\" ><small>Cambiar de Estado</small></button></td></tr>";
         for (x in response.lcuenta) {
         response.lcuenta[x].item = parseInt(x) + 1;
         $tb.append(Mustache.render(template, response.lcuenta[x]));
@@ -1294,6 +1294,7 @@ showeditcuenta = function(){
   $("input[name=cts]").val(this.getAttribute("data-cts"));
   $("input[name=costoxhora]").val(this.getAttribute("data-costxhora"));
   $("select[id=combotipocontrato]").val(this.getAttribute("data-tipocontrato"));
+  $("#setfamily").prop('checked', this.getAttribute('data-setfamily') == 'true'? true : false);
   $(".editcuentaemple").modal("open");
 }
 
@@ -2891,6 +2892,7 @@ save_or_edit_cuenta = function() {
   data.tipopago = $("select[id=combotipopago]").val();
   data.remuneracion = $("input[name=remuneracion]").val();
   data.tipocontrato = $("select[id=combotipocontrato]").val();
+  data.setfamily = $("#setfamily").is(":checked");
   data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
   data.exists = true;
 
