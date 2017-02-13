@@ -114,12 +114,12 @@
                         <td>{{x.fields.status.fields.description}}</td>
                         <td class="right-align">{{x.fields.viatical}}</td>
                         <td>
-                            <a href="#!edit" class="grey-text text-darken-3">
+                            <a href="#!edit" class="grey-text text-darken-3" ng-click="vm.openControls(x)">
                                 <i class="fa fa-pencil fa-lg"></i>
                             </a>
                         </td>
                         <td>
-                            <a href="#!remove" class="red-text">
+                            <a href="#!remove" class="red-text" ng-click="vm.deleteAssistance(x)">
                                 <i class="fa fa-trash fa-lg"></i>
                             </a>
                         </td>
@@ -128,11 +128,11 @@
             </table>
         </div>
         <div class="modal-footer">
-            <button type="button" ng-if="(vm.hoursload.length == 0)" ng-click="vm.openControls()" class="left waves-effect waves-ligth btn green lighten-1 grey-text text-darken-3">
+            <button type="button" ng-click="vm.openControls()" class="waves-effect waves-ligth btn green lighten-1 grey-text text-darken-3">
                 <i class="fa fa-plus"></i>
                 <span>AGREGAR</span>
             </button>
-            <button type="button" class="waves-effect waves-ligth modal-action modal-close btn grey lighten-5 grey-text text-darken-3">
+            <button type="button" class="waves-effect waves-ligth modal-action modal-close btn grey lighten-5 grey-text text-darken-3 left">
                 <i class="fa fa-times"></i>
                 <span>SALIR</span>
             </button>
@@ -145,17 +145,17 @@
             <div class="row">
                 <div class="col l12 m12 s12">
                     <label for="project">Proyecto</label>
-                    <select class="browser-default chosen-select" name="project" id="project" ng-model="vm.assistance.project" ng-options="x.pk as x.fields.nompro for x in vm.lprojects">
+                    <select class="browser-default chosen-select" name="project" id="project" ng-model="vm.assistance.project" ng-options="x.pk as (x.pk + ' ' +x.fields.nompro) for x in vm.projects">
                         <option value="">-- NINGUNO --</option>
                     </select>
-                    <a href="#!refresh" class="right" ng-click="vm.listProject()"><i class="fa fa-refresh"></i></a>
+                    <a href="#!refresh" class="right" ng-click="vm.getProjects()"><i class="fa fa-refresh"></i></a>
                 </div>
                 <div class="col l12 m12 s12">
                 <label for="types">Tipo de Asistencia</label>
-                    <select class="browser-default" id="types" ng-model="vm.assistance.type" ng-options="x.pk as x.fields.description for x in vm.ltypes" readonly="True">
+                    <select class="browser-default" id="types" ng-model="vm.assistance.type" ng-options="x.pk as x.fields.description for x in vm.rltypes" readonly="True">
                         <option value="">-- SELECCIONE OBLIGATORIO --</option>
                     </select>
-                    <a href="#!refresh" class="right" ng-click="vm.listtype()"><i class="fa fa-refresh"></i></a>
+                    <a href="#!refresh" class="right" ng-click="vm.getrltypes()"><i class="fa fa-refresh"></i></a>
                 </div>
                 <div class="input-field col l6 m6 s12">
                     <input type="text" maxlength="5" formattime ng-model="vm.assistance.hin" placeholder="00:00" id="hin">
@@ -189,11 +189,11 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="buttom" class="waves-effect waves-light btn blue">
+            <button type="buttom" class="waves-effect waves-light btn blue" ng-click="vm.saveAssistance()">
                 <i class="fa fa-floppy-o"></i>
                 <span>GUARDAR</span>
             </button>
-            <button type="buttom" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+            <button type="buttom" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3 left">
                 <i class="fa fa-ban"></i>
                 <span>CANCELAR</span>
             </button>

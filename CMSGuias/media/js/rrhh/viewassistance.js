@@ -44,6 +44,10 @@
     vm.bdata = [];
     vm.settings = {};
     vm.order = 'name';
+    vm.assistance = {
+      'type': null,
+      'project': null
+    };
     angular.element(document).ready(function() {
       console.info("I am ready!");
       angular.element(".modal").modal({
@@ -56,6 +60,8 @@
         format: 'yyyy-mm-dd'
       });
       vm.gettypes();
+      vm.getrltypes();
+      vm.getProjects();
     });
     vm.changerange = function() {
       var day, dt, month;
@@ -64,6 +70,28 @@
       month = dt.getMonth() + 1;
       day = dt.getDate();
       vm.search.ff = (dt.getFullYear()) + "-" + (month < 10 ? '0' + month : month) + "-" + (day < 10 ? '0' + day : day);
+    };
+    vm.getrltypes = function() {
+      cpFactory.get({
+        'lrtypes': true
+      }).success(function(response) {
+        if (response.status) {
+          vm.rltypes = response.ltypes;
+        } else {
+          Materialize.toast("Error: " + response.raise, 4000);
+        }
+      });
+    };
+    vm.getProjects = function() {
+      cpFactory.get({
+        'projects': true
+      }).success(function(response) {
+        if (response.status) {
+          vm.projects = response.projects;
+        } else {
+          Materialize.toast("Error: " + response.raise, 4000);
+        }
+      });
     };
     vm.gettypes = function() {
       cpFactory.get({
@@ -121,9 +149,139 @@
       vm.getRegisterAssistance(obj.dni, dt);
       angular.element("#medit").modal('open');
     };
-    vm.openControls = function() {
+    vm.deleteAssistance = function(obj) {
+      swal({
+        title: "Realmente desea quitar la asistencia?",
+        text: "" + obj.fields.assistance,
+        confirmButtonText: "Si!, eliminar",
+        cancelButtonText: "No!",
+        confirmButtonColor: "#dd5b66",
+        closeOnConfirm: true,
+        closeOnCancel: true
+      }, function(isConfirm) {
+        var params;
+        if (isConfirm) {
+          params = {
+            deleteAssistance: true,
+            pk: obj.pk,
+            dni: obj.fields.employee,
+            date: obj.fields.assistance
+          };
+          return cpFactory.post(params).success(function(response) {
+            if (response.status) {
+              vm.getRegisterAssistance(obj.fields.employee, obj.fields.assistance);
+              vm.getAssistance();
+            } else {
+              Materialize.toast("Error: " + response.raise, 4000);
+            }
+          });
+        }
+      });
+    };
+    vm.openControls = function(obj) {
+      if (obj == null) {
+        obj = {};
+      }
+      vm.assistance.date = vm.showlist.date;
+      vm.assistance.dni = vm.showlist.dni;
+      if (vm.showlist.days[vm.showlist.nameday].day !== null && obj.hasOwnProperty('hin')) {
+        console.info("Show object for modify");
+        vm.assistance.hin = obj.fields.hourin;
+        vm.assistance.hout = obj.fields.hourout;
+        vm.assistance.hinb = obj.fields.hourinbreak;
+        vm.assistance.houtb = obj.fields.houroutbreak;
+        vm.assistance.viatical = parseFloat(obj.fields.viatical);
+        vm.assistance.project = obj.fields.project !== null ? obj.fields.project.pk : null;
+        vm.assistance.type = obj.fields.types.pk;
+        vm.assistance.modifyassistance = true;
+        vm.assistance.pkassistance = obj.pk;
+      }
       angular.element("#mcontrols").modal("open");
     };
+    vm.saveAssistance = function() {
+      var prms;
+      if (vm.assistance.type === null) {
+        Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe seleccionar un tipo de asistencia", 4000);
+        return false;
+      }
+      if (vm.assistance.hasOwnProperty('hin')) {
+        switch (vm.assistance.hin) {
+          case '00:00':
+          case null:
+          case '':
+            Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de entrada!", 4000);
+            return false;
+        }
+      } else {
+        Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de entrada!", 4000);
+        return false;
+      }
+      if (vm.assistance.hasOwnProperty('hout')) {
+        switch (vm.assistance.hout) {
+          case '00:00':
+          case null:
+          case '':
+            Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de Salida!", 4000);
+            return false;
+        }
+      } else {
+        Materialize.toast("<i class='fa fa-exclamation-circle amber-text fa-lg'></i>&nbsp;Debe de Ingresar hora de Salida!", 4000);
+        return false;
+      }
+      if (!vm.assistance.hasOwnProperty('hinb')) {
+        vm.assistance.hinb = '00:00';
+      }
+      if (!vm.assistance.hasOwnProperty('houtb')) {
+        vm.assistance.houtb = '00:00';
+      }
+      if (!vm.assistance.hasOwnProperty('viatical')) {
+        vm.assistance.viatical = 0;
+      } else {
+        switch (vm.assistance.viatical) {
+          case '':
+          case void 0:
+          case null:
+            vm.assistance.viatical = 0;
+        }
+      }
+      if (!vm.assistance.hasOwnProperty('discount')) {
+        vm.assistance.discount = 0;
+      }
+      prms = vm.assistance;
+      prms['saveAssistance'] = true;
+      console.info(prms);
+      cpFactory.post(prms).success(function(response) {
+        if (response.status) {
+          vm.getRegisterAssistance(vm.assistance.dni, vm.assistance.date);
+          vm.getAssistance();
+          Materialize.toast("<i class='fa fa-check fa-lg green-text'></i>&nbsp;Asistencia Registrada!", 2600);
+          vm.assistance.dni = '';
+          vm.assistance.name = '';
+          vm.assistance.hin = '';
+          vm.assistance.hout = '';
+          angular.element("#mcontrols").modal('close');
+        } else {
+          Materialize.toast("<i class='fa fa-times fa-lg red-text'></i>&nbsp;Error: " + response.raise, 8000);
+        }
+      });
+    };
+    $scope.$watch('vm.assistance.project', function(nw, old) {
+      var tp;
+      tp = angular.element("#types")[0];
+      if (nw === '-' || nw === null) {
+        tp.removeAttribute('disabled');
+        vm.assistance.type = null;
+      } else {
+        vm.assistance.type = 'TY02';
+        tp.setAttribute('disabled', 'disabled');
+      }
+    });
+    $scope.$watch('vm.assistance.type', function(nw, old) {
+      if (nw === 'TY02' && vm.assistance.project === null) {
+        vm.assistance.type = null;
+      }
+    });
+    return;
   };
   'use strict';
   app = angular.module('assApp', ['ngCookies']);

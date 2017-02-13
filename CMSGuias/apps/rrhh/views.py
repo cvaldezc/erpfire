@@ -2211,6 +2211,7 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
                         obj.hourout = request.POST['hout']
                         obj.hourinbreak = request.POST['hinb']
                         obj.houroutbreak = request.POST['houtb']
+                        obj.viatical = request.POST['viatical']
                         obj.tag = True
                         obj.save()
                         return 1
@@ -2226,7 +2227,11 @@ class AssistanceEmployee(JSONResponseMixin, TemplateView):
                         obj = exists.latest('register')
                         hourin = request.POST['hin']
                         # print 'OBJECT ', type(obj.hourin), obj.hourin
-                        inh = datetime.strptime(hourin, '%H:%M', ).time()
+                        hourin = str(hourin)[:5]
+                        if type(hourin) is str:
+                            inh = datetime.datetime.strptime(hourin, '%H:%M').time()
+                        else:
+                            inh = hourin
                         print type(inh), inh
                         print type(hourin), hourin
                         if inh <= obj.hourin:
@@ -2519,10 +2524,21 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
         try:
             if request.is_ajax():
                 try:
+                    if 'projects' in request.GET:
+                        kwargs['projects'] = json.loads(serializers.serialize(
+                            'json',
+                            Proyecto.objects.filter(
+                                flag=True, status='AC').order_by('-registrado')))
+                        kwargs['status'] = True
                     if 'gtypes' in request.GET:
                         kwargs['types'] = json.loads(serializers.serialize(
                             'json',
                             TipoEmpleado.objects.filter(flag=True)))
+                        kwargs['status'] = True
+                    if 'lrtypes' in request.GET:
+                        kwargs['ltypes'] = json.loads(serializers.serialize(
+                            'json',
+                            TypesEmployee.objects.filter(flag=True)))
                         kwargs['status'] = True
                     if 'getday' in request.GET:
                         kwargs['hours'] = json.loads(serializers.serialize(
@@ -2626,6 +2642,104 @@ class ViewAssistance(JSONResponseMixin, TemplateView):
             return render(request, 'rrhh/viewassistance.html', kwargs)
         except TemplateDoesNotExist as ext:
             return Http404(ext)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            try:
+                if 'saveAssistance' in request.POST:
+                    if 'modifyassistance' in request.POST:
+                        asl = Assistance.objects.filter(
+                            employee_id=request.POST['dni'], assistance=request.POST['date'])
+                        if asl:
+                            try:
+                                print "ready for delete assistance"
+                                asl.get(pk=request.POST['pkassistance']).delete()
+                                if len(asl) == 1:
+                                    BalanceAssistance.objects.get(
+                                        employee_id=request.POST['dni'],
+                                        assistance=request.POST['date']).delete()
+                            except Exception as bex:
+                                pass
+                    proj = request.POST['project'] if 'project' in request.POST else ''
+                    proj = '' if proj == 'null' else proj
+                    def registerassistance():
+                        """this function register assistance"""
+                        obj = Assistance()
+                        obj.userregister_id = request.user.get_profile().empdni_id
+                        obj.employee_id = request.POST['dni']
+                        obj.project_id = proj if proj != '' else None
+                        obj.types_id = request.POST['type']
+                        obj.assistance = request.POST['date']
+                        obj.hourin = request.POST['hin']
+                        obj.hourout = request.POST['hout']
+                        obj.hourinbreak = request.POST['hinb']
+                        obj.houroutbreak = request.POST['houtb']
+                        obj.viatical = request.POST['viatical']
+                        obj.tag = True
+                        obj.save()
+                        return 1
+                    exists = None
+                    if proj != '' or proj is None:
+                        exists = Assistance.objects.filter(
+                            assistance=request.POST['date'],
+                            employee_id=request.POST['dni'], project_id=proj)
+                    else:
+                        exists = Assistance.objects.filter(
+                            assistance=request.POST['date'], employee_id=request.POST['dni'])
+                    if len(exists):
+                        obj = exists.latest('register')
+                        hourin = request.POST['hin']
+                        # print 'OBJECT ', type(obj.hourin), obj.hourin
+                        print type(hourin), hourin
+                        hourin = str(hourin)[:5]
+                        if type(hourin) is str:
+                            inh = datetime.datetime.strptime(hourin, '%H:%M').time()
+                            # inh = datetime.strptime(hourin, '%H:%M').time()
+                        else:
+                            inh = hourin
+                        print type(inh), inh
+                        print type(hourin), hourin
+                        if inh <= obj.hourin:
+                            kwargs['raise'] = 'No se puede por que la hora ingresada '\
+                                'es menor a una ya ingresada para esta fecha'
+                            kwargs['status'] = False
+                        else:
+                            registerassistance()
+                    else:
+                        registerassistance()
+                    if 'status' not in request.POST:
+                        try:
+                            rb = BalanceAssistance.objects.get(
+                                employee_id=request.POST['dni'],
+                                assistance=request.POST['date'])
+                            rb.discount = request.POST['discount']
+                            rb.save()
+                        except Exception as rdex:
+                            pass
+                    kwargs['status'] = True
+                if 'deleteAssistance' in request.POST:
+                    asl = Assistance.objects.filter(
+                        employee_id=request.POST['dni'], assistance=request.POST['date'])
+                    if asl:
+                        try:
+                            asl.get(pk=request.POST['pk']).delete()
+                            if len(asl) == 1:
+                                BalanceAssistance.objects.get(
+                                    employee_id=request.POST['dni'],
+                                    assistance=request.POST['date']).delete()
+                            else:
+                                asl = Assistance.objects.filter(
+                                    employee_id=request.POST['dni'], assistance=request.POST['date'])
+                                asl[0].viatical = asl[0].viatical
+                                asl[0].save()
+                        except Exception as bex:
+                            pass
+                        kwargs['status'] = True
+            except ObjectDoesNotExist as oex:
+                kwargs['status'] = False
+                kwargs['raise'] = str(oex)
+            return self.render_to_json_response(kwargs)
 
 # class load data test
 class LoadRe(TemplateView):

@@ -22,6 +22,7 @@ DECLARE
     lack NUMERIC;
     xhfs TIME;
     xhts TIME;
+    dsct NUMERIC;
 BEGIN
     RAISE WARNING 'NEW RECORD %', NEW;
     SELECT INTO config * FROM home_employeesettings ORDER BY register DESC LIMIT 1 OFFSET 0;
@@ -88,7 +89,7 @@ BEGIN
     -- discount hour break if only have employee to work yo M - F if have break
     IF EXTRACT('hour' FROM break)::NUMERIC > 0 THEN
         RAISE WARNING 'HERE DISCOUNT HOUR BREAK';
-        thours := (thours - EXTRACT('hour' FROM break)::NUMERIC);
+        thours := (thours - (EXTRACT('hour' FROM break)::NUMERIC) + EXTRACT('minutes' FROM break)::NUMERIC);
     END IF;
     -- end block discount break
     RAISE WARNING 'INSIDE HOURS EXTRA';
@@ -107,7 +108,8 @@ BEGIN
             firsttime := (xhts::TIME - xhfs::TIME);
             ft := (EXTRACT('hour' FROM firsttime))::NUMERIC;
             RAISE WARNING 'ADDITIONAL FIRSTTIME % %', firsttime, ft;
-            thours := (EXTRACT('hour' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC + EXTRACT('minutes' FROM (types.outsaturday::TIME - types.starthour::TIME)/60)::NUMERIC);
+            RAISE WARNING 'HOUR OUT SATURDAY % %', types.outsaturday, types.starthour::TIME;
+            thours := (EXTRACT('hour' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC + (EXTRACT('minutes' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC)/60);
             fvalid := TRUE;
         ELSE
             st := 0;
@@ -139,7 +141,7 @@ BEGIN
                 RAISE WARNING 'INSIDE HOURS FIRST EXTRA';
                 firsttime := ((to_char(thours, '00":00:00"'))::TIME - xhfs::TIME);
                 ft := (EXTRACT('hour' FROM firsttime))::NUMERIC;
-                thours := (EXTRACT('hour' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC + EXTRACT('minutes' FROM (types.outsaturday::TIME - types.starthour::TIME)/60)::NUMERIC);
+                thours := (EXTRACT('hour' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC + (EXTRACT('minutes' FROM (types.outsaturday::TIME - types.starthour::TIME))::NUMERIC)/60);
             ELSE
                 ft := 0;
             END IF;
@@ -176,11 +178,17 @@ BEGIN
     -- here is perform update or insert
     SELECT INTO balance * FROM rrhh_balanceassistance WHERE employee_id = NEW.employee_id AND assistance::DATE = NEW.assistance::DATE;
     RAISE WARNING 'FOUND balance exists or not';
+    -- DISCOUNT IS NULL SET ZERO
+    dsct := 0;
     IF FOUND THEN
-        UPDATE rrhh_balanceassistance SET hextfirst = ft, hextsecond = st, hwork = thours, hdelay = delay, hlack = lack WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance;
+        -- DISCOUNT IS NULL SET ZERO
+        IF balance.discount <= 0 THEN
+            dsct := 0;
+        END IF;
+        UPDATE rrhh_balanceassistance SET hextfirst = ft, hextsecond = st, hwork = thours, hdelay = delay, hlack = lack, discount = dsct WHERE employee_id = NEW.employee_id AND assistance = NEW.assistance;
         RAISE WARNING 'FINISH UPDATE TABLE BALANCE';
     ELSE
-        INSERT INTO rrhh_balanceassistance(employee_id, assistance, hextfirst, hextsecond, hwork, hdelay, flag, hlack) VALUES(NEW.employee_id, NEW.assistance, ft, st, thours, delay, TRUE, lack);
+        INSERT INTO rrhh_balanceassistance(employee_id, assistance, hextfirst, hextsecond, hwork, hdelay, flag, hlack, discount) VALUES(NEW.employee_id, NEW.assistance, ft, st, thours, delay, TRUE, lack, dsct);
         RAISE WARNING 'FINISH INSERT TABLE BALANCE';
     END IF;
     RETURN NEW;
