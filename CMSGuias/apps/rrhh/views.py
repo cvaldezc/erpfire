@@ -19,7 +19,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from openpyxl import load_workbook, Workbook, cell
-from openpyxl.styles import Alignment, Style
+from openpyxl.utils import coordinate_from_string, column_index_from_string, get_column_letter
+from openpyxl.styles import Alignment, Style, Border, Side, colors
 
 from ..home.models import *
 from ..rrhh.models import *
@@ -2822,17 +2823,38 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         week[index]['textra'] += (x.hextfirst + x.hextsecond)
                         week[index]['discount'] += x.discount
                 # Create File ExportarAssistance
-                if 'hour' in request.GET:
+                    # block start style
+                    def style_range(ws, cell_range, style=None):
+                        """
+                        :param ws:  Excel worksheet instance
+                        :param range: An excel range to style (e.g. A1:F20)
+                        :param style: An openpyxl Style object
+                        """
+
+                        start_cell, end_cell = cell_range.split(':')
+                        start_coord = coordinate_from_string(start_cell)
+                        start_row = start_coord[1]
+                        start_col = column_index_from_string(start_coord[0])
+                        end_coord = coordinate_from_string(end_cell)
+                        end_row = end_coord[1]
+                        end_col = column_index_from_string(end_coord[0])
+
+                        for row in range(start_row, end_row + 1):
+                            for col_idx in range(start_col, end_col + 1):
+                                col = get_column_letter(col_idx)
+                                ws.cell('%s%s' % (col, row)).style = style
+                    # end block
                     response = HttpResponse(
                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
                     response['Content-Disposition'] = 'attachment; filename=PLANILLA-%s-%s.xlsx' % (request.GET['din'], request.GET['dout'])
                     wb = Workbook()
                     ws = wb.active
-                    ws.title = 'PANILLA %s AL %s' % (request.GET['din'][:5], request.GET['dout'][:5])
+                    ws.title = 'PANILLA %s AL %s' % (request.GET['din'][5:], request.GET['dout'][5:])
                     ws.sheet_properties.tabColor = '1072BA'
                     # set title
                     ws.cell(column=1, row=3).value = 'PLANILLA DE %s AL %s' % (request.GET['din'], request.GET['dout'])
                     #ws.cell['A3:K3'].alignment = Alignment(mergeCell=True)
+                    ws.merge_cells('A3:O3')
                     #set Header
                     ws.cell(column=2, row=4).value = 'Apellidos y Nombres'
                     ws.cell(column=3, row=4).value = 'Sistema de Pensiones'
@@ -2852,6 +2874,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                     count = 5
                     total = 0
                     reminv = 85
+                if 'hour' in request.GET:
                     for x in week:
                         dom = 0
                         setfamily = 0
@@ -2881,8 +2904,43 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         total += tot
                         count += 1
                     ws.cell(column=15, row=count).value = total
-                    wb.save(response)
-                    return response
+                if 'days' in request.GET:
+                    for x in week:
+                        dom = 0
+                        setfamily = 0
+                        dom = Decimal(x['remuneracion'] / float(request.GET['payment'])).quantize(Decimal('0.01'))
+                        if x['setfamily'] == True:
+                            setfamily = Decimal((reminv/30) * float(request.GET['payment'])).quantize(Decimal('0.01'))
+                        ws.cell(column=1, row=count).value = (count - 4)
+                        ws.cell(column=2, row=count).value = x['name']
+                        ws.cell(column=3, row=count).value = x['pensionario']
+                        ws.cell(column=4, row=count).value = Decimal(x['percent']).quantize(Decimal('0.01'))
+                        ws.cell(column=5, row=count).value = ((Decimal(x['remuneracion']) - dom) - setfamily) if x['setfamily'] else (Decimal(x['remuneracion']) - dom)
+                        ws.cell(column=6, row=count).value = dom
+                        ws.cell(column=7, row=count).value = setfamily
+                        ws.cell(column=8, row=count).value = x['remuneracion']
+                        ## to here performed calc hours
+                        calchour = Decimal((x['remuneracion'] / 7) / 8.5).quantize(Decimal('0.0001'))
+                        ws.cell(column=9, row=count).value = x['twork']
+                        ws.cell(column=10, row=count).value = x['textra']
+                        tworked = Decimal(calchour * (x['twork'] + x['textra'])).quantize(Decimal('0.01'))
+                        ws.cell(column=11, row=count).value = tworked + dom
+                        seg = Decimal(tworked * (x['percent'] / 100)).quantize(Decimal('0.01'))
+                        ws.cell(column=12, row=count).value = seg
+                        ws.cell(column=13, row=count).value = x['discount']
+                        ws.cell(column=14, row=count).value = (x['discount'] + seg)
+                        tot = ((tworked + dom) - (x['discount'] + seg))
+                        ws.cell(column=15, row=count).value = tot
+                        total += tot
+                        count += 1
+                    ws.cell(column=15, row=count).value = total
+                style_range(ws, ('A3:O%d' % count), Style(alignment=Alignment(horizontal='center'),
+                            border=Border(top=Side(border_style='thin', color=colors.BLACK),
+                                            left=Side(border_style='thin', color=colors.BLACK),
+                                            bottom=Side(border_style='thin', color=colors.BLACK),
+                                            right=Side(border_style='thin', color=colors.BLACK), )),)
+                wb.save(response)
+                return response
             else:
                 return render(request, 'rrhh/exportar.html', kwargs)
         except TemplateDoesNotExist as ext:
