@@ -92,9 +92,9 @@
     vm.saveExportData = function(type) {
       var params;
       params = vm.assistance;
-      params[type] = type;
+      params['tfile'] = type;
       params['exportdata'] = true;
-      window.open(location.href + "?" + (angular.element.param(params)), "_blank");
+      window.open("?" + (angular.element.param(params)), "_blank");
     };
   };
   'use strict';

@@ -70,9 +70,9 @@ do ->
     # export
     vm.saveExportData = (type) ->
         params = vm.assistance
-        params[type] = type
+        params['tfile'] = type
         params['exportdata'] = true
-        window.open "#{location.href}?#{angular.element.param(params)}", "_blank"
+        window.open "?#{angular.element.param(params)}", "_blank"
         # Materialize.toast "<i class='fa fa-circle-o-notch fa-fw fa-spin fa-2x'>", 'infity', 'toast-remove'
         # cpFactory.post params
         # .success (response) ->

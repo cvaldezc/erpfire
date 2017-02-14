@@ -20,7 +20,7 @@ from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from openpyxl import load_workbook, Workbook, cell
 from openpyxl.utils import coordinate_from_string, column_index_from_string, get_column_letter
-from openpyxl.styles import Alignment, Style, Border, Side, colors
+from openpyxl.styles import Alignment, Style, Border, Side, colors, PatternFill, Color
 
 from ..home.models import *
 from ..rrhh.models import *
@@ -2765,6 +2765,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         TipoPago.objects.filter(flag=True)))
                     kwargs['status'] = True
                 return self.render_to_json_response(kwargs)
+            print request.GET
             if 'exportdata' in request.GET:
                 kwargs['status'] = True
                 if 'type' in request.GET:
@@ -2810,7 +2811,12 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                             'count': 1,
                             'twork': x.hwork,
                             'textra': (x.hextfirst + x.hextsecond),
-                            'discount': x.discount})
+                            'discount': x.discount,
+                            'delay': x.hdelay,
+                            'viatical': Assistance.objects.filter(
+                                assistance__range=(request.GET['din'], request.GET['dout']),
+                                employee_id=x.employee_id).aggregate(
+                                    Sum('viatical'))['viatical__sum']})
                     else:
                         # week[index]['days'][x.assistance.strftime('%A')] = {
                         #     'day': x.assistance,
@@ -2822,123 +2828,197 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         week[index]['twork'] += x.hwork
                         week[index]['textra'] += (x.hextfirst + x.hextsecond)
                         week[index]['discount'] += x.discount
+                        week[index]['delay'] += x.hdelay
                 # Create File ExportarAssistance
-                    # block start style
-                    def style_range(ws, cell_range, style=None):
-                        """
-                        :param ws:  Excel worksheet instance
-                        :param range: An excel range to style (e.g. A1:F20)
-                        :param style: An openpyxl Style object
-                        """
+                # block start style
+                def style_range(ws, cell_range, options={}):
+                    """
+                    :param ws:  Excel worksheet instance
+                    :param range: An excel range to border (e.g. A1:F20)
+                    :param border: An openpyxl border object
+                    """
 
-                        start_cell, end_cell = cell_range.split(':')
-                        start_coord = coordinate_from_string(start_cell)
-                        start_row = start_coord[1]
-                        start_col = column_index_from_string(start_coord[0])
-                        end_coord = coordinate_from_string(end_cell)
-                        end_row = end_coord[1]
-                        end_col = column_index_from_string(end_coord[0])
-
-                        for row in range(start_row, end_row + 1):
-                            for col_idx in range(start_col, end_col + 1):
-                                col = get_column_letter(col_idx)
-                                ws.cell('%s%s' % (col, row)).style = style
-                    # end block
-                    response = HttpResponse(
-                        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                    response['Content-Disposition'] = 'attachment; filename=PLANILLA-%s-%s.xlsx' % (request.GET['din'], request.GET['dout'])
-                    wb = Workbook()
-                    ws = wb.active
-                    ws.title = 'PANILLA %s AL %s' % (request.GET['din'][5:], request.GET['dout'][5:])
-                    ws.sheet_properties.tabColor = '1072BA'
-                    # set title
-                    ws.cell(column=1, row=3).value = 'PLANILLA DE %s AL %s' % (request.GET['din'], request.GET['dout'])
-                    #ws.cell['A3:K3'].alignment = Alignment(mergeCell=True)
-                    ws.merge_cells('A3:O3')
-                    #set Header
-                    ws.cell(column=2, row=4).value = 'Apellidos y Nombres'
-                    ws.cell(column=3, row=4).value = 'Sistema de Pensiones'
-                    ws.cell(column=4, row=4).value = '%'
-                    ws.cell(column=5, row=4).value = 'Jornal'
-                    ws.cell(column=6, row=4).value = 'Dominical'
-                    ws.cell(column=7, row=4).value = 'Asig. Familiar'
-                    ws.cell(column=8, row=4).value = 'Total Rem.'
-                    ws.cell(column=9, row=4).value = 'Horas Laboradas'
-                    ws.cell(column=10, row=4).value = 'Horas Extra'
-                    ws.cell(column=11, row=4).value = 'Rem. Total'
-                    ws.cell(column=12, row=4).value = 'AFP/ONP'
-                    ws.cell(column=13, row=4).value = 'Otros Dsct'
-                    ws.cell(column=14, row=4).value = 'Total Dsct'
-                    ws.cell(column=15, row=4).value = 'Total a Pagar'
-                    # set data body
-                    count = 5
-                    total = 0
-                    reminv = 85
-                if 'hour' in request.GET:
+                    start_cell, end_cell = cell_range.split(':')
+                    start_coord = coordinate_from_string(start_cell)
+                    start_row = start_coord[1]
+                    start_col = column_index_from_string(start_coord[0])
+                    end_coord = coordinate_from_string(end_cell)
+                    end_row = end_coord[1]
+                    end_col = column_index_from_string(end_coord[0])
+                    for row in range(start_row, end_row + 1):
+                        for col_idx in range(start_col, end_col + 1):
+                            col = get_column_letter(col_idx)
+                            if 'fnumber' in options:
+                                ws.cell('%s%s' % (col, row)).number_format = options['fnumber']
+                            if 'border' in options:
+                                ws.cell('%s%s' % (col, row)).border = options['border']
+                            if 'bg' in options:
+                                ws.cell('%s%s' % (col, row)).fill = options['bg']
+                            if 'alignment' in options:
+                                ws.cell('%s%s' % (col, row)).alignment = options['alignment']
+                # end block
+                tf = {'hour': 'HORA', 'days': 'DAY'}
+                response = HttpResponse(
+                    mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                response['Content-Disposition'] = 'attachment;filename=PLANILLA-%s-%s X %s.xlsx' % (
+                    request.GET['din'], request.GET['dout'], tf[request.GET['tfile']])
+                wb = Workbook()
+                ws = wb.active
+                ws.title = 'PANILLA %s AL %s' % (request.GET['din'][5:], request.GET['dout'][5:])
+                ws.sheet_properties.tabColor = '1072BA'
+                # set title
+                ws.cell(column=1, row=3).value = 'PLANILLA DE %s AL %s' % (
+                    request.GET['din'], request.GET['dout'])
+                #set Header
+                ws.cell(column=2, row=4).value = 'Apellidos y Nombres'
+                ws.cell(column=3, row=4).value = 'Sistema de Pensiones'
+                ws.cell(column=4, row=4).value = '%'
+                ws.cell(column=5, row=4).value = 'Jornal'
+                ws.cell(column=6, row=4).value = 'Dominical'
+                ws.cell(column=7, row=4).value = 'Asig. Familiar'
+                ws.cell(column=8, row=4).value = 'Total Rem.'
+                ws.cell(column=9, row=4).value = 'Horas Laboradas'
+                ws.cell(column=10, row=4).value = 'Horas Extra'
+                ws.cell(column=11, row=4).value = 'Rem. Total'
+                ws.cell(column=12, row=4).value = 'AFP/ONP'
+                ws.cell(column=13, row=4).value = 'Otros Dsct'
+                ws.cell(column=14, row=4).value = 'Total Dsct'
+                ws.cell(column=15, row=4).value = 'Total a Pagar'
+                # set data body
+                count = 5
+                total = 0
+                reminv = 85
+                pxhour = 8
+                print week
+                print len(week)
+                if request.GET['tfile'] == 'hour':
                     for x in week:
                         dom = 0
                         setfamily = 0
-                        dom = Decimal(x['remuneracion'] / float(request.GET['payment'])).quantize(Decimal('0.01'))
+                        dom = Decimal(x['remuneracion'] / float(
+                            request.GET['payment'])).quantize(Decimal('0.01'))
                         if x['setfamily'] == True:
-                            setfamily = Decimal((reminv/30) * float(request.GET['payment'])).quantize(Decimal('0.01'))
+                            setfamily = Decimal((reminv/30) * float(
+                                request.GET['payment'])).quantize(Decimal('0.01'))
                         ws.cell(column=1, row=count).value = (count - 4)
                         ws.cell(column=2, row=count).value = x['name']
                         ws.cell(column=3, row=count).value = x['pensionario']
-                        ws.cell(column=4, row=count).value = Decimal(x['percent']).quantize(Decimal('0.01'))
-                        ws.cell(column=5, row=count).value = ((Decimal(x['remuneracion']) - dom) - setfamily) if x['setfamily'] else (Decimal(x['remuneracion']) - dom)
+                        ws.cell(column=4, row=count).value = Decimal(
+                            x['percent']).quantize(Decimal('0.01'))
+                        ws.cell(column=5, row=count).value = (
+                            (Decimal(x['remuneracion']) - dom) - setfamily) if x['setfamily'] else (
+                                Decimal(x['remuneracion']) - dom)
                         ws.cell(column=6, row=count).value = dom
                         ws.cell(column=7, row=count).value = setfamily
                         ws.cell(column=8, row=count).value = x['remuneracion']
                         ## to here performed calc hours
-                        calchour = Decimal((x['remuneracion'] / 7) / 8.5).quantize(Decimal('0.0001'))
+                        calchour = Decimal((
+                            x['remuneracion'] / float(request.GET['payment'])) / pxhour).quantize(
+                                Decimal('0.0001'))
                         ws.cell(column=9, row=count).value = x['twork']
                         ws.cell(column=10, row=count).value = x['textra']
-                        tworked = Decimal(calchour * (x['twork'] + x['textra'])).quantize(Decimal('0.01'))
+                        tworked = Decimal(calchour * x['twork']).quantize(Decimal('0.01'))
                         ws.cell(column=11, row=count).value = tworked + dom
                         seg = Decimal(tworked * (x['percent'] / 100)).quantize(Decimal('0.01'))
                         ws.cell(column=12, row=count).value = seg
                         ws.cell(column=13, row=count).value = x['discount']
                         ws.cell(column=14, row=count).value = (x['discount'] + seg)
-                        tot = ((tworked + dom) - (x['discount'] + seg))
+                        tot = ((tworked + dom) - (seg))
                         ws.cell(column=15, row=count).value = tot
                         total += tot
                         count += 1
                     ws.cell(column=15, row=count).value = total
-                if 'days' in request.GET:
+                if request.GET['tfile'] == 'days':
                     for x in week:
                         dom = 0
                         setfamily = 0
-                        dom = Decimal(x['remuneracion'] / float(request.GET['payment'])).quantize(Decimal('0.01'))
+                        dom = Decimal(x['remuneracion'] / float(
+                            request.GET['payment'])).quantize(Decimal('0.01'))
                         if x['setfamily'] == True:
-                            setfamily = Decimal((reminv/30) * float(request.GET['payment'])).quantize(Decimal('0.01'))
+                            setfamily = Decimal((reminv/30) * float(
+                                request.GET['payment'])).quantize(Decimal('0.01'))
                         ws.cell(column=1, row=count).value = (count - 4)
                         ws.cell(column=2, row=count).value = x['name']
                         ws.cell(column=3, row=count).value = x['pensionario']
-                        ws.cell(column=4, row=count).value = Decimal(x['percent']).quantize(Decimal('0.01'))
-                        ws.cell(column=5, row=count).value = ((Decimal(x['remuneracion']) - dom) - setfamily) if x['setfamily'] else (Decimal(x['remuneracion']) - dom)
+                        ws.cell(column=4, row=count).value = Decimal(
+                            x['percent']).quantize(Decimal('0.01'))
+                        ws.cell(column=5, row=count).value = (
+                            (Decimal(x['remuneracion']) - dom) - setfamily) if x['setfamily'] else (
+                                Decimal(x['remuneracion']) - dom)
                         ws.cell(column=6, row=count).value = dom
                         ws.cell(column=7, row=count).value = setfamily
                         ws.cell(column=8, row=count).value = x['remuneracion']
                         ## to here performed calc hours
-                        calchour = Decimal((x['remuneracion'] / 7) / 8.5).quantize(Decimal('0.0001'))
-                        ws.cell(column=9, row=count).value = x['twork']
+                        calchour = Decimal((
+                            x['remuneracion'] / float(request.GET['payment'])) / pxhour).quantize(
+                                Decimal('0.0001'))
+                        calcday = Decimal((
+                            x['remuneracion'] / float(request.GET['payment']))).quantize(
+                                Decimal('0.0001'))
+                        ws.cell(column=9, row=count).value = x['count']
                         ws.cell(column=10, row=count).value = x['textra']
-                        tworked = Decimal(calchour * (x['twork'] + x['textra'])).quantize(Decimal('0.01'))
+                        tworked = Decimal((x['count'] * calcday)).quantize(Decimal('0.01'))
                         ws.cell(column=11, row=count).value = tworked + dom
                         seg = Decimal(tworked * (x['percent'] / 100)).quantize(Decimal('0.01'))
                         ws.cell(column=12, row=count).value = seg
                         ws.cell(column=13, row=count).value = x['discount']
                         ws.cell(column=14, row=count).value = (x['discount'] + seg)
-                        tot = ((tworked + dom) - (x['discount'] + seg))
+                        tot = ((tworked + dom) - (seg))
                         ws.cell(column=15, row=count).value = tot
                         total += tot
                         count += 1
                     ws.cell(column=15, row=count).value = total
-                style_range(ws, ('A3:O%d' % count), Style(alignment=Alignment(horizontal='center'),
-                            border=Border(top=Side(border_style='thin', color=colors.BLACK),
-                                            left=Side(border_style='thin', color=colors.BLACK),
-                                            bottom=Side(border_style='thin', color=colors.BLACK),
-                                            right=Side(border_style='thin', color=colors.BLACK), )),)
+                style_range(ws, ('A3:O%d' % count), {
+                    'border': Border(top=Side(border_style='thin', color=colors.BLACK),
+                        left=Side(border_style='thin', color=colors.BLACK),
+                        bottom=Side(border_style='thin', color=colors.BLACK),
+                        right=Side(border_style='thin', color=colors.BLACK), )},)
+                style_range(ws, 'A3:O4', {'bg': PatternFill(
+                    start_color='FFFFFF00', end_color='FFFFFF00', fill_type='solid')})
+                style_range(ws, ('O5:O%d' % count), {'bg': PatternFill(
+                    start_color='FFFFFF00', end_color='FFFFFF00', fill_type='solid')})
+                ws['A3'].alignment = Alignment(horizontal='center')
+                ws.merge_cells('A3:O3')
+                ws.merge_cells('A%(n)d:N%(n)d' % {'n':count})
+                ws['A%d'%count].value = 'TOTAL'
+                ws['A%d'%count].alignment = Alignment(horizontal='right')
+                ws.column_dimensions['A'].width = 4
+                ws.column_dimensions['B'].width = 35
+                ws.column_dimensions['c'].width = 12
+                ws.column_dimensions['D'].width = 7
+                style_range(ws, ('D5:O%d' % count), {'fnumber': '#,##0.00'})
+                # now include employee with payment extra
+                count += 3
+                ws.cell(column=1, row=count).value = 'EXTRAS'
+                ws.merge_cells('A%(n)d:G%(n)d'%{'n': count})
+                count += 1
+                ws.cell(column=1, row=count).value = '#'
+                ws.cell(column=2, row=count).value = 'APELLIDOS Y NOMBRES'
+                ws.cell(column=3, row=count).value = 'HORAS EXTRAS'
+                ws.cell(column=4, row=count).value = 'IMPORTE'
+                ws.cell(column=5, row=count).value = 'VIATICOS'
+                ws.cell(column=6, row=count).value = 'DSCT'
+                ws.cell(column=7, row=count).value = 'TOTAL'
+                count += 1
+                nb = 1
+                totalextra = 0
+                for x in week:
+                    ws.cell(column=1, row=count).value = (nb)
+                    ws.cell(column=2, row=count).value = x['name']
+                    ws.cell(column=3, row=count).value = x['textra']
+                    calchour = Decimal((
+                        x['remuneracion'] / float(request.GET['payment'])) / pxhour).quantize(
+                            Decimal('0.0001'))
+                    tsc = Decimal(calchour * x['textra']).quantize(Decimal('0.01'))
+                    ws.cell(column=4, row=count).value = tsc
+                    ws.cell(column=5, row=count).value = x['viatical']
+                    ws.cell(column=6, row=count).value = x['discount']
+                    ws.cell(column=7, row=count).value = Decimal(
+                        (tsc + x['viatical']) - x['discount']).quantize(Decimal('0.01'))
+                    totalextra += ws.cell(column=7, row=count).value
+                    nb += 1
+                    count += 1
+                ws.cell(column=7, row=count).value = totalextra
                 wb.save(response)
                 return response
             else:
