@@ -2438,7 +2438,7 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                         oparam['viatical'] = 0
                                     print 'end format'
                                     return oparam
-                                for xraw in xrange(9, nrow):
+                                for xraw in xrange(9, nrow+1):
                                     param = {}
                                     # ndta = 3
                                     dni = wsheet.cell(row=xraw, column=2).internal_value
@@ -2483,7 +2483,9 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                                                     else:
                                                         if len(param['project']) == 4:
                                                             param['types'] = param['project']
+                                                            param['project'] = None
                                                         else:
+                                                            param['project'] = None
                                                             param['types'] = 'TY04'
                                                 else:
                                                     if param['project'] is None:
