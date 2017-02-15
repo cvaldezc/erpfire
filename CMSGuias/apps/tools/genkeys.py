@@ -21,8 +21,8 @@ from ..rrhh.models import (
 
 
 # format date str
-# __date_str = '%Y-%m-%d'
-# __year_str = '%y'
+__date_str = '%Y-%m-%d'
+__year_str = '%y'
 
 
 def __init__():
