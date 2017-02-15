@@ -2970,9 +2970,9 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                     ws.cell(column=15, row=count).value = total
                 style_range(ws, ('A3:O%d' % count), {
                     'border': Border(top=Side(border_style='thin', color=colors.BLACK),
-                        left=Side(border_style='thin', color=colors.BLACK),
-                        bottom=Side(border_style='thin', color=colors.BLACK),
-                        right=Side(border_style='thin', color=colors.BLACK), )},)
+                                    left=Side(border_style='thin', color=colors.BLACK),
+                                    bottom=Side(border_style='thin', color=colors.BLACK),
+                                    right=Side(border_style='thin', color=colors.BLACK), )},)
                 style_range(ws, 'A3:O4', {'bg': PatternFill(
                     start_color='FFFFFF00', end_color='FFFFFF00', fill_type='solid')})
                 style_range(ws, ('O5:O%d' % count), {'bg': PatternFill(
@@ -2989,6 +2989,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                 style_range(ws, ('D5:O%d' % count), {'fnumber': '#,##0.00'})
                 # now include employee with payment extra
                 count += 3
+                second = count
                 ws.cell(column=1, row=count).value = 'EXTRAS'
                 ws.merge_cells('A%(n)d:G%(n)d'%{'n': count})
                 count += 1
@@ -3002,6 +3003,12 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                 count += 1
                 nb = 1
                 totalextra = 0
+                tviatical = 0
+                thours = 0
+                tdiscount = 0
+                style_range(ws, ('A%d:G%d' % (count - 2, count - 1)), {
+                    'bg': PatternFill(
+                        fill_type='solid', start_color='FFFFFF00', end_color='FFFFFF00')})
                 for x in week:
                     ws.cell(column=1, row=count).value = (nb)
                     ws.cell(column=2, row=count).value = x['name']
@@ -3016,9 +3023,21 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                     ws.cell(column=7, row=count).value = Decimal(
                         (tsc + x['viatical']) - x['discount']).quantize(Decimal('0.01'))
                     totalextra += ws.cell(column=7, row=count).value
+                    tviatical += x['viatical']
+                    tdiscount += x['discount']
+                    thours += x['textra']
                     nb += 1
                     count += 1
+                ws.cell(column=3, row=count).value = thours
+                ws.cell(column=5, row=count).value = tviatical
+                ws.cell(column=6, row=count).value = tdiscount
                 ws.cell(column=7, row=count).value = totalextra
+                style_range(ws, ('A%d:G%d' % (second, count)), {
+                    'border': Border(
+                        top=Side(border_style='thin', color=colors.BLACK),
+                        left=Side(border_style='thin', color=colors.BLACK),
+                        bottom=Side(border_style='thin', color=colors.BLACK),
+                        right=Side(border_style='thin', color=colors.BLACK), )})
                 wb.save(response)
                 return response
             else:
