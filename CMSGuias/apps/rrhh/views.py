@@ -2923,7 +2923,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         tworked = Decimal(calchour * x['twork']).quantize(Decimal('0.01'))
                         ws.cell(column=11, row=count).value = tworked + dom
                         safp = Decimal(
-                            float(tworked) * (float(x['percent']) / 100)).quantize(Decimal('0.01'))
+                            float(tworked + dom) * (float(x['percent']) / 100)).quantize(Decimal('0.01'))
                         ws.cell(column=12, row=count).value = safp
                         ws.cell(column=13, row=count).value = x['discount']
                         ws.cell(column=14, row=count).value = (x['discount'] + safp)
@@ -2956,14 +2956,14 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                             x['remuneracion'] / float(request.GET['payment'])) / pxhour).quantize(
                                 Decimal('0.0001'))
                         calcday = Decimal((
-                            x['remuneracion'] / float(request.GET['payment']))).quantize(
+                            float(x['remuneracion']) / float(request.GET['payment']))).quantize(
                                 Decimal('0.0001'))
                         ws.cell(column=9, row=count).value = x['count']
                         ws.cell(column=10, row=count).value = x['textra']
                         tworked = Decimal((x['count'] * calcday)).quantize(Decimal('0.01'))
                         ws.cell(column=11, row=count).value = tworked + dom
                         safp = Decimal(
-                            float(tworked) * (float(x['percent']) / 100)).quantize(Decimal('0.01'))
+                            float(tworked + dom) * (float(x['percent']) / 100)).quantize(Decimal('0.01'))
                         ws.cell(column=12, row=count).value = safp
                         ws.cell(column=13, row=count).value = x['discount']
                         ws.cell(column=14, row=count).value = (x['discount'] + safp)
