@@ -58,6 +58,7 @@
             vm.lock = false;
             angular.element(".toast-remove").remove();
             if (response.status) {
+              Materialize.toast("<i class='fa fa-check fa-2x green-text'></i> Los Datos han sido cargados!", 6000);
               vm.log = response;
             } else {
               Materialize.toast("Error: " + response.raise, 4000);

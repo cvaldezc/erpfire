@@ -2860,7 +2860,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                             if 'alignment' in options:
                                 ws.cell('%s%s' % (col, row)).alignment = options['alignment']
                 # end block
-                tf = {'hour': 'HORA', 'days': 'DAY'}
+                tf = {'hour': 'HORA', 'days': 'DIAS'}
                 response = HttpResponse(
                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
                 response['Content-Disposition'] = 'attachment;filename=PLANILLA-%s-%s X %s.xlsx' % (
@@ -2880,7 +2880,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                 ws.cell(column=6, row=4).value = 'Dominical'
                 ws.cell(column=7, row=4).value = 'Asig. Familiar'
                 ws.cell(column=8, row=4).value = 'Total Rem.'
-                ws.cell(column=9, row=4).value = 'Horas Laboradas'
+                ws.cell(column=9, row=4).value = '%s Laboradas' % (tf[request.GET['tfile']])
                 ws.cell(column=10, row=4).value = 'Horas Extra'
                 ws.cell(column=11, row=4).value = 'Rem. Total'
                 ws.cell(column=12, row=4).value = 'AFP/ONP'
