@@ -1,0 +1,48 @@
+{% extends "basemd.html" %}
+{% block title %}
+Delete Assistance
+{% endblock title %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+<section ng-app="delApp" ng-controller="delctrl as vm">
+    <header>
+        <h4>
+            Eliminar Asistencia
+            <br>
+            <small>Por rango de fecha y tipo de empleado</small>
+        </h4>
+    </header>
+    <div class="card">
+        <div class="card-cotent">
+            <div class="row">
+                <div class="input-field col l3 m3 s12">
+                    <input type="text" class="datepicka" ng-model="vm.delete.start">
+                </div>
+                <div class="input-field col l3 m3 s12">
+                    <input type="text" class="datepicka" ng-model="vm.delete.end">
+                </div>
+                <div class="input-field col l3 m3 s12">
+                    <select class="make_select" ng-model="vm.delete.type">
+                        <option value="">--OBLIGATORIO--</option>
+                        {% for x in types %}
+                            <option value="{{x.tipoemple_id}}">{{x.descripcion}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div classE"input-field col l1 m2 s12">
+                    <button type="button" class="btn red" ng-click="vm.deleteAssistance()">
+                        <i class="fa fa-filter"></i>
+                        <span>ELIMINAR ASISTENCIA</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- SCripts -->
+<script defer src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/rrhh/delassistance.js"></script>
+{% endblock content %}

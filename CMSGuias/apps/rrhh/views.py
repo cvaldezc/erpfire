@@ -2793,6 +2793,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                             index = sw
                             break
                     if count == len(week):
+                        print x.employee_id
                         repen = detPensEmple.objects.get(empdni_id=x.employee_id)
                         cuenta = CuentaEmple.objects.filter(
                             empdni_id=x.employee_id).order_by('-registro')[0]
@@ -3047,13 +3048,46 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
         except TemplateDoesNotExist as ext:
             raise Http404(ext)
 
-# class load data test
+# class delete assistance
+class DeleteAssistance(JSONResponseMixin, TemplateView):
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            kwargs['types'] = TipoEmpleado.objects.filter(flag=True)
+            return render(request, 'rrhh/delassistance.html', kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        if  request.is_ajax():
+            try:
+                if 'deleteAssistance' in request.POST:
+                    sass = Assistance.objects.filter(
+                        assistance__range=(request.POST['start'], request.POST['end']),
+                        employee__tipoemple_id=request.POST['type'])
+                    for x in sass:
+                        x.delete()
+                    bass = BalanceAssistance.objects.filter(
+                        assistance__range=(request.POST['start'], request.POST['end']),
+                        employee__tipoemple_id=request.POST['type'])
+                    for x in bass:
+                        x.delete()
+                    kwargs['status'] = True
+            except ObjectDoesNotExist as oex:
+                kwargs['status'] = False
+                kwargs['raise'] = str(oex)
+        return self.render_to_json_response(kwargs)
+
+# #class load data test
 class LoadRe(TemplateView):
 
     def get(self, request, *args, **kwargs):
         import  random
         # import date
         dni = ['10278772','09434564','43504371','47403858','70015965','09279015','19242694','71744452','43572763','44684519','45576052','09164147','43179067','40472915','17589085','41452883','23392439','47720073','10659544','42492201','40894066','43402155','45505146','42661096','00000000','46377134','77498386','44488336','44263241','46296730','42577451','43402156','46279300','47431405','44463959','42333571','72604244','70921414','77070893','70492850','46824555','43414194','42825437','41822143','44322016','40080344','05406738','47542298','43378121','70266206','43316178','44969405','42310463','43984365','40990712','40143637','43598455','40043764','45768794','47999575','71251518','43869036','46879331','48022378','73585896','25798318','44363536']
+        count = 0
         if 'pensionary' in request.GET:
             afp = ['RP001', 'RP002', 'RP003', 'RP004', 'RP005']
             name = {'RP001':'HABITAT', 'RP002':'ONP', 'RP003':'PROFUTURO', 'RP004':'PRIMA', 'RP005':'INTEGRA'}

@@ -28,9 +28,24 @@
         </div>
     </article>
     <div class="card-panel">
-        <strong>Estadisticas en formato JSON</strong>
+        <strong>Estadisticas: Total Registros {{ vm.log.raises.length }}</strong>
         {% verbatim %}
-            {{ vm.log.raises }}
+        <table class="table responsive-table highlight hovered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="x in vm.log.raises">
+                    <td>{{$index + 1}}</td>
+                    <td>{{x}}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
         {% endverbatim %}
     </div>
 </section>
