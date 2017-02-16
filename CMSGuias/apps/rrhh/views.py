@@ -862,7 +862,7 @@ class CuentaCorriente(JSONResponseMixin, TemplateView):
                         ce.cts = request.POST['cts']
                         ce.costxhora = request.POST['costoxhora']
                         ce.tipocontrato_id = request.POST['tipocontrato']
-                        ce.setfamily = request.POST['setfamily']
+                        ce.setfamily = True if request.POST['setfamily'] == 'true' else False 
                         ce.save()
                         context['status'] = True
                     if 'cambestadocuenta' in request.POST:
@@ -2897,22 +2897,22 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                 if request.GET['tfile'] == 'hour':
                     for x in week:
                         dom = 0
-                        setfamily = 0
+                        sfamily = 0
                         dom = Decimal(x['remuneracion'] / float(
                             request.GET['payment'])).quantize(Decimal('0.01'))
                         if x['setfamily'] == True:
-                            setfamily = Decimal((reminv/30) * float(
-                                request.GET['payment'])).quantize(Decimal('0.01'))
+                            sfamily = Decimal((reminv/30) * float(
+                                float(request.GET['payment'])).quantize(Decimal('0.01'))
                         ws.cell(column=1, row=count).value = (count - 4)
                         ws.cell(column=2, row=count).value = x['name']
                         ws.cell(column=3, row=count).value = x['pensionario']
                         ws.cell(column=4, row=count).value = Decimal(
                             x['percent']).quantize(Decimal('0.01'))
                         ws.cell(column=5, row=count).value = (
-                            (Decimal(x['remuneracion']) - dom) - setfamily) if x['setfamily'] else (
+                            (Decimal(x['remuneracion']) - dom) - sfamily) if x['setfamily'] else (
                                 Decimal(x['remuneracion']) - dom)
                         ws.cell(column=6, row=count).value = dom
-                        ws.cell(column=7, row=count).value = setfamily
+                        ws.cell(column=7, row=count).value = sfamily
                         ws.cell(column=8, row=count).value = x['remuneracion']
                         ## to here performed calc hours
                         calchour = Decimal((
@@ -2922,11 +2922,11 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         ws.cell(column=10, row=count).value = x['textra']
                         tworked = Decimal(calchour * x['twork']).quantize(Decimal('0.01'))
                         ws.cell(column=11, row=count).value = tworked + dom
-                        seg = Decimal(tworked * (x['percent'] / 100)).quantize(Decimal('0.01'))
-                        ws.cell(column=12, row=count).value = seg
+                        safp = Decimal(tworked * (x['percent'] / 100)).quantize(Decimal('0.01'))
+                        ws.cell(column=12, row=count).value = safp
                         ws.cell(column=13, row=count).value = x['discount']
-                        ws.cell(column=14, row=count).value = (x['discount'] + seg)
-                        tot = ((tworked + dom) - (seg))
+                        ws.cell(column=14, row=count).value = (x['discount'] + safp)
+                        tot = ((tworked + dom) - (safp))
                         ws.cell(column=15, row=count).value = tot
                         total += tot
                         count += 1
@@ -2934,11 +2934,11 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                 if request.GET['tfile'] == 'days':
                     for x in week:
                         dom = 0
-                        setfamily = 0
+                        sfamily = 0
                         dom = Decimal(x['remuneracion'] / float(
                             request.GET['payment'])).quantize(Decimal('0.01'))
                         if x['setfamily'] == True:
-                            setfamily = Decimal((reminv/30) * float(
+                            sfamily = Decimal((float(reminv)/30) * float(
                                 request.GET['payment'])).quantize(Decimal('0.01'))
                         ws.cell(column=1, row=count).value = (count - 4)
                         ws.cell(column=2, row=count).value = x['name']
@@ -2946,7 +2946,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         ws.cell(column=4, row=count).value = Decimal(
                             x['percent']).quantize(Decimal('0.01'))
                         ws.cell(column=5, row=count).value = (
-                            (Decimal(x['remuneracion']) - dom) - setfamily) if x['setfamily'] else (
+                            (Decimal(x['remuneracion']) - dom) - sfamily) if x['setfamily'] else (
                                 Decimal(x['remuneracion']) - dom)
                         ws.cell(column=6, row=count).value = dom
                         ws.cell(column=7, row=count).value = setfamily
