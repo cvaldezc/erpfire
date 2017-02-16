@@ -2922,7 +2922,8 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         ws.cell(column=10, row=count).value = x['textra']
                         tworked = Decimal(calchour * x['twork']).quantize(Decimal('0.01'))
                         ws.cell(column=11, row=count).value = tworked + dom
-                        safp = Decimal(tworked * (x['percent'] / 100)).quantize(Decimal('0.01'))
+                        safp = Decimal(
+                            float(tworked) * (float(x['percent']) / 100)).quantize(Decimal('0.01'))
                         ws.cell(column=12, row=count).value = safp
                         ws.cell(column=13, row=count).value = x['discount']
                         ws.cell(column=14, row=count).value = (x['discount'] + safp)
@@ -2938,8 +2939,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         dom = Decimal(x['remuneracion'] / float(
                             request.GET['payment'])).quantize(Decimal('0.01'))
                         if x['setfamily'] == True:
-                            sfamily = Decimal((float(reminv)/30) * float(
-                                request.GET['payment'])).quantize(Decimal('0.01'))
+                            sfamily = Decimal((float(reminv)/30) * float(request.GET['payment'])).quantize(Decimal('0.01'))
                         ws.cell(column=1, row=count).value = (count - 4)
                         ws.cell(column=2, row=count).value = x['name']
                         ws.cell(column=3, row=count).value = x['pensionario']
@@ -2949,7 +2949,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                             (Decimal(x['remuneracion']) - dom) - sfamily) if x['setfamily'] else (
                                 Decimal(x['remuneracion']) - dom)
                         ws.cell(column=6, row=count).value = dom
-                        ws.cell(column=7, row=count).value = setfamily
+                        ws.cell(column=7, row=count).value = sfamily
                         ws.cell(column=8, row=count).value = x['remuneracion']
                         ## to here performed calc hours
                         calchour = Decimal((
@@ -2962,11 +2962,12 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         ws.cell(column=10, row=count).value = x['textra']
                         tworked = Decimal((x['count'] * calcday)).quantize(Decimal('0.01'))
                         ws.cell(column=11, row=count).value = tworked + dom
-                        seg = Decimal(tworked * (x['percent'] / 100)).quantize(Decimal('0.01'))
-                        ws.cell(column=12, row=count).value = seg
+                        safp = Decimal(
+                            float(tworked) * (float(x['percent']) / 100)).quantize(Decimal('0.01'))
+                        ws.cell(column=12, row=count).value = safp
                         ws.cell(column=13, row=count).value = x['discount']
-                        ws.cell(column=14, row=count).value = (x['discount'] + seg)
-                        tot = ((tworked + dom) - (seg))
+                        ws.cell(column=14, row=count).value = (x['discount'] + safp)
+                        tot = ((tworked + dom) - (safp))
                         ws.cell(column=15, row=count).value = tot
                         total += tot
                         count += 1
