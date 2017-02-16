@@ -2987,7 +2987,7 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                 ws['A%d'%count].alignment = Alignment(horizontal='right')
                 ws.column_dimensions['A'].width = 4
                 ws.column_dimensions['B'].width = 35
-                ws.column_dimensions['c'].width = 12
+                ws.column_dimensions['C'].width = 12
                 ws.column_dimensions['D'].width = 7
                 style_range(ws, ('D5:O%d' % count), {'fnumber': '#,##0.00'})
                 # now include employee with payment extra
