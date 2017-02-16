@@ -2901,7 +2901,8 @@ class ExportarAssistance(JSONResponseMixin, TemplateView):
                         dom = Decimal(x['remuneracion'] / float(
                             request.GET['payment'])).quantize(Decimal('0.01'))
                         if x['setfamily'] == True:
-                            sfamily = Decimal(float(reminv/30) * float(request.GET['payment'])).quantize(Decimal('0.01'))
+                            sfamily = Decimal((float(reminv)/30) * float(
+                                request.GET['payment'])).quantize(Decimal('0.01'))
                         ws.cell(column=1, row=count).value = (count - 4)
                         ws.cell(column=2, row=count).value = x['name']
                         ws.cell(column=3, row=count).value = x['pensionario']
