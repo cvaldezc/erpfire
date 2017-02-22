@@ -301,12 +301,12 @@ class ProjectsList(JSONResponseMixin, TemplateView):
             return self.render_to_json_response(context)
         try:
             if area == 'ventas' or area == 'administrator':
-                    context['currency'] = Moneda.objects.filter(flag=True)
-                    context['typep'] = globalVariable.typeProject
+                context['currency'] = Moneda.objects.filter(flag=True)
+                context['typep'] = globalVariable.typeProject
             return render_to_response(
-                    self.template_name,
-                    context,
-                    context_instance=RequestContext(request))
+                self.template_name,
+                context,
+                context_instance=RequestContext(request))
         except TemplateDoesNotExist, e:
             messages.error(request, 'Template Does Not Exist %s' % e)
             raise Http404('Template Does Not Exist %s' % e)
@@ -331,6 +331,7 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                         context['status'] = True
                     else:
                         context['status'] = False
+                        context['raise'] = str(form.errors)
             except ObjectDoesNotExist, e:
                 context['raise'] = e.__str__()
                 context['status'] = False

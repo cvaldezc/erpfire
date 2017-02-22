@@ -62,7 +62,7 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mantenimientos <b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li class="dropdown-header">Proveedores</li>
-            <li><a href="{% url 'view_login_suppler' %}">Crear Usuario</a></li>
+            {% comment %}<li><a href="{% url 'view_login_suppler' %}">Crear Usuario</a></li>{% endcomment %}
             <li><a href="{% url 'view_create_supplier' %}">Nuevo Proveedor</a></li>
             <li class="divider"></li>
             <li><a href="{% url 'materials_price_views' %}">Precios</a></li>

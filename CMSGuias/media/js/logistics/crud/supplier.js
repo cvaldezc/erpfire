@@ -1,7 +1,7 @@
 var getDataRUC;
 
 $(document).ready(function() {
-  $("input,select").attr("class", "form-control input-sm");
+  $("input,select").attr("class", "form-control input-lg");
   $("select[name=pais]").on("click", getDepartamentOption);
   $("select[name=departamento]").on("click", getProvinceOption);
   $("select[name=provincia]").on("click", getDistrictOption);

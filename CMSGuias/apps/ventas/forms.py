@@ -11,11 +11,18 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Proyecto
         exclude = {
-                    'proyecto_id',
-                    'registrado',
-                    'status',
-                    'flag',
-                    'empdni'}
+            'proyecto_id',
+            'registrado',
+            'status',
+            'flag',
+            'empdni',
+            'handworksales',
+            'servicessales',
+            'handworkpurchase',
+            'starthour',
+            'outsaturday',
+            'shxsaturday',
+            'shxsaturdayt'}
 
 
 class SectoreForm(forms.ModelForm):

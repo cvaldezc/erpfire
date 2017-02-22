@@ -386,13 +386,16 @@ class TipoCambio(models.Model):
 
     def __unicode__(self):
         return '%s %s - %f %f' % (
-                    self.moneda, self.fecha, self.compra, self.venta)
+            self.moneda, self.fecha, self.compra, self.venta)
 
 
 class Rubro(models.Model):
     rubro_id = models.CharField(primary_key=True, max_length=8)
     rubro = models.CharField(max_length=50)
     flag = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return '%s' % self.rubro
 
 
 class Proveedor(models.Model):
