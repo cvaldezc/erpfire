@@ -1,0 +1,2 @@
+wadofstuff-django-serializers==1.1.0
+https://pypi.python.org/packages/04/a1/33ff36b3e6060ba3f3a08e540406cc2aa28358b114851332189e0d66beb5/wadofstuff-django-serializers-1.1.0.tar.gz

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 # Django settings for CMSGuias project.
 import os
 
@@ -21,8 +21,8 @@ DATABASES = {
         # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'postgres',
-        'PASSWORD': 'fronhell',
-        'HOST': 'localhost',
+        'PASSWORD': 'Syst3mH3ll',
+        'HOST': '172.17.0.4',
         # Empty for localhost through domain sockets or '127.0.0.1'
         # for localhost through TCP.
         'PORT': '5432', # Set to empty string for default.
