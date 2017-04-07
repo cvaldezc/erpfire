@@ -1,0 +1,55 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<div class="modal lfiltmat">
+    <div class="modal-content">
+        <div class="switch">
+            <div class="row">
+                <div class="input-field col s0">
+                    <h5><strong>Especificar Marca y Modelo? --></strong></h5>
+                </div>
+                <div class="input-field col s4">
+                    <label>
+                        NO
+                    <input id="checkbrand" type="checkbox">
+                    <span class="lever"></span>
+                        SI
+                    </label>
+                </div>
+            </div>
+        </div>
+        <table class="table-lfiltmat" id="table-lfiltmat" >
+            <thead>
+                <tr class="brand-primary">
+                    <th class="colnum">#</th>
+                    <th>Material</th>
+                    <th>Medida</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="bodylfiltmat" style="height:510px;"></tbody>
+        </table>
+        <div align="right" >
+        <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">SALIR</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal lbrandmodel">
+    <table class="table-lbrandmodel" id="table-lbrandmodel" >
+        <caption><h5 class="titnamemat"></h5></caption>
+        <thead>
+            <tr class="brand-primary">
+                <th class="colnum">#</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody class="bodylbrandmodel" style="height:600px;"></tbody>
+    </table>
+    <div align="right" style="margin-top:20px;">
+    <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">SALIR</button>
+    </div>
+</div>

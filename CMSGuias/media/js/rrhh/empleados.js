@@ -1,17 +1,12 @@
    var cod = '';
+   var m = '';
+   var y = '';
   $(document).ready(function() {
   $('.collapsible').collapsible();
-  // $('#templeados td.colsituacion').each(function(){
-  //   $(this).css('font-weight','bold');
-  //   if ($(this).text() =='True') {
-  //     $(this).css('color','#66bb6a');
-  //     $(this).css('background-color','#66bb6a');
-  //   }else{
-  //     $(this).css('color','#ef5350');
-  //     $(this).css('background-color','#ef5350');}});
 
     $('#tbldetailscuenta td.colesta').each(function(){
     $(this).css('font-weight','bold');
+    console.log($(this).text());
     if ($(this).text() == 'ACTIVO') {
       $(this).css('background-color','#aed581');
       $(this).css('color','#aed581');
@@ -30,7 +25,6 @@
       $(this).css('color','#ef9a9a');
     }});
 
-
   $('.datepicker').pickadate({selectYears: 10,selectMonths: true,container: 'body',yearRange: "1950:2020",format: 'yyyy-mm-dd'});
 
   $('.datepi').pickadate({
@@ -45,7 +39,6 @@
   $("input[name=txtbuscar]").on("keyup", buscarempleado);
   $("input[name=txtbuscarexa]").on("keyup", buscarexamen);
   $("input[name=txtbuscardoc]").on("keyup", buscardoc);
-  $("input[name=txtbuscarproy]").on("keyup", buscarproy);
 
 
   
@@ -68,17 +61,14 @@
   $(document).on("click", "button[id=btnidemerg]", openlistemerg);
   $(document).on("click", "button[id=btnidfamicr]", openlistfamicr);
 
-  $(document).on("click", "button[id=btnviewemp]", openlistempxobra);
-  $(document).on("click", "button[id=btnviewinduccion]", openlistinducxobra);
   $(document).on("click", "button[id=btnempexa]", openlistempexa);
   $(document).on("click", "button[id=btnempdoc]", openlistempdoc);
-
 
   $(document).on("click", "button[name=btntelefono]", sendatatelefono);
   $(document).on("click", "button[name=btnestudio]", sendataestudio);
   $(document).on("click", "button[name=btnsuspension]", sendatasuspension);
   $(document).on("click", "button[name=btnproyecto]", sendataproyecto);
-  $(document).on("click", "button[name=btninduccion]", sendatainduccion);
+  // $(document).on("click", "button[name=btninduccion]", sendatainduccion);
   $(document).on("click", "button[name=btnepps]", sendataepps);
   $(document).on("click", "button[name=btnexamen]", sendataexamen);
   $(document).on("click", "button[name=btndocumento]", sendatadocumento);
@@ -96,9 +86,9 @@
   $(document).on("click", "button.btndelsuspension", delsuspension);
   $(document).on("click", "button.btndelexamen", delexamen);
   $(document).on("click", "button.btndeldocumento", deldocumento);
-  $(document).on("click", "button.btndelproyecto", delproyecto);
+  // $(document).on("click", "button.btndelproyecto", delproyecto);
   $(document).on("click", "button.btndelepps", delepps);
-  $(document).on("click", "button.btndelinduccion", delinduccion);
+  // $(document).on("click", "button.btndelinduccion", delinduccion);
   $(document).on("click", "button.btndelregsal", delregimensalud);
   $(document).on("click", "button.btndelregpens", delregimenpension);
   $(document).on("click", "button.btndelcobsal", delcobsalud);
@@ -115,8 +105,8 @@
   $(document).on("click", "button.btn-editcuenta", showeditcuenta);
   $(document).on("click", "button.btn-editestudios", showeditestudios);
   $(document).on("click", "button.btn-editsuspension", showeditsuspension);
-  $(document).on("click", "button.btn-editproyecto", showeditproyecto);
-  $(document).on("click", "button.btn-editinduccion", showeditinduccion);
+  // $(document).on("click", "button.btn-editproyecto", showeditproyecto);
+  // $(document).on("click", "button.btn-editinduccion", showeditinduccion);
   $(document).on("click", "button.btn-editepps", showeditepps);
   $(document).on("click", "button.btn-editexamen", showeditexamen);
   $(document).on("click", "button.btn-editdocumento", showeditdocumento);
@@ -130,7 +120,6 @@
   $(document).on("click", "button.btn-editfamicr", showeditfamicr);
 
   $(document).on("click", "button.btnshowcambest", cambestcuenta);
-  $(document).on("click", ".btnactivemple", activeemple);
   $(document).on("click", "button.btnfinsusp", finsuspension);
 
   
@@ -141,8 +130,7 @@
   $(".btnsavesuspension").click(function() { save_or_edit_suspension(); });
   $(".btnsaveemple").click(function() { save_or_edit_empleado(); });
   $(".btnsavesegsocial").click(function() { save_segsocial(); });
-  $(".btnsaveproy").click(function() { save_or_edit_proyecto(); });
-  $(".btnsaveinduc").click(function() { save_or_edit_induccion(); });
+
   $(".btnsaveep").click(function() { save_or_edit_epps(); });
   $(".btnsaveeditexamen").click(function() { save_or_edit_examen(); });
   $(".btnsaveeditdoc").click(function() { save_or_edit_documento(); });
@@ -173,14 +161,30 @@
   $(".btnnewexamen").click(function() { opennewexamen(); });
   $(".btnnewdocumento").click(function() { opennewdocumento(); });
   $(".btnnewsegsocial").click(function() { opennewsegsocial(); });
-  $(document).on("click", "button.btnaddinduccion", opennewinduccion);
+  // $(document).on("click", "button.btnaddinduccion", opennewinduccion);
   $(".btnnewfamilia").click(function() { opennewfamilia(); });
   $(".btnnewexplab").click(function() { opennewexplaboral(); });
   $(".btnnewmedic").click(function() { opennewmedic(); });
   $(".btnnewemerg").click(function() { opennewemerg(); });
   $(".btnnewfamicr").click(function() { opennewfamicr(); });
   $(".btndardebaja").click(function() { opennewmotren(); });
+
+
+  //ultimo rrhh
+
+  //rrhh
+  $("#comboproyecto").chosen({
+  allow_single_deselect:true,
+  width: '100%'});
+
+  ////////////////
 });
+
+
+
+
+
+
 
 finsuspension = function(){
   var btn;
@@ -214,38 +218,6 @@ finsuspension = function(){
       });
     }
   }); 
-}
-
-activeemple = function(){
-  var btn;
-  btn = this;
-  swal({
-    title: "Activar Empleado?",
-    text: "Desea Activar al emleado?",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#dd6b55",
-    confirmButtonText: "Si, Cambiar!",
-    cancelButtonText: "No, Cancelar",
-    closeOnConfirm: true,
-    closeOnCancel: true
-  }, function(isConfirm) {
-    var data;
-    if (isConfirm) {
-      data = new Object;
-      data.activaremple = true;
-      data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
-      data.dni = btn.value;
-      $.post("/rrhh/empleado/segsocial/", data, function(response) {
-        if (response.status) {
-          Materialize.toast('Activacion del Empleado Correcto', 2000, 'rounded');
-          location.reload();
-        } else {
-          swal("Error", "Error de activacion", "warning");
-        }
-      });
-    }
-  });
 }
 
 cambestcuenta = function(){
@@ -359,12 +331,7 @@ opennewexamen = function(){
   limp_examen();
 }
 
-opennewinduccion = function(){
-document.getElementById("divestinduc").style.display = 'none';
-$(".dniinduc").text(this.value);
-$(".editinduccionemple").modal("open");
-limp_induccion();
-}
+
 
 opennewepps = function(){
  document.getElementById("divfechrec").style.display = 'none';
@@ -374,6 +341,8 @@ opennewepps = function(){
 
 opennewproyecto = function(){
   $(".editproyemple").modal("open");
+  document.getElementById("divselect").style.display = 'block';
+  document.getElementById("divselectopcional").style.display = 'none';
   limp_proyecto();
 }
 
@@ -471,13 +440,7 @@ openlistempexa = function(){
   listempexamen();
 }
 
-openlistinducxobra = function(){
-  listindxobra();
-}
 
-openlistempxobra = function(){
-  listempxobra();
-}
 
 listempdoc = function(){
   var data,id;
@@ -501,11 +464,12 @@ listempdoc = function(){
         document.getElementById("table-detaildocumento").style.display = 'block';
         $tb = $("table.table-detaildocumento > tbody");
         $tb.empty();
-        template = "<tr><td style=\"text-align: center;\">{{ counter }}</td><td style=\"text-align: center;\">{{ apellid }}, {{ nombr }}</td><td style=\"text-align: center;\">{{ fcaduci }}</td><td style=\"text-align: center;\">{{ cond }}</td></tr>";
+        template = "<tr><td style=\"text-align: center;\">{{ counter }}</td><td style=\"text-align: center;\">{{ apellid }}, {{ nombr }}</td><td style=\"text-align: center;\" class=\"fca\">{{ fcaduci }}</td><td style=\"text-align: center;\">{{ cond }}</td></tr>";
         for (x in response.lempdoc) {
         response.lempdoc[x].item = parseInt(x) + 1;
         $tb.append(Mustache.render(template, response.lempdoc[x]));
         }
+        changecolortd('td.fca');
       } 
     }
     });
@@ -536,80 +500,13 @@ listempexamen = function(){
         document.getElementById("table-detailsexamenes").style.display = 'block';
         $tb = $("table.table-detailsexamenes > tbody");
         $tb.empty();
-        template = "<tr><td style=\"text-align: center;\">{{ count }}</td><td>{{ ape }}, {{ nomb }}</td><td style=\"text-align: center;\">{{ lugar }}</td><td style=\"text-align: center;\">{{ fini }}</td><td style=\"text-align: center;\">{{ fcad }}</td><td style=\"text-align: center;\">{{ apt }}</td></tr>";
+        template = "<tr><td style=\"text-align: center;\">{{ count }}</td><td>{{ ape }}, {{ nomb }}</td><td style=\"text-align: center;\">{{ lugar }}</td><td style=\"text-align: center;\">{{ fini }}</td><td style=\"text-align: center;\" class=\"fechacad\">{{ fcad }}</td><td style=\"text-align: center;\">{{ apt }}</td></tr>";
         for (x in response.lempexa) {
         response.lempexa[x].item = parseInt(x) + 1;
         $tb.append(Mustache.render(template, response.lempexa[x]));
-
         }
+        changecolortd('td.fechacad');
         }
-    }
-    });
-  }
-}
-
-listindxobra = function(){
-  var data,id;
-  // codproy = $("select[id=comboproyecto]").val();
-  id=$("select[id=comboproyecto]").val();
-  console.log(id);
-  if (id !== "") {
-    data = {
-      datindxobr: id,
-      lempxinduccion: true,
-    };
-    $.getJSON("", data, function(response) {
-        var $tb, template, x;
-      if (response.status) {
-        if (response.lindxobra == false) {
-          Materialize.toast('No existe inducciones para este proyecto',3000,'rounded');
-          return false;
-        }else{
-        document.getElementById("table-indxobra").style.display = 'block';
-        document.getElementById("table-detailproyecto").style.display = 'none';
-        $tb = $("table.table-indxobra > tbody");
-        $tb.empty();
-        template = "<tr><td style=\"text-align: center;\">{{ conta }}</td><td>{{ apellidos }}, {{ nombres }}</td><td style=\"text-align: center;\">{{ dni }}</td><td style=\"text-align: center;\">{{ cargo }}</td><td style=\"text-align: center;\">{{ finicio }}</td><td style=\"text-align: center;\">{{ fcad }}</td><td style=\"text-align: center;\">{{ estad }}</td></tr>";
-        for (x in response.lindxobra) {
-        response.lindxobra[x].item = parseInt(x) + 1;
-        $tb.append(Mustache.render(template, response.lindxobra[x]));
-        }
-
-      } 
-    }
-    });
-  }
-}
-
-listempxobra = function(){
-  var data,id,codproy;
-  codproy = $("select[id=comboproyecto]").val();
-  id=codproy;
-  console.log(id);
-  if (id !== "") {
-    data = {
-      dat: id,
-      lempxobra: true,
-    };
-    $.getJSON("", data, function(response) {
-        var $tb, template, x;
-      if (response.status) {
-        if (response.lobras == false) {
-          Materialize.toast('No existe trabajadores asignados para este proyecto',3000,'rounded');
-          return false;
-        }else{
-        document.getElementById("table-indxobra").style.display = 'none';
-        document.getElementById("table-detailproyecto").style.display = 'block';
-        $tb = $("table.table-detailproyecto > tbody");
-        $tb.empty();
-        template = "<tr><td style=\"text-align: center;\">{{ conta }}</td><td>{{ ape }}, {{ nomb }}</td><td style=\"text-align: center;\">{{ finiproyecto }} / {{ ffinproyecto }}</td><td style=\"text-align: center;\">{{ finiproy }}</td><td style=\"text-align: center;\">{{ carnet }} - {{ fotocheck }}</td></tr>";
-        for (x in response.lobras) {
-        response.lobras[x].item = parseInt(x) + 1;
-        $tb.append(Mustache.render(template, response.lobras[x]));
-        }
-
-      }
-
     }
     });
   }
@@ -860,6 +757,7 @@ listInduccion = function(){
   }
 }
 
+
 openlistobra = function(){
   $(".dniepps").text(this.getAttribute("data-obradni"))
   $(".nameempleepps").text(this.getAttribute("data-nameobra"))
@@ -996,7 +894,7 @@ listcuenta = function(){
       if (response.status) {
         $tb = $("table.table-detailscuenta > tbody");
         $tb.empty();
-        template = "<tr><td style=\"text-align: center;\" class=\"colnumcuenta\">{{ cuenta }}</td><td style=\"text-align: center;\">{{ tipodepago }}</td><td style=\"text-align: center;\">{{ remuneracion }}</td><td style=\"text-align: center;\">{{ gratificacion }}</td><td style=\"text-align: center;\">{{ cts }}</td><td style=\"text-align: center;\">{{ costxhora }}</td><td style=\"text-align: center;\">{{ tipocontrato }}</td><td style=\"text-align: center;\" class=\"estcuenta\">{{ estado }}</td><td style=\"text-align: center;\"><button type=\"button\" class=\"btn btn-xs btn-link text-green btn-editcuenta\" data-namecuen=\"{{ namecuen }}\" value=\"{{ empdni_id }}\" data-dnicuenta=\"{{ empdni_id }}\" data-numcuenta=\"{{ cuenta }}\" data-tipopago=\"{{ tipodepago_id }}\" data-estado=\"{{ estado }}\" data-remuneracion=\"{{ remuneracion }}\" data-setfamily=\"{{ setfamily }}\" data-grati=\"{{ gratificacion }}\" data-cts=\"{{ cts }}\" data-costxhora=\"{{ costxhora }}\" data-tipocontrato=\"{{ tipocontrato_id }}\" data-cod=\"{{ id }}\"><i class=\"fa fa-pencil\"></i><span class=\"glyphicon glyphicon-edit\"></span></button></td><td class=\"text-center\"><button type=\"button\" class=\"btn red btndelcuenta\" value=\"{{ empdni_id }}\" data-delcuenta=\"{{ cuenta }}\"><i class=\"fa fa-trash-o\"></i></button></td><td class=\"text-center\"><button type=\"button\" style=\"border:none;color:blue;font-weight:bold;\" class=\"transparent btnshowcambest\"  value=\"{{ empdni_id }}\" data-cmbnumcuenta=\"{{ id }}\" data-estcuenta=\"{{ estado }}\" ><small>Cambiar de Estado</small></button></td></tr>";
+        template = "<tr><td style=\"text-align: center;\" class=\"colnumcuenta\">{{ cuenta }}</td><td style=\"text-align: center;\">{{ tipodepago }}</td><td style=\"text-align: center;\">{{ remuneracion }}</td><td style=\"text-align: center;\">{{ gratificacion }}</td><td style=\"text-align: center;\">{{ cts }}</td><td style=\"text-align: center;\">{{ costxhora }}</td><td style=\"text-align: center;\">{{ tipocontrato }}</td><td style=\"text-align: center;\" class=\"estcuenta\">{{ estado }}</td><td style=\"text-align: center;\"><button type=\"button\" class=\"btn btn-xs btn-link text-green btn-editcuenta\" data-namecuen=\"{{ namecuen }}\" value=\"{{ empdni_id }}\" data-dnicuenta=\"{{ empdni_id }}\" data-numcuenta=\"{{ cuenta }}\" data-tipopago=\"{{ tipodepago_id }}\" data-estado=\"{{ estado }}\" data-remuneracion=\"{{ remuneracion }}\" data-grati=\"{{ gratificacion }}\" data-cts=\"{{ cts }}\" data-costxhora=\"{{ costxhora }}\" data-tipocontrato=\"{{ tipocontrato_id }}\" data-cod=\"{{ id }}\"><i class=\"fa fa-pencil\"></i><span class=\"glyphicon glyphicon-edit\"></span></button></td><td class=\"text-center\"><button type=\"button\" class=\"btn red btndelcuenta\" value=\"{{ empdni_id }}\" data-delcuenta=\"{{ cuenta }}\"><i class=\"fa fa-trash-o\"></i></button></td><td class=\"text-center\"><button type=\"button\" style=\"border:none;color:blue;font-weight:bold;\" class=\"transparent btnshowcambest\"  value=\"{{ empdni_id }}\" data-cmbnumcuenta=\"{{ id }}\" data-estcuenta=\"{{ estado }}\" ><small>Cambiar de Estado</small></button></td></tr>";
         for (x in response.lcuenta) {
         response.lcuenta[x].item = parseInt(x) + 1;
         $tb.append(Mustache.render(template, response.lcuenta[x]));
@@ -1184,67 +1082,6 @@ showeditepps = function(){
   $(".editeppsemple").modal("open");
 }
 
-showeditinduccion = function(){
-  document.getElementById("divestinduc").style.display = 'block';
-  $(".accioninduccion").val("");
-  $(".codinduc").text(this.getAttribute("data-codind"));
-  $(".dniinduc").text(this.value);
-  $("input[name=finduccion]").val(this.getAttribute("data-finduccion"));
-  $("input[name=estinduccion]").val(this.getAttribute("data-estinduccion"));
-  $("input[name=fcadinduccion]").val(this.getAttribute("data-fcadinduccion"));
-  $("textarea[name=cominduccion]").val(this.getAttribute("data-cominduccion"));
-  $(".editinduccionemple").modal("open");
-}
-
-showeditproyecto = function(){
-  $(".accionproyecto").val("");
-  $("label[id=nameemplepro]").text(this.getAttribute("data-namepro"));
-  var datacar,datafoto,valorc,valorf;
-  datacar = this.getAttribute("data-mag")
-  datafoto = this.getAttribute("data-fotocheck")
-  // alert(datacar)
-  if (datacar == 'SI') {
-    valorc = 'true';
-  }else{
-    valorc = 'false';
-  }
-  if (datafoto == 'SI') {
-    valorf = 'true';
-  }else{
-    valorf = 'false';
-  }
-  $(".codproy").text(this.getAttribute("data-codproye"));
-  $(".dniproy").text(this.value);
-  $("select[id=comboproyecto]").val(this.getAttribute("data-proyectoid"));
-  $("input[name=finiproy]").val(this.getAttribute("data-feinicio"));
-  $("select[id=ccarnetmag]").val(valorc);
-  $("select[id=combfotocheck]").val(valorf);
-  $("textarea[name=comenobra]").val(this.getAttribute("data-comenta"));
-  $(".editproyemple").modal("open");
-}
-
-// showeditexamen = function(){
-//   document.getElementById("divfileexa").style.display = 'block';
-//   document.getElementById("divfcad").style.display = 'block';
-//   $("label[id=nameempleexa]").text(this.getAttribute("data-nameexa"));
-//   data = this.getAttribute("data-arch");
-//   archivo = data.substring(35);
-//   $(".txtchangeexa").val("");
-//   $(".codexa").text(this.getAttribute("data-codexa"));
-//   $(".dniexa").text(this.value);
-//   $("select[id=ctipoexamen]").val(this.getAttribute("data-tipoexa"));
-//   $("select[id=clugar]").val(this.getAttribute("data-lugar"));
-//   $("input[name=finiexam]").val(this.getAttribute("data-fini"));
-//   $("input[name=fcadexam]").val(this.getAttribute("data-fcad"));
-//   $(".archiexa").text(archivo);
-//   $("input[name=aptexa]").val(this.getAttribute("data-apt"));
-//   $("textarea[name=coexa]").val(this.getAttribute("data-coment"));
-//   $(".editexaemple").modal("open");
-// }
-
-
-
-
 showeditsuspension = function(){
   $(".accionsuspension").val("");
   data = this.getAttribute("data-archisusp");
@@ -1294,7 +1131,6 @@ showeditcuenta = function(){
   $("input[name=cts]").val(this.getAttribute("data-cts"));
   $("input[name=costoxhora]").val(this.getAttribute("data-costxhora"));
   $("select[id=combotipocontrato]").val(this.getAttribute("data-tipocontrato"));
-  $("#setfamily").prop('checked', this.getAttribute('data-setfamily') == 'true'? true : false);
   $(".editcuentaemple").modal("open");
 }
 
@@ -1512,72 +1348,6 @@ deldocumento = function(){
           Materialize.toast('Documento Eliminado', 2000, 'rounded');
         } else {
           swal("Error", "Error al eliminar el Documento", "warning");
-        }
-      });
-    }
-  });
-}
-
-delproyecto = function(){
-  var btn;
-  btn = this;
-  swal({
-    title: "Eliminar Proyecto",
-    text: "Realmente desea eliminar el Proyecto?",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#dd6b55",
-    confirmButtonText: "Si, eliminar!",
-    cancelButtonText: "No, Cancelar",
-    closeOnConfirm: true,
-    closeOnCancel: true
-  }, function(isConfirm) {
-    var data;
-    if (isConfirm) {
-      data = new Object;
-      data.delproy = true;
-      data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
-      data.dni = btn.value;
-      data.pk = btn.getAttribute("data-delproy");
-      $.post("/rrhh/empleado/obra/", data, function(response) {
-        if (response.status) {
-          listObra();
-          Materialize.toast('Proyecto Eliminado', 2000, 'rounded');
-        } else {
-          swal("Error", "Error al eliminar el Proyecto", "warning");
-        }
-      });
-    }
-  });
-}
-
-delinduccion = function(){
-  var btn;
-  btn = this;
-  swal({
-    title: "Eliminar Induccion",
-    text: "Realmente desea eliminar la Induccion?",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#dd6b55",
-    confirmButtonText: "Si, eliminar!",
-    cancelButtonText: "No, Cancelar",
-    closeOnConfirm: true,
-    closeOnCancel: true
-  }, function(isConfirm) {
-    var data;
-    if (isConfirm) {
-      data = new Object;
-      data.delinduccion = true;
-      data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
-      data.dni = btn.value;
-      data.pk = btn.getAttribute("data-delinduccion");
-      $.post("/rrhh/empleado/obra/", data, function(response) {
-        if (response.status) {
-          listInduccion();
-          Materialize.toast('Induccion Eliminado', 2000, 'rounded');
-        } else {
-          swal("Error", "Error al eliminar la Induccion", "warning");
         }
       });
     }
@@ -2573,98 +2343,8 @@ save_or_edit_epps = function(){
   } 
 }
 
-sendatainduccion = function(){
-  $(".accioninduccion").val(this.getAttribute("data-addinduc"));
-}
-
-save_or_edit_induccion = function(){
-  valor = document.getElementById('accioninduccion').value;
-  var data,div;
-  div=document.getElementById("dniinduc").innerHTML;
-  lbpk= document.getElementById("codinduc").innerHTML;
-  data = new Object;
-  data.dni=div;
-  data.codinduccion = lbpk;
-  data.finduc = $("input[name=finduccion").val();
-  data.fcadinduc = $("input[name=fcadinduccion]").val();
-  data.estinduc = $("input[name=estinduccion]").val();
-  data.comentinduc = $("textarea[name=cominduccion]").val();
-  data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
-
-  if (data.finduc == "") {
-    Materialize.toast('Debe Ingresar una Fecha de Inicio', 2500, 'rounded');
-    return false;
-  }
-
-  if (valor == 'btnnewinduccion') {
-      data.saveinduccion = true;
-      $.post("/rrhh/empleado/obra/", data, function(response) {
-        if (response.status) {
-          Materialize.toast('Asignacion de Induccion correcta', 2500, 'rounded');
-          $(".editinduccionemple").modal("close");
-        }
-      }, "json");
-  }else{
-    data.editinduccion = true;
-    $.post("/rrhh/empleado/obra/", data, function(response) {
-        if (response.status) {
-          cod = div;
-          listInduccion();
-          Materialize.toast('Edicion de Induccion correcto', 2500, 'rounded');
-          $(".editinduccionemple").modal("close");
-        }
-      }, "json");
-  } 
-}
-
 sendataproyecto = function(){
   $(".accionproyecto").val(this.getAttribute("data-proyecto"));
-}
-
-save_or_edit_proyecto = function(){
-
-  valor = document.getElementById('accionproyecto').value;
-  var data,div;
-  div=document.getElementById("dniempleadoproy").innerHTML;
-  lbpk= document.getElementById("codproy").innerHTML;
-  data = new Object;
-  data.dni=div;
-  data.codproy = lbpk;
-  data.proy = $("select[id=comboproyecto").val();
-  data.finiproy = $("input[name=finiproy]").val();
-  data.mag = $("select[id=ccarnetmag]").val();
-  data.fot = $("select[id=combfotocheck]").val();
-  data.comentproy = $("textarea[name=comenobra]").val();
-  data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
-
-
-  if (data.finiproy === "") {
-    Materialize.toast('Debe ingresar Fecha de Inicio', 3000, 'rounded');
-    return false;
-  }
-
-  if (valor == 'btnnewproyecto') {
-      data.saveproyecto = true;
-      $.post("/rrhh/empleado/obra/", data, function(response) {
-        if (response.status) {
-          listObra();
-          Materialize.toast('Asignacion de Proyecto correcto', 3000, 'rounded');
-          $(".editproyemple").modal("close");
-        }
-      }, "json");
-  }else{
-    // alert('edit')
-    data.editproy = true;
-    $.post("/rrhh/empleado/obra/", data, function(response) {
-        if (response.status) {
-          cod = div;
-          listObra();
-          Materialize.toast('Edicion de Proyecto Correcta', 3000, 'rounded');
-          $(".editproyemple").modal("close");
-        }
-      }, "json");
-  } 
-
 }
 
 
@@ -2858,7 +2538,6 @@ save_or_edit_telefono = function(){
     }
     }, "json");
   }else{
-    // alert('editar')
     data.edittelefono = true;
     $.post("/rrhh/empleado/phone/", data, function(response) {
         if (response.status) {
@@ -2892,7 +2571,6 @@ save_or_edit_cuenta = function() {
   data.tipopago = $("select[id=combotipopago]").val();
   data.remuneracion = $("input[name=remuneracion]").val();
   data.tipocontrato = $("select[id=combotipocontrato]").val();
-  data.setfamily = $("#setfamily").is(":checked");
   data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
   data.exists = true;
 
@@ -3173,9 +2851,11 @@ buscarempleado = function(event) {
   for (i = 0; i < tr.length; i++) {
     td = tr[i].getElementsByTagName("td")[1];
     td2= tr[i].getElementsByTagName("td")[2];
+    td3= tr[i].getElementsByTagName("td")[3];
     if (td || td2) {
       if (td.innerHTML.toUpperCase().indexOf(filter) > -1 || 
-          td2.innerHTML.toUpperCase().indexOf(filter) > -1) {
+          td2.innerHTML.toUpperCase().indexOf(filter) > -1 ||
+          td3.innerHTML.toUpperCase().indexOf(filter) > -1) {
         tr[i].style.display = ""; 
       } else {
         tr[i].style.display = "none";
@@ -3220,95 +2900,6 @@ buscardoc = function(event){
     }
   }
 }
-
-buscarproy = function(event){
-  var input,filter,table,table2, tr,tr2, td, i;
-  input = document.getElementById("txtbuscarproy");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("table-detailproyecto");
-  table2 = document.getElementById("table-indxobra");
-  tr = table.getElementsByTagName("tr");
-  tr2 = table2.getElementsByTagName("tr");
-
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[1];
-    if (td) {
-      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = ""; 
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-  for (i = 0; i < tr2.length; i++) {
-    td = tr2[i].getElementsByTagName("td")[1];
-    if (td) {
-      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-        tr2[i].style.display = ""; 
-      } else {
-        tr2[i].style.display = "none";
-      }
-    }
-  }
-}
-
-///////////////////////
-  //bootstrap menu table
-
-//   $(function() {
-//   var $contextMenu = $("#contextMenu");
-//   $("body").on("contextmenu", "[name='table-princ'] tr", function(e) {
-//     var $row = $(this).closest("tr"); 
-//     var $text = $row.find(".coldni").text();
-//     var $name = $row.find(".colname").text();
-//     var $planilla = $row.find(".colplanilla").text();
-
-//     document.getElementById("dniexplab").innerHTML=$text;
-//     document.getElementById("nameempleexplab").innerHTML=$name;
-
-//     document.getElementById("segso").innerHTML=$planilla;
-//     document.getElementById("dniempleadosusp").innerHTML=$text;
-//     document.getElementById("nameemplesusp").innerHTML=$name;
-
-//     document.getElementById("dniempleadotel").innerHTML=$text;
-//     document.getElementById("nameemple").innerHTML=$name;
-
-//     document.getElementById("dniempleadocuenta").innerHTML=$text;
-//     document.getElementById("nameemplecu").innerHTML=$name;
-
-//     document.getElementById("dnidoc").innerHTML=$text;
-//     document.getElementById("nameempledocu").innerHTML=$name;
-//     document.getElementById("dniempleadoproy").innerHTML=$text;
-//     document.getElementById("nameemplepro").innerHTML=$name;
-
-//     document.getElementById("dniexa").innerHTML=$text;
-//     document.getElementById("nameempleexa").innerHTML=$name;
-
-//     document.getElementById("dniempleadoestudio").innerHTML=$text;
-//     document.getElementById("nameempleest").innerHTML=$name;
-
-//     document.getElementById("dniinduc").innerHTML=$text;
-//     document.getElementById("dniepps").innerHTML=$text;
-//     document.getElementById("nameempleepps").innerHTML=$name;
-
-//     document.getElementById("dnisegsocial").innerHTML=$text;
-//     document.getElementById("nameemplesegsoc").innerHTML=$name;
-
-//     document.getElementById("dniempleadofamilia").innerHTML=$text;
-//     document.getElementById("nameemplefam").innerHTML=$name;
-//     $contextMenu.css({
-//       display: "block",
-//       background: "#FFF",
-//       padding: "5px",
-//       left: e.pageX,
-//       top: e.pageY
-//     });
-//     return false;
-//   });
-//   $(document).click(function() {
-//       $contextMenu.hide();
-//    }); 
-// });
 
 limp_famicr = function(){
   $(".namefamicr").val("");
@@ -3365,12 +2956,6 @@ limp_proyecto = function(){
   $("textarea[name=comenobra]").val("");
 }
 
-limp_induccion = function(){
-$("input[name=finduccion]").val("");
-$("input[name=fcadinduccion]").val("");
-$("input[name=estinduccion]").val("");
-$("textarea[name=cominduccion]").val("");
-}
 limp_epps = function(){
 $("input[name=itobra]").val("");
 $("input[name=fentrepps]").val("");
@@ -3461,31 +3046,16 @@ $("input[name=fechrecepps]").val("");
 $("textarea[name=comentepps]").val("");
 }
 
-// $(function(){
-//     $("#remuneracion").keyup(function(){
-//       var mes = $(this).val();
-//       var dia = (mes/30);
-//       var hora = dia/8;
-//       var bono = mes * 0.09;
-//       var grati = (mes*2)+bono;
-//       $("#cts").val(mes).parseInt();
-//     });
-// });
 
-// $(function(){
-//     $("#cts").keyup(function(){
-//       var mes = $(this).val();
-//       var bono = mes * 0.09;
-//       var grati = (mes*2)+bono;
-//       $("#gratificacion").val(grati.toFixed(2)).parseInt();
-//     });
-// });
+//ultimo rrhh
 
-// $(function(){
-//     $("#remuneracion").keyup(function(){
-//       var mes = $(this).val();
-//       var dia = (mes/30);
-//       var hora = dia/8;
-//       $("#costoxhora").val(hora.toFixed(2)).parseInt();
-//     });
-// });
+$(function(){
+  $('.tipouniv').change(function(){
+    var sup = $("#idcombotipoinst option:selected").attr("data-estsup");
+    if (sup=="NO") {
+      document.getElementById("divdatasuperior").style.display ="none";
+    }else{
+      document.getElementById("divdatasuperior").style.display ="block";
+    }
+  });
+});

@@ -4,22 +4,25 @@
 from django.conf.urls import patterns, url
 from django.conf.urls import patterns, url, include
 from .views import *
+from assistance import *
 
 
 TipoInstitucion_urls = patterns(
     '',
-    url(r'^list/$', TipInstList.as_view(),name='tipoinst_list'),
-    url(r'^new/$', TipInstCreate.as_view(),name='tipoinst_new'),
-    url(r'^edit/(?P<pk>\w+)/$',TipInstUpdate.as_view(), name='tipoinst_edit'),
-    url(r'^delete/(?P<pk>\w+)/$',TipInstDelete.as_view(), name='tipoinst_del'),
+    url(r'^list/$', TipInstList.as_view(), name='tipoinst_list'),
+    url(r'^new/$', TipInstCreate.as_view(), name='tipoinst_new'),
+    url(r'^edit/(?P<pk>\w+)/$', TipInstUpdate.as_view(), name='tipoinst_edit'),
+    url(r'^delete/(?P<pk>\w+)/$', TipInstDelete.as_view(), name='tipoinst_del'),
 )
 
 TipoEmple_urls = patterns(
     '',
-    url(r'^list/$', TipEmpleList.as_view(),name='tipoemple_list'),
-    url(r'^new/$', TipEmpleCreate.as_view(),name='tipoemple_new'),
-    url(r'^edit/(?P<tipoemple_id>\w+)/$',TipEmpleUpdate.as_view(), name='tipoemple_edit'),
-    url(r'^delete/(?P<tipoemple_id>\w+)/$',TipEmpleDelete.as_view(), name='tipoemple_del'),
+    url(r'^list/$', TipEmpleList.as_view(), name='tipoemple_list'),
+    url(r'^new/$', TipEmpleCreate.as_view(), name='tipoemple_new'),
+    url(r'^edit/(?P<tipoemple_id>\w+)/$', TipEmpleUpdate.as_view(),
+        name='tipoemple_edit'),
+    url(r'^delete/(?P<tipoemple_id>\w+)/$', TipEmpleDelete.as_view(),
+        name='tipoemple_del'),
 )
 
 TipoCobertura_urls = patterns(

@@ -1,0 +1,64 @@
+<div class="modal asigobrero" style="width:1000px;height:100%;" > 
+  <div class="modal-content">
+          <div class="row">
+              <div class="input-field col s8">
+                  <select id="comboasigproyecto" class="browser-default">
+                    <option value="" selected disabled>Seleccione un proyecto</option>
+                    {% for x in lproyecto %}
+                      {% if x.status == 'AC' %}
+                        <option value="{{ x.proyecto_id }}">
+                        {{x.proyecto_id}} - {{x.nompro}}</option>
+                  {% endif %}
+                {% endfor %}
+                  </select>
+              </div>
+              <div class="input-field col s0" style="margin-left:215px;margin-top:-20px;">
+                <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+          </div>
+          <div class="card" style="margin-bottom:50px;">
+            <div class="card-action" style="height:180px;">
+              <div class="row">
+                  <div class="input-field col s8">
+                      <select id="combopersonal" class="browser-default">
+                      <option value="" selected disabled>Seleccione un empleado</option>
+                        {% for x in lpersonal %}
+                          <option value="{{ x.empdni_id }}" data-cargo="{{ x.charge.cargos }}">
+                          {{x.lastname}}, {{x.firstname}}</option>
+                    {% endfor %}
+                      </select>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="input-field col s4">
+                    <input placeholder="" id="finiobra" type="date" class="datepicker finiobra">
+                    <label for="finiobra">Fecha de Ingreso</label>
+                  </div>
+                  <div class="input-field col s4">
+                    <button type="button" style="border:none;" class="transparent btnaddperobra" id="btnaddperobra"><i style="font-size:30px;margin-top:15px;" class="fa fa-plus-square"></i></button> 
+                  </div>
+                  <div class="input-field col s0" style="margin-left:120px;">
+                    <button type="button" class="btn waves-effect green lighten-1 btnsaveasigproy">
+                      <i class="fa fa-floppy-o"></i>
+                      <span>Guardar</span>
+                    </button>
+                  </div>
+              </div>
+            </div>
+          </div>
+          <table class="table-lpersobra" id="table-lpersobra">
+              <thead>
+                  <tr>
+                      <th>Personal</th>
+                      <th>Cargo</th>
+                      <th>Fecha de Inicio</th>
+                      <th></th>
+                  </tr>
+                  <hr>
+              </thead>
+
+          </table>
+    </div>
+</div>

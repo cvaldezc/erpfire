@@ -3,66 +3,151 @@
     {% include "menus/rrhhmd.html" %}
 {% endblock menu %}
 {% block content %}
-<script src="/media/js/rrhh/empleados.js"></script>
+<script src="/media/js/rrhh/proyecto.js"></script>
 <script src="{{ MEDIA_URL }}js/mustache.js"></script>
 
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
 <link rel="stylesheet" href="/media/css/rrhh/empleado.css">
-<div class="row">
-  <div class="input-field col s0">
-    <h4><strong>Proyecto:</strong></h4>
+
+<div class="content" style="margin-left:60px;">
+  <div class="row">
+    <div class="input-field col">
+      <button style="height:50px;" type="button" class="btn waves-effect green lighten-1 btnasigobrero" id="btnasigobrero">
+      <i class="fa fa-check"></i>
+      <strong>Asignar Obreros</strong></button>
+    </div>
   </div>
-  <div class="input-field col s6">
-      <select id="comboproyecto" class="browser-default">
-        {% for x in lproyecto %}
-          <option value="{{ x.proyecto_id }}">
-            {{x.proyecto_id}} - {{x.nompro}}</option>
-    {% endfor %}
-      </select>                 
+
+  <div class="card" style="width:95%;">
+    <div class="card-action" style="height:200px;">
+      <div class="row">
+        <div class="input-field col">
+          <h5>Filtrar por: </h5>
+        </div>
+        <div class="input-field col">
+          <input onclick="javascript:viewproyclien();" type="radio" id="radiopro" value="check" name="checkpro" />
+          <label for="radiopro" style="font-size:15px;font-weight:bold;color:black;">Proyecto</label>
+          <input onclick="javascript:viewproyclien();" type="radio" id="radiocli" value="check" name="checkpro" />
+          <label for="radiocli" style="font-size:15px;font-weight:bold;color:black;">Cliente</label>
+        </div>
+        <div class="input-field col s5" style="display:none;margin-top:25px;margin-left:100px;" id="divfilpro">
+          <select id="comboproyectocon" class="browser-default">
+            <option selected disabled >  Seleccione Proyecto </option>
+            {% for x in lproyecto %}
+              <option data-nompro="{{ x.nompro }}" value="{{ x.proyecto_id }}">
+                {{x.proyecto_id}} - {{x.nompro}}</option>
+        {% endfor %}
+          </select>                 
+        </div>
+        <div class="input-field col s5" style="display:none;margin-top:25px;margin-left:100px;" id="divfilcli">
+          <select id="combocliente" class="browser-default">
+            <option selected disabled > Seleccione Cliente </option>
+            {% for x in lcliente %}
+              <option value="{{ x.ruccliente_id }}">{{x.razonsocial}}</option>
+        {% endfor %}
+          </select>                 
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col ">
+          <button type="button" name="btnviewemp" class="btn waves-effect green lighten-1 btnviewemp" id="btnviewemp">
+          <i class="fa fa-list-alt"></i>
+          <strong>Trabajadores</strong></button>
+        </div>
+        <div class="input-field col ">
+          <button type="button" name="btnviewinduccion" class="btn waves-effect green lighten-1 btnviewinduccion" id="btnviewinduccion">
+          <i class="fa fa-file-text-o"></i>
+          <strong>Inducciones</strong>
+          </button>
+        </div>
+        <div class="input-field col s6" style="margin-left:100px;">
+          <i class="prefix fa fa-search"></i>
+          <input class="txtbuscarproy" type="search" placeholder="Buscar Empleado" name="txtbuscarproy" id="txtbuscarproy" >
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-<div class="row" style="margin-top:20px;margin-left:60px;">
-<div class="input-field col">
-<button style="height:50px;" type="button" name="btnviewemp" class="btn waves-effect green lighten-1 btnviewemp" id="btnviewemp"><strong>Trabajadores Asignados</strong></button>
-<button style="height:50px;" type="button" name="btnviewinduccion" class="btn waves-effect green lighten-1 btnviewinduccion" id="btnviewinduccion"><strong>Inducciones</strong>
-</button>
-</div>
-<div class="input-field col">
-<input class="txtbuscarproy" style="width: 80%;margin-left:400px;" align="center" type="search" placeholder="Buscar Empleado" name="txtbuscarproy" id="txtbuscarproy" >
-</div>
+
 </div>
 <hr>
-    <table style="display:none;margin-left:20px;width:95%;" id="table-detailproyecto" name="table-princ" class="table-detailproyecto">
-    <caption align="center" style="margin-left:700px;"><h5>Empleados</h5></caption>
+  <div style="display:none;margin-left:20px;width:95%;" id="table-detailproyecto">
+    <table name="table-princ" class="table-detailproyecto">
+    <h5 class="lbltitempxpro" align="center"></h5>
         <thead>
           <tr>
-            <th style="text-align:center;">N°</th>
-            <th style="text-align:center;">Nombres</th>
-            <th style="text-align:center;">Duracion Proyecto</th>
-            <th style="text-align:center;">F.Entrada al Proyecto</th>
-            <th style="text-align:center;">Carnet - FotoCheck</th>
+            <th class="colnumdetpro">#</th>
+            <th class="colnomdetpro">Nombres y Apellidos</th>
+            <th class="coldurdetpro">Dni</th>
+            <th class="colentrdetpro">F.Entrada al Proyecto</th>
+            <th ></th>
           </tr>
         </thead>
         <tbody id="fbody" class="tbodyprinc">
         </tbody>  
     </table>
+  </div>
 
-    <table style="display:none;margin-left:20px;width:95%;" id="table-indxobra" name="table-princ" class="table-indxobra">
-    <caption align="center" style="margin-left:700px;"><h5>Inducciones</h5></caption>
+  <div style="display:none;margin-left:20px;width:95%;" id="table-indxobra">
+    <table  name="table-princ" class="table-indxobra">
+      <h5 align="center">Inducciones</h5>
+    
         <thead>
           <tr>
-            <th style="text-align:center;">N°</th>
-            <th style="text-align:center;">Nombres</th>
-            <th style="text-align:center;">DNI</th>
-            <th style="text-align:center;">Cargo</th>
-            <th style="text-align:center;">Fecha de Inicio</th>
-            <th style="text-align:center;">Fecha de Caducidad</th>
-            <th style="text-align:center;">Estado</th>
+            <th class="colnumdetind">#</th>
+            <th class="colnomdetind">Nombres y Apellidos</th>
+            <th class="coldniind">DNI</th>
+            <th class="colcargoind">Cargo</th>
+            <th class="colfiniind">F.Inicio</th>
+            <th class="colfcadind">F.Caducidad</th>
+            <th class="colestind">Estado</th>
           </tr>
         </thead>
         <tbody id="fbody" class="tbodyprinc">
         </tbody>  
     </table>
+  </div>
+
+  <div style="display:none;margin-left:20px;width:95%;" id="table-detempxcli">
+    <table  name="table-princ" class="table-detempxcli">
+      <h5 align="center">Empleados</h5>
+        <thead>
+          <tr>
+            <th class="colnumdetpro">#</th>
+            <th class="colnomdetpro">Nombres y Apellidos</th>
+            <th class="coldurdetpro">Proyecto</th>
+            <th class="colentrdetpro">F.Entrada al Proyecto</th>
+            <th class="colopcdetpro">Induccion</th>
+          </tr>
+        </thead>
+        <tbody id="fbody" class="tbodyprinc">
+        </tbody>  
+    </table>
+  </div>
+
+  <div style="display:none;margin-left:20px;width:95%;" id="table-detindxcli">
+    <table name="table-princ" class="table-detindxcli" id="detindxcli">
+      <h5 align="center">Inducciones</h5>
+        <thead>
+          <tr>
+            <th class="colnumdetpro">#</th>
+            <th class="coldurdetpro">Nombres y Apellidos</th>
+            <th class="colentrdetpro">Proyecto</th>
+            <th class="coldniind">Cargo</th>
+            <th class="coldniind">F.Inicio</th>
+            <th class="coltitfcad">F.Caducidad</th>
+            <th class="colnumdetpro">Estado</th>
+            <th class="coldniind" style="text-alig:center"></th>
+          </tr>
+        </thead>
+        <tbody id="fbody" class="tbodyprinc">
+        </tbody>  
+    </table>
+  </div>
+
+{% include "rrhh/forms/formasigobrero.html" %}
+{% include "rrhh/forms/formeditproyecto.html" %}
+
 
 {% csrf_token %}
-
 {% endblock %}

@@ -12,12 +12,13 @@
                   <div style="display:none;">
                   <input  id="accionproyecto" class="accionproyecto" name="accionproyecto">
                   </div>
-                </div>    
+                </div>
               </div>
               <div class="input-field col s0">
                 <p>Proyecto:</p>
               </div>
               <div class="input-field col">
+                <div id="divselect" style="margin-top:15px;">
                   <select id="comboproyecto" class="browser-default">
                     {% for x in lproyecto %}
                       {% if x.status == 'AC' %}
@@ -25,7 +26,18 @@
                         {{x.proyecto_id}} - {{x.nompro}}</option>
                   {% endif %}
                 {% endfor %}
-                  </select>                 
+                  </select>
+                </div>
+                <div id="divselectopcional">
+                  <select id="comboproyopcional" class="browser-default">
+                    {% for x in lproyecto %}
+                      {% if x.status == 'AC' %}
+                        <option value="{{ x.proyecto_id }}">
+                        {{x.proyecto_id}} - {{x.nompro}}</option>
+                  {% endif %}
+                {% endfor %}
+                  </select>
+                </div>
               </div>
 
           </div>
@@ -35,8 +47,8 @@
                     <label for="finiproy" >FECHA DE INICIO</label>
                 </div>
             </div>
-          <div class="row">
-              <div class="row">
+          <div class="row" style="display:none;">
+            <div class="row">
               <div class="input-field col s0">
                 <p>Carnet Magnetico:</p>
               </div>
@@ -55,7 +67,7 @@
                     <option value="false">NO</option>
                   </select>                 
               </div>
-          </div>
+            </div>
           </div>
           <div class="row">                 
                 <div class="input-field col s6">
@@ -79,23 +91,47 @@
   <div class="modal editinduccionemple" style="width:800px;height:70%;" > 
     <div class="modal-content ">
           <div class="row">
-            <div style="">
-            <label style="display:none;" id="codinduc" class="codinduc" name="codinduc"></label>
+            <div style="display:none;">
+            <label style="" id="codinduc" class="codinduc" name="codinduc"></label>
             <label>Obra:</label>
             <label class="dniinduc" id="dniinduc" name="dniinduc"></label>  
             </div>
             <div style="display:none;">
-                <input  id="accioninduccion" class="accioninduccion" name="accioninduccion">
-              </div>
+              <input  id="accioninduccion" class="accioninduccion" name="accioninduccion">
+            </div>
+            <div>
+              <h5 class="lblnombempleind"></h5>
+            </div>
+            <hr>
           </div>
           <div class="row">
-              <div class="input-field col s5">
+              <div class="input-field col s5" id="divfind">
                 <input placeholder="" id="finduccion" name="finduccion" type="date" class="datepicker">
               <label for="finduccion" >FECHA DE INDUCCION</label>
               </div>
-              <div class="input-field col s5">
+              <div class="input-field col s5" id="divfcadind">
                 <input placeholder="" id="fcadinduccion" name="fcadinduccion" type="date" class="datepicker">
                 <label for="fcadinduccion" >FECHA DE CADUCIDAD</label>
+              </div>
+          </div>
+          <div class="row" id="divmagfoto">
+              <div class="input-field col s0">
+                <p>Carnet Magnetico:</p>
+              </div>
+              <div class="input-field col s2">
+                  <select id="combomagnetico" class="browser-default">
+                    <option value="true">SI</option>
+                    <option value="false">NO</option>
+                  </select>                 
+              </div>
+              <div class="input-field col s0">
+                <p>Fotocheck:</p>
+              </div>
+              <div class="input-field col s2">
+                  <select id="combofotocheck" class="browser-default">
+                    <option value="true">SI</option>
+                    <option value="false">NO</option>
+                  </select>                 
               </div>
           </div>
           <div class="row" id="divestinduc">
@@ -120,9 +156,73 @@
               <i class="fa fa-floppy-o"></i>
               <span>Guardar Cambios</span>
             </button>
-      </div> 
-<!--MODAL EPPS-->
+      </div>
+
   </div>
+  <!--MODAL DETALLE INDUCCION-->
+  <div id="detinduccion" class="modal detinduccion" style="width:70%;max-height:75%;">
+    <div class="row" style="margin:5px;background-color:#bdbdbd;color:white;font-weight:bold;">
+      <div class="input-field col">
+        <h4 class="detindnames"></h4>
+      </div>
+    </div>
+    <div class="modal-content">
+      <div class="row">
+        <div class="input-field col s4">
+          <h6>PROYECTO</h6>   
+        </div>
+        <div class="input-field col">
+          <h6 class="detindproy"></h6>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s4">
+          <h6>CARGO</h6>   
+        </div>
+        <div class="input-field col">
+          <h6 class="detindcargo"></h6>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s4">
+          <h6>DURACION</h6>   
+        </div>
+        <div class="input-field col">
+          <h6 class="detduracion"></h6>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s4">
+          <h6>ESTADO</h6>
+        </div>
+        <div class="input-field col">
+          <h6 class="detindestado"></h6>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s4">
+          <h6>CARNET MAG / FOTOCHECK</h6>   
+        </div>
+        <div class="input-field col">
+          <h6 class="detindmagfoto"></h6>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s4">
+          <h6>COMENTARIO</h6>   
+        </div>
+        <div class="input-field col">
+          <h6 class="detindcoment"></h6>
+        </div>
+      </div>
+    </div>
+    <div align="right" style="">
+      <button style="margin-top:10px;margin-right:5px; width:200px;height:50px; background-color:black; color:white; font-weight:bold;" type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">SALIR</button>
+    </div>
+   
+  </div>
+
+  <!--MODAL EPPS-->
     <div class="modal editeppsemple" style="width:50%;height:100%;" > 
       <div class="modal-content" >
           <div class="row">

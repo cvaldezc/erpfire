@@ -249,6 +249,7 @@ class Induccion(models.Model):
     estado = models.CharField(max_length=50, null=True, blank=True)
     registro = models.DateTimeField(auto_now_add=True)
     comentario = models.CharField(max_length=200, null=True, blank=True)
+    stat = models.CharField(max_length=2, default='')
 
     audit_log = AuditLog()
 
@@ -324,6 +325,7 @@ class detPensEmple(models.Model):
 class TipoInstitucion(models.Model):
     tipoinst_id = models.CharField(primary_key=True, max_length=9)
     tipo = models.CharField(max_length=50)
+    estsuperior = models.CharField(max_length=2, default='')
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -412,4 +414,3 @@ class RenunciaEmple(models.Model):
     registro = models.DateTimeField(auto_now_add=True)
 
     audit_log = AuditLog()
-

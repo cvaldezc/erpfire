@@ -20,18 +20,18 @@ letter-spacing: 2px;
 }
 
 .lbldetail{
-	color: black;
-	font-weight: bold;
-	font-size: 18px;
-	letter-spacing: 1px;
+    color: black;
+    font-weight: bold;
+    font-size: 18px;
+    letter-spacing: 1px;
 }
 .lbldetailresp{
-	color: black;
-	letter-spacing: 1px;
+    color: black;
+    letter-spacing: 1px;
 }
 
 .divq{
-	background-color: black;
+    background-color: black;
 }
 tbody tr:hover {
   background-color: #e0e0e0;
@@ -45,39 +45,39 @@ right: 40%;
 } 
 
 .colnumcuenta{
-	width: 220px;
+    width: 220px;
 }
 .modal.bottom-sheet{
-	max-height: 75%;
+    max-height: 75%;
 }
 
 .formaddsusp{
-	height: 460px;
+    height: 460px;
 }
 .foraddempl{
-	height: 450px;	
+    height: 450px;	
 }
 .foraddempl4{
-	height: 420px;
+    height: 420px;
 }
 .formaddobra{
-	height: 400px;
+    height: 400px;
 }
 .formaddexamen{
-	height: 450px;
+    height: 450px;
 }
 .divsub{
-	background-color: black;
-	color: white;
-	font-weight: bold;
-	font-size: 15px;
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
 }
 .btnguardar{
-	color: white;
-	font-weight: bold;
+    color: white;
+    font-weight: bold;
 }
 .telefbody{
-	display:block;
+    display:block;
     height:80px;
     overflow:auto;
 }
@@ -87,9 +87,9 @@ right: 40%;
   cursor: pointer;
 }
 .bodydetails{
-	display:block;
-	height:450px;
-	overflow:auto;
+    display:block;
+    height:450px;
+    overflow:auto;
 }
 
 /*tbody {
@@ -103,63 +103,63 @@ thead, tbody tr {
     table-layout:fixed;
 }
 .subtit{
-	background-color: black;
-	font-size: 15px;
-	font-weight: bold;
-	color: white;
+    background-color: black;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
 }
 
 .divsubphone{
-	background-color: black;
-	color: white;
-	font-weight: bold;
-	font-size: 15px;
-	margin-left: 70px;
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    margin-left: 70px;
 }
 .columdesc{
-	width: 5px;
+    width: 5px;
 }
 
 .btnaddempleado{
-	margin-top: 20px;
-	margin-left: 250px;
-	width: 250px;
-	font-weight: bold;
+    margin-top: 20px;
+    margin-left: 250px;
+    width: 250px;
+    font-weight: bold;
 }
 .coltable{
-	text-align: center;
-	width: 210px;
+    text-align: center;
+    width: 210px;
 }
 .colname{
-	text-align: center;
-	width: 350px;
+    text-align: center;
+    width: 350px;
 }
 
 .colsituacion{
-	text-align: center;
-	width: 90px;
+    text-align: center;
+    width: 90px;
 }
 .colmant{
-	text-align: center;
+    text-align: center;
 }
 .colnum{
-	width: 40px;
-	text-align: center;
+    width: 40px;
+    text-align: center;
 }
 .coltitemail{
-	width: 250px;
-	text-align: center;
+    width: 250px;
+    text-align: center;
 }
 .colemail{
-	width: 250px;
+    width: 250px;
 }
 .coldni{
-	width: 100px;
-	text-align: center;
+    width: 100px;
+    text-align: center;
 }
 .colingreso{
-	width: 100px;
-	text-align: center;
+    width: 100px;
+    text-align: center;
 }
 #contextMenu {
   position: absolute;
@@ -168,55 +168,275 @@ thead, tbody tr {
   color: #2196f3;  
 }
 .fieldsphone{
-	margin-left: 60px;
+    margin-left: 60px;
 }
 
 .modal{
-	height: 100%;
+    height: 100%;
 }
 
 .input-field3{
-	width: 10px;
+    width: 10px;
 
 }
 .validate{
-	width: 500px;
+    width: 500px;
 }
 .tabl{
-	width:95%;
-	margin-top: 5px;
-	margin-left: 30px;
-	height: 10px;
-	overflow: scroll;
+    width:95%;
+    margin-top: 5px;
+    margin-left: 30px;
+    height: 10px;
+    overflow: scroll;
 }
 .form_addemple{
-	width: 80%;
-	margin-left:100px;
-	margin-top: 10px;
+    width: 80%;
+    margin-left:100px;
+    margin-top: 10px;
 }
 
 .navinicio{
-	background-color: white;
+    background-color: white;
 }
 .txtbuscar{
-	background-color: black;
+    background-color: black;
 }
 
 .divbtnactivos{
-	margin-top: 30px;
-	margin-left: 150px;
-	
+    margin-top: 30px;
+    margin-left: 150px;
+    
 }
 .btnactivo{
-	font-size: 10px;
-	font-weight: bold;
+    font-size: 10px;
+    font-weight: bold;
 }
 
 .btninactivo{
-	background-color: #f44336;
-	font-size: 10px;
-	font-weight: bold;
+    background-color: #f44336;
+    font-size: 10px;
+    font-weight: bold;
 }
 .txtbuscar{
-	margin-left: 1500;
+    margin-left: 1500;
+}
+
+/*Ultimo kardex*/
+.bodylfiltmat{
+display: block;
+overflow: auto;	
+}
+
+.lfiltmat{
+    margin-top: -60px;
+    width: 90%;
+    max-height: 95%;
+}
+
+.btnsalirmodal{
+    margin-top:25px; 
+    width:200px;
+    height:50px; 
+    color:white; 
+    font-weight:bold;
+}
+
+
+
+/*ultimo rrhh*/
+
+
+#drop li{
+    position: relative;
+}
+
+#drop li a{
+    padding: 0px 30px 0px 30px;
+    margin: 0px 0;
+    line-height: 40px;
+    color: black;
+    display: block;
+}
+
+#drop ul{
+    right: 10px;
+    background-color: #f2f5f6; 
+    width:170px;
+}
+
+#drop ul li {
+    border-bottom:1px solid #DDDDDD;
+    height:38px;
+}
+#drop ul li .title {
+    color:#6791AD;
+    font: 13px/38px Georgia, "Times New Roman", Times, serif;
+    font-weight: bold;
+    border-bottom:1px solid #FFFFFF;
+}
+
+#drop ul li .subtitle {
+    color:#6791AD;
+    font: 13px/38px Georgia, "Times New Roman", Times, serif;
+    border-bottom:1px solid #FFFFFF;
+}
+
+#drop ul li .title:hover{
+    background:#bbdefb;
+}
+
+#drop ul li ul li:hover{
+    width: 165px;
+    background-color: #e3f2fd;
+}
+
+
+#drop ul{
+    display: none;
+    visibility:hidden;
+    position: absolute;
+    top: 0px;
+}
+
+
+#drop ul ul{
+    top: 0px;
+    right:170px;
+    display: none;
+    visibility:hidden;
+    border: 1px solid #DDDDDD;
+    /*background-color: black;*/
+}
+#drop ul ul li{
+    width: 170px;
+    /*background-color: blue;*/
+}
+
+#drop ul li{
+    display: block;
+    visibility:visible;
+}
+#drop li:hover > ul{
+    display: block;
+    visibility:visible;
+}
+
+#drop li .lit:hover{
+    background: #bbdefb;
+}
+.asigobrero{
+    margin-top: -60px;
+    max-height: 95%;
+}
+
+
+/*drop de proyecto*/
+#dropproy li{
+    position: relative;
+}
+
+#dropproy li a{
+    padding: 0px 30px 0px 10px;
+    color: black;
+    display: block;
+}
+
+#dropproy ul{
+    left: 30px;
+    background-color: #f2f5f6; 
+    width:155px;
+}
+
+#dropproy ul li {
+    border-bottom:1px solid #DDDDDD;
+    height:25px;
+}
+#dropproy ul li .title {
+    color:white;
+    font: 13px/25px Georgia, "Times New Roman", Times, serif;
+    font-weight: bold;
+    border-bottom:1px solid #FFFFFF;
+}
+
+#dropproy ul{
+    display: none;
+    visibility:hidden;
+    position: absolute;
+    top: 0px;
+}
+
+#dropproy ul ul{
+    top: 0px;
+    right:170px;
+    display: none;
+    visibility:hidden;
+    border: 1px solid #DDDDDD;
+}
+
+#dropproy ul li{
+    display: block;
+    visibility:visible;
+}
+#dropproy li:hover > ul{
+    display: block;
+    visibility:visible;
+}
+
+#dropproy li .litproy{
+    background: #26a69a;
+}
+#dropproy ul .litproy:hover {
+    background-color: #004d40;
+}
+
+#dropproy li .litdelproy{
+    background: #ef5350;
+}
+#dropproy li .litdelproy:hover{
+    background: #e53935;
+}
+
+.colnumdetpro{
+    text-align: center;
+    width: 5%;
+}
+.colnomdetpro{
+    width: 30%;
+}
+.coldurdetpro{
+    width: 30%;
+}
+.colentrdetpro{
+    width: 20%;
+}
+.colopcdetpro{
+    text-align: center;
+    width: 15%;
+}
+
+.colnumdetind{
+    width: 5%;
+    text-align: center;
+}
+.colnomdetind{
+    width: 35%;
+
+}
+.coldniind{
+    width: 10%;
+
+}
+.colcargoind{
+    width: 20%;
+
+}
+.colfiniind{
+    width: 10%;
+}
+.colfcadind{
+    width: 10%;
+}
+.colestind{
+    text-align: center;
+    width: 15%;
 }

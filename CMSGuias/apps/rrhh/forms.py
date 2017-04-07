@@ -3,12 +3,18 @@ from django.contrib.auth.models import User
 from .models import *
 from CMSGuias.apps.home.models import *
 
+
 class TipoInstitucionForm(forms.ModelForm):
     class Meta:
+        STATUS_SUPERIOR = (
+            ('SI', 'SI'),
+            ('NO', 'NO')
+            )
         model = TipoInstitucion
-        exclude = {'flag', 'tipoinst_id',}
+        exclude = {'flag', 'tipoinst_id'}
         widgets = {
             'tipo': forms.TextInput(attrs={'class': 'form-control'}),
+            'estsuperior' : forms.Select(attrs={'class': 'form-control browser-default'},choices=STATUS_SUPERIOR),
         }
 
 class TipoEmpleadoForm(forms.ModelForm):

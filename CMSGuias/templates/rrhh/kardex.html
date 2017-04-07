@@ -1,0 +1,127 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/rrhhmd.html" %}
+{% endblock menu %}
+{% block content %}
+<script src="/media/js/rrhh/kardex.js"></script>
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+<link rel="stylesheet" href="/media/css/rrhh/empleado.css">
+
+<div class="row" style="margin-top:50px;margin-left:50px;">
+	<div>
+		<h3>Generar Kardex</h3>
+	</div>
+
+	<div class="input-field" style="margin-bottom:50px;">
+	    <div class="row">
+			<div class="input-field col s3">
+				<input class="txtfiltracod" type="text" placeholder="" id="txtfiltracod" name="txtfiltracod">
+				<label for="txtfiltracod">Codigo</label>
+			</div>
+			<div class="input-field col s8">
+				<input class="txtfiltramat" type="text" placeholder="" name="txtfiltramat" >
+				<label for="txtfiltramat">Descripcion</label>
+			</div>
+		</div>
+		<div class="row" style="display:none;" id="divbrmodel">
+			<div class="input-field col s3">
+				<input readOnly class="txtbrand" type="text" placeholder="" name="txtbrand">
+				<label for="txtbrand">Marca</label>
+			</div>
+			<div class="input-field col s3">
+				<input readonly class="txtmodel" type="text" placeholder="" name="txtmodel">
+				<label for="txtmodel">Modelo</label>
+			</div>
+		</div>
+		<hr>
+		<label class="codmarca" style="display:none;"></label>
+		<label class="codmodelo" style="display:none;"></label>
+      	<input onclick="javascript:viewradkar();" name="group1" type="radio" id="rfech" value="fech"/>
+      	<label for="rfech" style="font-size:25px;font-weight:bold;color:black;">Mes</label>
+      	<input onclick="javascript:viewradkar();" name="group1" type="radio" id="rrango" value="rango"/>
+      	<label for="rrango" style="font-size:25px;font-weight:bold;color:black;">Rango de Meses</label>
+    </div>
+
+    <div id="divfech" style="display:none">
+    	<div class="row">
+		    <div class="input-field col s2" >
+		    	<select id="combomes">
+		    		<option value="" selected disabled>Seleccione Mes</option>
+		            <option value="01">Enero</option>
+		            <option value="02">Febrero</option>
+		            <option value="03">Marzo</option>
+		            <option value="04">Abril</option>
+		            <option value="05">Mayo</option>
+		            <option value="06">Junio</option>
+		            <option value="07">Julio</option>
+		            <option value="08">Agosto</option>
+		            <option value="09">Setiembre</option>
+		            <option value="10">Octubre</option>
+		            <option value="11">Noviembre</option>
+		            <option value="12">Diciembre</option>
+                </select>
+		    </div>
+		    <div class="input-field col s3">
+		      <input class="txtyear" type="text" placeholder="" name="txtyear" >
+			  <label for="txtyear">Año</label>
+		    </div>
+	    </div>
+	</div>
+    <div id="divrango" style="display:none">
+	    <div class="row">
+			<div class="input-field col s3">
+				<select id = "combofrommes">
+					<option selected disabled >Mes Inicial</option>
+		            <option value="01">Enero</option>
+		            <option value="02">Febrero</option>
+		            <option value="03">Marzo</option>
+		            <option value="04">Abril</option>
+		            <option value="05">Mayo</option>
+		            <option value="06">Junio</option>
+		            <option value="07">Julio</option>
+		            <option value="08">Agosto</option>
+		            <option value="09">Setiembre</option>
+		            <option value="10">Octubre</option>
+		            <option value="11">Noviembre</option>
+		            <option value="12">Diciembre</option>
+				</select>
+			</div>
+
+			<div class="input-field col s3">
+				<select id = "combotomes">
+					<option selected disabled>Mes Final</option>
+		            <option value="01">Enero</option>
+		            <option value="02">Febrero</option>
+		            <option value="03">Marzo</option>
+		            <option value="04">Abril</option>
+		            <option value="05">Mayo</option>
+		            <option value="06">Junio</option>
+		            <option value="07">Julio</option>
+		            <option value="08">Agosto</option>
+		            <option value="09">Setiembre</option>
+		            <option value="10">Octubre</option>
+		            <option value="11">Noviembre</option>
+		            <option value="12">Diciembre</option>
+				</select>
+			</div>
+
+			<div class="input-field col s3">
+		      <input class="txtyearrango" type="text" placeholder="" name="txtyearrango" >
+			  <label for="txtyearrango">Año</label>
+		    </div>
+		</div>
+	</div>
+	<div class="row" id="btnviewkar" style="display:none;">
+ 		<button type="button" name="btnviewkar" class="btn waves-effect green 		lighten-1 btnviewkar">
+            <span>
+            <strong>
+            <i class="fa fa-sign-in"></i>
+            Ver kardex
+            </strong></span>
+    	</button>
+	</div>
+</div>
+
+{% csrf_token %}
+{% include "rrhh/forms/formfiltromat.html" %}
+{% endblock %}
