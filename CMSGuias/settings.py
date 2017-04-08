@@ -22,7 +22,7 @@ DATABASES = {
         # The following settings are not used with sqlite3:
         'USER': 'postgres',
         'PASSWORD': 'Syst3mH3ll',
-        'HOST': '172.17.0.4',
+        'HOST': '127.0.0.1',
         # Empty for localhost through domain sockets or '127.0.0.1'
         # for localhost through TCP.
         'PORT': '5432', # Set to empty string for default.
@@ -137,7 +137,7 @@ TEMPLATE_DIRS = (
     # or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(PATH_PROJECT, 'templates')
+    os.path.join(PATH_PROJECT, 'templates'),
 )
 
 INSTALLED_APPS = (

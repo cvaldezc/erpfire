@@ -1,0 +1,101 @@
+{% extends "basemd.html" %}
+{% extends "div.html %"}
+{% block title %}
+  Consultas
+{% endblock %}
+{% block menu %}
+  {% include "menus/almherramd.html" %}
+{% endblock %}
+{% block content %}
+
+<script src="/media/js/almacen/guiaherramienta.js"></script>
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+<link rel="stylesheet" href="/media/css/almacen/guia.css">
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+<div>
+  <div class="row" style="margin-left:30px;">
+    <h4 align="center">Materiales en Campo</h4>
+    <div class="card" style="height:100px;width:98%">
+      <div class="card-action">
+        <div class="input-field col s5">
+          <i class="prefix fa fa-search"></i>
+          <input class="txtbuscarh"  type="search" placeholder="Ingresar Herramienta" name="txtbuscarh" id="txtbuscarh">
+        </div>
+        <div class="input-field col s5" style="margin-left:10%;">
+          <select id="combolproy" class="combolproy">
+            <option value="" selected disabled><label>Seleccione un proyecto</label></option>
+          {% for x in lpro %}
+            <option value="{{ x.proyecto_id }}">{{ x.proyecto_id }} {{ x.proyecto.nompro }}</option>
+          {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+    <hr>
+    <!--
+    <div class="row" style="margin-bottom:50px;">
+
+      <div class="input-field col s0">
+        <p>Herramienta:</p>
+      </div>
+      <div class="input-field col s5">
+        <select id="combolherra" class="browser-default combolherra">
+        {% for x in lhe %}
+          <option value="{{ x.herramienta_id }}">{{ x.herramienta.nombre }} {{ x.herramienta.medida }}</option>
+        {% endfor %}
+        </select>
+      </div>
+
+    </div>
+  -->
+
+    <div id="divtabherraproy" class="divtabherraproy" style="display:none;">
+      <table class="tabla-detherraproy" id="tabla-detherraproy">
+        <div class="card">
+          <div class="card-action">
+            <h6><strong><label class="lblcodhe" style="display:none;"></label><h5 class="nombreherra" style="color:black"></h5></strong></h6>
+          </div>
+        </div>
+          <caption><h4>Proyectos por Herramienta</h4></caption>
+          <thead class="cab">
+            <tr>
+              <th class="colnum">#</th>
+              <th>Proyecto</th>
+              <th>Cantidad Enviada</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="fbody" class="bodydetherraproy">
+            </tbody>
+      </table>
+    </div>
+    <div id="divtabproyherra" class="divtabproyherra" style="display:none;">
+      <table class="tabla-detproyherra" id="tabla-detproyherra">
+          <div class="card">
+            <div class="card-action">
+                <h6><strong><h5 class="nombreproyecto" style="color:black"></h5></strong></h6>  
+            </div>
+          </div>
+          <caption><h4>Herramientas por Proyecto</h4></caption>
+          <thead class="cab">
+            <tr>
+              <th class="colnum">#</th>
+              <th>Herramienta</th>
+              <th>Cantidad</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="fbody" class="bodydetherraproy">
+            </tbody>  
+      </table>
+    </div>
+</div>
+
+{% csrf_token %}
+
+{% include "almacen/form/detherraconsul.html" %}
+{% include "almacen/form/listconsulherra.html" %}
+
+{% endblock %}

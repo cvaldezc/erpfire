@@ -1,0 +1,57 @@
+{% extends "basemd.html" %}
+{% extends "div.html %"}
+{% block title %}
+  Estados de Herramienta
+{% endblock %}
+{% block menu %}
+  {% include "menus/almherramd.html" %}
+{% endblock %}
+{% block content %}
+<script src="/media/js/almacen/estadoherra.js"></script>
+<link rel="stylesheet" href="/media/css/almacen/estadoherra.css">
+
+<div>
+	<h4 align="center">Consulta por estado de Herramienta</h4>
+	<div class="card" style="width:95%;margin-left:20px;">
+	<div class="card-action">
+		<div class="row">
+		  <div class="input-field col" style="width:45%;">
+		    <select id="comboestadherra" class="browser-default comboestadherra">
+		      <option disabled selected ><label>Seleccione un estado de material</label></option>
+	          <option value="ALMACEN" >EN OBRA</option>
+	          <option value="ALQUILER" >ALQUILER</option>
+	          <option value="REPARACION" >REPARACION</option>
+	          <option value="BAJA" >DE BAJA</option>
+	        </select>
+		  </div>
+		  <div class="input-field col" style="margin-left:60px;width:45%;">
+		  	<i class="prefix fa fa-search"></i>
+			<input class="txtestbuscarh"  type="search" placeholder="" name="txtestbuscarh" id="txtestbuscarh">
+		  </div>
+		</div>
+	</div>
+	</div>
+	<!--DIV ALMACEN Y ALQUILER-->
+	<div id="divtabalmacen" class="divtabalmacen">
+      <table class="table-lalmacen" id="table-lalmacen">
+         	<caption><h4 class="captiontable"></h4></caption>
+          <thead class="cab">
+            <tr>
+              <th class="colnum">#</th>
+              <th class="colcod">Codigo</th>
+              <th class="colherra">Herramienta</th>
+              <th class="colmedida">Medida</th>
+              <th class="colmarca">Marca</th>
+              <th class="coldetalle">Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="fbody" class="bodytabalmacen" style="height:100px;">
+            </tbody>
+      </table>
+    </div>
+</div>
+
+
+{% csrf_token %}
+{% include "almacen/form/detestalmacen.html" %}
+{% endblock %}

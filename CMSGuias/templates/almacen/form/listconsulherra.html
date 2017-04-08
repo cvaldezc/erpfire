@@ -1,0 +1,27 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<div class="modal lconsherra">
+    <div class="modal-content">
+    <h6>Seleccione una herramienta</h6>
+        <table class="table-lconsherra" id="table-lconsherra" >
+            <thead class="cab">
+                <tr class="brand-primary">
+                    <th class="colnum">#</th>
+                    <th>Herramienta</th>
+                    <th>Medida</th>
+                    <th>Marca</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="bodylconsherra" style="height:500px;"></tbody>
+        </table>
+        <div align="right" style="">
+        <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+        <i class="fa fa-times"></i>
+        <span>SALIR</span>
+        </button>
+        </div>
+    </div>
+</div>

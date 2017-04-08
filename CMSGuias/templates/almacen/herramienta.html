@@ -1,0 +1,74 @@
+{% extends "basemd.html" %}
+{% extends "div.html %"}
+{% block title %}
+  Herramienta
+{% endblock %}
+{% block menu %}
+  {% include "menus/almherramd.html" %}
+{% endblock %}
+{% block content %}
+<script src="/media/js/almacen/guiaherramienta.js"></script>
+<link rel="stylesheet" href="/media/css/almacen/guiaherramienta.css">
+<div>
+
+  <div class="row divcabherra">
+    <div class="card" style="width:95%;">
+    <div class="card-action" style="height:100px;">
+      <div class="input-field col s4">
+      	<div class="btnaddherr">
+        	<button type="button" name="btnopennewherra" data-herra="btnnewherra" class="btn waves-effect teal lighten-1 btnopennewherra">
+                  <i class="fa fa-plus"></i>
+        	        <span><strong>AGREGAR HERRAMIENTA</strong></span>
+        	</button>
+      	</div>
+      </div>
+      <div class="input-field col s7">
+        <div class="divbuscar">
+          <i class="prefix fa fa-search"></i>
+          <input class="txtbuscar" style="width:90%;" type="search" placeholder="Buscar Herramienta" data-table="tabl" name="txtbuscar" id="txtbuscar" >
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+    <table class="tabla-herra" id="tabla-herra">
+
+        <thead>
+          <tr>
+            <th class="tnumherra">#</th>
+            <th class="tcodherra">Codigo</th>
+            <th class="tnameherra">Herramienta</th>
+            <th class="tmarcaherra">Marca</th>
+            <th class="tunidherra">Unidad</th>
+            <th class="teditherra"></th>
+            <!--<th class="titedit"></th>-->
+            <!--<th></th>-->
+            
+          </tr>
+        </thead>
+        <tbody id="fbody" class="bodydetailsherra">
+          {% for x in lherra %}                    
+          <tr class="fer">
+            <td class="tnumherra">{{ forloop.counter }}</td>
+            <td class="tcodherra">{{ x.herramienta_id }}</td>
+            <td class="tnameherra">{{ x.nombre }} - {{ x.medida }}</td>
+            <td class="tmarcaherra">{{ x.marca.brand }}</td>
+            <td class="tunidherra">{{ x.unidad.uninom }}</td>
+            <td class="teditherra">
+			<button type="button" class="btn btneditherramienta" value="{{ x.herramienta_id }}" ><i class="fa fa-pencil" data-nombre = "7" data-medida="{{ x.medida }}" data-marca="{{ x.marca_id }}" data-unidad="{{ x.unidad_id }}" data-tvida="{{ x.tvida }}"></i><span class="glyphicon glyphicon-edit"></span></button>
+			</td>
+      <!--
+			<td class="titedit">
+			<button type="button" class="btn red btndelherramienta" value="{{ herramienta_id }}"><i class="fa fa-trash-o"></i></button>
+			</td>
+      -->
+          </tr>
+          {% endfor %}  
+          </tbody>  
+    </table> 
+</div>
+
+{% csrf_token %}
+{% include "almacen/form/newherramienta.html" %}
+{% endblock %}

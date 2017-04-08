@@ -1,0 +1,85 @@
+<div class="navbar-fixed">
+  
+  <ul id="user-setting" class="dropdown-content">
+    <li><a class="black-text">Cargo: {{ user.get_profile.empdni.charge.cargos }}</a></li>
+  </ul>
+
+  <ul id="listaguia" class="dropdown-content">
+    <li><a href="{% url 'viewherramienta' %}">Herramienta</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'viewguiaherra' %}">Guia Herramienta</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'viewinventario' %}">Inventario</a></li> 
+    <li class="divider"></li>
+    <li><a href="{% url 'viewdevolucion' %}">Doc Devolucion</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'viewconsulta' %}">Consulta</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'viewestherramienta' %}">Estado Herramienta</a></li>
+    <li class="divider"></li>
+    <li><a href="{% url 'viewcarga' %}">Cargar Herramienta</a></li>
+  </ul>
+  <!--devolucion mat-->
+  <ul id="listmat" class="dropdown-content">
+    <li><a href="{% url 'viewdevolucionmat' %}">Devolucion</a></li>
+  </ul>
+  <!---->
+
+  <nav class="grey darken-3">
+
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <li>
+        <a href="/"><span class="fa fa-home fa-lg"></span></a>
+        </li>
+        <li style="width:150px;">
+          <a class="dropdown-button" href="#!" data-hover="true" data-activates="listaguia" data-gutter="0" data-beloworigin="true">
+            Guia <b class="fa fa-caret-down"></b>
+          </a>
+        </li>
+        <!--devolucion mat-->
+        <li>
+          <a class="dropdown-button" href="#!" data-hover="true" data-activates="listmat" data-beloworigin="true" data-gutter="0">Materiales
+          <b class="fa fa-caret-down"></b></a>
+        </li>
+        <!---->
+
+
+        <li style="width:300px;">
+          <a class="dropdown-button" href="#!" data-hover="true" data-activates="user-setting" data-gutter="0" data-beloworigin="true">
+            {{ user.get_profile.empdni.firstname }}, {{ user.get_profile.empdni.lastname }} <b class="fa fa-caret-down"></b>
+          </a>
+        </li>
+      </ul>
+
+
+
+
+       <ul id="slide-out" class="side-nav">
+        <li><a href="#!">First Sidebar Link</a></li>
+        <li><a href="#!">Second Sidebar Link</a></li>
+        <li class="no-padding">
+          <ul class="collapsible collapsible-accordion">
+            <li>
+              <a class="collapsible-header">Dropdown<i class="mdi-navigation-arrow-drop-down"></i></a>
+              <div class="collapsible-body">
+                <ul>
+                  <li><a href="#!">First</a></li>
+                  <li><a href="#!">Second</a></li>
+                  <li><a href="#!">Third</a></li>
+                  <li><a href="#!">Fourth</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <a class="brand-logo" href="/operations/">Guia</a>
+      <a href="#" data-activates="slide-out" class="button-collapse">
+        <span class="fa fa-bars fa-2x"></span>
+      </a>
+    <!-- </div> -->
+  </nav>
+</div>
+<script type="text/javascript">
+  $(".button-collapse").sideNav();
+</script>

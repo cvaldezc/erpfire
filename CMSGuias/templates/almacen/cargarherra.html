@@ -1,0 +1,38 @@
+{% extends "basemd.html" %}
+{% extends "div.html %"}
+{% block title %}
+  Cargar Herramienta
+{% endblock %}
+{% block menu %}
+  {% include "menus/almherramd.html" %}
+{% endblock %}
+{% block content %}
+<!--<script src="/media/js/almacen/guiaherramienta.js"></script>-->
+<link rel="stylesheet" href="/media/css/almacen/guiaherramienta.css">
+
+  <form method="post" action="{% url 'storare_view_carga_tools' %}" enctype="multipart/form-data">
+  <fieldset>
+  <legend align="center"><h4>Cargar lista de herramienta</h4></legend>
+    {% csrf_token %}
+    <div class="file-field input-field">
+      <div class="btn">
+        <i class="fa fa-file-excel-o"></i>
+        <span>Seleccione los Archivos</span>
+        <input type="file" name="files[]" multiple accept="application/vnd.ms-excel">
+      </div>
+      <div class="file-path-wrapper">
+        <input class="file-path validate" type="text">
+      </div>
+      <button type="submit" class="right waves-effect waves-light btn red lighten-1">
+        <i class="fa fa-upload"></i>
+        <span class="hide-on-small-only">PROCESAR ARCHIVO</span>
+      </button>
+    </div>
+    <!-- <div align="center" style="margin-top:20px;">
+      <input type="file" name="files[]" multiple/> <br/>
+      <input type="submit" value="Cargar" style="margin-top:20px;" />
+    </div> -->
+  </fieldset>
+  </form>
+{% csrf_token %}
+{% endblock %}

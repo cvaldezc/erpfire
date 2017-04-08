@@ -1,0 +1,38 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<div class="modal detherraconsult">
+    <div class="modal-content">
+        <div class="row">
+            <div class="input-field col s12">
+                <h6 class="titproyherra" style="font-weight: bold;"></h6>
+            </div>
+            <div class="input-field col s12">
+                <h6 class="titherra" style="font-weight: bold;"></h6>
+            </div>
+        </div>
+        <table class="table-detherraconsult" id="table-detherraconsult" >
+            <thead class="cab">
+                <tr class="brand-primary">
+                    <th class="colnum">#</th>
+                    <th>Guia</th>
+                    <th>F.Registro</th>
+                    <th>F.Salida</th>
+                    <th>Herramienta</th>
+                    <th>Marca</th>
+                    <th>Cantidad</th>
+                    <th>Estado</th>
+                    <th>F.Devolucion</th>
+                </tr>
+            </thead>
+            <tbody class="bodydetherraconsult" style="height:400px;"></tbody>
+        </table>
+        <div align="right" style="">
+        <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+        <i class="fa fa-times"></i>
+        <span><strong>SALIR</strong></span>
+        </button>
+        </div>
+    </div>
+</div>

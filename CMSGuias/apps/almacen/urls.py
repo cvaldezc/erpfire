@@ -1,8 +1,10 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # from django.conf.urls.defaults import patterns, url
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 
-from .views import *
+from CMSGuias.apps.almacen.views import *
+from CMSGuias.apps.almacen.vtools import *
 
 
 urlpatterns = patterns(
@@ -121,4 +123,15 @@ urlpatterns = patterns(
     url(r'^devolution/$', DevolutionStorage.as_view(), name='return_view'),
     url(r'^return/with/$', ReturnWith.as_view(), name='returnw_view'),
     url(r'^return/without/$', ReturnWithout.as_view(), name='returnwo_view'),
+    # part for tools
+    url(r'^herramienta/$', Herramient.as_view(), name='viewherramienta'),
+    url(r'^cargar/$', Cargar.as_view(), name='storare_view_carga_tools'),
+    url(r'^herramienta/guia$', Guia.as_view(), name='viewguiaherra'),
+    url(r'^herramienta/inventario$', Inventario.as_view(), name='viewinventario'),
+    url(r'^herramienta/guia/devolucion$', Devolucion.as_view(), name='viewdevolucion'),
+    url(r'^herramienta/guia/consulta$', Consulta.as_view(), name='viewconsulta'),
+    url(r'^herramienta/cargar$', Cargar.as_view(), name='viewcarga'),
+    url(r'^herramienta/estados$', EstadoHerramienta.as_view(), name='viewestherramienta'),
+    # # devolucion material
+    url(r'^devolucionmaterial/$', DevMaterial.as_view(), name='viewdevolucionmat'),
 )

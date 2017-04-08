@@ -66,7 +66,8 @@ def deleteFile(uripath, partial=False):
             os.remove(path)
         else:
             return False
-    except Exception, e:
+    except Exception as e:
+        print "Exception when delete file"
         print e
         return False
 

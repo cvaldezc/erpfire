@@ -16,4 +16,4 @@ CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
 # docker run -d -p 22 -p 8000:8000 --name sdjango -v ~/development/python/erpfire:/code --link pgdev:postgres cv/django:1.5.9
 
-# docker run -p 5432:5432 --name pgdev -v ~/containers/dbs/pgdata:/var/lib/postgresql/data -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=Syst3mH3ll -d postgres:9.6
+# docker run -p 172.17.0.4:5432:5432 --name pgdev -v ~/containers/dbs/pgdata:/var/lib/postgresql/data -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=Syst3mH3ll -d postgres:9.6

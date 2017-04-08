@@ -1,0 +1,93 @@
+.divcabherra{
+	margin-top: 30px;
+	margin-left: 70px;
+}
+.newherramienta{
+	width:550px;
+	max-height: 100%;
+}
+tbody tr:hover {
+  background-color: #e0e0e0;
+  cursor: pointer;
+}
+.titnum{
+	width: 5%;
+	text-align: center;
+}
+.titherra{
+	width: 50%;
+}
+.titmarca{
+	width: 15%;
+
+}
+.titstock{
+	width: 5%;
+	text-align: center;
+
+}
+.titcodinvent{
+	width: 15%;
+}
+
+.titaddstock{
+	text-align: center;
+}
+
+table.tabla-herra{
+	width: 90%;
+	margin-left: 5%;
+}
+
+table.tabla-invent{
+	width: 90%;
+	margin-left: 5%;
+}
+
+.bodydetailsherra{
+display: block;
+overflow: auto;
+height: 450px;
+}
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}
+
+thead {
+	background-color: #9e9e9e;
+	color: white;
+	font-size: 20px;
+}
+
+/*columnas tabla herramienta*/
+.tnumherra{
+width: 5%;
+text-align: center;
+/*font-weight: 20px;*/
+}
+.tcodherra{
+width: 15%;
+}
+.tnameherra{
+width: 50%;
+
+}
+.tmarcaherra{
+width: 15%;
+}
+.tunidherra{
+width: 5%;
+}
+.teditherra{
+width: 10%;
+text-align: center;
+}
+
+.bodydetailinvent{
+display: block;
+overflow: auto;
+height: 450px;
+}
+

@@ -1,0 +1,69 @@
+<div class="modal newherramientaguia" style="width:60%;">
+              <div class="modal-content">
+
+                <div class="row" style="display:none;">
+                  <label>PK:</label>
+                  <label style="" id="iddetguia" class="iddetguia" name="iddetguia"></label>
+                  <label>Guia:</label>
+                  <label style="" id="codguia" class="codguia" name="codguia"></label>
+                  <div style="">
+                  <input  id="accionguia" class="accionguia" name="accionguia">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s0">
+                    <p>Herramienta:</p>
+                  </div>
+                  <div class="input-field col s7" style="margin-top:25px;">
+                    <select id="comboherra" class="browser-default comboherra">
+                    {% for x in lherramienta %}
+                      {% if x.cantalmacen > 0 %}
+                      <option value="{{ x.herramienta_id }}" data-n="{{ x.herramienta.nombre }}">{{ x.herramienta.nombre }} {{ x.herramienta.medida }} {{ x.herramienta.marca.brand }}</option>
+                      {% endif %}
+                    {% endfor %}
+                    </select>                 
+                  </div>
+                  <div class="input-field col s2">
+                    <h5 class="textstock"></h5>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s4">
+                    <input placeholder="" id="guiaherracant" name="guiaherracant" type="text" class="guiaherracant">
+                    <label for="guiaherracant">Cantidad</label>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="input-field col s1">
+                    <p>Estado: </p>
+                  </div>
+                  <div class="input-field col s5">
+                    <select id="idcomboestado" class="browser-default estpais">
+                      <option value="ALMACEN">ALMACEN</option>
+                      <option value="ALQUILER">ALQUILER</option>
+                    </select>                 
+                  </div>
+                    <div class="input-field col s4" id="divfdev" style="display:none;">
+                      <input placeholder="" id="fguiadevol" name="fguiadevol" type="date" class="datepicker fguiadevol">
+                      <label for="fguiadevol">Fecha Devolucion</label>
+                    </div>
+                </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <textarea placeholder="" id="txtcomentguiah" length="200" name="txtcomentguiah" class="materialize-textarea txtcomentguiah"></textarea>
+                      <label for="txtcomentguiah">COMENTARIO</label>
+                    </div>
+                  </div>
+                  <div class="moda-footer" align="center" style="margin-top:50px;">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" id="btnsaveguiaherra" name="btnsaveguiaherra" class="btn waves-effect green lighten-1 btnsaveguiaherra">
+                      <i class="fa fa-floppy-o"></i>
+                      <span><strong>Guardar</strong></span>
+                    </button>
+                  </div>
+            </div>              
+</div>

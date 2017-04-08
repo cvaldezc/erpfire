@@ -1,0 +1,32 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<div class="modal lmaterials">
+    <div class="modal-content">
+        <table class="table-lmaterials" id="table-lmaterials" >
+            <thead class="cab">
+                <tr class="brand-primary">
+                    <th class="colnum">#</th>
+                    <th>Codigo</th>
+                    <th>Material</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Cantidad</th>
+                    <th>Comentario</th>
+                </tr>
+            </thead>
+            <tbody class="bodylmaterials"></tbody>
+        </table>
+        <div align="center" style="margin-top:10px;">
+            <button type="button" id="btnsave" class="btn waves-effect teal lighten-1 btnsavedevmat">
+            <i class="fa fa-file"></i>
+            <span><strong>GUARDAR</strong></span>
+            </button>
+            <button style="color:white;font-weight:bold;" type="button" class="btn modal-action modal-close red lighten-1 btn-flat ">
+            <i class="fa fa-times"></i>
+            <span>CANCELAR</span>
+            </button>
+        </div>
+    </div>
+</div>

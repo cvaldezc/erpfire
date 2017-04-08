@@ -1,0 +1,70 @@
+
+<div class="modal newherramienta">
+              <div class="modal-content">
+                <div class="row" style="display:none;">
+                  <label style="" id="codherra" class="codherra" name="codherra"></label>
+                  <div style="">
+                  <input  id="accionherra" class="accionherra" name="accionherra">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input placeholder="" id="idherra" name="idherra" type="text" class="idherra" length="15">
+                    <label for="nameherra" >CODIGO</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input placeholder="" id="nameherra" name="nameherra" type="text" class="nameherra">
+                    <label for="nameherra" >NOMBRE</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                  <input placeholder="" id="medida" name="medida" type="text" class="medida">
+                  <label for="medida" >MEDIDA</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s0">
+                    <p>Marca:</p>
+                  </div>
+                  <div class="input-field col s10">
+                    <select id="combomarca" class="browser-default combomarca">
+                    {% for x in lmarca %}
+                      <option value="{{ x.brand_id }}">{{ x.brand }}</option>
+                    {% endfor %}
+                    </select>                 
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s0">
+                    <p>Unidad:</p>
+                  </div>
+                  <div class="input-field col s10">
+                    <select id="combounid" class="browser-default combounid">
+                    {% for x in lunidade %}
+                      <option value="{{ x.unidad_id }}">{{ x.uninom }}</option>
+                    {% endfor %}
+                    </select>                 
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input placeholder="" id="tvida" name="tvida" type="text" class="tvida">
+                    <label for="tvida" >TIEMPO DE VIDA</label>
+                  </div>
+                </div>
+                  <div class="moda-footer" align="center" style="margin-top:50px;">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" class="btn waves-effect teal lighten-1 btnsaveherramienta">
+                      <i class="fa fa-floppy-o"></i>
+                      <span><strong>Guardar</strong></span>
+                    </button>
+                  </div>
+            </div>
+                     
+</div>

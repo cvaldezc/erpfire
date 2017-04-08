@@ -37,6 +37,8 @@ from CMSGuias.apps.operations.models import *
 ##
 #  Declare variables
 ##
+FORMAT_DATE_STR = '%Y-%m-%d'
+
 
 class JSONResponseMixin(object):
     def render_to_json_response(self, context, **response_kwargs):
@@ -50,15 +52,15 @@ class JSONResponseMixin(object):
     def convert_context_to_json(self, context):
         return json.dumps(context, encoding='utf-8', cls=DjangoJSONEncoder)
 
-FORMAT_DATE_STR = '%Y-%m-%d'
 
-class StorageHome(View):
+class StorageHome(TemplateView):
     template_name = 'almacen/storage.html'
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         return render_to_response(
             self.template_name, context_instance=RequestContext(request))
+
 
 @login_required(login_url='/SignUp/')
 def view_pedido(request):
@@ -2020,7 +2022,7 @@ class InputOrderPurchase(JSONResponseMixin, TemplateView):
                 ).order_by('-compra_id')
             context['storage'] = Almacene.objects.filter(flag=True)
             context['employee'] = Employee.objects.filter(
-                                    flag=True, 
+                                    flag=True,
                                     charge__area__icontains='almacen')
             return render_to_response(
                     self.template_name,

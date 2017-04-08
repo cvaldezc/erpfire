@@ -1,0 +1,64 @@
+<div class="modal neweditherramientaguia" style="width:60%;">
+              <div class="modal-content">
+                <div class="row">
+                  <div class="input-field col">
+                    <h6 class="keyguia"></h6>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s0">
+                    <p>Herramienta:</p>
+                  </div>
+                  <div class="input-field col s7" style="margin-top:25px;">
+                    <select id="comboneweditherra" class="browser-default comboneweditherra">
+                    {% for x in lherramienta %}
+                      {% if x.cantalmacen > 0 %}
+                      <option value="{{ x.herramienta_id }}" data-name="{{ x.herramienta.nombre }}">{{ x.herramienta.nombre }} {{ x.herramienta.medida }} {{ x.herramienta.marca.brand }}</option>
+                      {% endif %}
+                    {% endfor %}
+                    </select>                 
+                  </div>
+                  <div class="input-field col s2">
+                    <h5 class="textneweditstock"></h5>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s4">
+                    <input placeholder="" id="neweditherracant" name="neweditherracant" type="text" class="neweditherracant">
+                    <label for="neweditherracant">Cantidad</label>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="input-field col s2">
+                    <p>Estado: </p>
+                  </div>
+                  <div class="input-field col s5">
+                    <select id="comboneweditestado" class="browser-default comboneweditestado">
+                      <option value="ALMACEN">ALMACEN</option>
+                      <option value="ALQUILER">ALQUILER</option>
+                    </select>                 
+                  </div>
+                    <div class="input-field col s4" id="divneweditfdev" style="display:none;">
+                      <input placeholder="" id="neweditfguiadevol" name="neweditfguiadevol" type="date" class="datepicker neweditfguiadevol">
+                      <label for="neweditfguiadevol">Fecha Devolucion</label>
+                    </div>
+                </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <textarea placeholder="" id="txtneweditcomentguiah" length="200" name="txtneweditcomentguiah" class="materialize-textarea txteditcomentguiah"></textarea>
+                      <label for="txtneweditcomentguiah">COMENTARIO</label>
+                    </div>
+                  </div>
+                  <div class="moda-footer" align="center" style="margin-top:50px;">
+                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+                      <i class="fa fa-times"></i>
+                      <span>Cancelar</span>
+                    </button>
+                    <button type="button" id="btnneweditsaveguiaherra" name="btnneweditsaveguiaherra" class="btn waves-effect green lighten-1 btnneweditsaveguiaherra">
+                      <i class="fa fa-floppy-o"></i>
+                      <span><strong>Guardar</strong></span>
+                    </button>
+                  </div>
+            </div>              
+</div>

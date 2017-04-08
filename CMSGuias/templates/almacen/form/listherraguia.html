@@ -1,0 +1,102 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<div class="modal lherraguia">
+      <div class="modal-content">
+      <!--
+        <div class="row">
+            <label>Proyecto:</label>
+            <label class="lblproy"></label>
+            </br>
+            <label>Guia:</label>
+            <label class="lblguia"></label>
+        </div>
+        -->
+        <div class="row">
+          <div class="input-field col s3">
+            <input placeholder="" id="ednumguia" name="ednumguia" type="text" class="ednumguia">
+            <label for="ednumguia" >NUMERO DE GUIA</label>
+          </div>
+          <div class="input-field col s0">
+            <p>Proyecto:</p>
+          </div>
+          <div class="input-field col s5" id="edcomboproyecto">
+            <select id="edcomboproyecto" class="browser-default edcomboproyecto">
+            {% for x in lproyecto %}
+          <option value="{{ x.proyecto_id }}">{{ x.proyecto_id }} {{ x.nompro }}</option>
+            {% endfor %}
+            </select>                 
+          </div>
+        <div class="input-field col s3">
+          <input placeholder="" id="edfguiasalida" name="edfguiasalida" type="date" class="datepicker edfguiasalida">
+          <label for="edfguiasalida">Fecha de Salida</label>
+        </div>
+        </div>
+        <div class="row">
+      <div class="input-field col s0" style="margin-top:50px;">
+        <p>Transportista:</p>
+      </div>
+      <div class="input-field col s2" style="margin-top:50px;">
+        <select id="edcombotransportista" class="browser-default edcombotransportista">
+        {% for x in ltransportista %}
+          <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
+        {% endfor %}
+        </select>                 
+      </div>
+      <div class="input-field col s0" style="margin-top:50px;">
+        <p>Conductor:</p>
+      </div>
+      <div class="input-field col s2" style="margin-top:50px;">
+        <select id="edcomboconductor" class="browser-default edcomboconductor">
+        {% for x in lconductor %}
+          <option value="{{ x.condni_id }}">{{ x.connom }}</option>
+        {% endfor %}
+        </select>                 
+      </div>
+      <div class="input-field col s0" style="margin-top:50px;">
+        <p>Placa:</p>
+      </div>
+      <div class="input-field col s2" style="margin-top:50px;">
+        <select id="edcomboplaca" class="browser-default edcomboplaca">
+        {% for x in ltransporte %}
+          <option value="{{ x.nropla_id }}">{{ x.nropla_id }}  {{ x.marca }}</option>
+        {% endfor %}
+        </select>                 
+      </div>
+        <div class="input-field col s3">
+          <textarea placeholder="" id="edtxtcomentguia" name="edtxtcomentguia" class="materialize-textarea edtxtcomentguia"></textarea>
+          <label for="edtxtcomentguia">COMENTARIO</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s0" id="divaddherra">
+            <button type="button" name="btnnewguiaherra" data-newguiaherra="btnnewguiaherra" class="btn waves-effect green lighten-1 btnnewguiaherra">
+                    <span>AGREGAR HERRAMIENTA</span>
+            </button>
+        </div>
+        <div class="input-field col s0" style="margin-left:800px;">
+            <button type="button" name="edsaveherraguia" class="btn waves-effect green lighten-1 edsaveherraguia">
+                    <span>GUARDAR CAMBIOS</span>
+            </button>
+        </div> 
+    </div>
+        <table class="table-detailherraguia" id="table-detailherraguia" >
+            <thead>
+                <tr class="brand-primary">
+                    <th>N°</th>
+                    <th>Herramienta</th>
+                    <th style="text-align:center;">Cantidad</th>
+                    <th style="text-align:center;">Estado</th>
+                    <th style="text-align:center;">F.Devolucion</th>
+                    <th style="text-align:center;"></th> 
+                </tr>
+            </thead>
+            <tbody class="bodydetailsherra" style="height:270px;"></tbody>
+        </table>
+        <div align="right" style="">
+        <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">SALIR</button>
+        </div>
+      </div>
+</div>
+{% csrf_token %}

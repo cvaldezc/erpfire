@@ -1,0 +1,166 @@
+
+<div class="modal newguiadev" >
+    <div class="modal-content">
+    <div class="row">
+    <label style="display:none;" class="lblnumguia"></label>
+      <div class="input-field col s0">
+        <p>Transportista:</p>
+      </div>
+      <div class="input-field col s2">
+        <select id="devcombotrans" class="browser-default devcombotrans">
+        {% for x in ltransportista %}
+          <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
+        {% endfor %}
+        </select>                 
+      </div>
+      <div class="input-field col s0">
+        <p>Conductor:</p>
+      </div>
+      <div class="input-field col s2">
+        <select id="devcomboconduc" class="browser-default devcomboconduc">
+        {% for x in lconductor %}
+          <option value="{{ x.condni_id }}">{{ x.connom }}</option>
+        {% endfor %}
+        </select>                 
+      </div>
+      <div class="input-field col s0">
+        <p>Placa:</p>
+      </div>
+      <div class="input-field col s2">
+        <select id="devcomboplaca" class="browser-default devcomboplaca">
+        {% for x in ltransporte %}
+          <option value="{{ x.nropla_id }}">{{ x.nropla_id }}  {{ x.marca }}</option>
+        {% endfor %}
+        </select>                 
+      </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s2">
+          <input placeholder="" id="fdevretorno" name="fdevretorno" type="date" class="datepicker fdevretorno">
+          <label for="fdevretorno">Fecha de Retorno</label>
+        </div>
+        <div class="input-field col s2" style="margin-left:650px;">
+        <button type="button" name="btnsaveguiadev" class="btn waves-effect teal lighten-1 btnsaveguiadev">
+            <i class="fa fa-floppy-o"></i>
+            <span><strong>GUARDAR DATOS</strong></span>
+        </button>
+        </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s2"><label style="color:black;">N.Guia</label></div>
+      <div class="input-field col s2"><label style="color:black;">Herramienta</label></div>
+      <div class="input-field col s2"><label style="color:black;">Cant.Entregada</label></div>
+      <div class="input-field col s2"><label style="color:black;">Devolucion</label></div>
+      <div class="input-field col s2"><label style="color:black;">Cant.Devuelta</label></div>
+    </div>
+    <hr style="margin-top:50px;">
+    
+    <div class="divherradev" id="divherradev" style="">
+    </div>
+<!--
+    <table class="table-detailsherradev" id="table-detailsherradev">
+        <thead>
+            <tr class="">
+                <th style="">Guia</th>
+                <th style="">Herramienta</th>
+                <th style="">Cant.Enviada</th>
+                <th style="">Devolver</th> 
+            </tr>
+        </thead>
+        <tbody class="bodydetails" style="height:200px;" ></tbody>
+    </table>
+-->
+  </div>
+                     
+</div>
+
+
+
+
+<!-- fin -->
+
+<div class="modal newdev" >
+    <div class="modal-content">
+    <div class="row">
+    <label style="display:none;" class="lblnumguia"></label>
+      <div class="input-field col s0">
+        <p>Transportista:</p>
+      </div>
+      <div class="input-field col s2">
+        <select id="devcotrans" class="browser-default devcotrans">
+        {% for x in ltransportista %}
+          <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
+        {% endfor %}
+        </select>                 
+      </div>
+      <div class="input-field col s0">
+        <p>Conductor:</p>
+      </div>
+      <div class="input-field col s2">
+        <select id="devcoconduc" class="browser-default devcoconduc">
+        {% for x in lconductor %}
+          <option value="{{ x.condni_id }}">{{ x.connom }}</option>
+        {% endfor %}
+        </select>                 
+      </div>
+      <div class="input-field col s0">
+        <p>Placa:</p>
+      </div>
+      <div class="input-field col s2">
+        <select id="devcoplaca" class="browser-default devcoplaca">
+        {% for x in ltransporte %}
+          <option value="{{ x.nropla_id }}">{{ x.nropla_id }}  {{ x.marca }}</option>
+        {% endfor %}
+        </select>                 
+      </div>
+      <div class="input-field col s2">
+        <input placeholder="" id="fdevret" name="fdevret" type="date" class="datepicker fdevret">
+        <label for="fdevret">Fecha de Retorno</label>
+      </div>
+    </div>
+    <div class="row">
+
+      <div class="input-field col">
+        <h6>Guia: </h6>
+      </div>
+      <div class="input-field col">
+        <h6 class="numguiadev"></h6>
+      </div>
+
+      <div class="input-field col s0">
+        <button type="button" style="border:none;font-weight:bold;" class="transparent btndetherracompletas" id="btndev" value=""><small>det.Herramientas Completas</small></button>
+      </div>
+
+      <div class="input-field col s2" style="margin-left:800px;">
+      <button type="button" name="saveguiadev" class="btn waves-effect teal lighten-1 saveguiadev">
+        <i class="fa fa-floppy-o"></i>
+        <span><strong>GUARDAR DATOS</strong></span>
+      </button>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+    </div>
+
+    <table class="table-herradev" id="table-herradev">
+        <thead class="cab">
+            <tr>
+                <th>Herramienta</th>
+                <th class="colcant">Enviado</th>
+                <th class="colcant">Devuelto</th>
+                <th class="coldev">Devolver</th>
+                <th class="colestado">Estado</th>
+                <th>Comentario</th>
+            </tr>
+        </thead>
+        <tbody class="bodydetherradev" style="height:400px;" ></tbody>
+    </table>
+    <div align="right">
+    <button type="button" class="btn modal-action modal-close waves-effect waves-black blue lighten-1 btn-flat btnsalirmodal">
+    <i class="fa fa-times"></i>
+    <span><strong>SALIR</strong></span>
+    </button>
+    </div>
+  </div>
+                     
+</div>
