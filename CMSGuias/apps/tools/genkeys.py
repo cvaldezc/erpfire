@@ -683,3 +683,20 @@ def GenerateIdEmpleCampo(dni=None, pr=None):
             return '%s%s%s' % (dni, pr, '001')
     except ObjectDoesNotExist:
         return '%s%s%s' % (dni, pr, '001')
+
+
+def GenerateIdGuiaDev():
+    id = None
+    try:
+        code = devolucionHerra.objects.aggregate(max=Max('docdev_id'))
+        id = code['max']
+        if id is not None:
+            counter = int(id[2:7])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('DO', '{:0>5d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
