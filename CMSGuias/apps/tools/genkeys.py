@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Max
 
 from CMSGuias.apps.almacen.models import (
-    Pedido, GuiaRemision, Suministro, NoteIngress, Restoration)
+    Pedido, GuiaRemision, Suministro, NoteIngress, Restoration, devolucionHerra)
 from CMSGuias.apps.logistica.models import Cotizacion, Compra, ServiceOrder
 from CMSGuias.apps.ventas.models import Proyecto
 from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado, Rubro
