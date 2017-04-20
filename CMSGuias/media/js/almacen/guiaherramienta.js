@@ -1853,14 +1853,14 @@ listherraguia = function () {
 }
 
 verdocherrapdf = function () {
-  window.open('http://' + location.hostname + ':8080/reports/toolsguidereturn?ndoc=' + this.value, '_blank');
+  window.open('http://' + location.hostname + ':8089/reports/toolsguidereturn?ndoc=' + this.value, '_blank');
 }
 
 verguiaherrapdf = function () {
-  window.open('http://' + location.hostname + ':8080/reports/guide/tools?ng=' + this.value, '_blank');
+  window.open('http://' + location.hostname + ':8089/reports/guide/tools?ng=' + this.value, '_blank');
 }
 verguiacompdf = function () {
-  window.open('http://' + location.hostname + ':8080/reports/guide/tools?ng=' + this.value, '_blank');
+  window.open('http://' + location.hostname + ':8089/reports/guide/tools?ng=' + this.value, '_blank');
 }
 
 generarguia = function () {
