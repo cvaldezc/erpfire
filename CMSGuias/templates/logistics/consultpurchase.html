@@ -45,7 +45,7 @@
 					<div class="col l4 m4 s12">
 						<dl>
 							<dt>Nro Orden de Compra</dt>
-							<dd><a href="/reports/order/purchase/{{purbedside.pk}}/" target="_blank">{{purbedside.pk}}</a></dd>
+							<dd><a href="http://172.16.0.80:8089/reports/purchase?purchase={{purbedside.pk}}" target="_blank">{{purbedside.pk}}</a></dd>
 							<dt>Provedor</dt>
 							<dd>{{purbedside.fields.proveedor.pk}} {{purbedside.fields.proveedor.fields.razonsocial}}</dd>
 						</dl>
@@ -138,7 +138,7 @@
 				<tr ng-repeat="x in resumen">
 					<td>{{$index + 1}}</td>
 					<td>
-						<a href="/reports/order/purchase/{{x.fields.compra.pk}}/" target="_blank">{{x.fields.compra.pk}}</a>
+						<a href="http://172.16.0.80:8089/reports/purchase?purchase={{x.fields.compra.pk}}" target="_blank">{{x.fields.compra.pk}}</a>
 					</td>
 					<td>{{x.fields.compra.fields.registrado|date:"yyyy-MM-dd"}}</td>
 					<td>{{x.fields.materiales.pk}}</td>

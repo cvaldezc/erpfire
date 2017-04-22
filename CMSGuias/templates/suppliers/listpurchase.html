@@ -29,14 +29,14 @@
                     {% for x in purchase %}
                         <div class="col-sm-5 col-md-3">
                             <div class="thumbnail">
-                                <iframe src="/reports/order/purchase/{{ x.compra_id }}/" scrolling="no" seamless="seamless"></iframe>
+                                <iframe src="http://172.16.0.80:8089/reports/purchase?purchase={{ x.compra_id }}" scrolling="no" seamless="seamless"></iframe>
                                 <div class="caption">
                                     <h6><strong>Nro Compra {{ x.compra_id }}</strong></h6>
                                     <p>
                                         <h6><strong>Fecha de traslado:</strong> {{ x.traslado }}</h6>
                                     </p>
                                     <p>
-                                        <a href="/reports/order/purchase/{{ x.compra_id }}/" target="_blank" class="btn btn-sm btn-primary" role="button">Ver</a>
+                                        <a href="http://172.16.0.80:8089/reports/purchase?purchase={{ x.compra_id }}" target="_blank" class="btn btn-sm btn-primary" role="button">Ver</a>
                                         <a target="_blank" href="{{ MEDIA_URL }}{{ x.deposito }}" class="btn btn-sm btn-warning pull-right text-black" role="button"><span class="glyphicon glyphicon-credit-card"></span> Deposito</a>
                                     </p>
                                 </div>

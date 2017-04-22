@@ -118,7 +118,7 @@ getSearch = function() {
 };
 
 openWindow = function() {
-  window.open("/reports/order/purchase/" + this.value + "/", "_blank");
+  window.open("http://172.16.0.80:8089/reports/purchase?purchase=" + this.value, "_blank");
 };
 
 showActions = function(event) {

@@ -96,7 +96,7 @@ listTemplate = (list)->
             <span class="glyphicon glyphicon-credit-card"></span></button>
         </td>
         <td class="text-center">
-          <a href="/reports/order/purchase/{{ purchase }}/"
+          <a href="http://172.16.0.80:8089/reports/purchase?purchase={{ purchase }}"
            target="_blank" class="btn btn-xs btn-link text-black">
             <span class="glyphicon glyphicon-eye-open"></span></a>
         </td>

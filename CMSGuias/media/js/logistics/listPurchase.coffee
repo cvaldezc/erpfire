@@ -114,7 +114,7 @@ getSearch = ->
     return
 
 openWindow = ->
-    window.open("/reports/order/purchase/#{@value}/","_blank")
+    window.open("http://172.16.0.80:8089/reports/purchase?purchase=#{@value}","_blank")
     return
 
 showActions = (event) ->

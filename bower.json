@@ -1,5 +1,5 @@
 {
-  "name": "CMSGuias",
+  "name": "erpfire",
   "version": "0.0.4",
   "homepage": "https://github.com/christian6/CMSGuias",
   "description": "Libraries",
@@ -37,8 +37,5 @@
     "trumbowyg": "^2.2.0",
     "chosen": "^1.6.2",
     "materialize": "^0.97.8"
-  },
-  "resolutions": {
-    "font-awesome": "^4.7.0"
   }
 }
