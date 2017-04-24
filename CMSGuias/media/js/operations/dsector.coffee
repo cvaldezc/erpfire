@@ -23,7 +23,7 @@ app.directive 'file', ($parse) ->
       file = event.target.files[0]
       scope.file = if file then file else undefined
       scope.$apply()
-      
+
 app.factory 'Factory', ($http, $cookies) ->
   $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -66,9 +66,12 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   $scope.status = false
   $scope.sldm = [[0, 0], [0, 0]]
   $scope.pnp = 0
+  ## order to storage
+  $scope.preorders = []
+  $scope.selectedniple = []
   angular.element(document).ready ->
     $scope.mdstatus = false
-    angular.element('.modal').modal 'dismissible': false
+    angular.element('.modal').modal dismissible: false
     angular.element('ul.tabs').tabs 'onShow': -> window.scrollTo 0, 680
     angular.element('.collapsible').collapsible()
     $table = $(".floatThead")
@@ -809,95 +812,23 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         $("#commentm").modal('close')
         return
     return
-  $scope.changeSelOrder = ($event) ->
-    # console.log $event.currentTarget.value
-    $("[name=chkorders]").each (index, element) ->
-      $(element).prop "checked", Boolean parseInt $event.currentTarget.value
-      return
-    return
+  # part perform orders to storage
+  # this funciton open modal for preview order
   $scope.pOrders = ($event) ->
-    data = new Array()
-    $("[name=chkorders]").each (index, element) ->
-      $e = $(element)
-      if $e.is(":checked")
-        data.push
-          "id": $e.val()
-          "name": $e.attr "data-nme"
-          "unit": $e.attr "data-unit"
-          "brandid": $e.attr "data-brandid"
-          "modelid": $e.attr "data-modelid"
-          "brand": $e.attr "data-brand"
-          "model": $e.attr "data-model"
-          "quantity": parseFloat $e.attr "data-quantity"
-          "qorders": $e.attr "data-quantity"
-          "nipple": $e.attr "data-nipple"
-      return
-    if data.length
-      $scope.dataOrders = data
+    counter = 0
+    for x in $scope.preorders
+      if x.status
+        counter++
+    if counter > 0
       $("#morders").modal('open')
       return
+  $scope.changeSelOrder = ($event) ->
+    # console.log $event.currentTarget.value
+    # $("[name=chkorders]").each (index, element) ->
+    for x in $scope.preorders
+      x.status = Boolean parseInt $event.currentTarget.value
     return
-    # $scope.dataOrders = []
-    # console.log $scope.dataOrders.length
-    # if $scope.dataOrders.length
-    #   data = []
-    #   $("[name=chkorders]").each (index, element) ->
-    #     $e = $(element)
-    #     if $e.is(":checked")
-    #       counter = 0
-    #       for x in data
-    #         if x.id == $e.val()
-    #           continue
-    #         else
-    #           counter++
-    #       console.log counter, data.length
-    #       if counter == data.length
-    #         data.push
-    #           "id": $e.val()
-    #           "name": $e.attr "data-nme"
-    #           "unit": $e.attr "data-unit"
-    #           "brandid": $e.attr "data-brandid"
-    #           "modelid": $e.attr "data-modelid"
-    #           "brand": $e.attr "data-brand"
-    #           "model": $e.attr "data-model"
-    #           "quantity": $e.attr "data-quantity"
-    #           "qorders": $e.attr "data-quantity"
-    #           "nipple": $e.attr "data-nipple"
-    #         return
-    #   $scope.dataOrders = []
-    #   $timeout (->
-    #     $scope.dataOrders = data
-    #     return
-    #   ), 200
-    #   console.log data
-    # else
-    #   data = new Array()
-    #   $("[name=chkorders]").each (index, element) ->
-    #     $e = $(element)
-    #     if $e.is(":checked")
-    #       $scope.dataOrders.push
-    #         "id": $e.val()
-    #         "name": $e.attr "data-nme"
-    #         "unit": $e.attr "data-unit"
-    #         "brandid": $e.attr "data-brandid"
-    #         "modelid": $e.attr "data-modelid"
-    #         "brand": $e.attr "data-brand"
-    #         "model": $e.attr "data-model"
-    #         "quantity": $e.attr "data-quantity"
-    #         "qorders": $e.attr "data-quantity"
-    #         "nipple": $e.attr "data-nipple"
-    #     return
-    #   # $scope.dataOrders = data
-    # $timeout ->
-    #   console.log $scope.dataOrders.length
-    #   if $scope.dataOrders.length
-    #     $("#morders").modal('open')
-    #     return
-    #   else
-    #     swal "Ninguno.", "Debe de seleccionar al menos unos.", "warning"
-    #     return
-    # , 500
-    # return
+
   $scope.changeQOrders = ($event) ->
     if parseFloat($event.currentTarget.value) > parseFloat($event.currentTarget.dataset.qmax)
       $event.currentTarget.value = $event.currentTarget.dataset.qmax
@@ -905,45 +836,51 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       if x.id == $event.currentTarget.dataset.materials
         x.qorders = $event.currentTarget.value
     return
-  $scope.deleteItemOrders = ($id) ->
-    $tmp = $scope.dataOrders
-    remove = ->
+
+  $scope.deleteItemOrders = ($index) ->
+    console.log $index
+    $scope.preorders[$index].status = false
+    removeItem = ->
       defer = $q.defer()
-      promises = []
-      count = 0
-      for x in $tmp
-        # console.log x.id, $event.currentTarget.value
-        if x.id == $id
-          $tmp.splice count, 1
-          promises.push count
-          # console.log "item delete"
-        count++
-      $q.all(promises).then (result) ->
-        defer.resolve result
-        return
+      counter = 0
+      for x in $scope.preorders
+        if x.status is true
+          counter++
+      defer.resolve counter
       return defer.promise
-    remove().then (result) ->
-      $scope.dataOrders = $tmp
-      if $scope.dataOrders.length <= 0
+    removeItem().then (response) ->
+      if response <= 0
         angular.element("#morders").modal('close')
       return
     return
-  $scope.getNippleMaterials = ($event) ->
-    data =
-      nippleOrders: true
-      materials: $event.currentTarget.value
-    if !$scope.snip["#{data.materials}"]
+
+  $scope.getNippleMaterials = ($index) ->
+    #$scope.setToastStatic "Obteniendo Niples, espere!", "cog"
+    getniples = ->
+      defer = $q.defer()
+      data =
+        nippleOrders: true
+        materials: $scope.preorders[$index].materials.pk
+        brand: $scope.preorders[$index].brand.pk
+        model: $scope.preorders[$index].model.pk
       $http.get "", params: data
-      .success (response) ->
-        console.log response
-        if response.status
-          console.log $scope.snip
-          $scope.snip["#{data.materials}"] = !$scope.snip["#{data.materials}"]
-          $scope.nip["#{data.materials}"] = response.nipple
+        .success (response) ->
+          console.log response
+          defer.resolve response
           return
-    else
-      $scope.snip["#{data.materials}"] = !$scope.snip["#{data.materials}"]
+      return defer.promise
+    getniples().then (response) ->
+      #$scope.removeToastStatic()
+      # if not $scope.preorders[$index].hasOwnProperty("selected")
+      $scope.preorders[$index]['selected'] = response['nipple']
+      $scope.selectedniple['details'] = $scope.preorders[$index].selected
+      $scope.selectedniple['materials'] = $scope.preorders[$index].materials
+      angular.element("#mselectedniple").modal 'open'
+      return
+
+        #   return
     return
+
   $scope.sumNipple = ($event) ->
     $timeout ->
       $scope.ordersm["#{$event.currentTarget.value}"] = 0
@@ -957,9 +894,9 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       $scope.ordersm["#{$event.currentTarget.value}"] = (amount / 100)
     , 200
     return
+
+  # orders
   $scope.saveOrdersStorage = ($event) ->
-    console.log $scope.orders
-    console.log $scope.ordersm
     # get list nipples
     swal
       title: "Desea generar la orden?"
@@ -1053,6 +990,11 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
               return
         return
     return
+
+    ##
+    # end functions for orders
+    # end block
+    ##
 
   $scope.validUrl = (file) ->
     uri = "/media/#{file}"
@@ -1308,6 +1250,15 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   #           console.error "Error ", response
   #       return
   #   return
+  $scope.setToastStatic = (message="", icon="", duration=0) ->
+    if duration is 0
+      duration = "undefined"
+    Materialize.toast "<i class='fa fa-#{icon} fa-spin fa-fw fa-2x'></i>&nbsp; #{message}", duration, "toast-remove"
+    return
+  $scope.removeToastStatic = ->
+    angular.element ".toast-remove"
+      .remove()
+    return
   $scope.calcApproved = ->
     # calc amount global
     $scope.pnp = parseFloat($scope.amnp)

@@ -512,7 +512,7 @@ class ProgramingProject(JSONResponseMixin, View):
                                                 odsm.psales = sales
                                                 if odsm.tag == '2':
                                                     odsm.tag = '1'
-                                                odsm.save() 
+                                                odsm.save()
                                             else:
                                                 dm = DSMetrado()
                                                 dm.dsector_id = sgroup[tgn][ns]['id']
@@ -655,8 +655,10 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             Nipple.objects.filter(
                                 area_id=kwargs['area'],
                                 materiales_id=request.GET['materials'],
+                                # brand_id=request.GET['brand'],
+                                # model_id=request.GET['model'],
                                 cantshop__gt=0),
-                            relations=('materiales')))
+                            )) # relations=('materiales')
                     context['status'] = True
                 if 'lsttemp' in request.GET:
                     def lists(tp):
@@ -902,8 +904,8 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             dsmt.save()
                         except DSMetradoTemp.DoesNotExist as ex:
                             print ex
-                            DSMetradoTemp.objects.create(dsector_id=kwargs['area'], 
-                            materials_id=request.POST['code'], 
+                            DSMetradoTemp.objects.create(dsector_id=kwargs['area'],
+                            materials_id=request.POST['code'],
                             brand_id=request.POST['brand'],
                             model_id=request.POST['model'],
                             missingsend=request.POST['quantity'],
@@ -1013,12 +1015,12 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             symb = '+'
                         else:
                             symb = '-'
-                        if symb == '-': 
+                        if symb == '-':
                             diff = (dsm.quantity - qtt)
                             if dsm.qorder <= diff and dsm.qorder > 0:
                                 qtt = (diff - dsm.qorder)
                             elif dsm.qorder > diff and dsm.qorder > 0:
-                                qtt = diff 
+                                qtt = diff
                             elif dsm.qorder == 0:
                                 qtt = 0
                             else:
@@ -1635,7 +1637,7 @@ class CompareMaterials(JSONResponseMixin, TemplateView):
                     context['id'] = o[0].brand_id
                     context['name'] = o[0].brand
                 context['status'] = True
-            if 'saveModel' in request.POST: 
+            if 'saveModel' in request.POST:
                 model = request.POST['model'].strip().upper()
                 o = Model.objects.filter(brand_id=request.POST['brand'], model=model)
                 if not o.count():

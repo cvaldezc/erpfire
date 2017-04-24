@@ -13,3 +13,4 @@ npm-debug.log
 **/images/icrlogo.png
 .vscode/
 CMSGuias/static/load.json
+settings.py

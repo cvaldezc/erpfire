@@ -227,8 +227,23 @@
                     <script type="text/ng-template" id="areatmp.html">
                         <td class="center-align">{{$index + 1}}</td>
                         <td class="center-align">
-                            <input type="checkbox" name="chkorders" id="chk{{x.fields.materials.pk}}" value="{{x.fields.materials.pk}}" data-brand="{{x.fields.brand.fields.brand}}" data-brandid="{{x.fields.brand.pk}}" data-modelid="{{x.fields.model.pk}}" data-model="{{x.fields.model.fields.model}}" data-quantity="{{x.fields.qorder}}" data-nme="{{x.fields.materials.fields.matnom}} - {{x.fields.materials.fields.matmed}}" data-nipple="{{x.fields.nipple}}" ng-if="x.fields.tag != '2'">
+                            <input type="checkbox" name="chkorders" id="chk{{x.fields.materials.pk}}" value="{{x.fields.materials.pk}}" data-brand="{{x.fields.brand.fields.brand}}" data-brandid="{{x.fields.brand.pk}}" data-modelid="{{x.fields.model.pk}}" data-model="{{x.fields.model.fields.model}}" data-quantity="{{x.fields.qorder}}" data-nme="{{x.fields.materials.fields.matnom}} - {{x.fields.materials.fields.matmed}}" data-nipple="{{x.fields.nipple}}" ng-if="x.fields.tag != '2'"
+                            ng-model="preorders[$index].status" class="filled-in">
                             <label for="chk{{x.fields.materials.pk}}"></label>
+                            <!-- set object materiales for preorders -->
+                            <input type="hidden" ng-model="preorders[$index].materials" ng-init="preorders[$index].materials=x.fields.materials">
+                            <!-- set object brand for preorders -->
+                            <input type="hidden" ng-model="preorders[$index].brand" ng-init="preorders[$index].brand=x.fields.brand">
+                            <!-- set object model for preorders -->
+                            <input type="hidden" ng-model="preorders[$index].model" ng-init="preorders[$index].model=x.fields.model">
+                            <!-- set object niple for preorders -->
+                            <input type="hidden" ng-model="preorders[$index].niple" ng-init="preorders[$index].niple=x.fields.nipple">
+                            <!-- set object quantity for attend for preorders -->
+                            <input type="hidden" ng-model="preorders[$index].quantity" ng-init="preorders[$index].quantity=x.fields.qorder">
+                            <!-- set object tag visible for preorders -->
+                            <input type="hidden" ng-model="preorders[$index].tag" ng-init="preorders[$index].tag=x.fields.tag">
+                            <!-- set index for operations-->
+                            <input type="hidden" ng-model="preorders[$index].index" ng-init="preorders[$index].index=$index">
                         </td>
                         <td class="center-align text-9">{{x.fields.materials.pk}}</td>
                         <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
@@ -435,7 +450,7 @@
                 <ul class="collapsible popout" data-collapsible="expandable">
                     <li ng-class="{'active': mmview}">
                         <div ng-class="{'active': mmview}" class="collapsible-header green-text text-lighten-1">
-                            <i class="fa fa-plus"></i> Nuevos 
+                            <i class="fa fa-plus"></i> Nuevos
                             <div style="margin-top: 5px;" class="chip right green lighten-2">
                                 <strong>Venta: {{tmlstN[1] | number:"2"}}</strong></div>
                             <div style="margin-top: 5px;" class="chip right green lighten-2">
@@ -492,7 +507,7 @@
                     </li>
                     <li ng-class="{'active': mmview}">
                         <div ng-class="{'active': mmview}" class="collapsible-header blue-text text-darken-1">
-                            <i class="fa fa-edit"></i> Modificados 
+                            <i class="fa fa-edit"></i> Modificados
                             <div style="margin-top: 5px;" class="chip right blue lighten-2">
                                 <strong>Venta: {{tmlstM[1] | number:"2"}}</strong></div>
                             <div style="margin-top: 5px;" class="chip right blue lighten-2">
@@ -550,7 +565,7 @@
                     </li>
                     <li ng-class="{'active': mmview}">
                         <div ng-class="{'active': mmview}" class="collapsible-header red-text">
-                            <i class="fa fa-trash"></i> Eliminados 
+                            <i class="fa fa-trash"></i> Eliminados
                             <div style="margin-top: 5px;" class="chip right red lighten-2">
                                 <strong>Venta: {{tmlstD[1] | number:"2"}}</strong></div>
                             <div style="margin-top: 5px;" class="chip right red lighten-2">
@@ -920,6 +935,10 @@
                     Pedido Almacén
                     <br>
                     <small>
+                        <button type="button" class="btn grey lighten-5 grey-text text-darken-3 modal-action modal-close">
+                            <i class="fa fa-times"></i>
+                            SALIR
+                        </button>
                         <button type="button" class="right btn light-blue darken-1" ng-click="ordersp1=true;ordersp2=true">
                             <i class="fa fa-arrow-right"></i>
                             continuar
@@ -928,36 +947,37 @@
                 </h5>
                 <table id="torders" class="table highlight responsive-table">
                     <thead>
-                        <tr>
-                            <th></th>
-                            <th>Código</th>
-                            <th>Descripción</th>
-                            <th>Marca</th>
-                            <th>Modelo</th>
+                        <tr class="blue lighten-3">
+                            <th class="center-align"></th>
+                            <th class="center-align">Código</th>
+                            <th class="center-align">Descripción</th>
+                            <th class="center-align">Marca</th>
+                            <th class="center-align">Modelo</th>
                             <th class="center-align">Cantidad</th>
-                            <th>Pedido</th>
+                            <th class="center-align">C. a Pedir</th>
+                            <th class="center-align"></th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% verbatim %}
-                            <tr ng-repeat="x in dataOrders">
-                                <td>{{$index+1}}</td>
-                                <td>{{x.id}}</td>
-                                <td>{{x.name}}</td>
-                                <td>{{x.brand}}</td>
-                                <td>{{x.model}}</td>
+                            <tr ng-repeat="x in preorders | filter: {tag:'!2'} | filter: {'status': true}">
+                                <td>{{$index + 1 }}</td>
+                                <td>{{x.materials.pk}} {{x.status}}</td>
+                                <td>{{x.materials.fields.matnom}} {{x.materials.fields.matmed}}</td>
+                                <td>{{x.brand.fields.brand}}</td>
+                                <td>{{x.model.fields.model}}</td>
                                 <td class="center-align">{{x.quantity}}</td>
                                 <td>
-                                    <input type="number" step="0.01" max="{{x.quantity}}" min="0" class="right-align" data-materials="{{x.id}}" data-qmax="{{x.quantity}}" ng-model="ordersm[x.id]" ng-init="ordersm[x.id]=x.nipple=='false' ? x.quantity : 0" ng-disabled="x.nipple=='true'" ng-value="ordersm[x.id]" ng-blur="changeQOrders($event)">
+                                    <input type="number" step="0.01" max="{{x.quantity}}" min="0" class="right-align" value="{{ (x.niple) ? 0 : x.quantity}}" ng-disabled="x.niple==true">
                                 </td>
                                 <td class="center-align">
-                                    <button type="button" class="btn-flat grey lighten-5 green-text text-lighten-1 waves-effect" ng-if="x.nipple=='true'" value="{{x.id}}" ng-click="getNippleMaterials($event)">
+                                    <button type="button" class="btn-flat grey lighten-5 green-text waves-effect" ng-if="x.niple==true" ng-click="getNippleMaterials(x.index)">
                                         <i class="fa fa-plus"></i>
                                     </button>
                                 </td>
                                 <td>
-                                    <button type="button" ng-click="deleteItemOrders(x.id)" class="btn btn-flat grey lighten-5 red-text text-lighten-1 waves-effect" value="{{x.id}}">
+                                    <button type="button" ng-click="deleteItemOrders(x.index)" class="btn btn-flat grey lighten-5 red-text waves-effect">
                                         <i class="fa fa-times"></i>
                                     </button>
                                 </td>
@@ -965,8 +985,8 @@
                         {% endverbatim %}
                     </tbody>
                 </table>
-                {% verbatim %}
-                    <table class="table responsive-table highlight" id="ordersnipples" ng-repeat="x in dataOrders" ng-if="x.nipple=='true'" >
+                {#% verbatim %#}
+                    {% comment %}<table class="table responsive-table highlight" id="ordersnipples" ng-repeat="x in dataOrders" ng-if="x.nipple=='true'" >
                         <thead>
                             <tr>
                                 <th style="width: 25px;">
@@ -1017,8 +1037,8 @@
                                 <td class="center-align">cm</td>
                             </tr>
                         </tbody>
-                    </table>
-                {% endverbatim %}
+                    </table>{% endcomment %}
+                {#% endverbatim %#}
             </div>
             <div class="modal-content" ng-model="ordersp2" ng-show="ordersp2">
                 <h5>
@@ -1075,14 +1095,56 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn grey lighten-5 grey-text text-darken-3 modal-action modal-close">
-                    <i class="fa fa-times"></i>
-                    SAlir
-                </button>
-            </div>
         </div>
     </div>
+    <!-- show modal for seleccion niple -->
+    {% verbatim %}
+            <div id="mselectedniple" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                    <h5>
+                        <small>NIPLES</small>
+                        <br>
+                        <strong><small>{{selectedniple.materials.fields.matnom}} {{selectedniple.materials.fields.matmed}} {{selectedniple.materials.fields.unidad}}  </small></strong>
+                    </h5>
+                    <table class="table hovered highlight responsive-table">
+                        <thead>
+                            <tr class="lime lighten-3">
+                                <th></th>
+                                <th>Descripción</th>
+                                <th>Tipo</th>
+                                <th></th>
+                                <th>Medida</th>
+                                <th>Cantidad</th>
+                                <th>A Pedir</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in selectedniple.details ">
+                                <td class="center-align">{{$index+1}}</td>
+                                <td class="left-align">Niple {{x.fields.tipo}}</td>
+                                <td>{{x.fields.tipo}}</td>
+                                <td>x</td>
+                                <td>{{x.fields.metrado}} cm</td>
+                                <td>{{x.fields.cantshop}}</td>
+                                <td>
+                                    <input type="number" step="0.01" value="{{x.fields.cantshop}}" max={{x.cantshop}}>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal-action modal-close left waves-effect btn grey lighten-5 grey-text text-darken-3">
+                        <i class="fa fa-external-link"></i>
+                        <span>DEJAR EN CERO</span>
+                    </button>
+                    <button type="button" class="waves-effect btn red">
+                        <i class="fa fa-check"></i>
+                        <span>ACEPTAR</span>
+                    </button>
+                </div>
+            </div>
+            {% endverbatim %}
     <div class="modal" id="mdplane">
         <div class="modal-content">
             <div class="file-field input-field">
