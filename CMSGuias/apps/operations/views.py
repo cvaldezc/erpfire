@@ -1349,58 +1349,99 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     if 'ordersf' in request.FILES:
                         orders.orderfile = request.FILES['ordersf']
                     orders.save()
-                    # save orders details
-                    det = json.loads(request.POST['details'])
-                    # print det
-                    for x in det:
-                        ds = DSMetrado.objects.get(
-                                dsector_id=kwargs['area'],
-                                materials_id=x['materials'])
-                        d = Detpedido()
-                        d.pedido_id = gkey
-                        d.materiales_id = x['materials']
-                        d.brand_id = ds.brand_id
-                        d.model_id = ds.model_id
-                        d.cantidad = x['quantity']
-                        d.cantshop = x['quantity']
-                        d.tag = '0'
-                        d.comment = ds.comment if ds.comment else ''
-                        ds.qorder -= float(d.cantshop)
-                        if ds.qorder > 0:
-                            ds.tag = '1'
-                        else:
-                            ds.tag = '2'
-                        ds.save()
-                        d.save()
-                    # save nipples
-                    if 'nipples' in request.POST:
-                        nipples = json.loads(request.POST['nipples'])
-                        print nipples
-                        for n in nipples:
-                            npo = Nipple.objects.get(id=n['id'])
-                            nip = Niple()
-                            nip.pedido_id = gkey
-                            nip.proyecto_id = kwargs['pro']
-                            nip.sector_id = kwargs['sec']
-                            nip.dsector_id = kwargs['area']
-                            nip.empdni = request.user.get_profile().empdni_id
-                            nip.materiales_id = n['m']
-                            nip.cantidad = n['quantity']
-                            nip.metrado = n['measure']
-                            nip.cantshop = n['quantity']
-                            nip.cantguide = 0
-                            nip.tipo = npo.tipo
-                            nip.comment = npo.comment
-                            nip.tag = '0'
-                            npo.cantshop -= float(nip.cantshop)
-                            if npo.cantshop > 0:
-                                npo.tag = '1'
-                            else:
-                                npo.tag = '2'
-                            npo.save()
-                            nip.save()
+
                     context['orders'] = gkey
                     context['status'] = True
+                if 'dordersave' in request.POST:
+                    # save orders details
+                    orderpk = request.POST['bedside']
+                    itemsfail = list()
+                    details = json.loads(request.POST['details'])
+                    # discount quantity from table DSMetrado
+                    def discountDSM(item):
+                        print item
+                        try:
+                            dsm = DSMetrado.objects.get(
+                                dsector_id=kwargs['area'],
+                                materials_id=item['materials']['pk'],
+                                brand_id=item['brand']['pk'],
+                                model_id=item['model']['pk'])
+                            dsm.qorder -= float(item['qorder'])
+                            dsm.tag = '1' if dsm.qorder > 0 else '2'
+                            dsm.save()
+                            return True
+                        except DSMetrado.DoesNotExist as oex:
+                            item['raise'] = str(oex)
+                            itemsfail.append(item)
+                            print "Discount MEtrado"
+                            return False
+
+                    def saveDPedido(pdet):
+                        # print pdet
+                        # print len(pdet['brand']['pk']), pdet['brand']['pk']
+                        # print len(pdet['model']['pk'])
+                        try:
+                            details = Detpedido()
+                            details.pedido_id = orderpk
+                            details.materiales_id = pdet['materials']['pk']
+                            details.brand_id = pdet['brand']['pk']
+                            details.model_id = pdet['model']['pk']
+                            details.cantidad = pdet['qorder']
+                            details.cantshop = pdet['qorder']
+                            details.tag = '0'
+                            details.comment = pdet['observation'] if 'observation' in pdet else ''
+                            details.save()
+                        except Exception as ex:
+                            pdet['raise'] = str(ex)
+                            itemsfail.append(pdet)
+                            print "Det pedidio"
+
+                    def discountONipple(onip):
+                        print onip
+                        try:
+                            onp = Nipple.objects.get(id=onip['pk'])
+                            onp.cantshop -= float(onip['qorder'])
+                            onp.tag = '1' if onp.cantshop > 0 else '2'
+                            onp.save()
+                        except Nipple.DoesNotExist as onex:
+                            onip['raise'] = str(onex)
+                            itemsfail.append(onip)
+                            print "Discount niple operations"
+
+                    def saveNiple(nselected):
+                        print nselected
+                        try:
+                            for x in nselected:
+                                if x['status']:
+                                    discountONipple(x)
+                                    nip = Niple()
+                                    nip.pedido_id = orderpk
+                                    nip.proyecto_id = kwargs['pro']
+                                    nip.sector_id = kwargs['sec']
+                                    nip.dsector_id = kwargs['area']
+                                    nip.empdni = request.user.get_profile().empdni_id
+                                    nip.materiales_id = x['fields']['materiales']
+                                    nip.brand_id = x['fields']['brand']
+                                    nip.model_id = x['fields']['model']
+                                    nip.cantidad = x['qorder']
+                                    nip.metrado = x['fields']['metrado']
+                                    nip.cantshop = x['qorder']
+                                    nip.cantguide = 0
+                                    nip.tipo = x['fields']['tipo']
+                                    nip.comment = x['fields']['comment']
+                                    nip.tag = '0'
+                                    nip.save()
+                        except Exception as ex:
+                            x['raise'] = str(ex)
+                            itemsfail.append(x)
+                            print "save niple storage"
+                    for x in details:
+                        if discountDSM(x):
+                            saveDPedido(x)
+                            if x['niple']:
+                                saveNiple(x['selected'])
+                    context['status'] = False if itemsfail.__len__() else True
+                    context['fail'] = json.dumps(itemsfail)
                 if 'uploadPlane' in request.POST:
                     sf = SectorFiles()
                     sf.dsector_id = kwargs['area']

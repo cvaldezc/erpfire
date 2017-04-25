@@ -388,6 +388,8 @@ class Nipple(models.Model):
         null=True,
         blank=True)
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
+    brand = models.ForeignKey(Brand, related_name='brandtonipple', default='BR000')
+    model = models.ForeignKey(Model, related_name='modeltonipple', default='MO000')
     cantidad = models.FloatField(null=True, default=1)
     metrado = models.FloatField(null=False, default=0)
     cantshop = models.FloatField(null=True, default=0)

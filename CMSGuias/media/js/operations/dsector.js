@@ -42,6 +42,8 @@
     };
   });
 
+  app.directive('minandmax', valMinandMax);
+
   app.factory('Factory', function($http, $cookies) {
     var frm, obj;
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
@@ -980,18 +982,25 @@
         x.status = Boolean(parseInt($event.currentTarget.value));
       }
     };
-    $scope.changeQOrders = function($event) {
-      var i, len, ref, x;
-      if (parseFloat($event.currentTarget.value) > parseFloat($event.currentTarget.dataset.qmax)) {
-        $event.currentTarget.value = $event.currentTarget.dataset.qmax;
+    $scope.addobservation = function($index) {
+      $scope.sitem = {};
+      if ($scope.preorders[$index].hasOwnProperty('observation')) {
+        $scope.sitem.observation = $scope.preorders[$index]['observation'];
+      } else {
+        $scope.preorders[$index].observation = '';
+        $scope.sitem.observation = '';
       }
-      ref = $scope.dataOrders;
-      for (i = 0, len = ref.length; i < len; i++) {
-        x = ref[i];
-        if (x.id === $event.currentTarget.dataset.materials) {
-          x.qorders = $event.currentTarget.value;
-        }
-      }
+      $scope.sitem.index = $index;
+      $scope.sitem.materials = $scope.preorders[$index]['materials'];
+      angular.element("#editor").trumbowyg();
+      angular.element("#editor").trumbowyg('html', $scope.sitem.observation);
+      angular.element("#mobservation").modal('open');
+    };
+    $scope.saveobservation = function() {
+      $scope.preorders[$scope.sitem.index]['observation'] = angular.element("#editor").trumbowyg('html');
+      $scope.sitem = {};
+      angular.element("#editor").trumbowyg('html', '');
+      angular.element("#mobservation").modal('close');
     };
     $scope.deleteItemOrders = function($index) {
       var removeItem;
@@ -1019,6 +1028,7 @@
     };
     $scope.getNippleMaterials = function($index) {
       var getniples;
+      $scope.setToastStatic("Obteniendo Niples, espere!", "cog");
       getniples = function() {
         var data, defer;
         defer = $q.defer();
@@ -1037,27 +1047,73 @@
         return defer.promise;
       };
       getniples().then(function(response) {
+        $scope.removeToastStatic();
         $scope.preorders[$index]['selected'] = response['nipple'];
         $scope.selectedniple['details'] = $scope.preorders[$index].selected;
         $scope.selectedniple['materials'] = $scope.preorders[$index].materials;
+        $scope.selectedniple['index'] = $index;
         angular.element("#mselectedniple").modal('open');
       });
     };
-    $scope.sumNipple = function($event) {
-      $timeout(function() {
-        var amount;
-        $scope.ordersm["" + $event.currentTarget.value] = 0;
+    $scope.selectedmodalniples = function($event) {
+      var i, len, ref, x;
+      ref = $scope.selectedniple.details;
+      for (i = 0, len = ref.length; i < len; i++) {
+        x = ref[i];
+        x.status = Boolean(parseInt($event.currentTarget.value));
+      }
+    };
+    $scope.sumSelectedNiple = function() {
+      var getAmountMeter;
+      $scope.setToastStatic("Procesando!", "cog");
+      getAmountMeter = function() {
+        var amount, defer, i, len, ref, x;
         amount = 0;
-        $("[name=selno" + $event.currentTarget.value + "]").each(function(index, element) {
-          var $e, $np;
-          $e = $(element);
-          if ($e.is(":checked")) {
-            $np = $("#n" + ($e.attr("data-nid")));
-            amount += parseInt($np.val()) * parseFloat($np.attr("data-measure"));
+        defer = $q.defer();
+        ref = $scope.selectedniple.details;
+        for (i = 0, len = ref.length; i < len; i++) {
+          x = ref[i];
+          if (x.status) {
+            amount += $scope.toRound(x.fields.metrado * x.qorder);
           }
-        });
-        return $scope.ordersm["" + $event.currentTarget.value] = amount / 100;
-      }, 200);
+        }
+        defer.resolve($scope.toRound(amount / 100));
+        return defer.promise;
+      };
+      getAmountMeter().then(function(response) {
+        var $index;
+        $index = $scope.selectedniple['index'];
+        $scope.preorders[$index]['selected'] = $scope.selectedniple['details'];
+        $scope.preorders[$index]['qorder'] = response;
+        angular.element("#mselectedniple").modal('close');
+        $scope.selectedniple = {};
+        $scope.removeToastStatic();
+      });
+    };
+    $scope.nextStepOrder = function() {
+      var statusQOrder;
+      statusQOrder = function() {
+        var defer, i, len, ref, x;
+        defer = $q.defer();
+        ref = $scope.preorders;
+        for (i = 0, len = ref.length; i < len; i++) {
+          x = ref[i];
+          if (x.status && x.qorder <= 0) {
+            defer.resolve(false);
+            return defer.promise;
+          }
+        }
+        defer.resolve(true);
+        return defer.promise;
+      };
+      statusQOrder().then(function(status) {
+        if (status) {
+          $scope.ordersp1 = true;
+          return $scope.ordersp2 = true;
+        } else {
+          return $scope.setToastStatic("Existen cantidades en 0.", "remove", 2200, false);
+        }
+      });
     };
     $scope.saveOrdersStorage = function($event) {
       swal({
@@ -1071,50 +1127,15 @@
         closeOnConfirm: true,
         closeOnCancel: true
       }, function(isConfirm) {
-        var $file, arn, data, det, i, k, len, n, nipples, ref, ref1, v;
+        var $file, data, k, ref, sendbedside, senddetails, v;
         if (isConfirm) {
-          arn = new Array;
-          nipples = new Array;
-          for (n in $scope.dataOrders) {
-            if (JSON.parse($scope.dataOrders[n].nipple)) {
-              arn.push($scope.dataOrders[n].id);
-            }
-          }
-          if (arn.length) {
-            for (i = 0, len = arn.length; i < len; i++) {
-              n = arn[i];
-              $("[name=selno" + n).each(function(index, element) {
-                var $e, $np;
-                $e = $(element);
-                if ($e.is(":checked")) {
-                  $np = $("#n" + ($e.attr("data-nid")));
-                  nipples.push({
-                    'id': $e.attr("data-nid"),
-                    'm': n,
-                    'quantity': $np.val(),
-                    'measure': $np.attr("data-measure")
-                  });
-                }
-              });
-            }
-          }
-          det = new Array();
-          ref = $scope.ordersm;
-          for (k in ref) {
-            v = ref[k];
-            if (v <= 0) {
-              swal("", "Los materiales deben de tener una cantidad mayor a 0", "warning");
-              break;
-              return false;
-            } else {
-              det.push({
-                'materials': k,
-                'quantity': v
-              });
-            }
-          }
-          data = new FormData;
+          $scope.setToastStatic("Procesando!", "cog", 0);
+          data = new FormData();
           if (!$scope.orders.hasOwnProperty("transfer")) {
+            swal("", "Debe de seleccionar una fecha para la envio.", "warning");
+            return false;
+          }
+          if ($scope.orders.transfer === "") {
             swal("", "Debe de seleccionar una fecha para la envio.", "warning");
             return false;
           }
@@ -1126,41 +1147,84 @@
           if ($file.files.length) {
             data.append("ordersf", $file.files[0]);
           }
-          ref1 = $scope.orders;
-          for (k in ref1) {
-            v = ref1[k];
+          ref = $scope.orders;
+          for (k in ref) {
+            v = ref[k];
             data.append(k, v);
           }
-          data.append("details", JSON.stringify(det));
           data.append("saveOrders", true);
-          if (nipples.length) {
-            data.append("nipples", JSON.stringify(nipples));
-          }
+          $scope.setToastStatic("Enviado datos al servidor", "upload", 1200, false);
           data.append("csrfmiddlewaretoken", $("[name=csrfmiddlewaretoken]").val());
-          $.ajax({
-            url: "",
-            data: data,
-            type: "post",
-            dataType: "json",
-            processData: false,
-            contentType: false,
-            cache: false,
-            sendBefore: function(object, result) {
-              $event.target.disabled = true;
-              $event.target.innerHTML = "<i class=\"fa fa-cog fa-spin\"></i>";
-            },
-            success: function(response) {
-              if (response.status) {
-                swal("" + response.orders, "Felicidades! Orden generada.", "success");
-                $timeout(function() {
-                  location.reload();
-                }, 6600);
-              } else {
-                swal("Error", "al procesar. " + response.raise, "error");
-                $event.target.disabled = false;
-                $event.target.className = "btn red grey-text text-darken-1";
-                $event.target.innerHTML = "<i class=\"fa fa-timescircle\"></i> Error!";
+          sendbedside = function() {
+            var defer;
+            defer = $q.defer();
+            $.ajax({
+              url: "",
+              data: data,
+              type: "post",
+              dataType: "json",
+              processData: false,
+              contentType: false,
+              cache: false,
+              sendBefore: function(object, result) {
+                $event.target.disabled = true;
+                $event.target.innerHTML = "<i class=\"fa fa-cog fa-spin\"></i>";
+              },
+              success: function(response) {
+                if (response.status) {
+                  $scope.setToastStatic("Datos almancenados", "tasks", 1200, false);
+                  defer.resolve(response.orders);
+                } else {
+                  defer.resolve(false);
+                  swal("Error", "al procesar. " + response.raise, "error");
+                  $event.target.disabled = false;
+                  $event.target.className = "btn red grey-text text-darken-1";
+                  $event.target.innerHTML = "<i class=\"fa fa-timescircle\"></i> Error!";
+                }
               }
+            });
+            return defer.promise;
+          };
+          senddetails = function(order) {
+            var defer, details, i, len, ref1, x;
+            defer = $q.defer();
+            details = [];
+            ref1 = $scope.preorders;
+            for (i = 0, len = ref1.length; i < len; i++) {
+              x = ref1[i];
+              if (x.status === true) {
+                details.push(x);
+              }
+            }
+            data = {
+              'dordersave': true,
+              'bedside': order,
+              'details': JSON.stringify(details),
+              'csrfmiddlewaretoken': angular.element("[name=csrfmiddlewaretoken]").val()
+            };
+            Factory.post(data).success(function(response) {
+              if (response.status) {
+                defer.resolve(true);
+              } else {
+                $scope.setToastStatic("Error " + response.raise, "remove");
+                defer.resolve(false);
+              }
+            });
+            return defer.promise;
+          };
+          sendbedside().then(function(bedside) {
+            if (bedside !== false) {
+              angular.element("#morders").modal('close');
+              senddetails(bedside).then(function(response) {
+                if (response) {
+                  $scope.setToastStatic("Pedido Generado <strong>" + bedside + "</strong>", "check text-green", 6800, false);
+                  setTimeout((function() {
+                    location.reload();
+                  }), 6800);
+                } else {
+                  angular.element("#morders").modal('open');
+                }
+              });
             }
           });
         }
@@ -1390,7 +1454,8 @@
         }
       });
     };
-    $scope.setToastStatic = function(message, icon, duration) {
+    $scope.setToastStatic = function(message, icon, duration, spin) {
+      var ref, textspin;
       if (message == null) {
         message = "";
       }
@@ -1400,10 +1465,16 @@
       if (duration == null) {
         duration = 0;
       }
+      if (spin == null) {
+        spin = true;
+      }
       if (duration === 0) {
         duration = "undefined";
       }
-      Materialize.toast("<i class='fa fa-" + icon + " fa-spin fa-fw fa-2x'></i>&nbsp; " + message, duration, "toast-remove");
+      textspin = (ref = spin) != null ? ref : {
+        "fa-spin fa-fw": ""
+      };
+      Materialize.toast("<i class='fa fa-" + icon + " " + textspin + " fa-2x'></i>&nbsp; " + message, duration, "toast-remove");
     };
     $scope.removeToastStatic = function() {
       angular.element(".toast-remove").remove();
@@ -1439,6 +1510,9 @@
       $scope.meditindex = -1;
       $scope.objedit = {};
       $scope.editm = {};
+    };
+    $scope.toRound = function(number) {
+      return (Math.round(number * 100)) / 100;
     };
     $scope.$watch('ascsector', function() {
       if ($scope.ascsector) {

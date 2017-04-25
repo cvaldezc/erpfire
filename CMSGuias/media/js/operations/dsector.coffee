@@ -24,6 +24,8 @@ app.directive 'file', ($parse) ->
       scope.file = if file then file else undefined
       scope.$apply()
 
+app.directive 'minandmax', valMinandMax
+
 app.factory 'Factory', ($http, $cookies) ->
   $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -823,20 +825,32 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       $("#morders").modal('open')
       return
   $scope.changeSelOrder = ($event) ->
-    # console.log $event.currentTarget.value
-    # $("[name=chkorders]").each (index, element) ->
     for x in $scope.preorders
       x.status = Boolean parseInt $event.currentTarget.value
     return
-
-  $scope.changeQOrders = ($event) ->
-    if parseFloat($event.currentTarget.value) > parseFloat($event.currentTarget.dataset.qmax)
-      $event.currentTarget.value = $event.currentTarget.dataset.qmax
-    for x in $scope.dataOrders
-      if x.id == $event.currentTarget.dataset.materials
-        x.qorders = $event.currentTarget.value
+  #
+  # set observation for item materials
+  $scope.addobservation = ($index) ->
+    $scope.sitem = {}
+    if $scope.preorders[$index].hasOwnProperty('observation')
+      $scope.sitem.observation = $scope.preorders[$index]['observation']
+    else
+      $scope.preorders[$index].observation = ''
+      $scope.sitem.observation = ''
+    $scope.sitem.index = $index
+    $scope.sitem.materials = $scope.preorders[$index]['materials']
+    angular.element("#editor").trumbowyg()
+    angular.element("#editor").trumbowyg('html', $scope.sitem.observation)
+    angular.element("#mobservation").modal 'open'
     return
-
+  $scope.saveobservation = ->
+    $scope.preorders[$scope.sitem.index]['observation'] = angular.element("#editor").trumbowyg 'html'
+    $scope.sitem = {}
+    angular.element("#editor").trumbowyg 'html', ''
+    angular.element("#mobservation").modal 'close'
+    return
+  # manage preorder with niples
+  #
   $scope.deleteItemOrders = ($index) ->
     console.log $index
     $scope.preorders[$index].status = false
@@ -855,7 +869,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     return
 
   $scope.getNippleMaterials = ($index) ->
-    #$scope.setToastStatic "Obteniendo Niples, espere!", "cog"
+    $scope.setToastStatic "Obteniendo Niples, espere!", "cog"
     getniples = ->
       defer = $q.defer()
       data =
@@ -870,34 +884,59 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           return
       return defer.promise
     getniples().then (response) ->
-      #$scope.removeToastStatic()
+      $scope.removeToastStatic()
       # if not $scope.preorders[$index].hasOwnProperty("selected")
       $scope.preorders[$index]['selected'] = response['nipple']
       $scope.selectedniple['details'] = $scope.preorders[$index].selected
       $scope.selectedniple['materials'] = $scope.preorders[$index].materials
+      $scope.selectedniple['index'] = $index
       angular.element("#mselectedniple").modal 'open'
       return
-
-        #   return
+    return
+  $scope.selectedmodalniples = ($event) ->
+    for x in $scope.selectedniple.details
+      x.status = Boolean parseInt($event.currentTarget.value)
     return
 
-  $scope.sumNipple = ($event) ->
-    $timeout ->
-      $scope.ordersm["#{$event.currentTarget.value}"] = 0
+  $scope.sumSelectedNiple = ->
+    $scope.setToastStatic "Procesando!", "cog"
+    getAmountMeter = ->
       amount = 0
-      $("[name=selno#{$event.currentTarget.value}]").each (index, element) ->
-        $e = $(element)
-        if $e.is(":checked")
-          $np = $("#n#{$e.attr("data-nid")}")
-          amount += parseInt($np.val())*parseFloat($np.attr("data-measure"))
-          return
-      $scope.ordersm["#{$event.currentTarget.value}"] = (amount / 100)
-    , 200
+      defer = $q.defer()
+      for x in $scope.selectedniple.details
+        if x.status
+          amount += $scope.toRound(x.fields.metrado * x.qorder)
+      defer.resolve $scope.toRound(amount/100)
+      return defer.promise
+    getAmountMeter().then (response) ->
+      $index = $scope.selectedniple['index']
+      $scope.preorders[$index]['selected'] = $scope.selectedniple['details']
+      $scope.preorders[$index]['qorder'] = response
+      angular.element("#mselectedniple").modal 'close'
+      $scope.selectedniple = {}
+      $scope.removeToastStatic()
+      return
     return
 
-  # orders
+  # next step valid items with quantity
+  $scope.nextStepOrder = ->
+    statusQOrder = ->
+      defer = $q.defer()
+      for x in $scope.preorders
+        if x.status and x.qorder <= 0
+          defer.resolve false
+          return defer.promise
+      defer.resolve true
+      return defer.promise
+    statusQOrder().then (status) ->
+      if status
+        $scope.ordersp1=true
+        $scope.ordersp2=true
+      else
+        $scope.setToastStatic "Existen cantidades en 0.", "remove", 2200, false
+    return
+  # save orders
   $scope.saveOrdersStorage = ($event) ->
-    # get list nipples
     swal
       title: "Desea generar la orden?"
       text: ''
@@ -910,40 +949,44 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       closeOnCancel: true
     , (isConfirm) ->
       if isConfirm
-        arn = new Array
-        nipples = new Array
-        for n of $scope.dataOrders
-          if JSON.parse($scope.dataOrders[n].nipple)
-            arn.push $scope.dataOrders[n].id
-        # console.log arn
-        if arn.length
-          for n in arn
-            $("[name=selno#{n}").each (index, element) ->
-              $e = $(element)
-              if $e.is(":checked")
-                $np = $("#n#{$e.attr("data-nid")}")
-                nipples.push
-                  'id': $e.attr("data-nid")
-                  'm': n
-                  'quantity': $np.val()
-                  'measure': $np.attr("data-measure")
-                return
-        # console.log nipples
-        det = new Array()
-        # Valid quantity list principal
-        for k,v of $scope.ordersm
-          # console.log k, v
-          if v <= 0
-            swal "", "Los materiales deben de tener una cantidad mayor a 0", "warning"
-            break
-            return false
-          else
-            det.push
-              'materials': k
-              'quantity': v
+        $scope.setToastStatic "Procesando!", "cog", 0
+        # arn = new Array
+        # nipples = new Array
+        # for n of $scope.dataOrders
+        #   if JSON.parse($scope.dataOrders[n].nipple)
+        #     arn.push $scope.dataOrders[n].id
+        # # console.log arn
+        # if arn.length
+        #   for n in arn
+        #     $("[name=selno#{n}").each (index, element) ->
+        #       $e = $(element)
+        #       if $e.is(":checked")
+        #         $np = $("#n#{$e.attr("data-nid")}")
+        #         nipples.push
+        #           'id': $e.attr("data-nid")
+        #           'm': n
+        #           'quantity': $np.val()
+        #           'measure': $np.attr("data-measure")
+        #         return
+        # # console.log nipples
+        # det = new Array()
+        # # Valid quantity list principal
+        # for k,v of $scope.ordersm
+        #   # console.log k, v
+        #   if v <= 0
+        #     swal "", "Los materiales deben de tener una cantidad mayor a 0", "warning"
+        #     break
+        #     return false
+        #   else
+        #     det.push
+        #       'materials': k
+        #       'quantity': v
         # get bedside orders
-        data = new FormData
+        data = new FormData()
         if !$scope.orders.hasOwnProperty "transfer"
+          swal "", "Debe de seleccionar una fecha para la envio.", "warning"
+          return false
+        if $scope.orders.transfer is ""
           swal "", "Debe de seleccionar una fecha para la envio.", "warning"
           return false
         if !$scope.orders.hasOwnProperty "storage"
@@ -956,38 +999,82 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         for k,v of $scope.orders
           data.append k, v
         # console.log data
-        data.append "details", JSON.stringify det
+        # data.append "details", JSON.stringify det
         data.append "saveOrders", true
-        if nipples.length
-          data.append "nipples", JSON.stringify nipples
+        $scope.setToastStatic "Enviado datos al servidor", "upload", 1200, false
+        # if nipples.length
+        #   data.append "nipples", JSON.stringify nipples
         # console.log $event
         data.append "csrfmiddlewaretoken", $("[name=csrfmiddlewaretoken]").val()
-        $.ajax
-          url: ""
-          data: data
-          type: "post"
-          dataType: "json"
-          processData: false
-          contentType: false
-          cache: false
-          sendBefore: (object, result) ->
-            $event.target.disabled = true
-            $event.target.innerHTML = """<i class="fa fa-cog fa-spin"></i>"""
-            return
-          success: (response) ->
-            if response.status
-              swal "#{response.orders}", "Felicidades! Orden generada.", "success"
-              $timeout ->
-                location.reload()
+        # save bedside por order
+        sendbedside = ->
+          defer = $q.defer()
+          $.ajax
+            url: ""
+            data: data
+            type: "post"
+            dataType: "json"
+            processData: false
+            contentType: false
+            cache: false
+            sendBefore: (object, result) ->
+              $event.target.disabled = true
+              $event.target.innerHTML = """<i class="fa fa-cog fa-spin"></i>"""
+              return
+            success: (response) ->
+              if response.status
+                $scope.setToastStatic "Datos almancenados", "tasks", 1200, false
+                defer.resolve response.orders
+                # swal "#{response.orders}", "Felicidades! Orden generada.", "success"
+                # $timeout ->
+                #   location.reload()
+                #   return
+                # , 6600
                 return
-              , 6600
+              else
+                defer.resolve false
+                swal "Error", "al procesar. #{response.raise}", "error"
+                $event.target.disabled = false
+                $event.target.className = "btn red grey-text text-darken-1"
+                $event.target.innerHTML = """<i class="fa fa-timescircle"></i> Error!"""
+                return
+          return defer.promise
+        senddetails = (order) ->
+          defer = $q.defer()
+          details = []
+          for x in $scope.preorders
+            if x.status is true
+              details.push x
+          data =
+            'dordersave': true
+            'bedside': order
+            'details': JSON.stringify details
+            'csrfmiddlewaretoken': angular.element("[name=csrfmiddlewaretoken]").val()
+          Factory.post data
+          .success (response) ->
+            if response.status
+              defer.resolve true
               return
             else
-              swal "Error", "al procesar. #{response.raise}", "error"
-              $event.target.disabled = false
-              $event.target.className = "btn red grey-text text-darken-1"
-              $event.target.innerHTML = """<i class="fa fa-timescircle"></i> Error!"""
+              $scope.setToastStatic "Error #{response.raise}", "remove"
+              defer.resolve false
               return
+          return defer.promise
+        sendbedside().then (bedside) ->
+          if bedside isnt false
+            angular.element("#morders").modal 'close'
+            # prepare details orders
+            senddetails(bedside).then (response) ->
+              if response
+                $scope.setToastStatic "Pedido Generado <strong>#{bedside}</strong>", "check text-green", 6800, false
+                setTimeout (->
+                  location.reload()
+                  return
+                  ), 6800
+              else
+                angular.element("#morders").modal 'open'
+              return
+            return
         return
     return
 
@@ -1250,10 +1337,11 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   #           console.error "Error ", response
   #       return
   #   return
-  $scope.setToastStatic = (message="", icon="", duration=0) ->
+  $scope.setToastStatic = (message="", icon="", duration=0, spin=true) ->
     if duration is 0
       duration = "undefined"
-    Materialize.toast "<i class='fa fa-#{icon} fa-spin fa-fw fa-2x'></i>&nbsp; #{message}", duration, "toast-remove"
+    textspin = (spin) ? "fa-spin fa-fw" : ""
+    Materialize.toast "<i class='fa fa-#{icon} #{textspin} fa-2x'></i>&nbsp; #{message}", duration, "toast-remove"
     return
   $scope.removeToastStatic = ->
     angular.element ".toast-remove"
@@ -1296,6 +1384,9 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     $scope.objedit = {}
     $scope.editm = {}
     return
+
+  $scope.toRound = (number) ->
+    return ((Math.round(number * 100)) / 100)
 
   $scope.$watch 'ascsector', ->
     if $scope.ascsector

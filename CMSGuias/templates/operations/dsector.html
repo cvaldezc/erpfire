@@ -18,6 +18,7 @@
 {% endblock menu %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/getMaterials.css">
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/trumbowyg/dist/ui/trumbowyg.min.css">
 <div ng-app="dsApp" ng-controller="DSCtrl">
     <input type="hidden" id="perarea" ng-model="perarea" ng-init="{{ request.user.get_profile.empdni.charge.area|lower }}" value="{{ request.user.get_profile.empdni.charge.area|lower }}">
     <input type="hidden" id="percharge" ng-model="percharge" ng-init="{{ request.user.get_profile.empdni.charge.cargos|lower }}" value="{{ request.user.get_profile.empdni.charge.cargos|lower }}">
@@ -228,7 +229,7 @@
                         <td class="center-align">{{$index + 1}}</td>
                         <td class="center-align">
                             <input type="checkbox" name="chkorders" id="chk{{x.fields.materials.pk}}" value="{{x.fields.materials.pk}}" data-brand="{{x.fields.brand.fields.brand}}" data-brandid="{{x.fields.brand.pk}}" data-modelid="{{x.fields.model.pk}}" data-model="{{x.fields.model.fields.model}}" data-quantity="{{x.fields.qorder}}" data-nme="{{x.fields.materials.fields.matnom}} - {{x.fields.materials.fields.matmed}}" data-nipple="{{x.fields.nipple}}" ng-if="x.fields.tag != '2'"
-                            ng-model="preorders[$index].status" class="filled-in">
+                            ng-model="preorders[$index].status" class="filled-in blue">
                             <label for="chk{{x.fields.materials.pk}}"></label>
                             <!-- set object materiales for preorders -->
                             <input type="hidden" ng-model="preorders[$index].materials" ng-init="preorders[$index].materials=x.fields.materials">
@@ -277,9 +278,9 @@
                 <p>
                     <p>
                       <strong>Seleccionar: </strong>
-                      <input name="sltorder" type="radio" ng-click="changeSelOrder($event)" id="all" value="1"/>
+                      <input name="sltorder" type="radio" ng-click="changeSelOrder($event)" id="all" class="with-gap blue" value="1"/>
                       <label for="all">Todo</label>
-                      <input name="sltorder" type="radio" ng-click="changeSelOrder($event)" id="nothing" value="0"/>
+                      <input name="sltorder" type="radio" ng-click="changeSelOrder($event)" id="nothing" class="with-gap blue" value="0"/>
                       <label for="nothing">Ninguno</label>
                     </p>
                 </p>
@@ -939,7 +940,7 @@
                             <i class="fa fa-times"></i>
                             SALIR
                         </button>
-                        <button type="button" class="right btn light-blue darken-1" ng-click="ordersp1=true;ordersp2=true">
+                        <button type="button" class="right btn light-blue darken-1" ng-click="nextStepOrder()">
                             <i class="fa fa-arrow-right"></i>
                             continuar
                         </button>
@@ -947,7 +948,7 @@
                 </h5>
                 <table id="torders" class="table highlight responsive-table">
                     <thead>
-                        <tr class="blue lighten-3">
+                        <tr class="brown lighten-4">
                             <th class="center-align"></th>
                             <th class="center-align">Código</th>
                             <th class="center-align">Descripción</th>
@@ -956,6 +957,7 @@
                             <th class="center-align">Cantidad</th>
                             <th class="center-align">C. a Pedir</th>
                             <th class="center-align"></th>
+                            <th></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -969,17 +971,22 @@
                                 <td>{{x.model.fields.model}}</td>
                                 <td class="center-align">{{x.quantity}}</td>
                                 <td>
-                                    <input type="number" step="0.01" max="{{x.quantity}}" min="0" class="right-align" value="{{ (x.niple) ? 0 : x.quantity}}" ng-disabled="x.niple==true">
+                                    <input type="number" step="0.01" ng-model="preorders[x.index].qorder" ng-init="preorders[x.index].qorder=(x.niple)?0:x.quantity" max="{{x.quantity}}" min="0" class="right-align" ng-readonly="x.niple">
                                 </td>
                                 <td class="center-align">
-                                    <button type="button" class="btn-flat grey lighten-5 green-text waves-effect" ng-if="x.niple==true" ng-click="getNippleMaterials(x.index)">
+                                    <a class="green-text col-1 waves-effect" ng-if="x.niple==true" ng-click="getNippleMaterials(x.index)">
                                         <i class="fa fa-plus"></i>
-                                    </button>
+                                    </a>
                                 </td>
-                                <td>
-                                    <button type="button" ng-click="deleteItemOrders(x.index)" class="btn btn-flat grey lighten-5 red-text waves-effect">
+                                <td  class="center-align">
+                                    <a class="col-1 waves-effect grey-text text-darken-3" ng-click="addobservation(x.index)">
+                                        <i class="fa fa-commenting"></i>
+                                    </a>
+                                </td>
+                                <td  class="center-align">
+                                    <a ng-click="deleteItemOrders(x.index)" class="red-text col-1 waves-effect">
                                         <i class="fa fa-times"></i>
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
                         {% endverbatim %}
@@ -1097,54 +1104,80 @@
             </div>
         </div>
     </div>
-    <!-- show modal for seleccion niple -->
     {% verbatim %}
-            <div id="mselectedniple" class="modal modal-fixed-footer">
-                <div class="modal-content">
-                    <h5>
-                        <small>NIPLES</small>
-                        <br>
-                        <strong><small>{{selectedniple.materials.fields.matnom}} {{selectedniple.materials.fields.matmed}} {{selectedniple.materials.fields.unidad}}  </small></strong>
-                    </h5>
-                    <table class="table hovered highlight responsive-table">
-                        <thead>
-                            <tr class="lime lighten-3">
-                                <th></th>
-                                <th>Descripción</th>
-                                <th>Tipo</th>
-                                <th></th>
-                                <th>Medida</th>
-                                <th>Cantidad</th>
-                                <th>A Pedir</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="x in selectedniple.details ">
-                                <td class="center-align">{{$index+1}}</td>
-                                <td class="left-align">Niple {{x.fields.tipo}}</td>
-                                <td>{{x.fields.tipo}}</td>
-                                <td>x</td>
-                                <td>{{x.fields.metrado}} cm</td>
-                                <td>{{x.fields.cantshop}}</td>
-                                <td>
-                                    <input type="number" step="0.01" value="{{x.fields.cantshop}}" max={{x.cantshop}}>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="modal-action modal-close left waves-effect btn grey lighten-5 grey-text text-darken-3">
-                        <i class="fa fa-external-link"></i>
-                        <span>DEJAR EN CERO</span>
-                    </button>
-                    <button type="button" class="waves-effect btn red">
-                        <i class="fa fa-check"></i>
-                        <span>ACEPTAR</span>
-                    </button>
-                </div>
-            </div>
-            {% endverbatim %}
+    <!-- modal for set observation for each item-->
+    <div id="mobservation" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h6>{{sitem.materials.fields.matnom}} {{sitem.materials.fields.matmed}}</h6>
+            <div id="editor"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="waves-effect btn blue" ng-click="saveobservation()">
+                <i class="fa fa-floppy-o "></i>
+                <span>GUARDAR</span>
+            </button>
+            <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 grey-text text-darken-3">
+                <i class="fa fa-times "></i>
+                <span>SALIR</span>
+            </button>
+        </div>
+    </div>
+    <!-- show modal for seleccion niple -->
+    <div id="mselectedniple" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h5>
+                <small>NIPLES {{selectedniple.materials.fields.matnom}} {{selectedniple.materials.fields.matmed}} {{selectedniple.materials.fields.unidad}}  </small>
+            </h5>
+            <table class="table hovered highlight responsive-table">
+                <thead>
+                    <tr class="lime lighten-3">
+                        <th></th>
+                        <th></th>
+                        <th>Descripción</th>
+                        <th>Tipo</th>
+                        <th></th>
+                        <th>Medida</th>
+                        <th>Cantidad</th>
+                        <th class="col-3">C. a Pedir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in selectedniple.details ">
+                        <td class="center-align">{{$index+1}}</td>
+                        <td>
+                            <input type="checkbox" id="sn{{x.pk}}" class="filled-in amber" ng-model="selectedniple.details[$index].status" ng-init="selectedniple.details[$index].status=false">
+                            <label for="sn{{x.pk}}"></label>
+                        </td>
+                        <td class="left-align">Niple {{tnipple[x.fields.tipo]}}</td>
+                        <td>{{x.fields.tipo}}</td>
+                        <td>x</td>
+                        <td>{{x.fields.metrado}} cm</td>
+                        <td>{{x.fields.cantshop}}</td>
+                        <td>
+                            <input type="number" step="0.01" min="0" max="{{x.fields.cantshop}}" ng-model="selectedniple.details[$index].qorder" ng-init="selectedniple.details[$index].qorder=x.fields.cantshop" ng-disabled="!selectedniple.details[$index].status" minandmax>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="waves-effect btn red" ng-click="sumSelectedNiple()">
+                <i class="fa fa-check"></i>
+                <span>ACEPTAR</span>
+            </button>
+            <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 grey-text text-darken-3" ng-click="sumSelectedNiple()">
+                <i class="fa fa-external-link"></i>
+                <span>DEJAR EN CERO</span>
+            </button>
+            <p>
+                <input type="radio" id="rdosn1" name="rdosn" ng-click="selectedmodalniples($event)" value="1" class="with-gap amber">
+                <label for="rdosn1">Todo</label>
+                <input type="radio" id="rdosn2" name="rdosn" ng-click="selectedmodalniples($event)" value="0" class="amber">
+                <label for="rdosn2">Ninguno</label>
+            </p>
+        </div>
+    </div>
+    {% endverbatim %}
     <div class="modal" id="mdplane">
         <div class="modal-content">
             <div class="file-field input-field">
@@ -1264,7 +1297,9 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
 <!-- <script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular-sanitize/angular-sanitize.min.js"></script> -->
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/jquery.floatThead/dist/jquery.floatThead.min.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}js/getMaterials.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/mustache.js/mustache.min.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/getMaterials.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/directives.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/trumbowyg/dist/trumbowyg.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/operations/dsector.js"></script>
 {% endblock %}
