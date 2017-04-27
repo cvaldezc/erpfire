@@ -826,13 +826,17 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     try:
                         area = DSector.objects.get(
                                 dsector_id=kwargs['area'])
-                    except DSector.DoesNotExist:
+                    except DSector.DoesNotExist as ex:
+                        kwargs['raise'] = str(ex)
                         area = {'sector_id': ''}
+                    # print request.POST
                     # kw = request.POST
                     request.POST._mutable = True
                     request.POST['proyecto'] = kwargs['area'][:7]
                     request.POST['area'] = kwargs['area']
                     request.POST['sector'] = area.sgroup.sector_id
+                    request.POST['brand'] = 'BR000';
+                    request.POST['model'] = 'MO000';
                     request.POST._mutable = False
                     if 'edit' in request.POST:
                         Np = Nipple.objects.get(

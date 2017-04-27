@@ -826,7 +826,8 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       return
   $scope.changeSelOrder = ($event) ->
     for x in $scope.preorders
-      x.status = Boolean parseInt $event.currentTarget.value
+      if x.tag != '2'
+        x.status = Boolean parseInt $event.currentTarget.value
     return
   #
   # set observation for item materials
@@ -1066,11 +1067,15 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
             # prepare details orders
             senddetails(bedside).then (response) ->
               if response
-                $scope.setToastStatic "Pedido Generado <strong>#{bedside}</strong>", "check text-green", 6800, false
-                setTimeout (->
+                # $scope.setToastStatic "Pedido Generado <strong>#{bedside}</strong>", "check text-green"
+                swal
+                  title: "Pedido Generado #{bedside}"
+                  text: ''
+                  type: 'success'
+                  confirmButtonColor: '#039be5'
+                  closeOnConfirm: true
+                , (isConfirm) ->
                   location.reload()
-                  return
-                  ), 6800
               else
                 angular.element("#morders").modal 'open'
               return
