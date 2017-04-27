@@ -135,6 +135,9 @@
                     <i class="fa fa-list"></i>
                     PEDIDO ALMACÉN
                 </button>
+                <button type="button" ng-click="run()">
+                    <i class="fa fa-terminal"></i>
+                </button>
                 {% endif %}
             {% endif %}
             {% if modify|length > 0 %}
@@ -965,7 +968,7 @@
                         {% verbatim %}
                             <tr ng-repeat="x in preorders | filter: {tag:'!2'} | filter: {'status': true}">
                                 <td>{{$index + 1 }}</td>
-                                <td>{{x.materials.pk}} {{x.status}}</td>
+                                <td>{{x.materials.pk}}</td>
                                 <td>{{x.materials.fields.matnom}} {{x.materials.fields.matmed}}</td>
                                 <td>{{x.brand.fields.brand}}</td>
                                 <td>{{x.model.fields.model}}</td>
@@ -1301,5 +1304,6 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}js/getMaterials.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/directives.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/trumbowyg/dist/trumbowyg.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/operations/dsector.js"></script>
 {% endblock %}

@@ -1,8 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # from django.conf.urls.defaults import patterns, url
 from django.conf.urls import patterns, url, include
 
 from .views import *
+
+
+# router = routers.DefaultRouter()
+# router.register(r'users', UserViewSet)
 
 # urls recurrents
 urls_crossdomain = patterns(
@@ -82,4 +87,6 @@ urlpatterns = patterns(
         ExportMetProject.as_view()),
     url(r'^export/data/materials/db/', ExportMaterialsDB.as_view()),
     url(r'^get/emails/starts/$', EmailsForsProject.as_view()),
+    # url(r'restful/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^settings/$', RESTFulSettings.as_view()),
 )

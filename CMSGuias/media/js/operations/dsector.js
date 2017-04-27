@@ -1216,7 +1216,11 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
           if (bedside !== false) {
             angular.element("#morders").modal('close');
             senddetails(bedside).then(function(response) {
+              var mailer;
               if (response) {
+                mailer = {
+                  to: ''
+                };
                 swal({
                   title: "Pedido Generado " + bedside,
                   text: '',

@@ -13,7 +13,7 @@ from django.http import HttpResponse, Http404
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
-from django.utils import simplejson
+# from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, View
@@ -37,7 +37,7 @@ class JSONResponseMixin(object):
         )
 
     def convert_context_to_json(self, context):
-        return simplejson.dumps(context, encoding='utf-8', cls=DjangoJSONEncoder)
+        return json.dumps(context, encoding='utf-8', cls=DjangoJSONEncoder)
 
 
 def get_description_materials(request):
@@ -52,7 +52,7 @@ def get_description_materials(request):
         except ObjectDoesNotExist:
             context['status'] = False
         return HttpResponse(
-            simplejson.dumps(context),
+            json.dumps(context),
             mimetype='application/json')
 
 
@@ -172,7 +172,7 @@ def get_resumen_details_materiales(request):
             context['raise'] = e.__str__()
             context['status'] = False
         return JSONResponseMixin().render_to_json_response(context)
-        #return HttpResponse(simplejson.dumps(context),
+        #return HttpResponse(json.dumps(context),
         #                    mimetype='application/json')
 
 
@@ -276,7 +276,7 @@ class GetDetailsMaterialesByCode(DetailView):
             except ObjectDoesNotExist, e:
                 context['raise'] = str(e)
                 context['status'] = False
-            return HttpResponse(simplejson.dumps(context),
+            return HttpResponse(json.dumps(context),
                                 mimetype='application/json')
 
 
@@ -318,7 +318,7 @@ def save_order_temp_materials(request):
                     obj.model_id = 'MO000'
                     obj.save()
         data['status'] = True
-    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+    return HttpResponse(json.dumps(data), mimetype='application/json')
 
 
 def update_order_temp_materials(request):
@@ -336,7 +336,7 @@ def update_order_temp_materials(request):
     except ObjectDoesNotExist, e:
         data['status'] = False
         data['raise'] = e.__str__()
-    return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+    return HttpResponse(json.dumps(data), mimetype='application/json')
 
 
 def delete_order_temp_material(request):
@@ -351,7 +351,7 @@ def delete_order_temp_material(request):
         else:
             data['status'] = False
         return HttpResponse(
-            simplejson.dumps(data), mimetype='application/json')
+            json.dumps(data), mimetype='application/json')
     except ObjectDoesNotExist, e:
         raise e
 
@@ -371,7 +371,7 @@ def delete_all_temp_order(request):
         else:
             data['status'] = False
         return HttpResponse(
-                simplejson.dumps(data), mimetype='application/json')
+                json.dumps(data), mimetype='application/json')
     except ObjectDoesNotExist, e:
         raise e
 
@@ -399,7 +399,7 @@ def get_list_order_temp(request):
         else:
             data['status'] = False
         return HttpResponse(
-                simplejson.dumps(data), mimetype='application/json')
+                json.dumps(data), mimetype='application/json')
     except ObjectDoesNotExist, e:
         raise e
 
@@ -415,7 +415,7 @@ def get_details_materials_by_id(request):
             if len(mat) > 0:
                 mat['status'] = True
             return HttpResponse(
-                simplejson.dumps(mat),
+                json.dumps(mat),
                 mimetype='application/json')
     except ObjectDoesNotExist, e:
         raise e
@@ -441,7 +441,7 @@ def get_list_beside_nipples_temp_orders(request):
                 data['status'] = False
                 data['niples'] = 'Nothing'
             return HttpResponse(
-                simplejson.dumps(data), mimetype='application/json')
+                json.dumps(data), mimetype='application/json')
     except ObjectDoesNotExist, e:
         raise e
 
@@ -467,7 +467,7 @@ def get_list_temp_nipples(request):
         else:
             data['status'] = False
         return HttpResponse(
-            simplejson.dumps(data), mimetype="application/json")
+            json.dumps(data), mimetype="application/json")
     except ObjectDoesNotExist:
         raise Http404
 
@@ -492,7 +492,7 @@ def post_saved_update_temp_nipples(request):
             raise e
             data['status'] = False
         return HttpResponse(
-            simplejson.dumps(data), mimetype="application/json")
+            json.dumps(data), mimetype="application/json")
 # delete item nipple template
 def post_delete_temp_item_nipple(request):
     data = {}
@@ -504,7 +504,7 @@ def post_delete_temp_item_nipple(request):
         except ObjectDoesNotExist, e:
             raise e
             data['status'] = False
-        return HttpResponse(simplejson.dumps(data), mimetype="application/json")
+        return HttpResponse(json.dumps(data), mimetype="application/json")
 # delete item nipple template
 def post_delete_temp_all_nipple(request):
     data = {}
@@ -516,7 +516,7 @@ def post_delete_temp_all_nipple(request):
         except ObjectDoesNotExist, e:
             raise e
             data['status'] = False
-    return HttpResponse(simplejson.dumps(data), mimetype="application/json")
+    return HttpResponse(json.dumps(data), mimetype="application/json")
 ## upload file orders temp and reader file temp orders
 @login_required(login_url='/SignUp/')
 def post_upload_file_temp_orders(request):
@@ -569,7 +569,7 @@ def post_upload_file_temp_orders(request):
             except Exception, e:
                 data['status']= False
             #print 'Num Rows: %i'%sheet.nrows
-            return HttpResponse(simplejson.dumps(data),mimetype="application/json")
+            return HttpResponse(json.dumps(data),mimetype="application/json")
 ###
 """
 ##    Recurrent get list
@@ -584,7 +584,7 @@ def get_list_projects(request):
             data['status'] = True
         except Exception, e:
             data['status'] = False
-        return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+        return HttpResponse(json.dumps(data), mimetype='application/json')
 # get list sectors
 def get_list_sectors(request):
     if request.method == 'GET':
@@ -598,7 +598,7 @@ def get_list_sectors(request):
             data['status']= True
         except ObjectDoesNotExist, e:
             data['status'] = False
-        return HttpResponse(simplejson.dumps(data),mimetype="application/json")
+        return HttpResponse(json.dumps(data),mimetype="application/json")
 # get list subprojects
 def get_list_subprojects(request):
     if request.method == 'GET':
@@ -609,7 +609,7 @@ def get_list_subprojects(request):
             data['status']= True
         except ObjectDoesNotExist, e:
             data['status']= False
-        return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+        return HttpResponse(json.dumps(data), mimetype='application/json')
 # get list Stores
 def get_list_stores(request):
     if request.method == 'GET':
@@ -620,7 +620,7 @@ def get_list_stores(request):
             data['status']= True
         except ObjectDoesNotExist, e:
             data['status']= False
-        return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+        return HttpResponse(json.dumps(data), mimetype='application/json')
 
 """
 ## end block Recurrent
@@ -638,7 +638,7 @@ def post_approved_orders(request):
         except ObjectDoesNotExist, e:
             data['status']= False
             data['msg']= e
-        return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+        return HttpResponse(json.dumps(data), mimetype='application/json')
 
 # cancel orders
 def post_cancel_orders(request):
@@ -725,7 +725,7 @@ def post_cancel_orders(request):
         except ObjectDoesNotExist, e:
             data['status']= False
             data['msg']= e.__str__()
-        return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+        return HttpResponse(json.dumps(data), mimetype='application/json')
 
 # get list carrier XHR XMLHttpRequest
 def get_list_carrier(request):
@@ -755,7 +755,7 @@ def get_recover_list_transport(request,truc):
                 data['status']= True
             except ObjectDoesNotExist, e:
                 data['status']= False
-            return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+            return HttpResponse(json.dumps(data), mimetype='application/json')
 
 # recover list conductor
 def get_recover_list_conductor(request,truc):
@@ -767,7 +767,7 @@ def get_recover_list_conductor(request,truc):
                 data['status']= True
             except ObjectDoesNotExist, e:
                 data['status']= False
-            return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+            return HttpResponse(json.dumps(data), mimetype='application/json')
 
 # Class Views Generics
 #
@@ -784,7 +784,7 @@ class get_OrdersDetails(ListView):
               context['status'] = True
           except ObjectDoesNotExist:
               context['status'] = False
-          return HttpResponse(simplejson.dumps(context),mimetype='application/json')
+          return HttpResponse(json.dumps(context),mimetype='application/json')
 
 class SupplyDetailView(DetailView):
 
@@ -814,7 +814,7 @@ class SupplyDetailView(DetailView):
             bedside = Suministro.objects.get(pk=kwargs['sid'])
             context['project'] = [{'nompro': x.nompro} for x in Proyecto.objects.filter(proyecto_id__in=bedside.orders.split(','))]
             context['status'] = True
-            response.write(simplejson.dumps(context))
+            response.write(json.dumps(context))
         except ObjectDoesNotExist, e:
             context['raise'] = e.__str__()
             context['status'] = False
@@ -1362,3 +1362,20 @@ class EmailsForsProject(JSONResponseMixin, View):
                 context['raise'] = str(e)
                 context['status'] = False
             return self.render_to_json_response(context)
+
+
+class RESTFulSettings(JSONResponseMixin, View):
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    if 'list' in request.GET:
+                        kwargs['status'] = True
+                except Configuracion.DoesNotExist as ex:
+                    kwargs['raise'] = str(ex)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+        except TemplateDoesNotExist as exs:
+            raise Http404(exs)

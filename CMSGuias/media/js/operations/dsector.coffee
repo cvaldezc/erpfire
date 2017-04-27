@@ -118,6 +118,16 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     #   return
     # , 100
     return
+
+  # return other function test
+  $scope.run = ->
+    mailing.Mailing()
+    mailing.test()
+    .success (response) ->
+      console.info response
+    return
+  #
+
   $scope.getListAreaMaterials = ->
     $scope.dsmaterials = []
     data =
@@ -951,38 +961,6 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     , (isConfirm) ->
       if isConfirm
         $scope.setToastStatic "Procesando!", "cog", 0
-        # arn = new Array
-        # nipples = new Array
-        # for n of $scope.dataOrders
-        #   if JSON.parse($scope.dataOrders[n].nipple)
-        #     arn.push $scope.dataOrders[n].id
-        # # console.log arn
-        # if arn.length
-        #   for n in arn
-        #     $("[name=selno#{n}").each (index, element) ->
-        #       $e = $(element)
-        #       if $e.is(":checked")
-        #         $np = $("#n#{$e.attr("data-nid")}")
-        #         nipples.push
-        #           'id': $e.attr("data-nid")
-        #           'm': n
-        #           'quantity': $np.val()
-        #           'measure': $np.attr("data-measure")
-        #         return
-        # # console.log nipples
-        # det = new Array()
-        # # Valid quantity list principal
-        # for k,v of $scope.ordersm
-        #   # console.log k, v
-        #   if v <= 0
-        #     swal "", "Los materiales deben de tener una cantidad mayor a 0", "warning"
-        #     break
-        #     return false
-        #   else
-        #     det.push
-        #       'materials': k
-        #       'quantity': v
-        # get bedside orders
         data = new FormData()
         if !$scope.orders.hasOwnProperty "transfer"
           swal "", "Debe de seleccionar una fecha para la envio.", "warning"
@@ -999,8 +977,6 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           data.append "ordersf", $file.files[0]
         for k,v of $scope.orders
           data.append k, v
-        # console.log data
-        # data.append "details", JSON.stringify det
         data.append "saveOrders", true
         $scope.setToastStatic "Enviado datos al servidor", "upload", 1200, false
         # if nipples.length
@@ -1026,11 +1002,6 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
               if response.status
                 $scope.setToastStatic "Datos almancenados", "tasks", 1200, false
                 defer.resolve response.orders
-                # swal "#{response.orders}", "Felicidades! Orden generada.", "success"
-                # $timeout ->
-                #   location.reload()
-                #   return
-                # , 6600
                 return
               else
                 defer.resolve false
@@ -1067,7 +1038,9 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
             # prepare details orders
             senddetails(bedside).then (response) ->
               if response
-                # $scope.setToastStatic "Pedido Generado <strong>#{bedside}</strong>", "check text-green"
+                # construct mail for storage
+                mailer =
+                  to: ''
                 swal
                   title: "Pedido Generado #{bedside}"
                   text: ''
@@ -1317,31 +1290,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
            Se debe de seleccionar al menos un item""", 4000
         return
     return
-  # $scope.delRegdel = ->
-  #   swal
-  #     title: 'Realmente desea eliminar?'
-  #     text: 'Toda la lista de "eliminados"'
-  #     showButtonCancel: true
-  #     confirmButtonColor: "#DD6B55"
-  #     confirmButtonText:"Si! eliminar todo"
-  #     closeOnCancel: true
-  #     closeOnConfirm: true
-  #   , (isConfirm) ->
-  #     if isConfirm
-  #       param = $scope.delrg
-  #       param['delregdel'] = true
-  #       Factory.post(param)
-  #       .success (response) ->
-  #         if response.status
-  #           $scope.disableModify()
-  #           $scope.listTemps 'D'
-  #           Materialize.toast """<i class='fa fa-trash fa-lg red-text'></i>
-  #             items eliminados!""", 4000
-  #           return
-  #         else
-  #           console.error "Error ", response
-  #       return
-  #   return
+
   $scope.setToastStatic = (message="", icon="", duration=0, spin=true) ->
     if duration is 0
       duration = "undefined"
@@ -1356,8 +1305,6 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     # calc amount global
     $scope.pnp = parseFloat($scope.amnp)
     $scope.pns = parseFloat($scope.amns)
-    #$scope.dgp = (parseFloat($scope.amsecp) - parseFloat($scope.amstp))
-    #$scope.dgs = (parseFloat($scope.amsecs) - parseFloat($scope.amsts))
     #if type is 'N'
     $scope.pnp += $scope.tmlstN[0]
     $scope.pns += $scope.tmlstN[1]
@@ -1455,7 +1402,6 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     for k of $scope.dsmaterials
       if $scope.dsmaterials[k].fields.nipple
         count++
-    # console.log count
     if count
       $scope.snipple = true
       setTimeout ->
