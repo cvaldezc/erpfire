@@ -17,6 +17,7 @@ from django.db.models import Sum
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, View
+from django.views.generic import TemplateView
 
 from CMSGuias.apps.almacen.models import *
 from CMSGuias.apps.home.models import *
@@ -1204,7 +1205,7 @@ class SearchGroupMaterials(JSONResponseMixin, View):
 #                 context['status'] = False
 #             return self.render_to_json_response(context)
 
-class SystemEmails(JSONResponseMixin, View):
+class SystemEmails(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
@@ -1364,18 +1365,22 @@ class EmailsForsProject(JSONResponseMixin, View):
             return self.render_to_json_response(context)
 
 
-class RESTFulSettings(JSONResponseMixin, View):
+class RESTFulSettings(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         try:
-            if request.is_ajax():
-                try:
-                    if 'list' in request.GET:
-                        kwargs['status'] = True
-                except Configuracion.DoesNotExist as ex:
-                    kwargs['raise'] = str(ex)
-                    kwargs['status'] = False
-                return self.render_to_json_response(kwargs)
+            try:
+                # print request.is_ajax()
+                if 'servermail' in request.GET:
+                    kwargs['servermail'] = json.loads(
+                        serializers.serialize('json',
+                        SettingsApp.objects.filter(flag=True)),
+                        'utf-8')[0]['fields']['servermail']
+                    kwargs['status'] = True
+            except Exception as ex:
+                kwargs['raise'] = str(ex)
+                kwargs['status'] = False
+            return self.render_to_json_response(kwargs)
         except TemplateDoesNotExist as exs:
             raise Http404(exs)

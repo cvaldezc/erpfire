@@ -122,7 +122,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   # return other function test
   $scope.run = ->
     mailing.Mailing()
-    mailing.test()
+    mailing.geturls()
     .success (response) ->
       console.info response
     return

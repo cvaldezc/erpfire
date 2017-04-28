@@ -169,6 +169,12 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     $scope.listPlanes();
     angular.element('.materialboxed').materialbox();
   });
+  $scope.run = function() {
+    mailing.Mailing();
+    mailing.geturls().success(function(response) {
+      return console.info(response);
+    });
+  };
   $scope.getListAreaMaterials = function() {
     var data;
     $scope.dsmaterials = [];
