@@ -1363,7 +1363,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     details = json.loads(request.POST['details'])
                     # discount quantity from table DSMetrado
                     def discountDSM(item):
-                        print item
+                        # print item
                         try:
                             dsm = DSMetrado.objects.get(
                                 dsector_id=kwargs['area'],
@@ -1445,6 +1445,12 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             if x['niple']:
                                 saveNiple(x['selected'])
                     context['status'] = False if itemsfail.__len__() else True
+                    if context['status']:
+                        context['company'] = request.session['company']['name']
+                        context['cc'] = request.user.get_profile().empdni.email
+                        order = Pedido.objects.get(pedido_id=orderpk)
+                        context['project'] = order.proyecto_id
+                        context['projectname'] = order.proyecto.nompro
                     context['fail'] = json.dumps(itemsfail)
                 if 'uploadPlane' in request.POST:
                     sf = SectorFiles()

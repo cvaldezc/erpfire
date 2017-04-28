@@ -4,7 +4,6 @@ namespace mailing{
     interface IMail{
         injector: any;
         $http: any;
-        servermail: string;
         geturls(): any;
         send(): any;
     }
@@ -15,10 +14,17 @@ namespace mailing{
 
         injector: any;
         $http: any;
-        servermail = '';
+        servermail: string = "";
+        other: object = {};
         constructor() {
             this.injector = angular.injector(['ng']);
             this.$http = this.injector.get('$http');
+            // this.geturls().success(other){
+            //     if (response.status)
+            //     {
+            //         this.servermail = response.servermail
+            //     }
+            // }
         }
 
         geturls = function (){
@@ -26,16 +32,29 @@ namespace mailing{
             return this.$http.get("/json/settings/", {'params': params});
         }
 
-        send = function (options: object={}) {
-            return this.geturls().success(function (response: object) {
+        mailer = function (): string{
+            let server: string = "";
+            this.geturls().success(function (response: object) {
                 if (response['status']){
-                    let data: object;
-                    this.servermail = response['servermail'];
-                    data['mail'] = JSON.stringify(options);
-                    data['callback'] = "JSON_CALLBACK";
-                    return this.$http.jsonp(this.servermail, data);
+                    return response['servermail'];
                 }
             });
+            return server;
+        }
+
+        send = function (options: object={}) {
+            let objparam: object = {};
+            //let servermail = this.mailer();
+            objparam['mail'] = JSON.stringify(options);
+            objparam['callback'] = "JSON_CALLBACK";
+            objparam['jsonpCallbackParam'] = 'callback'
+            console.log(objparam);
+            return $.jsonp(options['server'], objparam);
+            // let objparam: object = {};
+            // objparam['mail'] = JSON.stringify(options);
+            // objparam['callback'] = "JSON_CALLBACK";
+            // console.log(objparam);
+            // return this.$http.jsonp(this.servermail, objparam);
         };
 
         test = function(){

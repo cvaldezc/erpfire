@@ -1039,16 +1039,40 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
             senddetails(bedside).then (response) ->
               if response
                 # construct mail for storage
+                $scope.setToastStatic "Enviado correo...!", "envelop-o", 3000, false
                 mailer =
-                  to: ''
-                swal
-                  title: "Pedido Generado #{bedside}"
-                  text: ''
-                  type: 'success'
-                  confirmButtonColor: '#039be5'
-                  closeOnConfirm: true
-                , (isConfirm) ->
-                  location.reload()
+                  to: "cvaldezch@outlook.com" #"almacen@icrperusa.com"
+                  cc: response.cc
+                  subject: "Pedido Generado #{bedside}"
+                  body: """<p><strong><strong>#{response.company} |
+                  </strong></strong> Operaciones Frecuentes</p>
+                  <p>Pedido Generado Número #{bedside} |
+                  <strong>#{new Date().toString()}</strong></p>
+                  <p><strong>Proyecto:&nbsp;#{response.project} #{response.projectname}</strong></p>"""
+                mailing.Mailing()
+                mailing.geturls().success (rurl) ->
+                  if rurl.status
+                    mailer['server'] = rurl['servermail']
+                    mailing.send(mailer).success (res) ->
+                      if res.status
+                        $scope.removeToastStatic()
+                        return
+                        # return
+                      else
+                        $scope.setToastStatic "Correo no enviado #{res.raise}", "times", 0, false
+                        return
+                    # return
+                    # show message for user with number of order
+                  swal
+                    title: "Pedido Generado #{bedside}"
+                    text: ''
+                    type: 'success'
+                    confirmButtonColor: '#039be5'
+                    closeOnConfirm: true
+                  , (isConfirm) ->
+                    location.reload()
+                    return
+                  return
               else
                 angular.element("#morders").modal 'open'
               return

@@ -974,7 +974,7 @@
                                 <td>{{x.model.fields.model}}</td>
                                 <td class="center-align">{{x.quantity}}</td>
                                 <td>
-                                    <input type="number" step="0.01" ng-model="preorders[x.index].qorder" ng-init="preorders[x.index].qorder=(x.niple)?0:x.quantity" max="{{x.quantity}}" min="0" class="right-align" ng-readonly="x.niple">
+                                    <input type="number" step="0.01" min="0" ng-model="preorders[x.index].qorder" ng-init="preorders[x.index].qorder=(x.niple)?0:x.quantity" max="{{x.quantity}}" min="0" class="right-align" ng-readonly="x.niple" minandmax>
                                 </td>
                                 <td class="center-align">
                                     <a class="green-text col-1 waves-effect" ng-if="x.niple==true" ng-click="getNippleMaterials(x.index)">
