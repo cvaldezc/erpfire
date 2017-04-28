@@ -10,11 +10,13 @@ namespace mailing{
      */
     export class Mailing implements IMail {
 
+        servermail = '';
+
         geturls = function () {
             let injector = angular.injector(['ng']);
             let $http = injector.get('$http');
             return {
-                'get': function (options?: object={}) {
+                'get': function (options: object={}) {
                     let data: object;
                     data['mail'] = JSON.stringify(options)
                     data['callback'] = "JSON_CALLBACK"

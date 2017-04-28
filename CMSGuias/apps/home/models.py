@@ -446,6 +446,16 @@ class Configuracion(models.Model):
         return '%s %s' % (self.periodo, self.moneda)
 
 
+class SettingsApp(models.Model):
+    serverreport = models.CharField(max_length=255, default='')
+    servermail = models.CharField(max_length=255, default='')
+    register = models.DateTimeField(auto_now_add=True)
+    flag = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return '%s %s %s %d' % (self.servermail, self.serverreport, self.register, self.flag)
+
+
 class Emails(models.Model):
     empdni = models.ForeignKey(Employee, to_field='empdni_id')
     email = models.CharField(max_length=200, null=True)

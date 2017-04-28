@@ -1,19 +1,17 @@
 {
+    "sourceMap": true,
     "compileOnSave": true,
     "compilerOptions": {
-        "noImplicitAny" : true,
         "target": "es5",
         "watch": true,
         "types": [
-            "angularjs"
+            "angularjs",
+            "jquery"
         ]
     },
-    "include": [
-        "src/**/*"
-    ],
+    "include": [ "./CMSGuias/media/js/*" ],
     "exclude": [
         "node_modules",
         "**/*.spec.ts"
-    ],
-    "sourceMap": true
+    ]
 }

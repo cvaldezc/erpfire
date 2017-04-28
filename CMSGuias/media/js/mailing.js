@@ -6,6 +6,7 @@ var mailing;
      */
     var Mailing = (function () {
         function Mailing() {
+            this.servermail = '';
             this.geturls = function () {
                 var injector = angular.injector(['ng']);
                 var $http = injector.get('$http');
