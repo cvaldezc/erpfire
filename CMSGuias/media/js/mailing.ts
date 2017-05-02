@@ -47,9 +47,11 @@ namespace mailing{
             //let servermail = this.mailer();
             objparam['mail'] = JSON.stringify(options);
             objparam['callback'] = "JSON_CALLBACK";
-            objparam['jsonpCallbackParam'] = 'callback'
+            // objparam['jsonpCallbackParam'] = 'callback'
             console.log(objparam);
-            return $.jsonp(options['server'], objparam);
+            let response = this.$http.jsonp(options['server']+ "/send", {params: objparam});
+            console.info(response);
+            return response;
             // let objparam: object = {};
             // objparam['mail'] = JSON.stringify(options);
             // objparam['callback'] = "JSON_CALLBACK";

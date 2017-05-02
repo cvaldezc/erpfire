@@ -1139,6 +1139,10 @@
         if (isConfirm) {
           $scope.setToastStatic("Procesando!", "cog", 0);
           data = new FormData();
+          if (!$scope.orders.hasOwnProperty("storage")) {
+            swal("", "Seleccione un almacén para el pedido", "warning");
+            return false;
+          }
           if (!$scope.orders.hasOwnProperty("transfer")) {
             swal("", "Debe de seleccionar una fecha para la envio.", "warning");
             return false;
@@ -1212,7 +1216,7 @@
             };
             Factory.post(data).success(function(response) {
               if (response.status) {
-                defer.resolve(true);
+                defer.resolve(response);
               } else {
                 $scope.setToastStatic("Error " + response.raise, "remove");
                 defer.resolve(false);
@@ -1225,23 +1229,26 @@
               angular.element("#morders").modal('close');
               senddetails(bedside).then(function(response) {
                 var mailer;
-                if (response) {
-                  $scope.setToastStatic("Enviado correo...!", "envelop-o", 3000, false);
+                console.log(response);
+                if (typeof response === "object") {
+                  $scope.setToastStatic("Enviado correo...!", "envelope-o", 3000, false);
                   mailer = {
-                    to: "cvaldezch@outlook.com",
+                    to: "almacen@icrperusa.com",
                     cc: response.cc,
                     subject: "Pedido Generado " + bedside,
                     body: "<p><strong><strong>" + response.company + " |\n</strong></strong> Operaciones Frecuentes</p>\n<p>Pedido Generado Número " + bedside + " |\n<strong>" + (new Date().toString()) + "</strong></p>\n<p><strong>Proyecto:&nbsp;" + response.project + " " + response.projectname + "</strong></p>"
                   };
                   mailing.Mailing();
                   mailing.geturls().success(function(rurl) {
+                    var sender;
                     if (rurl.status) {
                       mailer['server'] = rurl['servermail'];
-                      mailing.send(mailer).success(function(res) {
+                      sender = mailing.send(mailer);
+                      sender.success(function(res) {
                         if (res.status) {
                           $scope.removeToastStatic();
                         } else {
-                          $scope.setToastStatic("Correo no enviado " + res.raise, "times", 0, false);
+                          return $scope.setToastStatic("Correo no enviado " + res.raise, "times", 0, false);
                         }
                       });
                     }
@@ -1256,7 +1263,9 @@
                     });
                   });
                 } else {
-                  angular.element("#morders").modal('open');
+                  setTimeout(function() {
+                    angular.element("#morders").modal('open');
+                  }, 600);
                 }
               });
             }

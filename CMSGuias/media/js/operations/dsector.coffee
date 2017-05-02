@@ -962,7 +962,10 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       if isConfirm
         $scope.setToastStatic "Procesando!", "cog", 0
         data = new FormData()
-        if !$scope.orders.hasOwnProperty "transfer"
+        if not $scope.orders.hasOwnProperty "storage"
+          swal "", "Seleccione un almacén para el pedido", "warning"
+          return false
+        if not $scope.orders.hasOwnProperty "transfer"
           swal "", "Debe de seleccionar una fecha para la envio.", "warning"
           return false
         if $scope.orders.transfer is ""
@@ -1025,7 +1028,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           Factory.post data
           .success (response) ->
             if response.status
-              defer.resolve true
+              defer.resolve response
               return
             else
               $scope.setToastStatic "Error #{response.raise}", "remove"
@@ -1037,11 +1040,12 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
             angular.element("#morders").modal 'close'
             # prepare details orders
             senddetails(bedside).then (response) ->
-              if response
+              console.log response
+              if typeof response is "object"
                 # construct mail for storage
-                $scope.setToastStatic "Enviado correo...!", "envelop-o", 3000, false
+                $scope.setToastStatic "Enviado correo...!", "envelope-o", 3000, false
                 mailer =
-                  to: "cvaldezch@outlook.com" #"almacen@icrperusa.com"
+                  to: "almacen@icrperusa.com" #"cvaldezch@outlook.com" #
                   cc: response.cc
                   subject: "Pedido Generado #{bedside}"
                   body: """<p><strong><strong>#{response.company} |
@@ -1053,14 +1057,15 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
                 mailing.geturls().success (rurl) ->
                   if rurl.status
                     mailer['server'] = rurl['servermail']
-                    mailing.send(mailer).success (res) ->
+                    sender = mailing.send(mailer)
+                    sender.success (res) ->
                       if res.status
                         $scope.removeToastStatic()
                         return
                         # return
                       else
                         $scope.setToastStatic "Correo no enviado #{res.raise}", "times", 0, false
-                        return
+                        # return
                     # return
                     # show message for user with number of order
                   swal
@@ -1074,7 +1079,10 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
                     return
                   return
               else
-                angular.element("#morders").modal 'open'
+                setTimeout( ->
+                  angular.element("#morders").modal('open');
+                  return
+                , 600)
               return
             return
         return

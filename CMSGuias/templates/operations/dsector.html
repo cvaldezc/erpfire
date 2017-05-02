@@ -135,9 +135,9 @@
                     <i class="fa fa-list"></i>
                     PEDIDO ALMACÉN
                 </button>
-                <button type="button" ng-click="run()">
+                {% comment %}<button type="button" ng-click="run()">
                     <i class="fa fa-terminal"></i>
-                </button>
+                </button>{% endcomment %}
                 {% endif %}
             {% endif %}
             {% if modify|length > 0 %}
@@ -1068,8 +1068,8 @@
                 <div class="row">
                     <div class="input-field col l4">
                         <label ng-class="{'active':orders.storage}">Almacén</label>
-                        <select class="browser-default" ng-model="orders.storage" tabindex="0">
-                            <option value="" disabled selected>Elije tu Almacén</option>
+                        <select class="browser-default" ng-model="orders.storage" ng-init="orders.storage='AL01'" tabindex="0">
+                            <option value="" disabled selected>Elije un Almacén</option>
                             {% for a in storage %}
                                 <option value="{{a.almacen_id}}">{{a.nombre}}</option>
                             {% endfor %}
