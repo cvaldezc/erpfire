@@ -2557,6 +2557,19 @@ class ReturnItemOrders(JSONResponseMixin, TemplateView):
                                     'json',
                                     det,
                                     relations=('materiales','brand','model')))
+                            for x in context['details']:
+                                niple = Niple.objects.filter(
+                                    pedido_id=kwargs['order'],
+                                    materiales_id=x['fields']['materiales']['pk'],
+                                    brand_id=x['fields']['brand']['pk'],
+                                    model_id=x['fields']['model']['pk']
+                                    ).exclude(tag='2', cantshop__lte=0)
+                                if niple.count() > 0:
+                                    x['nstatus'] = True
+                                    x['niples'] = json.loads(serializers.serialize('json', niple))
+                                else:
+                                    x['niples'] = []
+                                    x['nstatus'] = False
                         else:
                             context['details'] = '[]'
                         context['status'] = True
@@ -2727,6 +2740,7 @@ class ReturnItemOrders(JSONResponseMixin, TemplateView):
                 context['raise'] = str(e)
                 context['status'] = False
             return self.render_to_json_response(context)
+
 
 class AttendOrder(JSONResponseMixin, TemplateView):
 

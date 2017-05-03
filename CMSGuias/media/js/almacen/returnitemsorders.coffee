@@ -103,15 +103,16 @@ app.factory 'rioF', ($http, $cookies) ->
     return obj
 
 app.controller 'rioC', ($scope, rioF) ->
-    $scope.mat = []
-    $scope.quantity = []
+    $scope.materials = []
+    $scope.tniples = []
     $scope.valid = true
     $scope.showNipple = false
     $scope.vnip = false
     $scope.np = []
     $scope.dnp = []
     angular.element(document).ready ->
-        angular.element('.modal').modal()
+        angular.element('.modal').modal
+            dismissible: false
         $scope.getDetails()
         return
 
@@ -119,6 +120,12 @@ app.controller 'rioC', ($scope, rioF) ->
         angular.forEach $scope.mat, (value, key) ->
             $scope.mat[key] = $scope.selAll.chk
             return
+        return
+
+    $scope.showNiple = ($index) ->
+        if $scope.materials[$index].nstatus
+            $scope.tniples = $scope.materials[$index]
+            angular.element("#mniple").modal("open")
         return
 
     $scope.getDetails = ->
@@ -230,7 +237,7 @@ app.controller 'rioC', ($scope, rioF) ->
                     $scope.sendReturnList()
                     return false
         return
-    
+
     $scope.getNipples = ->
         # validate order content nipple
         tmp = new Array
