@@ -2556,7 +2556,7 @@ class ReturnItemOrders(JSONResponseMixin, TemplateView):
                                 serializers.serialize(
                                     'json',
                                     det,
-                                    relations=('materiales','brand','model')))
+                                    relations=('materiales', 'brand', 'model')))
                             for x in context['details']:
                                 niple = Niple.objects.filter(
                                     pedido_id=kwargs['order'],
@@ -2572,23 +2572,24 @@ class ReturnItemOrders(JSONResponseMixin, TemplateView):
                                     x['nstatus'] = False
                         else:
                             context['details'] = '[]'
+                        context['nametypes'] = globalVariable.tipo_nipples
                         context['status'] = True
-                    if 'getNipples' in request.GET:
-                        gnp = json.loads(request.GET['check'])
-                        context['gnp'] = list()
-                        for x in gnp:
-                            nip = Niple.objects.filter(
-                                pedido_id=kwargs['order'],
-                                materiales_id=x['materials'],
-                                brand_id=x['brand'],
-                                model_id=x['model']).exclude(tag='2', cantshop__lte=0)
-                            if nip.count():
-                                context['gnp'].append(json.loads(
-                                    serializers.serialize(
-                                        'json',
-                                        nip, relations=('materiales'))))
-                        context['valid'] = True if len(context['gnp']) else False
-                        context['status'] = True
+                    # if 'getNipples' in request.GET:
+                    #     gnp = json.loads(request.GET['check'])
+                    #     context['gnp'] = list()
+                    #     for x in gnp:
+                    #         nip = Niple.objects.filter(
+                    #             pedido_id=kwargs['order'],
+                    #             materiales_id=x['materials'],
+                    #             brand_id=x['brand'],
+                    #             model_id=x['model']).exclude(tag='2', cantshop__lte=0)
+                    #         if nip.count():
+                    #             context['gnp'].append(json.loads(
+                    #                 serializers.serialize(
+                    #                     'json',
+                    #                     nip, relations=('materiales'))))
+                    #     context['valid'] = True if len(context['gnp']) else False
+                    #     context['status'] = True
                 except (ObjectDoesNotExist, Exception) as e:
                     context['raise'] = str(e)
                     context['status'] = False

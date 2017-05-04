@@ -122,7 +122,7 @@
     return obj;
   });
 
-  app.controller('rioC', function($scope, rioF) {
+  app.controller('rioC', function($scope, $q, rioF) {
     $scope.materials = [];
     $scope.tniples = [];
     $scope.valid = true;
@@ -130,6 +130,7 @@
     $scope.vnip = false;
     $scope.np = [];
     $scope.dnp = [];
+    $scope.types = {};
     angular.element(document).ready(function() {
       angular.element('.modal').modal({
         dismissible: false
@@ -137,9 +138,20 @@
       $scope.getDetails();
     });
     $scope.checkall = function() {
-      angular.forEach($scope.mat, function(value, key) {
-        $scope.mat[key] = $scope.selAll.chk;
-      });
+      var k, ref, v;
+      ref = $scope.materials;
+      for (k in ref) {
+        v = ref[k];
+        v.status = $scope.selAll.chk;
+      }
+    };
+    $scope.checkTNiple = function() {
+      var i, len, ref, x;
+      ref = $scope.tniples.niples;
+      for (i = 0, len = ref.length; i < len; i++) {
+        x = ref[i];
+        x.status = $scope.stnip;
+      }
     };
     $scope.showNiple = function($index) {
       if ($scope.materials[$index].nstatus) {
@@ -155,36 +167,41 @@
       rioF.getDetails(prm).success(function(response) {
         if (response.status) {
           $scope.details = response.details;
+          $scope.types = response.nametypes;
         } else {
           swal("Error", "" + response.raise, "error");
         }
       });
     };
     $scope.returnItems = function() {
-      var tmp;
-      tmp = new Array;
-      $scope.datareturn = tmp;
-      angular.forEach($scope.mat, function(value, key) {
-        if (value === true) {
-          angular.forEach($scope.details, function(obj, ik) {
-            if (obj.pk === key) {
-              tmp.push({
-                'id': obj.pk,
-                'materials': obj.fields.materiales.pk,
-                'name': obj.fields.materiales.fields.matnom + " " + obj.fields.materiales.fields.matmed,
-                'unit': obj.fields.materiales.fields.unidad,
-                'brand': obj.fields.brand.fields.brand,
-                'brand_id': obj.fields.brand.pk,
-                'model': obj.fields.model.fields.model,
-                'model_id': obj.fields.model.pk,
-                'quantity': $scope.quantity[obj.pk]
-              });
+      var validQ;
+      validQ = function() {
+        var counter, defer, k, ref, x, zeros;
+        defer = $q.defer();
+        counter = 0;
+        zeros = 0;
+        ref = $scope.materials;
+        for (k in ref) {
+          x = ref[k];
+          if (x.status) {
+            counter++;
+            if (x.qreturn > 0) {
+              zeros++;
             }
-          });
+          }
+        }
+        defer.resolve(counter + "," + zeros);
+        return defer.promise;
+      };
+      validQ().then(function(response) {
+        var arrays;
+        arrays = response.split(',');
+        if (arrays[0] === arrays[1] && arrays[0] !== "0") {
+          angular.element("#mview").modal('open');
+        } else {
+          Materialize.toast("Debe seleccionar y/o ingresar cantidades mayor a 0.", 2600);
         }
       });
-      $scope.datareturn = tmp;
-      angular.element("#mview").modal('open');
     };
     $scope.sendReturnList = function() {
       if (!$scope.showNipple && !$scope.vnip) {
@@ -262,41 +279,54 @@
       }
     };
     $scope.getNipples = function() {
-      var prm, tmp;
-      tmp = new Array;
-      angular.forEach($scope.mat, function(value, key) {
-        if (value === true) {
-          angular.forEach($scope.details, function(obj, ik) {
-            if (obj.pk === key) {
-              tmp.push({
-                'materials': obj.fields.materiales.pk,
-                'brand': obj.fields.brand.pk,
-                'model': obj.fields.model.pk
-              });
+      var getamount;
+      if (Object.keys($scope.tniples).length) {
+        getamount = function() {
+          var amount, defer, i, len, ntmp, ref, x;
+          defer = $q.defer();
+          amount = 0;
+          ref = $scope.tniples.niples;
+          for (i = 0, len = ref.length; i < len; i++) {
+            x = ref[i];
+            if (x.status) {
+              ntmp = 0;
+              ntmp = x.qorder * x.fields.metrado;
+              amount += (Math.round((ntmp / 100) * 100)) / 100;
             }
-          });
-        }
-      });
-      prm = {
-        check: JSON.stringify(tmp),
-        getNipples: true
-      };
-      rioF.getNiples(prm).success(function(response) {
-        $scope.vnip = true;
-        if (response.status === true && response.valid === true) {
-          $scope.gnp = response.gnp;
-          $scope.showNipple = true;
-          angular.element("#mnp").modal('open');
-        } else {
-          $scope.vnip = true;
-          $scope.showNipple = true;
-          $scope.sendReturnList();
-          return Materialize.toast("El pedido no tiene niples registrados", 2600);
-        }
-      });
+          }
+          defer.resolve(amount);
+          return defer.promise;
+        };
+        getamount().then(function(response) {
+          $scope.materials[$scope.tniples.index].qreturn = response;
+          $scope.materials[$scope.tniples.index].niples = $scope.tniples.niples;
+          $scope.tniples = {};
+          $scope.stnip = false;
+        });
+      }
     };
-    $scope.test = function() {
-      return console.log($scope);
+    $scope.removeSelected = function($index) {
+      var validselected;
+      $scope.materials[$index].status = false;
+      validselected = function() {
+        var count, defer, k, ref, x;
+        defer = $q.defer();
+        count = 0;
+        ref = $scope.materials;
+        for (k in ref) {
+          x = ref[k];
+          if (x.status) {
+            count++;
+          }
+        }
+        defer.resolve(count);
+        return defer.promise;
+      };
+      validselected().then(function(response) {
+        if (response <= 0) {
+          angular.element("#mview").modal('close');
+        }
+      });
     };
   });
 

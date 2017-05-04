@@ -102,7 +102,7 @@ app.factory 'rioF', ($http, $cookies) ->
 
     return obj
 
-app.controller 'rioC', ($scope, rioF) ->
+app.controller 'rioC', ($scope, $q, rioF) ->
     $scope.materials = []
     $scope.tniples = []
     $scope.valid = true
@@ -110,6 +110,7 @@ app.controller 'rioC', ($scope, rioF) ->
     $scope.vnip = false
     $scope.np = []
     $scope.dnp = []
+    $scope.types = {};
     angular.element(document).ready ->
         angular.element('.modal').modal
             dismissible: false
@@ -117,9 +118,15 @@ app.controller 'rioC', ($scope, rioF) ->
         return
 
     $scope.checkall = ->
-        angular.forEach $scope.mat, (value, key) ->
-            $scope.mat[key] = $scope.selAll.chk
-            return
+        # console.info $scope.materials
+        for k, v of $scope.materials
+            v.status = $scope.selAll.chk
+            # return
+        return
+
+    $scope.checkTNiple = ->
+        for x in $scope.tniples.niples
+            x.status = $scope.stnip
         return
 
     $scope.showNiple = ($index) ->
@@ -135,6 +142,7 @@ app.controller 'rioC', ($scope, rioF) ->
         .success (response) ->
             if response.status
                 $scope.details = response.details
+                $scope.types = response.nametypes
                 return
             else
                 swal "Error", "#{response.raise}", "error"
@@ -142,134 +150,118 @@ app.controller 'rioC', ($scope, rioF) ->
         return
 
     $scope.returnItems = ->
-        tmp = new Array
-        $scope.datareturn = tmp
-        angular.forEach $scope.mat, (value, key) ->
-            if value is true
-                angular.forEach $scope.details, (obj, ik) ->
-                    if obj.pk is key
-                        # console.log obj.pk
-                        # console.info key
-                        tmp.push
-                            'id': obj.pk
-                            'materials': obj.fields.materiales.pk
-                            'name': "#{obj.fields.materiales.fields.matnom} #{obj.fields.materiales.fields.matmed}"
-                            'unit': obj.fields.materiales.fields.unidad
-                            'brand': obj.fields.brand.fields.brand
-                            'brand_id': obj.fields.brand.pk
-                            'model': obj.fields.model.fields.model
-                            'model_id': obj.fields.model.pk
-                            'quantity': $scope.quantity[obj.pk]
-                        return
-            return
-        $scope.datareturn = tmp
-        angular.element("#mview").modal('open')
+        validQ = ->
+            defer = $q.defer()
+            counter = 0
+            zeros = 0
+            for k, x of $scope.materials
+                if x.status
+                    counter++
+                    if x.qreturn > 0
+                        zeros++
+            defer.resolve "#{counter},#{zeros}"
+            return defer.promise
+        validQ().then (response) ->
+            arrays = response.split(',')
+            if arrays[0] == arrays[1] and arrays[0] isnt "0"
+                angular.element("#mview").modal('open')
+                return
+            else
+                Materialize.toast "Debe seleccionar y/o ingresar cantidades mayor a 0.", 2600
+                return
+        return
+
+
+
+    $scope.getNipples = ->
+        # valid niples selected
+        if Object.keys($scope.tniples).length
+            getamount = ->
+                defer = $q.defer()
+                amount = 0
+                for x in $scope.tniples.niples
+                    if x.status
+                        ntmp = 0
+                        ntmp = x.qorder * x.fields.metrado
+                        amount += ((Math.round((ntmp/100) * 100))/100)
+                defer.resolve amount
+                return defer.promise
+            getamount().then (response) ->
+                $scope.materials[$scope.tniples.index].qreturn = response
+                $scope.materials[$scope.tniples.index].niples = $scope.tniples.niples
+                $scope.tniples = {}
+                $scope.stnip = false
+                return
+        return
+
+    $scope.removeSelected = ($index) ->
+        $scope.materials[$index].status = false
+        validselected = ->
+            defer = $q.defer()
+            count = 0
+            for k, x of $scope.materials
+                if x.status
+                    count++
+            defer.resolve count
+            return defer.promise
+        validselected().then (response) ->
+            if response <= 0
+                angular.element("#mview").modal('close')
+                return
         return
 
     $scope.sendReturnList = ->
-        if not $scope.showNipple and not $scope.vnip
-            # show nipples
-            $scope.getNipples()
-            return false
-        else
-            swal
-                title: "Esta seguro?"
-                text: "Regresar los materiales a la lista de proyecto."
-                type: "input"
-                showCancelButton: true
-                cancelButtonText: 'No!'
-                confirmButtonColor: '#dd6b55'
-                confirmButtonText: 'Si!, Retornar'
-                showLoaderOnConfirm: true
-                closeOnConfirm: false
-                animation: "slide-from-top"
-                inputPlaceholder: "Observación"
-            , (inputValue) ->
-                # console.log typeof inputValue
-                # console.info inputValue
-                if inputValue is false
-                    # console.warn "value is false"
-                    return false
-                if inputValue is ""
-                    # console.warn "value is empty"
-                    swal.showInputError "Nesecitas ingresar una Observación."
-                    return false
-                if inputValue isnt ""
-                    prm =
-                        'details': JSON.stringify $scope.datareturn
-                        'saveReturn': true
-                        'observation': inputValue
-                        'nip': new Array()
-                    angular.forEach $scope.datareturn, (value, keys) ->
-                        # console.warn value
-                        el = document.getElementsByName(value.materials)
-                        # console.error el.length
-                        if el.length > 0
-                            tmp = new Array
-                            angular.forEach el, (val) ->
-                                # console.info val
-                                console.log prm['nip']["#{value.materials}"]
-                                tmp.push
-                                    'id': val.attributes.id.value
-                                    'materials': value.materials
-                                    'quantity': val.value
-                                    'meter': val.attributes.metrado.value
-                                    'type': val.attributes.nip.value
-                                    'import': (parseFloat(val.value) * parseFloat(val.attributes.metrado.value))
+        swal
+            title: "Esta seguro de Regresar los materiales?"
+            text: "Ingrese el movito por se que retorna los materiales."
+            type: "input"
+            showCancelButton: true
+            cancelButtonText: 'No!'
+            confirmButtonColor: '#e82a37'
+            confirmButtonText: 'Si!, Retornar'
+            showLoaderOnConfirm: true
+            closeOnConfirm: false
+            animation: "slide-from-top"
+            inputPlaceholder: "Observación"
+        , (inputValue) ->
+            if inputValue is false
+                return false
+            if inputValue is ""
+                swal.showInputError "Nesecitas ingresar una Observación."
+                return false
+            if inputValue isnt ""
+                valid = ->
+                    defer = $q.defer()
+                    params = []
+                    for k, x of $scope.materials
+                        if x.status and x.qreturn > 0
+                            params.push x
+                    defer.resolve params
+                    return defer.promise
+                valid().then (params) ->
+                    if response.length
+                        prm =
+                            'details': params
+                            'saveReturn': true
+                            'observation': inputValue
+                        rioF.returnList(prm)
+                        .success (response) ->
+                            if response.status
+                                Materialize.toast "Se ha devuelto los materiales seleccionados.", 2800
+                                setTimeout ->
+                                    location.reload()
+                                    return
+                                , 2800
                                 return
-                            prm['nip'].push({"#{value.materials}": tmp})
-                            return
-                    prm['nip'] = JSON.stringify prm['nip']
-                    rioF.returnList(prm)
-                    .success (response) ->
-                        if response.status
-                            Materialize.toast "Se ha devuelto los materiales seleccionados.", 2800
-                            setTimeout ->
-                                location.reload()
-                            , 2800
-                            return
-                        else
-                            swal "Error!", "#{response.raise}", "error"
-                            return
-                    return
-                else
-                    swal.showInputError "Nesecitas ingresar una Observación."
-                    $scope.sendReturnList()
-                    return false
-        return
-
-    $scope.getNipples = ->
-        # validate order content nipple
-        tmp = new Array
-        angular.forEach $scope.mat, (value, key) ->
-            if value is true
-                angular.forEach $scope.details, (obj, ik) ->
-                    if obj.pk is key
-                        tmp.push
-                            'materials': obj.fields.materiales.pk
-                            'brand': obj.fields.brand.pk
-                            'model': obj.fields.model.pk
+                            else
+                                swal "Error!", "#{response.raise}", "error"
+                                return
                         return
                 return
-        prm =
-            check: JSON.stringify tmp
-            getNipples: true
-        rioF.getNiples prm
-        .success (response) ->
-            $scope.vnip = true
-            if response.status is true and response.valid is true
-                $scope.gnp = response.gnp
-                $scope.showNipple = true
-                angular.element("#mnp").modal('open')
-                return
             else
-                $scope.vnip = true
-                $scope.showNipple = true
+                swal.showInputError "Nesecitas ingresar una Observación."
                 $scope.sendReturnList()
-                Materialize.toast "El pedido no tiene niples registrados", 2600
+                return false
         return
 
-    $scope.test = ->
-        console.log $scope
     return
-

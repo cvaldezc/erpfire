@@ -73,8 +73,8 @@
                             <th>Marca</th>
                             <th>Modelo</th>
                             <th>Unidad</th>
-                            <th>Pedido</th>
-                            <th>Pendiente</th>
+                            <th>C. Pendiente</th>
+                            <th>C. a Devolver</th>
                         </tr>
                     </thead>
                     {% verbatim %}
@@ -98,7 +98,7 @@
                             <td>{{x.fields.materiales.fields.unidad}}</td>
                             <td class="right-align">{{x.fields.cantidad}}</td>
                             <td>
-                                <input type="number" class="right-align" min="0" max="{{x.fields.cantshop}}" step="1" ng-model="materials[x.pk].qreturn" ng-init="materials[x.pk].qreturn=x.fields.cantshop" ng-disabled="!materials[x.pk].status" ng-readonly="x.nstatus" ng-focus="showNiple(x.pk)" minandmax>
+                                <input type="number" class="right-align" min="0" max="{{x.fields.cantshop}}" step="1" ng-model="materials[x.pk].qreturn" ng-init="materials[x.pk].qreturn=(x.nstatus?0:x.fields.cantshop)" ng-disabled="!materials[x.pk].status" ng-readonly="x.nstatus" ng-focus="showNiple(x.pk)" minandmax>
                             </td>
                         </tr>
                     </tbody>
@@ -116,10 +116,10 @@
             </article>
         {% endif %}
         <!-- block modals -->
-        <div id="mview" class="modal modal-fixed-footer bottom-sheet" style="max-height: 95%; height: 100%;">
+        <div id="mview" class="modal modal-fixed-footer bottom-sheet" style="max-height: 95%;">
             <div class="modal-content">
                 <h5>Materiales que se van a retornar</h5>
-                <table class="responsive-table highlight">
+                <table class="table responsive-table highlight">
                     <thead>
                         <tr>
                             <th></th>
@@ -128,19 +128,25 @@
                             <th>Unidad</th>
                             <th>Marca</th>
                             <th>Modelo</th>
-                            <th>Cantidad Retorno</th>
+                            <th>Cantidad a Retornar</th>
+                            <th>Quitar</th>
                         </tr>
                     </thead>
                     {% verbatim %}
                     <tbody>
-                        <tr ng-repeat="x in datareturn">
+                        <tr ng-repeat="x in materials | filter: {status: true}">
                             <td>{{$index + 1}}</td>
-                            <td>{{x.materials}}</td>
-                            <td>{{x.name}}</td>
-                            <td>{{x.unit}}</td>
-                            <td>{{x.brand}}</td>
-                            <td>{{x.model}}</td>
-                            <td class="right-align">{{x.quantity}}</td>
+                            <td>{{x.materials.pk}}</td>
+                            <td>{{x.materials.fields.matnom}} {{x.materials.fields.matmed}}</td>
+                            <td>{{x.materials.fields.unidad}}</td>
+                            <td>{{x.brand.fields.brand}}</td>
+                            <td>{{x.model.fields.model}}</td>
+                            <td class="right-align">{{x.qreturn}}</td>
+                            <td class="center-align">
+                                <a href="#remove" class="red-text text-accent-2" ng-click="removeSelected(x.index)">
+                                    <i class="fa fa-remove fa-2x"></i>
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
                     {% endverbatim %}
@@ -155,23 +161,19 @@
                     <i class="fa fa-reply-all"></i>
                     <span class="hide-on-small-only">Retornar Materiales</span>
                 </button>
-                <button type="button" class="btn amber lighten-1 grey-text text-darken-3" ng-click="getNipples()">
-                    <i class="fa fa-bars"></i>
-                    <span>NIples</span>
-                </button>
             </div>
         </div>
-        <div id="mniple" class="modal modal-fixed-footer" style="width: 90%;">
+        <div id="mniple" class="modal modal-fixed-footer">
             <div class="modal-content">
                 {% verbatim %}
-                    <h4>Niples</h4>
+                    <h6>Niples</h6>
                     <table class="table hightlight responsive-table">
                         <caption class="left-align">
                             <div class="switch">
-                                <label>
+                                <label ng-click="checkTNiple()">
                                     Ninguno
-                                    <input type="checkbox" id="{{tniples.materials.pk}}" ng-model="dnp[x[0].fields.materiales.pk]" ng-init="dnp[x[0].fields.materiales.pk] = true" ng-checked="dnp[x[0].fields.materiales.pk]">
-                                    <span class="lever"></span>
+                                    <input type="checkbox" id="{{tniples.materials.pk}}" ng-model="stnip" ng-init="stnip=false" ng-checked="stnip">
+                                    <span class="lever blue"></span>
                                     Todo
                                 </label>
                             </div>
@@ -185,29 +187,33 @@
                                 <th>Cantidad</th>
                                 <th></th>
                                 <th>Medida</th>
-                                <th>Devolver</th>
+                                <th>C. a Devolver</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-repeat="x in tniples.niples">
                                 <td>{{$index + 1}}</td>
                                 <td>
-                                    <input type="checkbox">
-                                    <label for=""></label>
+                                    <!-- ng-init="tniples.niples[$index].status=false" -->
+                                    <input type="checkbox" id="tn{{tniples.niples[$index].pk}}" ng-model="tniples.niples[$index].status" ng-checked="tniples.niples[$index].status"  class="filled-in blue">
+                                    <label for="tn{{tniples.niples[$index].pk}}"></label>
                                 </td>
-                                <td class="center-align">Niple {{x.fields.tipo}}</td>
+                                <td class="center-align">Niple {{types[x.fields.tipo]}} ( {{x.fields.tipo}} )</td>
                                 <td class="right-align">{{x.fields.cantshop}}</td>
                                 <td class="center-align">x</td>
                                 <td>{{x.fields.metrado}} cm</td>
-                                <td><input type="number" id="{{x.pk}}" class="right-align" min="0" max="{{x.fields.cantshop}}"
-                                 ng-model="" ng-init="np[n.pk]=x.fields.cantshop" tmandm></td>
+                                <td>
+                                    <input type="number" id="{{x.pk}}" class="right-align" min="0"
+                                     max="{{x.fields.cantshop}}" ng-model="tniples.niples[$index].qorder"
+                                     ng-init="tniples.niples[$index].qorder=(x.hasOwnProperty('qorder'))?x.qorder:x.fields.cantshop" ng-disabled="!tniples.niples[$index].status" minandmax>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 {% endverbatim %}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn modal-action modal-close" ng-click="test()">
+                <button type="button" class="btn modal-action modal-close blue" ng-click="getNipples()">
                     <i class="fa fa-check"></i>
                     <span>Aceptar</span>
                 </button>
