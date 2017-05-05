@@ -239,9 +239,9 @@ app.controller 'rioC', ($scope, $q, rioF) ->
                     defer.resolve params
                     return defer.promise
                 valid().then (params) ->
-                    if response.length
+                    if params.length
                         prm =
-                            'details': params
+                            'details': JSON.stringify params
                             'saveReturn': true
                             'observation': inputValue
                         rioF.returnList(prm)

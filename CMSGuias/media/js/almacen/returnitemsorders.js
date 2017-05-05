@@ -203,81 +203,6 @@
         }
       });
     };
-    $scope.sendReturnList = function() {
-      if (!$scope.showNipple && !$scope.vnip) {
-        $scope.getNipples();
-        return false;
-      } else {
-        swal({
-          title: "Esta seguro?",
-          text: "Regresar los materiales a la lista de proyecto.",
-          type: "input",
-          showCancelButton: true,
-          cancelButtonText: 'No!',
-          confirmButtonColor: '#dd6b55',
-          confirmButtonText: 'Si!, Retornar',
-          showLoaderOnConfirm: true,
-          closeOnConfirm: false,
-          animation: "slide-from-top",
-          inputPlaceholder: "Observación"
-        }, function(inputValue) {
-          var prm;
-          if (inputValue === false) {
-            return false;
-          }
-          if (inputValue === "") {
-            swal.showInputError("Nesecitas ingresar una Observación.");
-            return false;
-          }
-          if (inputValue !== "") {
-            prm = {
-              'details': JSON.stringify($scope.datareturn),
-              'saveReturn': true,
-              'observation': inputValue,
-              'nip': new Array()
-            };
-            angular.forEach($scope.datareturn, function(value, keys) {
-              var el, obj1, tmp;
-              el = document.getElementsByName(value.materials);
-              if (el.length > 0) {
-                tmp = new Array;
-                angular.forEach(el, function(val) {
-                  console.log(prm['nip']["" + value.materials]);
-                  tmp.push({
-                    'id': val.attributes.id.value,
-                    'materials': value.materials,
-                    'quantity': val.value,
-                    'meter': val.attributes.metrado.value,
-                    'type': val.attributes.nip.value,
-                    'import': parseFloat(val.value) * parseFloat(val.attributes.metrado.value)
-                  });
-                });
-                prm['nip'].push((
-                  obj1 = {},
-                  obj1["" + value.materials] = tmp,
-                  obj1
-                ));
-              }
-            });
-            prm['nip'] = JSON.stringify(prm['nip']);
-            rioF.returnList(prm).success(function(response) {
-              if (response.status) {
-                Materialize.toast("Se ha devuelto los materiales seleccionados.", 2800);
-                setTimeout(function() {
-                  return location.reload();
-                }, 2800);
-              } else {
-                swal("Error!", "" + response.raise, "error");
-              }
-            });
-          } else {
-            swal.showInputError("Nesecitas ingresar una Observación.");
-            $scope.sendReturnList();
-            return false;
-          }
-        });
-      }
-    };
     $scope.getNipples = function() {
       var getamount;
       if (Object.keys($scope.tniples).length) {
@@ -325,6 +250,70 @@
       validselected().then(function(response) {
         if (response <= 0) {
           angular.element("#mview").modal('close');
+        }
+      });
+    };
+    $scope.sendReturnList = function() {
+      swal({
+        title: "Esta seguro de Regresar los materiales?",
+        text: "Ingrese el movito por se que retorna los materiales.",
+        type: "input",
+        showCancelButton: true,
+        cancelButtonText: 'No!',
+        confirmButtonColor: '#e82a37',
+        confirmButtonText: 'Si!, Retornar',
+        showLoaderOnConfirm: true,
+        closeOnConfirm: false,
+        animation: "slide-from-top",
+        inputPlaceholder: "Observación"
+      }, function(inputValue) {
+        var valid;
+        if (inputValue === false) {
+          return false;
+        }
+        if (inputValue === "") {
+          swal.showInputError("Nesecitas ingresar una Observación.");
+          return false;
+        }
+        if (inputValue !== "") {
+          valid = function() {
+            var defer, k, params, ref, x;
+            defer = $q.defer();
+            params = [];
+            ref = $scope.materials;
+            for (k in ref) {
+              x = ref[k];
+              if (x.status && x.qreturn > 0) {
+                params.push(x);
+              }
+            }
+            defer.resolve(params);
+            return defer.promise;
+          };
+          valid().then(function(params) {
+            var prm;
+            if (params.length) {
+              prm = {
+                'details': JSON.stringify(params),
+                'saveReturn': true,
+                'observation': inputValue
+              };
+              rioF.returnList(prm).success(function(response) {
+                if (response.status) {
+                  Materialize.toast("Se ha devuelto los materiales seleccionados.", 2800);
+                  setTimeout(function() {
+                    location.reload();
+                  }, 2800);
+                } else {
+                  swal("Error!", "" + response.raise, "error");
+                }
+              });
+            }
+          });
+        } else {
+          swal.showInputError("Nesecitas ingresar una Observación.");
+          $scope.sendReturnList();
+          return false;
         }
       });
     };
