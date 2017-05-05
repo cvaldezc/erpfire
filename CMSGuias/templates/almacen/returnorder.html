@@ -8,7 +8,14 @@
 {% block content %}
     <section ng-app="rioApp" ng-controller="rioC">
         <header>
-            <h3>Devolver Items a Proyecto</h3>
+            <h5>Devolver Items a Proyecto</h5>
+            <div class="card-panel amber lighten-5" ng-show="ismodify">
+                <div class="">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    El proyecto se encuentra en modificación, para devolver los materiales
+                    se requiere que acepte y/o se anule la modificaión del area del proyecto.
+                </div>
+            </div>
         </header>
         <article class="card-panel">
             <a href="#hstatus" class="right grey-text text-darken-3" ng-model="hstatus" ng-init="hstatus=false" ng-click="hstatus=!hstatus">
@@ -57,7 +64,7 @@
                         <label for="all">Todo</label>
                         <input type="radio" name="select" class="with-gap red" id="nothing" ng-model="selAll.chk" ng-value="false" ng-click="checkall()">
                         <label for="nothing">Ninguno</label>
-                        <button type="button" class="btn waves-effect waves-light red accent-2 right" ng-click="returnItems()">
+                        <button type="button" class="btn waves-effect waves-light red accent-2 right" ng-click="returnItems()" ng-disabled="ismodify">
                             <i class="fa fa-reply-all"></i>
                             <span>Retornar Materiales</span>
                         </button>
@@ -82,7 +89,7 @@
                         <tr ng-repeat="x in details">
                             <td>{{$index + 1}}</td>
                             <td class="center-align">
-                                <input type="checkbox" id="chk{{x.pk}}" class="filled-in red" ng-model="materials[x.pk].status" ng-init="materials[x.pk].status=false">
+                                <input type="checkbox" id="chk{{x.pk}}" class="filled-in red" ng-model="materials[x.pk].status" ng-init="materials[x.pk].status=false" ng-disabled="ismodify">
                                 <label for="chk{{x.pk}}"></label>
                                 <input type="hidden" ng-model="materials[x.pk].index" ng-init="materials[x.pk].index=x.pk">
                                 <input type="hidden" ng-model="materials[x.pk].materials" ng-init="materials[x.pk].materials=x.fields.materiales">
@@ -195,7 +202,7 @@
                                 <td>{{$index + 1}}</td>
                                 <td>
                                     <!-- ng-init="tniples.niples[$index].status=false" -->
-                                    <input type="checkbox" id="tn{{tniples.niples[$index].pk}}" ng-model="tniples.niples[$index].status" ng-checked="tniples.niples[$index].status"  class="filled-in blue">
+                                    <input type="checkbox" id="tn{{tniples.niples[$index].pk}}" ng-model="tniples.niples[$index].status" ng-init="tniples.niples[$index].status=tniples.niples[$index].hasOwnProperty('status')?tniples.niples[$index].status:false"  ng-checked="tniples.niples[$index].status"  class="filled-in blue">
                                     <label for="tn{{tniples.niples[$index].pk}}"></label>
                                 </td>
                                 <td class="center-align">Niple {{types[x.fields.tipo]}} ( {{x.fields.tipo}} )</td>

@@ -111,6 +111,7 @@ app.controller 'rioC', ($scope, $q, rioF) ->
     $scope.np = []
     $scope.dnp = []
     $scope.types = {};
+    $scope.ismodify = false
     angular.element(document).ready ->
         angular.element('.modal').modal
             dismissible: false
@@ -140,9 +141,11 @@ app.controller 'rioC', ($scope, $q, rioF) ->
             'getorder': true
         rioF.getDetails(prm)
         .success (response) ->
+            # console.info response
             if response.status
                 $scope.details = response.details
                 $scope.types = response.nametypes
+                $scope.ismodify = Boolean response.ismodify
                 return
             else
                 swal "Error", "#{response.raise}", "error"
@@ -220,7 +223,8 @@ app.controller 'rioC', ($scope, $q, rioF) ->
             confirmButtonColor: '#e82a37'
             confirmButtonText: 'Si!, Retornar'
             showLoaderOnConfirm: true
-            closeOnConfirm: false
+            closeOnConfirm: true
+            closeOnCancel: true
             animation: "slide-from-top"
             inputPlaceholder: "Observación"
         , (inputValue) ->
@@ -230,6 +234,8 @@ app.controller 'rioC', ($scope, $q, rioF) ->
                 swal.showInputError "Nesecitas ingresar una Observación."
                 return false
             if inputValue isnt ""
+                Materialize.toast "<i class='fa fa-cog fa-spin fa-2x'></i>&nbsp;Procesando, espere!", "undefine", "toast-remove"
+                $scope.ismodify = true
                 valid = ->
                     defer = $q.defer()
                     params = []
@@ -246,14 +252,17 @@ app.controller 'rioC', ($scope, $q, rioF) ->
                             'observation': inputValue
                         rioF.returnList(prm)
                         .success (response) ->
+                            $scope.ismodify = false
                             if response.status
-                                Materialize.toast "Se ha devuelto los materiales seleccionados.", 2800
+                                angular.element(".toast-remove").remove()
+                                Materialize.toast "<i class='fa fa-check fa-2x'></i>&nbsp;Materiales devueltos!.", 2800
                                 setTimeout ->
                                     location.reload()
                                     return
                                 , 2800
                                 return
                             else
+                                Materialize.toast "Se recomienda que actualizar la pagina ( F5 ).", 3600
                                 swal "Error!", "#{response.raise}", "error"
                                 return
                         return

@@ -131,6 +131,7 @@
     $scope.np = [];
     $scope.dnp = [];
     $scope.types = {};
+    $scope.ismodify = false;
     angular.element(document).ready(function() {
       angular.element('.modal').modal({
         dismissible: false
@@ -168,6 +169,7 @@
         if (response.status) {
           $scope.details = response.details;
           $scope.types = response.nametypes;
+          $scope.ismodify = Boolean(response.ismodify);
         } else {
           swal("Error", "" + response.raise, "error");
         }
@@ -263,7 +265,8 @@
         confirmButtonColor: '#e82a37',
         confirmButtonText: 'Si!, Retornar',
         showLoaderOnConfirm: true,
-        closeOnConfirm: false,
+        closeOnConfirm: true,
+        closeOnCancel: true,
         animation: "slide-from-top",
         inputPlaceholder: "Observación"
       }, function(inputValue) {
@@ -276,6 +279,8 @@
           return false;
         }
         if (inputValue !== "") {
+          Materialize.toast("<i class='fa fa-cog fa-spin fa-2x'></i>&nbsp;Procesando, espere!", "undefine", "toast-remove");
+          $scope.ismodify = true;
           valid = function() {
             var defer, k, params, ref, x;
             defer = $q.defer();
@@ -299,12 +304,15 @@
                 'observation': inputValue
               };
               rioF.returnList(prm).success(function(response) {
+                $scope.ismodify = false;
                 if (response.status) {
-                  Materialize.toast("Se ha devuelto los materiales seleccionados.", 2800);
+                  angular.element(".toast-remove").remove();
+                  Materialize.toast("<i class='fa fa-check fa-2x'></i>&nbsp;Materiales devueltos!.", 2800);
                   setTimeout(function() {
                     location.reload();
                   }, 2800);
                 } else {
+                  Materialize.toast("Se recomienda que actualizar la pagina ( F5 ).", 3600);
                   swal("Error!", "" + response.raise, "error");
                 }
               });
