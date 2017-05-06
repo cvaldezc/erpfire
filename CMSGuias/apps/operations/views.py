@@ -1433,6 +1433,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                     nip.cantguide = 0
                                     nip.tipo = x['fields']['tipo']
                                     nip.comment = x['fields']['comment']
+                                    nip.related = x['pk']
                                     nip.tag = '0'
                                     nip.save()
                         except Exception as ex:

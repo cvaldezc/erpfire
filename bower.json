@@ -36,6 +36,7 @@
     "angular-filter": "^0.5.9",
     "trumbowyg": "^2.2.0",
     "chosen": "^1.6.2",
-    "materialize": "^0.97.8"
+    "materialize": "^0.97.8",
+    "showdown": "^1.6.4"
   }
 }

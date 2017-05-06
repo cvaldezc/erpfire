@@ -1,196 +1,233 @@
 {% extends "basemd.html" %}
 {% block title %}
-	Return Items from Order to Project
+    Return Items from Order to Project
 {% endblock title %}
 {% block menu %}
     {% include "menus/storagemd.htm" %}
 {% endblock menu %}
 {% block content %}
-	<section ng-app="rioApp" ng-controller="rioC">
-		<header>
-			<h3>Devolver Items a Proyecto</h3>
-		</header>
-		<article class="card-panel">
-			<div class="card-content row">
-				<div class="col l6 m6 s12">
-					<blockquote>
-						<dl>
-							<dt>Proyecto</dt><dd>{{ order.proyecto_id }} - {{ order.proyecto.nompro }}</dd>
-							<dt>Subproyecto</dt><dd>{{ order.subproyecto_id }} - {{ order.subproyecto.nomsub }}</dd>
-							<dt>Sector</dt><dd>{{ order.sector_id }} - {{ order.sector.nomsec }}</dd>
-							<dt>Almacén</dt><dd>{{ order.almacen.nombre }}</dd>
-							<dt>Realizado</dt><dd>{{ usr.user.first_name }} {{ usr.user.last_name }}</dd>
-							<dt>Asunto</dt><dd>{{ order.asunto }}</dd>
-						</dl>
-					</blockquote>
-				</div>
-				<div class="col l6 m6 s12">
-					<blockquote>
-						<dl class="dl-horizontal">
-							<dt>Registrado</dt><dd>{{ order.registrado }}</dd>
-							<dt>Realizado</dt><dd>{{ order.traslado }}</dd>
-							<dt>Observación</dt><dd>{{ order.obser|safe }}</dd>
-							<dt>Estado</dt><dd>{{ order.status }}</dd>
-							{% if order.orderfile %}
-								<dt>Adjunto</dt><dd><a class="btn btn-default btn-xs btn-warning text-black" target="_blank" href="{{ MEDIA_URL }}/{{ order.orderfile }}"><span class="glyphicon glyphicon-download"></span></a></dd>
-							{% endif %}
-						</dl>
-					</blockquote>
-				</div>		
-			</div>
-		</article>
-		{% if order.status == 'CO' or order.status == 'AN' %}
-			<aside>
-				<blockquote>
-					<h4>No tiene items para ser devueltos.</h4>
-				</blockquote>
-			</aside>
-		{% else %}
-			<article>
-				<div class="card">
-					<div class="card-action">
-						<h6>Seleccionar: </h6>
-						<input type="radio" name="select" class="with-gap" id="all" ng-model="selAll.chk" ng-value="true" ng-click="checkall()">
-						<label for="all">Todo</label>
-						<input type="radio" name="select" class="with-gap" id="nothing" ng-model="selAll.chk" ng-value="false" ng-click="checkall()">
-						<label for="nothing">Ninguno</label>
-						<button type="button" class="btn waves-effect waves-light amber lighten-1 right" ng-click="returnItems()">
-							<i class="fa fa-reply-all"></i>
-							Devolver
-						</button>
-					</div>
-				</div>
-				<table class="highlight responsive-table hovered">
-					<thead>
-						<tr class="amber lighten-5">
-							<th></th>
-							<th></th>
-							<th>Código</th>
-							<th>Descripción</th>
-							<th>Marca</th>
-							<th>Modelo</th>
-							<th>Unidad</th>
-							<th>Pedido</th>
-							<th>Pendiente</th>
-						</tr>
-					</thead>
-					<tbody>
-					{% verbatim %}
-						<tr ng-repeat="x in details">
-							<td>{{$index + 1}}</td>
-							<td>
-								<input type="checkbox" id="{{x.pk}}" ng-model="mat[x.pk]" ng-init="mat[x.pk] = false">
-								<label for="{{x.pk}}"></label>
-							</td>
-							<td><small>{{x.fields.materiales.pk}}</small></td>
-							<td>{{x.fields.materiales.fields.matnom}} {{x.fields.materiales.fields.matmed}}</td>
-							<td>{{x.fields.brand.fields.brand}}</td>
-							<td>{{x.fields.model.fields.model}}</td>
-							<td>{{x.fields.materiales.fields.unidad}}</td>
-							<td>{{x.fields.cantidad}}</td>
-							<td>
-								<input type="number" class="right-align" min="0" max="{{x.fields.cantshop}}" step="1" ng-model="quantity[x.pk]" ng-init="quantity[x.pk]=x.fields.cantshop" ng-disabled="mat[x.pk] == false" minandmax>
-							</td>
-						</tr>
-					{% endverbatim %}
-					</tbody>
-				</table>
-			</article>
-		{% endif %}
-		<!-- block modals -->
-		<div id="mview" class="modal modal-fixed-footer bottom-sheet" style="max-height: 95%; height: 100%;">
-			<div class="modal-content">
-				<h5>Materiales que se van a retornar</h5>
-				<table class="responsive-table highlight">
-					<thead>
-						<tr>
-							<th></th>
-							<th>Código</th>
-							<th>Descripción</th>
-							<th>Unidad</th>
-							<th>Marca</th>
-							<th>Modelo</th>
-							<th>Cantidad Retorno</th>
-						</tr>
-					</thead>
-					{% verbatim %}
-					<tbody>
-						<tr ng-repeat="x in datareturn">
-							<td>{{$index + 1}}</td>
-							<td>{{x.materials}}</td>
-							<td>{{x.name}}</td>
-							<td>{{x.unit}}</td>
-							<td>{{x.brand}}</td>
-							<td>{{x.model}}</td>
-							<td class="right-align">{{x.quantity}}</td>
-						</tr>
-					</tbody>
-					{% endverbatim %}
-				</table>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn modal-action modal-close left grey lighten-5 grey-text text-darken-3">
-					<i class="fa fa-times"></i>
-					<span class="hide-on-small-only">Cancelar</span>
-				</button>
-				<button type="button" class="btn blue lighthen-2" ng-click="sendReturnList()">
-					<i class="fa fa-reply-all"></i>
-					<span class="hide-on-small-only">Retornar Materiales</span>
-				</button>
-				<button type="button" class="btn amber lighten-1 grey-text text-darken-3" ng-click="getNipples()">
-					<i class="fa fa-bars"></i>
-					<span>NIples</span>
-				</button>
-			</div>
-		</div>
-		<div id="mnp" class="modal modal-fixed-footer" style="width: 90%;">
-			<div class="modal-content">
-				<h4>Niples</h4>
-				{% verbatim %}
-					<table class="hightlight responsive-table" ng-repeat="x in gnp track by $index">
-						<caption class="left-align">
-							<div class="switch">
-								<label>
-									Ninguno
-									<input type="checkbox" id="{{x[0].fields.materiales.pk}}" ng-model="dnp[x[0].fields.materiales.pk]" ng-init="dnp[x[0].fields.materiales.pk] = true" ng-checked="dnp[x[0].fields.materiales.pk]" status>
-									<span class="lever"></span>
-									Todo
-								</label>
-							</div>
-							{{x[0].fields.materiales.fields.matnom}} {{x[0].fields.materiales.fields.matmed}}
-						</caption>
-						<thead>
-							<tr>
-								<th></th>
-								<th>Descripción</th>
-								<th>Cantidad</th>
-								<th></th>
-								<th>Medida</th>
-								<th>Devolver</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="n in x">
-								<td>{{$index+1}}</td>
-								<td class="center-align">Niple {{n.fields.tipo}}</td>
-								<td class="right-align">{{n.fields.cantidad}}</td>
-								<td class="center-align">x</td>
-								<td>{{n.fields.metrado}} cm</td>
-								<td><input type="number" id="{{n.pk}}" nip="{{n.fields.tipo}}" metrado="{{n.fields.metrado}}" name="{{n.fields.materiales.pk}}" class="right-align" min="0" max="{{n.fields.cantshop}}" ng-model="np[n.pk]" ng-init="np[n.pk]=n.fields.cantshop" tmandm></td>
-							</tr>
-						</tbody>
-					</table>
-				{% endverbatim %}
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn modal-action modal-close" ng-click="test()">
-					<i class="fa fa-check"></i>
-					<span>Aceptar</span>
-				</button>
-			</div>
-		</div>
-		<!-- end block -->
-	</section>
+    <section ng-app="rioApp" ng-controller="rioC">
+        <header>
+            <h5>Devolver Items a Proyecto</h5>
+            <div class="card-panel amber lighten-5" ng-show="ismodify">
+                <div class="">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    El proyecto se encuentra en modificación, para devolver los materiales
+                    se requiere que acepte y/o se anule la modificaión del area del proyecto.
+                </div>
+            </div>
+        </header>
+        <article class="card-panel">
+            <a href="#hstatus" class="right grey-text text-darken-3" ng-model="hstatus" ng-init="hstatus=false" ng-click="hstatus=!hstatus">
+                <i class="fa " ng-class="{'fa-window-restore': hstatus, 'fa-window-minimize': !hstatus}"></i>
+            </a>
+            <div class="card-content row" ng-hide="hstatus">
+                <div class="col l6 m6 s12">
+                    <blockquote>
+                        <dl>
+                            <dt>Proyecto</dt><dd>{{ order.proyecto_id }} - {{ order.proyecto.nompro }}</dd>
+                            <dt>Subproyecto</dt><dd>{{ order.subproyecto_id }} - {{ order.subproyecto.nomsub }}</dd>
+                            <dt>Sector</dt><dd>{{ order.sector_id }} - {{ order.sector.nomsec }}</dd>
+                            <dt>Almacén</dt><dd>{{ order.almacen.nombre }}</dd>
+                            <dt>Realizado</dt><dd>{{ usr.user.first_name }} {{ usr.user.last_name }}</dd>
+                            <dt>Asunto</dt><dd>{{ order.asunto }}</dd>
+                        </dl>
+                    </blockquote>
+                </div>
+                <div class="col l6 m6 s12">
+                    <blockquote>
+                        <dl class="dl-horizontal">
+                            <dt>Registrado</dt><dd>{{ order.registrado }}</dd>
+                            <dt>Realizado</dt><dd>{{ order.traslado }}</dd>
+                            <dt>Observación</dt><dd>{{ order.obser|safe }}</dd>
+                            <dt>Estado</dt><dd>{{ order.status }}</dd>
+                            {% if order.orderfile %}
+                                <dt>Adjunto</dt><dd><a class="btn btn-default btn-xs btn-warning text-black" target="_blank" href="{{ MEDIA_URL }}/{{ order.orderfile }}"><span class="glyphicon glyphicon-download"></span></a></dd>
+                            {% endif %}
+                        </dl>
+                    </blockquote>
+                </div>
+            </div>
+        </article>
+        {% if order.status == 'CO' or order.status == 'AN' %}
+            <aside>
+                <blockquote>
+                    <h4>No tiene materiales para devolver. <i class="fa fa-frown-o"></i></h4>
+                </blockquote>
+            </aside>
+        {% else %}
+            <article>
+                <div class="card">
+                    <div class="card-action">
+                        <label>Seleccionar: </label>
+                        <input type="radio" name="select" class="with-gap red" id="all" ng-model="selAll.chk" ng-value="true" ng-click="checkall()">
+                        <label for="all">Todo</label>
+                        <input type="radio" name="select" class="with-gap red" id="nothing" ng-model="selAll.chk" ng-value="false" ng-click="checkall()">
+                        <label for="nothing">Ninguno</label>
+                        <button type="button" class="btn waves-effect waves-light red accent-2 right" ng-click="returnItems()" ng-disabled="ismodify">
+                            <i class="fa fa-reply-all"></i>
+                            <span>Retornar Materiales</span>
+                        </button>
+                    </div>
+                </div>
+                <table class="table highlight responsive-table hovered">
+                    <thead>
+                        <tr class="red accent-2">
+                            <th></th>
+                            <th></th>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Unidad</th>
+                            <th>C. Pendiente</th>
+                            <th>C. a Devolver</th>
+                        </tr>
+                    </thead>
+                    {% verbatim %}
+                    <tbody ng-show="details.length>0">
+                        <tr ng-repeat="x in details">
+                            <td>{{$index + 1}}</td>
+                            <td class="center-align">
+                                <input type="checkbox" id="chk{{x.pk}}" class="filled-in red" ng-model="materials[x.pk].status" ng-init="materials[x.pk].status=false" ng-disabled="ismodify">
+                                <label for="chk{{x.pk}}"></label>
+                                <input type="hidden" ng-model="materials[x.pk].index" ng-init="materials[x.pk].index=x.pk">
+                                <input type="hidden" ng-model="materials[x.pk].materials" ng-init="materials[x.pk].materials=x.fields.materiales">
+                                <input type="hidden" ng-model="materials[x.pk].brand" ng-init="materials[x.pk].brand=x.fields.brand">
+                                <input type="hidden" ng-model="materials[x.pk].model" ng-init="materials[x.pk].model=x.fields.model">
+                                <input type="hidden" ng-model="materials[x.pk].nstatus" ng-init="materials[x.pk].nstatus=x.nstatus">
+                                <input type="hidden" ng-model="materials[x.pk].niples" ng-init="materials[x.pk].niples=x.niples">
+                            </td>
+                            <td><small>{{x.fields.materiales.pk}}</small></td>
+                            <td>{{x.fields.materiales.fields.matnom}} {{x.fields.materiales.fields.matmed}}</td>
+                            <td>{{x.fields.brand.fields.brand}}</td>
+                            <td>{{x.fields.model.fields.model}}</td>
+                            <td>{{x.fields.materiales.fields.unidad}}</td>
+                            <td class="right-align">{{x.fields.cantidad}}</td>
+                            <td>
+                                <input type="number" class="right-align" min="0" max="{{x.fields.cantshop}}" step="1" ng-model="materials[x.pk].qreturn" ng-init="materials[x.pk].qreturn=(x.nstatus?0:x.fields.cantshop)" ng-disabled="!materials[x.pk].status" ng-readonly="x.nstatus" ng-focus="showNiple(x.pk)" minandmax>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot ng-hide="details.length>0">
+                        <tr>
+                            <td class="center-align" colspan="9">
+                                <div class="progress red lighten-4">
+                                    <div class="indeterminate red accent-2"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                    {% endverbatim %}
+                </table>
+            </article>
+        {% endif %}
+        <!-- block modals -->
+        <div id="mview" class="modal modal-fixed-footer bottom-sheet" style="max-height: 95%;">
+            <div class="modal-content">
+                <h5>Materiales que se van a retornar</h5>
+                <table class="table responsive-table highlight">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Unidad</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Cantidad a Retornar</th>
+                            <th>Quitar</th>
+                        </tr>
+                    </thead>
+                    {% verbatim %}
+                    <tbody>
+                        <tr ng-repeat="x in materials | filter: {status: true}">
+                            <td>{{$index + 1}}</td>
+                            <td>{{x.materials.pk}}</td>
+                            <td>{{x.materials.fields.matnom}} {{x.materials.fields.matmed}}</td>
+                            <td>{{x.materials.fields.unidad}}</td>
+                            <td>{{x.brand.fields.brand}}</td>
+                            <td>{{x.model.fields.model}}</td>
+                            <td class="right-align">{{x.qreturn}}</td>
+                            <td class="center-align">
+                                <a href="#remove" class="red-text text-accent-2" ng-click="removeSelected(x.index)">
+                                    <i class="fa fa-remove fa-2x"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                    {% endverbatim %}
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn modal-action modal-close left grey lighten-5 grey-text text-darken-3">
+                    <i class="fa fa-times"></i>
+                    <span class="hide-on-small-only">Cancelar</span>
+                </button>
+                <button type="button" class="btn blue lighthen-2" ng-click="sendReturnList()">
+                    <i class="fa fa-reply-all"></i>
+                    <span class="hide-on-small-only">Retornar Materiales</span>
+                </button>
+            </div>
+        </div>
+        <div id="mniple" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                {% verbatim %}
+                    <h6>Niples</h6>
+                    <table class="table hightlight responsive-table">
+                        <caption class="left-align">
+                            <div class="switch">
+                                <label ng-click="checkTNiple()">
+                                    Ninguno
+                                    <input type="checkbox" id="{{tniples.materials.pk}}" ng-model="stnip" ng-init="stnip=false" ng-checked="stnip">
+                                    <span class="lever blue"></span>
+                                    Todo
+                                </label>
+                            </div>
+                            {{tniples.materials.fields.matnom}} {{tniples.materials.fields.matmed}}
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th></th>
+                                <th>Medida</th>
+                                <th>C. a Devolver</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in tniples.niples">
+                                <td>{{$index + 1}}</td>
+                                <td>
+                                    <!-- ng-init="tniples.niples[$index].status=false" -->
+                                    <input type="checkbox" id="tn{{tniples.niples[$index].pk}}" ng-model="tniples.niples[$index].status" ng-init="tniples.niples[$index].status=tniples.niples[$index].hasOwnProperty('status')?tniples.niples[$index].status:false"  ng-checked="tniples.niples[$index].status"  class="filled-in blue">
+                                    <label for="tn{{tniples.niples[$index].pk}}"></label>
+                                </td>
+                                <td class="center-align">Niple {{types[x.fields.tipo]}} ( {{x.fields.tipo}} )</td>
+                                <td class="right-align">{{x.fields.cantshop}}</td>
+                                <td class="center-align">x</td>
+                                <td>{{x.fields.metrado}} cm</td>
+                                <td>
+                                    <input type="number" id="{{x.pk}}" class="right-align" min="0"
+                                     max="{{x.fields.cantshop}}" ng-model="tniples.niples[$index].qorder"
+                                     ng-init="tniples.niples[$index].qorder=(x.hasOwnProperty('qorder'))?x.qorder:x.fields.cantshop" ng-disabled="!tniples.niples[$index].status" minandmax>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endverbatim %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn modal-action modal-close blue" ng-click="getNipples()">
+                    <i class="fa fa-check"></i>
+                    <span>Aceptar</span>
+                </button>
+            </div>
+        </div>
+        <!-- end block -->
+    </section>
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/almacen/returnitemsorders.js" defer></script>

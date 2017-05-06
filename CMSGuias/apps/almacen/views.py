@@ -2556,25 +2556,25 @@ class ReturnItemOrders(JSONResponseMixin, TemplateView):
                                 serializers.serialize(
                                     'json',
                                     det,
-                                    relations=('materiales','brand','model')))
+                                    relations=('materiales', 'brand', 'model')))
+                            for x in context['details']:
+                                niple = Niple.objects.filter(
+                                    pedido_id=kwargs['order'],
+                                    materiales_id=x['fields']['materiales']['pk'],
+                                    brand_id=x['fields']['brand']['pk'],
+                                    model_id=x['fields']['model']['pk']
+                                    ).exclude(tag='2', cantshop__lte=0)
+                                if niple.count() > 0:
+                                    x['nstatus'] = True
+                                    x['niples'] = json.loads(serializers.serialize('json', niple))
+                                else:
+                                    x['niples'] = []
+                                    x['nstatus'] = False
+                            context['ismodify'] = MMetrado.objects.filter(
+                                            dsector_id=det[0].pedido.dsector_id).order_by('-register').count()
                         else:
                             context['details'] = '[]'
-                        context['status'] = True
-                    if 'getNipples' in request.GET:
-                        gnp = json.loads(request.GET['check'])
-                        context['gnp'] = list()
-                        for x in gnp:
-                            nip = Niple.objects.filter(
-                                pedido_id=kwargs['order'],
-                                materiales_id=x['materials'],
-                                brand_id=x['brand'],
-                                model_id=x['model']).exclude(tag='2', cantshop__lte=0)
-                            if nip.count():
-                                context['gnp'].append(json.loads(
-                                    serializers.serialize(
-                                        'json',
-                                        nip, relations=('materiales'))))
-                        context['valid'] = True if len(context['gnp']) else False
+                        context['nametypes'] = globalVariable.tipo_nipples
                         context['status'] = True
                 except (ObjectDoesNotExist, Exception) as e:
                     context['raise'] = str(e)
@@ -2591,142 +2591,199 @@ class ReturnItemOrders(JSONResponseMixin, TemplateView):
         if request.is_ajax():
             try:
                 if 'saveReturn' in request.POST:
-                    """ save changes return list to project"""
-                    # validating quantity in ddbb
-                    # requeriment before return materials to project
-                    data = json.loads(request.POST['details'])
-                    nip = json.loads(request.POST['nip'])
-                    od = Pedido.objects.filter(pedido_id=kwargs['order'])
-                    if len(od) > 0:
-                        od = od[0]
-                    for d in data:
-                        valid = False
-                        nq = 0
-                        for n in nip:
-                            if d['materials'] in n:
-                                for x in n[d['materials']]:
-                                    nq += (float(x['import']) / 100)
-                                    # part return quantity at table nipple
-                                    try:
-                                        np = Nipple.objects.filter(
-                                                proyecto_id=od.proyecto_id,
-                                                sector_id=od.sector_id,
-                                                materiales_id=x['materials'],
-                                                metrado=x['meter'],
-                                                tipo=x['type'])
-                                        if np.count() > 0:
-                                            np = np[0]
-                                            np.cantshop += float(x['quantity'])
-                                            np.tag = '1'
-                                            np.save()
-                                        # remove or decrease
-                                        # items from orders nipple
-                                        rno = Niple.objects.get(id=x['id'])
-                                        rno.cantshop += float(x['quantity'])
-                                        rno.cantidad -= float(x['quantity'])
-                                        if rno.cantidad <= 0:
-                                            rno.delete()
-                                        else:
-                                            rno.save()
-                                    except Exception as e:
-                                        print 'NIPPLE DONT EXISTS'
-                                        print str(e)
-                                valid = True
-                        if valid is True:
-                            d['quantity'] = round(nq, 2)
-                    notProc = list()
-                    for x in data:
-                        valid = True
-                        queryset = Detpedido.objects.get(id=x['id'], pedido_id=kwargs['order'])
-                        print '---------------------------'
-                        print 'HERE QUERY ', queryset
-                        print '---------------------------'
-                        print queryset.cantshop, 'CANTIDAD PROCESS ', x['quantity']
-                        if queryset.cantshop < float(x['quantity']):
-                            valid = False
-                        if valid:
-                            if queryset.cantidad == x['quantity']:
-                                print 'ITEM DELETE'
-                                queryset.delete()
-                            elif queryset.cantshop == x['quantity']:
-                                print 'ITEM COMPLETE'
-                                queryset.cantshop = (queryset.cantshop - x['quantity'])
-                                queryset.cantidad = (queryset.cantidad - x['quantity'])
-                                queryset.tag = '2'
-                                queryset.save()
-                            if x['quantity'] < queryset.cantshop:
-                                print 'ITEM MEDIO'
-                                queryset.cantshop = (queryset.cantshop - x['quantity'])
-                                queryset.cantidad = (queryset.cantidad - x['quantity'])
-                                queryset.save()
-                        else:
-                            print 'ITEM NOT FOUND'
-                            notProc.append(x)
-                    # consult and update status order
+                    """ save changes return list to project not include support for the table operations metproject"""
+                    fail = list()
                     order = Pedido.objects.get(pedido_id=kwargs['order'])
-                    print order
-                    qdp = Detpedido.objects.filter(pedido_id=kwargs['order'])
-                    if qdp.filter(cantshop__gt=0).count():
-                        if qdp.count() == qdp.filter(cantshop__gt=0).count():
-                            order.status = 'AP'
+                    def gettag(quantity, qorder):
+                        tag = '0'
+                        if quantity > qorder and qorder > 0:
+                            tag = '1'
+                        elif qorder == 0:
+                            tag = '2'
+                        return tag
+
+                    # discount quantity of order storage
+                    def backniplesorder(obj):
+                        try:
+                            for x in obj:
+                                if x['status']:
+                                    onip = Niple.objects.get(
+                                        pedido_id=order.pedido_id,
+                                        id=x['pk'])
+                                    onip.cantidad -= x['qorder']
+                                    onip.cantshop -= x['qorder']
+                                    onip.tag = gettag(onip.cantidad, onip.cantshop)
+                                    if onip.cantidad <= 0:
+                                        onip.delete()
+                                    else:
+                                        onip.save()
+                        except Exception as nex:
+                            fail.append({
+                                'occurrend':'Back Niple Order',
+                                'raise': str(nex),
+                                'data': obj})
+                    def discountorder(obj):
+                        try:
+                            rdo = Detpedido.objects.filter(
+                                pedido_id=order.pedido_id,
+                                materiales_id=obj['materials']['pk'],
+                                brand_id=obj['brand']['pk'],
+                                model_id=obj['model']['pk'])
+                            if len(rdo):
+                                rdo = rdo[0]
+                                rdo.cantidad -= obj['qreturn']
+                                rdo.cantshop -= obj['qreturn']
+                                rdo.tag = gettag(rdo.cantidad, rdo.cantshop)
+                                if rdo.cantidad <= 0:
+                                    rdo.delete()
+                                else:
+                                    rdo.save()
+                                if obj['nstatus']:
+                                    backniplesorder(obj['niples'])
+                        except Exception as dex:
+                            fail.append({
+                                'occurrend':'Discount items Order',
+                                'raise': str(dex),
+                                'data': obj})
+                    # end block discount
+                    # block reference to rpoject
+                    def backniplesproject(obj):
+                        try:
+                            print 'Object to niple to project'
+                            print obj
+                            print type(obj)
+                            for x in obj:
+                                if x['status']:
+                                    exists = True
+                                    onip = Nipple.objects.filter(
+                                        area_id=order.dsector_id,
+                                        id=x['fields']['related'])
+                                    print 'first found related'
+                                    print onip
+                                    if len(onip):
+                                        onip = onip[0]
+                                    else:
+                                        onip = Nipple.objects.filter(
+                                            area_id=order.dsector_id,
+                                            materiales_id=x['fields']['materiales'],
+                                            brand_id=x['fields']['brand'],
+                                            model_id=x['fields']['model'],
+                                            tipo=x['fields']['tipo'],
+                                            metrado=x['fields']['metrado'])
+                                        print 'second found related'
+                                        print onip
+                                        if len(onip):
+                                            onip = onip[0]
+                                        else:
+                                            exists = False
+                                    print 'IF EXISTS NIP ', exists
+                                    if exists:
+                                        onip.cantshop += x['qorder']
+                                        if onip.cantshop > onip.cantidad:
+                                            onip.cantidad = onip.cantshop
+                                        onip.tag = gettag(onip.cantidad, onip.cantshop)
+                                        onip.save()
+                                    else:
+                                        onip = Nipple()
+                                        onip.proyecto_id = x['fields']['proyecto']
+                                        onip.sector_id = x['fields']['sector']
+                                        onip.area_id=order.dsector_id
+                                        onip.materiales_id=x['fields']['materiales']
+                                        onip.brand_id=x['fields']['brand']
+                                        onip.model_id=x['fields']['model']
+                                        onip.tipo=x['fields']['tipo']
+                                        onip.metrado=x['fields']['metrado']
+                                        onip.cantidad = x['qorder']
+                                        onip.cantshop = x['qorder']
+                                        onip.comment = x['fields']['comment']
+                                        onip.flag = True
+                                        onip.tag = gettag(onip.cantidad, onip.cantshop)
+                                        onip.save()
+                        except Exception as nex:
+                            fail.append({
+                                'occurrend':'Back Niple Project',
+                                'raise': str(nex),
+                                'data': obj})
+                    def backtoproject(obj):
+                        try:
+                            dsp = DSMetrado.objects.filter(
+                                dsector_id=order.dsector_id,
+                                materials_id=obj['materials']['pk'],
+                                brand_id=obj['brand']['pk'],
+                                model_id=obj['model']['pk'])
+                            if len(dsp):
+                                dsp = dsp[0]
+                                dsp.qorder += obj['qreturn']
+                                if dsp.qorder > dsp.quantity:
+                                    dsp.quantity = dsp.qorder
+                                dsp.tag = gettag(dsp.quantity, dsp.qorder)
+                                dsp.save()
+                            else:
+                                dsp = DSMetrado()
+                                dsp.dsector_id = order.dsector_id
+                                dsp.materials_id = obj['materials']['pk']
+                                dsp.brand_id=obj['brand']['pk']
+                                dsp.model_id=obj['model']['pk']
+                                dsp.quantity = obj['qreturn']
+                                dsp.qorder = obj['qreturn']
+                                dsp.qguide = 0
+                                dsp.ppurchase = 1
+                                dsp.psales = 1
+                                dsp.tag = gettag(dsp.quantity, dsp.qorder)
+                                dsp.flag = True
+                                dsp.nipple = obj['nstatus']
+                                dsp.sector_id = order.sector_id
+                                dsp.save()
+                            if obj['nstatus']:
+                                backniplesproject(obj['niples'])
+                            discountorder(obj)
+                        except Exception as pex:
+                            fail.append({
+                                'occurrend':'Back items Project',
+                                'raise': str(pex),
+                                'data': obj})
+
+                    # end block project
+                    # register in table audit
+                    def saveregister():
+                        rip = ReturnItemsProject()
+                        rip.pedido_id = order.pedido_id
+                        rip.listsend = request.POST['details']
+                        rip.notpro = json.dumps(fail)
+                        rip.observation = request.POST['observation']
+                        rip.status = 'AC'
+                        rip.save()
+                    def changeorder():
+                        dp = Detpedido.objects.filter(pedido_id=kwargs['order'])
+                        qend = dp.filter(tag='2', cantshop=0).count()
+                        status = ''
+                        if dp.count() == qend and qend > 0:
+                            status = 'CO'
+                        elif qend > 0 and qend < dp.count():
+                            status = 'IN'
                         else:
-                            order.status = 'IN'
-                    if qdp.filter(cantshop=0).count() == qdp.count():
-                        order.status = 'CO'
-                    order.save()
-                    # register in table ReturnItemsProject
-                    obj = ReturnItemsProject()
-                    obj.pedido_id = kwargs['order']
-                    obj.observation = request.POST['observation']
-                    obj.listsend = request.POST['details']
-                    obj.notpro = json.dumps(notProc)
-                    obj.save()
-                    # return materials to project
-                    opr = None
-                    # print request.POST
-                    if isinstance(order.dsector_id, str) and len(str(order.dsector_id).strip()) == 10:
-                        # this part return item to area table operations "dsmetrado"
-                        print 'table dsmetrado'
-                        for x in data:
-                            try:
-                                opr =  dsmetrado.objects.get(
-                                    dsecto_id=order.dsecto_id,
-                                    materials_id=x['materials'],
-                                    brand_id=x['brand_id'],
-                                    model_id=x['model_id'])
-                                opr.qorder += float(x['quantity'])
-                                if opr.quantity > opr.qorder:
-                                    opr.tag = '1'
-                                else:
-                                    opr.tag = '0'
-                                opr.save()
-                            except Exception, e:
-                                print e
-                                continue
-                    else:
-                        print 'table metProject'
-                        # this part return item to project for table operations "metproject"
-                        for x in data:
-                            try:
-                                opr = MetProject.objects.get(
-                                    sector_id=order.sector_id,
-                                    materiales_id=x['materials'],
-                                    brand_id=x['brand_id'],
-                                    model_id=x['model_id'])
-                                opr.quantityorder += x['quantity']
-                                if opr.cantidad > opr.quantityorder:
-                                    opr.tag = '1'
-                                else:
-                                    opr.tag = '0'
-                                opr.save()
-                            except Exception, e:
-                                print e
-                                continue
-                    context['status'] = True
+                            status = 'AP'
+                        if dp.count() == 0 and qend == 0:
+                            status = 'AN'
+                        if status != '':
+                            order.status = status
+                            order.save()
+                            context['status'] = True
+                        else:
+                            context['status'] = False
+                    # process to data
+                    for x in json.loads(request.POST['details']):
+                        backtoproject(x)
+                    # change order status
+                    changeorder()
+                    # register return
+                    saveregister()
+                    context['fail'] = json.dumps(fail)
             except (ObjectDoesNotExist, Exception), e:
                 context['raise'] = str(e)
                 context['status'] = False
             return self.render_to_json_response(context)
+
 
 class AttendOrder(JSONResponseMixin, TemplateView):
 
@@ -3091,3 +3148,4 @@ class ReturnWithout(JSONResponseMixin, TemplateView):
             return render(request, self.template_name, context)
         except TemplateDoesNotExist as e:
             raise Http404(e)
+
