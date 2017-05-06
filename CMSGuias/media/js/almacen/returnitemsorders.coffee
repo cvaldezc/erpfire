@@ -186,8 +186,8 @@ app.controller 'rioC', ($scope, $q, rioF) ->
                     if x.status
                         ntmp = 0
                         ntmp = x.qorder * x.fields.metrado
-                        amount += ((Math.round((ntmp/100) * 100))/100)
-                defer.resolve amount
+                        amount += (ntmp/100)
+                defer.resolve ((Math.round(amount*100))/100)
                 return defer.promise
             getamount().then (response) ->
                 $scope.materials[$scope.tniples.index].qreturn = response

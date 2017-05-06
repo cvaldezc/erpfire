@@ -218,10 +218,10 @@
             if (x.status) {
               ntmp = 0;
               ntmp = x.qorder * x.fields.metrado;
-              amount += (Math.round((ntmp / 100) * 100)) / 100;
+              amount += ntmp / 100;
             }
           }
-          defer.resolve(amount);
+          defer.resolve((Math.round(amount * 100)) / 100);
           return defer.promise;
         };
         getamount().then(function(response) {

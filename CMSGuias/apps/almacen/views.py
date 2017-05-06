@@ -2678,7 +2678,6 @@ class ReturnItemOrders(JSONResponseMixin, TemplateView):
                                             exists = False
                                     print 'IF EXISTS NIP ', exists
                                     if exists:
-                                        onip.cantidad += x['qorder']
                                         onip.cantshop += x['qorder']
                                         if onip.cantshop > onip.cantidad:
                                             onip.cantidad = onip.cantshop
@@ -2758,12 +2757,14 @@ class ReturnItemOrders(JSONResponseMixin, TemplateView):
                         dp = Detpedido.objects.filter(pedido_id=kwargs['order'])
                         qend = dp.filter(tag='2', cantshop=0).count()
                         status = ''
-                        if dp.count() == qend:
+                        if dp.count() == qend and qend > 0:
                             status = 'CO'
                         elif qend > 0 and qend < dp.count():
                             status = 'IN'
                         else:
                             status = 'AP'
+                        if dp.count() == 0 and qend == 0:
+                            status = 'AN'
                         if status != '':
                             order.status = status
                             order.save()
