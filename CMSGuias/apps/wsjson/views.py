@@ -187,9 +187,20 @@ def get_resumen_details_materiales(request):
                     materiales_id=request.GET['matid']).order_by('-compra__registrado')
                 if materials:
                     print materials.count()
-                    materials = materials.latest('compra__registrado')
+                    materials = materials.values().latest('compra__registrado')
                     print materials
-                context['list'] = list({})
+            if not materials:
+                materials = DSMetrado.objects.filter(
+                    materials_id=request.GET['matid']).order_by('-dsector_id')
+                if count(materials):
+                    materials = materials[0]
+            context['list'] = list({
+                'materialesid': materials,
+                'matnom': '',
+                'matmed': '',
+                'unidad': '',
+                'sale': if 'psales' in materials else materials['precio'],
+                'purchase': 0})
             context['status'] = True
         except ObjectDoesNotExist:
             context['raise'] = e.__str__()
