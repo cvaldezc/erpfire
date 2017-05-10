@@ -46,8 +46,8 @@ def get_description_materials(request):
     if request.method == 'GET':
         try:
             name = Materiale.objects.values('matnom').filter(
-                matnom__icontains=request.GET.get('nom')
-                    ).distinct('matnom').order_by('matnom')
+                matnom__icontains=request.GET.get('nom')).distinct(
+                    'matnom').order_by('matnom')
             context['name'] = [{'matnom': x['matnom']} for x in name]
             context['status'] = True
         except ObjectDoesNotExist:
@@ -175,32 +175,44 @@ def get_resumen_details_materiales(request):
             if 'pro' in request.GET:
                 # find in the all areas of the project
                 materials = DSMetrado.objects.filter(
-                    dsector_id__istartswith=request.GET['pro'],
-                    materials_id=request.GET['matid']).order_by('-dsector_id')
+                    dsector__dsector_id__startswith=request.GET['pro'],
+                    materials_id=request.GET['matid']).order_by('-dsector__dsector_id')
+                print 'WITH PROJECT ', materials
                 if materials:
                     print materials.count()
-                    materials = materials.latest('id')
+                    materials = materials.values().latest('id')
                     print materials
-            else:
+            if not materials:
                 # find in the order purchase
+                print 'IN DET COMPRA'
                 materials = DetCompra.objects.filter(
                     materiales_id=request.GET['matid']).order_by('-compra__registrado')
+                print materials
                 if materials:
                     print materials.count()
                     materials = materials.values().latest('compra__registrado')
+                    materials['purchase'] = materials['precio']
+                    materials['precio'] = round(materials['precio'] * 1.15, 2)
                     print materials
             if not materials:
+                print 'oTHEr get prices'
                 materials = DSMetrado.objects.filter(
-                    materials_id=request.GET['matid']).order_by('-dsector_id')
-                if count(materials):
-                    materials = materials[0]
-            context['list'] = list({
-                'materialesid': materials,
+                    materials_id=request.GET['matid']).order_by('-dsector__dsector_id')
+                print materials
+                if len(materials):
+                    materials = materials.values().latest('id')
+            if not materials:
+                materials = {'precio': 0, 'purchase': 0}
+            print materials
+            context['list'] = [{
+                'materialesid': request.GET['matid'],
                 'matnom': '',
                 'matmed': '',
                 'unidad': '',
-                'sale': if 'psales' in materials else materials['precio'],
-                'purchase': 0})
+                'sale': materials['psales'] if 'psales' in materials else materials['precio'],
+                'purchase': materials[
+                    'ppurchase'] if 'ppurchase' in materials else materials['purchase'],
+                'quantity': 0}]
             context['status'] = True
         except ObjectDoesNotExist:
             context['raise'] = e.__str__()
@@ -244,7 +256,7 @@ class GetDetailsMaterialesByCode(DetailView):
         if request.is_ajax():
             try:
                 mat = Materiale.objects.values(
-                        'materiales_id', 'matnom', 'matmed', 'unidad').get(
+                    'materiales_id', 'matnom', 'matmed', 'unidad').get(
                         pk=request.GET.get('code'))
                 purchase, sale, quantity = 0, 0, 0
                 if 'pro' in request.GET:
