@@ -111,6 +111,7 @@
     $scope.pnp = 0;
     $scope.preorders = [];
     $scope.selectedniple = [];
+    $scope.mchks = [];
     angular.element(document).ready(function() {
       var $table, i, len, ref, x;
       $scope.mdstatus = false;
@@ -1441,6 +1442,53 @@
         Materialize.toast("<i class='fa fa-exclamation-circle amber-text'></i> &nbsp; Debe de elegir un material para eliminar.", 4400);
       }
     };
+    $scope.schkallmodify = function() {
+      var k, obj, ref;
+      ref = $scope.mchks;
+      for (k in ref) {
+        obj = ref[k];
+        obj['status'] = $scope.schkm;
+      }
+    };
+    $scope.checkedDelete = function() {
+      var preload;
+      preload = function() {
+        var defer, k, obj, param, ref;
+        defer = $q.defer();
+        param = [];
+        ref = $scope.mchks;
+        for (k in ref) {
+          obj = ref[k];
+          if (obj['status']) {
+            param.push(obj);
+          }
+        }
+        param['status'] = param.length ? true : false;
+        defer.resolve(param);
+        return defer.promise;
+      };
+      preload().then(function(param) {
+        if (param['status']) {
+          return swal({
+            title: "Realmente desea eliminar los items seleccionados?",
+            text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Si!, eliminar",
+            closeOnCancel: true,
+            closeOnConfirm: true,
+            html: true
+          }, function(isConfirm) {
+            if (isConfirm) {
+              console.log(param);
+            }
+          });
+        } else {
+          $scope.setToastStatic("No se han seleccionado items", "exclamation", 2800);
+        }
+      });
+    };
     $scope.delModifiedNMD = function(type) {
       var valid;
       valid = function() {
@@ -1497,31 +1545,6 @@
         }
       });
     };
-    $scope.setToastStatic = function(message, icon, duration, spin) {
-      var ref, textspin;
-      if (message == null) {
-        message = "";
-      }
-      if (icon == null) {
-        icon = "";
-      }
-      if (duration == null) {
-        duration = 0;
-      }
-      if (spin == null) {
-        spin = true;
-      }
-      if (duration === 0) {
-        duration = "undefined";
-      }
-      textspin = (ref = spin) != null ? ref : {
-        "fa-spin fa-fw": ""
-      };
-      Materialize.toast("<i class='fa fa-" + icon + " " + textspin + " fa-2x'></i>&nbsp; " + message, duration, "toast-remove");
-    };
-    $scope.removeToastStatic = function() {
-      angular.element(".toast-remove").remove();
-    };
     $scope.calcApproved = function() {
       var rdap, rdas, totalp, totals;
       $scope.pnp = parseFloat($scope.amnp);
@@ -1563,6 +1586,31 @@
         $scope.fpl = true;
       }
     });
+    $scope.setToastStatic = function(message, icon, duration, spin) {
+      var ref, textspin;
+      if (message == null) {
+        message = "";
+      }
+      if (icon == null) {
+        icon = "";
+      }
+      if (duration == null) {
+        duration = 0;
+      }
+      if (spin == null) {
+        spin = true;
+      }
+      if (duration === 0) {
+        duration = "undefined";
+      }
+      textspin = (ref = spin) != null ? ref : {
+        "fa-spin fa-fw": ""
+      };
+      Materialize.toast("<i class='fa fa-" + icon + " " + textspin + " fa-2x'></i>&nbsp; " + message, duration, "toast-remove");
+    };
+    $scope.removeToastStatic = function() {
+      angular.element(".toast-remove").remove();
+    };
     calcSumTemp = function(arr, type) {
       if (arr !== void 0) {
         $scope["tmlst" + type] = [0, 0];
@@ -1623,19 +1671,21 @@
         calcSumTemp(nw, 'D');
       }
     });
-    $scope.$watch('dsmaterials', function() {
+    $scope.$watch('dsmaterials', function(nw, old) {
       var count, k;
-      count = 0;
-      for (k in $scope.dsmaterials) {
-        if ($scope.dsmaterials[k].fields.nipple) {
-          count++;
+      if (nw) {
+        count = 0;
+        for (k in $scope.dsmaterials) {
+          if ($scope.dsmaterials[k].fields.nipple) {
+            count++;
+          }
         }
-      }
-      if (count) {
-        $scope.snipple = true;
-        setTimeout(function() {
-          $('.collapsible').collapsible();
-        }, 800);
+        if (count) {
+          $scope.snipple = true;
+          setTimeout(function() {
+            $('.collapsible').collapsible();
+          }, 800);
+        }
       }
     });
     $scope.$watch('gui.smat', function() {

@@ -465,7 +465,9 @@
                                 <thead>
                                     <tr class="green lighten-5">
                                         <th class="col-1">
-                                            <a href="#!" class="grey-text text-darken-3"><i class="fa fa-filter"></i></a></th>
+                                            <a href="#!" class="grey-text text-darken-3">
+                                                <i class="fa fa-filter"></i></a>
+                                        </th>
                                         <th class="col-3">Código</th>
                                         <th>
                                             Descripción
@@ -697,23 +699,7 @@
                 <input type="hidden" name="lds" value="true">
                 {% verbatim %}
                     <script type="text/ng-template" id="modifytmp.html">
-                        <td class="center-align">{{$index + 1}}</td>
-                        <td class="center-align text-9">{{x.fields.materials.pk}}</td>
-                        <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-                        <td class="center-align">{{x.fields.brand.fields.brand}}</td>
-                        <td class="center-align">{{x.fields.model.fields.model}}</td>
-                        <td class="center-align">{{x.fields.materials.fields.unidad}}</td>
-                        <td class="right-align col-2">{{x.fields.qorder}}</td>
-                        <td class="right-align col-2">{{x.fields.quantity}}</td>
-                        <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.ppurchase}}</td>
-                        <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.psales}}</td>
-                        <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.quantity * x.fields.ppurchase | number:2}}</td>
-                        <td class="center-align">
-                            <input type="radio" name="wrench" class="with-gap" id="rb{{$index}}" ng-click="enableModify($index, x)">
-                            <label for="rb{{$index}}"></label>
-                            <!--<a href="#!" style="padding: 2px 0px 2px 3px;" ng-show="" ng-click="closeEditM($event)" class="waves-effect waves-light light-blue-text text-darken-3"><i class="fa fa-edit"></i></a>
-                            <a href="#!" style="padding: 2px 0px 2px 3px;" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'" ng-click="delEditM($event)" data-brand="{{x.fields.brand.pk}}" data-model="{{x.fields.model.pk}}" class="waves-effect waves-light red-text text-darken-1"><i class="fa fa-trash"></i></a>-->
-                        </td>
+
                     </script>
                 {% endverbatim %}
                 <table class="table highlight responsive-table floatThead">
@@ -729,23 +715,55 @@
                             <th class="center-align col-1">
                                 <i class="fa fa-angle-double-up cursor-hand" onClick="$('html, body').animate({scrollTop: 500}, 400);"></i>
                             </th>
+                            <th class="col-1">
+                                <div class="switch">
+                                    <label>
+                                    <!--Off-->
+                                    <input type="checkbox" ng-model="schkm" ng-init="schkm=false" ng-checked="schkm" ng-click="schkallmodify()">
+                                    <span class="lever red"></span>
+                                    <!--On-->
+                                    </label>
+                                </div>
+                            </th>
                             <th class="center-align col-3">Código</th>
                             <th>Descripción</th>
                             <th class="center-align col-2">Marca</th>
                             <th class="center-align col-2">Modelo</th>
                             <th class="center-align col-2">Unidad</th>
-                            <th class="right-align">Pendiente</th>
-                            <th class="right-align">Vendido</th>
-                            <th class="right-align" ng-show="perarea == 'administrator' || perarea == 'ventas'">Compra</th>
-                            <th class="right-align" ng-show="perarea == 'administrator' || perarea == 'ventas'">Venta</th>
-                            <th class="right-align" ng-show="perarea == 'administrator' || perarea == 'ventas'">Importe</th>
+                            <th class="right-align col-2">Pendiente</th>
+                            <th class="right-align col-2">Vendido</th>
+                            <th class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">Compra</th>
+                            <th class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">Venta</th>
+                            <th class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">Importe</th>
                             <th class="center-align">
-                                <i class="fa fa-search cursor-hand" ng-model="fme" ng-click="fme=!fme"></i></th>
+                                <i class="fa fa-search cursor-hand" ng-model="fme" ng-click="fme=!fme"></i>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                     {% verbatim %}
-                        <tr ng-include src="'modifytmp.html'" ng-repeat="x in lmodify | filter: finme" class="text-12"></tr>
+                        <tr ng-repeat="x in lmodify | filter: finme" class="text-12">
+                            <td class="center-align">{{$index + 1}}</td>
+                            <td class="center-align">
+                                <input type="checkbox" id="chkmd{{x.pk}}" ng-model="mchks[x.pk].status" ng-init="mchks[x.pk].status=false" class="filled-in red" ng-checked="mchks[x.pk].status" >
+                                <label for="chkmd{{x.pk}}"></label>
+                                <input type="hidden" ng-model="mchks[x.pk].materials" ng-init="mchks[x.pk].materials=x">
+                            </td>
+                            <td class="center-align text-9">{{x.fields.materials.pk}}</td>
+                            <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
+                            <td class="center-align">{{x.fields.brand.fields.brand}}</td>
+                            <td class="center-align">{{x.fields.model.fields.model}}</td>
+                            <td class="center-align">{{x.fields.materials.fields.unidad}}</td>
+                            <td class="right-align col-2">{{x.fields.qorder}}</td>
+                            <td class="right-align col-2">{{x.fields.quantity}}</td>
+                            <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.ppurchase}}</td>
+                            <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.psales}}</td>
+                            <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.quantity * x.fields.ppurchase | number:2}}</td>
+                            <td class="center-align">
+                                <input type="radio" name="wrench" class="with-gap" id="rb{{$index}}" ng-click="enableModify($index, x)">
+                                <label for="rb{{$index}}"></label>
+                            </td>
+                        </tr>
                     {% endverbatim %}
                     </tbody>
                 </table>
@@ -756,7 +774,10 @@
                         <i class="fa fa-wrench"></i>
                     </a>
                     <ul>
-                        <li ng-show="meditindex!=-1"><a class="waves-effect btn-floating  red" ng-click="enableDel()"><i class="fa fa-trash"></i></a></li>
+                        <li><a href="#chksdel" class="waves-effect btn-floating red tooltipped" ng-click="checkedDelete()" data-position="top" data-delay="50" data-tooltip="eliminar por selección">
+                            <i class="fa fa-trash"></i>
+                            </a></li>
+                        <li ng-show="meditindex!=-1"><a class="waves-effect btn-floating  red" ng-click="enableDel()"><i class="fa fa-minus-circle"></i></a></li>
                         <li ng-show="meditindex!=-1"><a class="waves-effect btn-floating  blue" ng-click="showEdit()"><i class="fa fa-pencil"></i></a></li>
                         <li ng-show="meditindex!=-1"><a class="waves-effect btn-floating  grey darken-1" ng-click="disableModify()"><i class="fa fa-times"></i></a></li>
                     </ul>

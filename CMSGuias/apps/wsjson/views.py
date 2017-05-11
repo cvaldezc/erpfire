@@ -172,6 +172,7 @@ def get_resumen_details_materiales(request):
             # first search code materials for description and measure
             # evaluate if the request contians project
             mtemp = dict()
+            materials = None
             if 'pro' in request.GET:
                 # find in the all areas of the project
                 materials = DSMetrado.objects.filter(
@@ -182,6 +183,13 @@ def get_resumen_details_materiales(request):
                     print materials.count()
                     materials = materials.values().latest('id')
                     print materials
+            if not materials:
+                print 'oTHEr get prices'
+                materials = DSMetrado.objects.filter(
+                    materials_id=request.GET['matid']).order_by('-dsector__dsector_id')
+                print materials
+                if len(materials):
+                    materials = materials.values().latest('id')
             if not materials:
                 # find in the order purchase
                 print 'IN DET COMPRA'
@@ -195,20 +203,14 @@ def get_resumen_details_materiales(request):
                     materials['precio'] = round(materials['precio'] * 1.15, 2)
                     print materials
             if not materials:
-                print 'oTHEr get prices'
-                materials = DSMetrado.objects.filter(
-                    materials_id=request.GET['matid']).order_by('-dsector__dsector_id')
-                print materials
-                if len(materials):
-                    materials = materials.values().latest('id')
-            if not materials:
                 materials = {'precio': 0, 'purchase': 0}
             print materials
+            dsc = Materiale.objects.get(materiales_id=request.GET['matid'])
             context['list'] = [{
                 'materialesid': request.GET['matid'],
-                'matnom': '',
-                'matmed': '',
-                'unidad': '',
+                'matnom': dsc.matnom,
+                'matmed': dsc.matmed,
+                'unidad': dsc.unidad.uninom,
                 'sale': materials['psales'] if 'psales' in materials else materials['precio'],
                 'purchase': materials[
                     'ppurchase'] if 'ppurchase' in materials else materials['purchase'],
@@ -250,80 +252,123 @@ class SearchModel(JSONResponseMixin, DetailView):
         return self.render_to_json_response(context)
 
 
-class GetDetailsMaterialesByCode(DetailView):
+class GetDetailsMaterialesByCode(JSONResponseMixin, DetailView):
     def get(self, request, *args, **kwargs):
         context = dict()
         if request.is_ajax():
             try:
-                mat = Materiale.objects.values(
-                    'materiales_id', 'matnom', 'matmed', 'unidad').get(
-                        pk=request.GET.get('code'))
-                purchase, sale, quantity = 0, 0, 0
+                # mat = Materiale.objects.values(
+                #     'materiales_id', 'matnom', 'matmed', 'unidad').get(
+                #         pk=request.GET.get('code'))
+                # purchase, sale, quantity = 0, 0, 0
+                # if 'pro' in request.GET:
+                #     name = 'PRICES%s' % (request.GET.get('pro'))
+                #     if name in request.session:
+                #         sectors = request.session[name]
+                #         for s in sectors:
+                #             if request.GET.get('sec') in s:
+                #                 for p in s[request.GET.get('sec')]:
+                #                     if mat['materiales_id'] == p['materials']:
+                #                         purchase = round(p['purchase'], 2)
+                #                         sale = round(p['sale'], 2)
+                #                         quantity = p['quantity']
+
+                # if purchase == 0 and sale == 0:
+                #     try:
+                #         getprices = MetProject.objects.filter(
+                #                     materiales_id=mat['materiales_id']
+                #                     ).distinct(
+                #                         'proyecto__proyecto_id'
+                #                         ).order_by(
+                #                             'proyecto__proyecto_id'
+                #                             ).reverse()
+                #         if getprices:
+                #             getprices = getprices[0]
+                #             purchase = getprices.precio
+                #             # max([p.precio for p in getprices])
+                #             sale = getprices.sales
+                #             # max([p.sales for p in getprices])
+                #         else:
+                #             purchase = 0
+                #             sale = 0
+                #     except ObjectDoesNotExist, e:
+                #         purchase = 0
+                #         sale = 0
+
+                # pc = MetProject.objects.filter(
+                #         materiales_id=mat['materiales_id']).order_by(
+                #             '-proyecto__registrado')[:5]
+                # if not pc:
+                #     ps = DetCompra.objects.filter(
+                #             materiales_id=mat['materiales_id']).order_by(
+                #                 '-compra__registrado')[:5]
+                #     context['sales'] = [{
+                #         'compra': s.precio,
+                #         'currency': s.compra.moneda.moneda}
+                #         for s in ps]
+                # else:
+                #     context['purchase'] = [{
+                #         'purchase': p.precio,
+                #         'sales': float(p.sales),
+                #         'currency': p.proyecto.currency.moneda}
+                #         for p in pc]
+                # context['list'] = {
+                #     'materialesid': mat['materiales_id'],
+                #     'matnom': mat['matnom'],
+                #     'matmed': mat['matmed'],
+                #     'unidad': mat['unidad'],
+                #     'purchase': purchase,
+                #     'sale': float(sale),
+                #     'quantity': quantity}
+                mtemp = dict()
+                materials = None
                 if 'pro' in request.GET:
-                    name = 'PRICES%s' % (request.GET.get('pro'))
-                    if name in request.session:
-                        sectors = request.session[name]
-                        for s in sectors:
-                            if request.GET.get('sec') in s:
-                                for p in s[request.GET.get('sec')]:
-                                    if mat['materiales_id'] == p['materials']:
-                                        purchase = round(p['purchase'], 2)
-                                        sale = round(p['sale'], 2)
-                                        quantity = p['quantity']
-
-                if purchase == 0 and sale == 0:
-                    try:
-                        getprices = MetProject.objects.filter(
-                                    materiales_id=mat['materiales_id']
-                                    ).distinct(
-                                        'proyecto__proyecto_id'
-                                        ).order_by(
-                                            'proyecto__proyecto_id'
-                                            ).reverse()
-                        if getprices:
-                            getprices = getprices[0]
-                            purchase = getprices.precio
-                            # max([p.precio for p in getprices])
-                            sale = getprices.sales
-                            # max([p.sales for p in getprices])
-                        else:
-                            purchase = 0
-                            sale = 0
-                    except ObjectDoesNotExist, e:
-                        purchase = 0
-                        sale = 0
-
-                pc = MetProject.objects.filter(
-                        materiales_id=mat['materiales_id']).order_by(
-                            '-proyecto__registrado')[:5]
-                if not pc:
-                    ps = DetCompra.objects.filter(
-                            materiales_id=mat['materiales_id']).order_by(
-                                '-compra__registrado')[:5]
-                    context['sales'] = [{
-                        'compra': s.precio,
-                        'currency': s.compra.moneda.moneda}
-                        for s in ps]
-                else:
-                    context['purchase'] = [{
-                        'purchase': p.precio,
-                        'sales': float(p.sales),
-                        'currency': p.proyecto.currency.moneda}
-                        for p in pc]
+                    # find in the all areas of the project
+                    materials = DSMetrado.objects.filter(
+                        dsector__dsector_id__startswith=request.GET['pro'],
+                        materials_id=request.GET['code']).order_by('-dsector__dsector_id')
+                    print 'WITH PROJECT ', materials
+                    if materials:
+                        # print materials.count()
+                        materials = materials.values().latest('id')
+                        # print materials
+                if not materials:
+                    print 'oTHEr get prices'
+                    materials = DSMetrado.objects.filter(
+                        materials_id=request.GET['code']).order_by('-dsector__dsector_id')
+                    # print materials
+                    if len(materials):
+                        materials = materials.values().latest('id')
+                if not materials:
+                    # find in the order purchase
+                    print 'IN DET COMPRA'
+                    materials = DetCompra.objects.filter(
+                        materiales_id=request.GET['code']).order_by('-compra__registrado')
+                    # print materials
+                    if materials:
+                        print materials.count()
+                        materials = materials.values().latest('compra__registrado')
+                        materials['purchase'] = materials['precio']
+                        materials['precio'] = round(materials['precio'] * 1.15, 2)
+                        # print materials
+                if not materials:
+                    materials = {'precio': 0, 'purchase': 0}
+                # print materials
+                dsc = Materiale.objects.get(materiales_id=request.GET['code'])
                 context['list'] = {
-                    'materialesid': mat['materiales_id'],
-                    'matnom': mat['matnom'],
-                    'matmed': mat['matmed'],
-                    'unidad': mat['unidad'],
-                    'purchase': purchase,
-                    'sale': float(sale),
-                    'quantity': quantity}
+                    'materialesid': request.GET['code'],
+                    'matnom': dsc.matnom,
+                    'matmed': dsc.matmed,
+                    'unidad': dsc.unidad.uninom,
+                    'sale': materials['psales'] if 'psales' in materials else materials['precio'],
+                    'purchase': materials[
+                        'ppurchase'] if 'ppurchase' in materials else materials['purchase'],
+                    'quantity': 0}
                 context['status'] = True
             except ObjectDoesNotExist, e:
                 context['raise'] = str(e)
                 context['status'] = False
-            return HttpResponse(json.dumps(context),
-                                mimetype='application/json')
+            return self.render_to_json_response(context)
 
 
 def save_order_temp_materials(request):

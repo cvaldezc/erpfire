@@ -71,6 +71,8 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   ## order to storage
   $scope.preorders = []
   $scope.selectedniple = []
+  ## modify
+  $scope.mchks = []
   angular.element(document).ready ->
     $scope.mdstatus = false
     angular.element('.modal').modal dismissible: false
@@ -126,7 +128,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     .success (response) ->
       console.info response
     return
-  #
+  #end block
 
   $scope.getListAreaMaterials = ->
     $scope.dsmaterials = []
@@ -1167,6 +1169,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           return
     return
   # 2016-11-28 08:54:50 add new modify
+  # block modify
   $scope.listTemps = (tp) ->
     Factory.get('lsttemp': true, 'type': tp).
     success (response) ->
@@ -1270,6 +1273,49 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       Materialize.toast "<i class='fa fa-exclamation-circle amber-text'></i>
         &nbsp; Debe de elegir un material para eliminar.", 4400
     return
+  # delete by selected items 2017-05-11 17:23:41
+  $scope.schkallmodify = ->
+    for k, obj of $scope.mchks
+      obj['status'] = $scope.schkm
+    return
+  $scope.checkedDelete = ->
+    preload = ->
+      defer = $q.defer()
+      param = []
+      for k, obj of $scope.mchks
+        if obj['status']
+          param.push
+            'materials': obj.fields.materials.pk
+            'obrand': obj.fields.brand.pk
+            'omodel': obj.fields.model.pk
+            'quantity': obj.fields.quantity
+            'psales': obj.fields.psales
+            'ppurchase': obj.fields.ppurchase
+
+      param['status'] = if param.length then true else false
+      defer.resolve param
+      return defer.promise
+    preload().then (param) ->
+      if param['status']
+        swal
+            title: "Realmente desea eliminar los items seleccionados?"
+            text: ""
+            type: "warning"
+            showCancelButton: true
+            confirmButtonColor: "#DD6B55"
+            confirmButtonText: "Si!, eliminar"
+            closeOnCancel: true
+            closeOnConfirm: true
+            html: true
+          , (isConfirm) ->
+            if isConfirm
+              # list for send data
+              console.log param
+            return
+      else
+        $scope.setToastStatic "No se han seleccionado items", "exclamation", 2800
+        return
+    return
   $scope.delModifiedNMD = (type) ->
     valid = ->
       defer = $q.defer()
@@ -1323,16 +1369,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         return
     return
 
-  $scope.setToastStatic = (message="", icon="", duration=0, spin=true) ->
-    if duration is 0
-      duration = "undefined"
-    textspin = (spin) ? "fa-spin fa-fw" : ""
-    Materialize.toast "<i class='fa fa-#{icon} #{textspin} fa-2x'></i>&nbsp; #{message}", duration, "toast-remove"
-    return
-  $scope.removeToastStatic = ->
-    angular.element ".toast-remove"
-      .remove()
-    return
+
   $scope.calcApproved = ->
     # calc amount global
     $scope.pnp = parseFloat($scope.amnp)
@@ -1369,6 +1406,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     $scope.editm = {}
     return
 
+  # other functions
   $scope.toRound = (number) ->
     return ((Math.round(number * 100)) / 100)
 
@@ -1377,6 +1415,17 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       $scope.fsl = true
       $scope.fpl = true
       return
+  $scope.setToastStatic = (message="", icon="", duration=0, spin=true) ->
+    if duration is 0
+      duration = "undefined"
+    textspin = (spin) ? "fa-spin fa-fw" : ""
+    Materialize.toast "<i class='fa fa-#{icon} #{textspin} fa-2x'></i>&nbsp; #{message}", duration, "toast-remove"
+    return
+  $scope.removeToastStatic = ->
+    angular.element ".toast-remove"
+      .remove()
+    return
+  # end block
   calcSumTemp = (arr, type) ->
     if arr isnt undefined
       $scope["tmlst#{type}"] = [0, 0]
@@ -1429,17 +1478,18 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     if nw isnt undefined
       calcSumTemp nw, 'D'
     return
-  $scope.$watch 'dsmaterials', ->
-    count = 0
-    for k of $scope.dsmaterials
-      if $scope.dsmaterials[k].fields.nipple
-        count++
-    if count
-      $scope.snipple = true
-      setTimeout ->
-        $('.collapsible').collapsible()
-        return
-      , 800
+  $scope.$watch 'dsmaterials', (nw, old) ->
+    if nw
+      count = 0
+      for k of $scope.dsmaterials
+        if $scope.dsmaterials[k].fields.nipple
+          count++
+      if count
+        $scope.snipple = true
+        setTimeout ->
+          $('.collapsible').collapsible()
+          return
+        , 800
     return
   $scope.$watch 'gui.smat', ->
     $(".floatThead").floatThead 'reflow'
