@@ -1281,20 +1281,51 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   $scope.checkedDelete = ->
     preload = ->
       defer = $q.defer()
-      param = []
+      param = {'param': []}
       for k, obj of $scope.mchks
         if obj['status']
-          param.push
-            'materials': obj.fields.materials.pk
-            'obrand': obj.fields.brand.pk
-            'omodel': obj.fields.model.pk
-            'quantity': obj.fields.quantity
-            'psales': obj.fields.psales
-            'ppurchase': obj.fields.ppurchase
+          param['param'].push
+            'materials': obj.materials.fields.materials.pk
+            'obrand': obj.materials.fields.brand.pk
+            'omodel': obj.materials.fields.model.pk
+            'quantity': obj.materials.fields.quantity
+            'psales': obj.materials.fields.psales
+            'ppurchase': obj.materials.fields.ppurchase
 
-      param['status'] = if param.length then true else false
+      param['status'] = if param['param'].length > 0 then true else false
       defer.resolve param
       return defer.promise
+    delchecked = (params) ->
+      defer = $q.defer()
+      param = {}
+      if params.length > 0
+        param = params[0]
+        params.splice 0, 1
+      next = if params.length > 0 then true else false
+      param['deleteReg'] = true
+      Factory.post param
+      .success (response) ->
+        if response.status
+          defer.resolve {'next': next, 'status': true, 'params': params}
+          return
+        else
+          defer.resolve {'next': next, 'status':false, 'raise': response.raise, 'objerr': param, 'params': params}
+          return
+      return defer.promise
+    execDel = (param) ->
+      delchecked(param).then (result) ->
+        if result['status']
+          if result['next']
+            execDel(result['params'])
+            return
+          else
+            $scope.setToastStatic "Items Eliminados", "check", 1800
+            $scope.listTemps('D')
+            return
+        else
+          $scope.setToastStatic "#{result['raise']} #{result['objerr']}", "ban", 2600
+          return
+      return
     preload().then (param) ->
       if param['status']
         swal
@@ -1309,9 +1340,10 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
             html: true
           , (isConfirm) ->
             if isConfirm
-              # list for send data
               console.log param
+              execDel(param['param'])
             return
+          return
       else
         $scope.setToastStatic "No se han seleccionado items", "exclamation", 2800
         return

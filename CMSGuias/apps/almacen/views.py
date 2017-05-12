@@ -2581,7 +2581,8 @@ class ReturnItemOrders(JSONResponseMixin, TemplateView):
                     context['status'] = False
                 return self.render_to_json_response(context)
             context['order'] = Pedido.objects.get(pedido_id=kwargs['order'], flag=True)
-            context['usr'] = userProfile.objects.get(empdni__exact=context['order'].empdni)
+            # # print context['order'].empdni
+            # context['usr'] = Employee.objects.values().get(empdni__exact=context['order'].empdni)
             return render(request, 'almacen/returnorder.html', context)
         except TemplateDoesNotExist, e:
             raise Http404(e)

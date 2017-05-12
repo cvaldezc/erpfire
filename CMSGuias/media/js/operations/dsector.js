@@ -1451,25 +1451,77 @@
       }
     };
     $scope.checkedDelete = function() {
-      var preload;
+      var delchecked, execDel, preload;
       preload = function() {
         var defer, k, obj, param, ref;
         defer = $q.defer();
-        param = [];
+        param = {
+          'param': []
+        };
         ref = $scope.mchks;
         for (k in ref) {
           obj = ref[k];
           if (obj['status']) {
-            param.push(obj);
+            param['param'].push({
+              'materials': obj.materials.fields.materials.pk,
+              'obrand': obj.materials.fields.brand.pk,
+              'omodel': obj.materials.fields.model.pk,
+              'quantity': obj.materials.fields.quantity,
+              'psales': obj.materials.fields.psales,
+              'ppurchase': obj.materials.fields.ppurchase
+            });
           }
         }
-        param['status'] = param.length ? true : false;
+        param['status'] = param['param'].length > 0 ? true : false;
         defer.resolve(param);
         return defer.promise;
       };
+      delchecked = function(params) {
+        var defer, next, param;
+        defer = $q.defer();
+        param = {};
+        if (params.length > 0) {
+          param = params[0];
+          params.splice(0, 1);
+        }
+        next = params.length > 0 ? true : false;
+        param['deleteReg'] = true;
+        Factory.post(param).success(function(response) {
+          if (response.status) {
+            defer.resolve({
+              'next': next,
+              'status': true,
+              'params': params
+            });
+          } else {
+            defer.resolve({
+              'next': next,
+              'status': false,
+              'raise': response.raise,
+              'objerr': param,
+              'params': params
+            });
+          }
+        });
+        return defer.promise;
+      };
+      execDel = function(param) {
+        delchecked(param).then(function(result) {
+          if (result['status']) {
+            if (result['next']) {
+              execDel(result['params']);
+            } else {
+              $scope.setToastStatic("Items Eliminados", "check", 1800);
+              $scope.listTemps('D');
+            }
+          } else {
+            $scope.setToastStatic(result['raise'] + " " + result['objerr'], "ban", 2600);
+          }
+        });
+      };
       preload().then(function(param) {
         if (param['status']) {
-          return swal({
+          swal({
             title: "Realmente desea eliminar los items seleccionados?",
             text: "",
             type: "warning",
@@ -1482,6 +1534,7 @@
           }, function(isConfirm) {
             if (isConfirm) {
               console.log(param);
+              execDel(param['param']);
             }
           });
         } else {

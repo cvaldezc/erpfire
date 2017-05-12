@@ -745,7 +745,7 @@
                         <tr ng-repeat="x in lmodify | filter: finme" class="text-12">
                             <td class="center-align">{{$index + 1}}</td>
                             <td class="center-align">
-                                <input type="checkbox" id="chkmd{{x.pk}}" ng-model="mchks[x.pk].status" ng-init="mchks[x.pk].status=false" class="filled-in red" ng-checked="mchks[x.pk].status" >
+                                <input type="checkbox" id="chkmd{{x.pk}}" class="filled-in red" ng-model="mchks[x.pk].status" ng-init="mchks[x.pk].status=false" ng-checked="mchks[x.pk].status">
                                 <label for="chkmd{{x.pk}}"></label>
                                 <input type="hidden" ng-model="mchks[x.pk].materials" ng-init="mchks[x.pk].materials=x">
                             </td>
