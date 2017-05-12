@@ -717,14 +717,25 @@ def get_list_stores(request):
 ## end block Recurrent
 """
 # approve orders
+@login_required(login_url='/')
 def post_approved_orders(request):
     if request.method == 'POST':
         data = {}
         try:
-            obj = Pedido.objects.get(pk=request.POST.get('oid'))
+            obj = Pedido.objects.get(pk=request.POST['oid'])
             obj.status = 'AP'
             obj.flag = True
             obj.save()
+            data['bedside'] = request.POST['oid']
+            data['company'] = request.session['company']['name']
+            usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni)
+            data['cc'] = usr.email
+            mpl = [obj.proyecto.empdni_id, obj.empdni_id]
+            data['to'] = ','.join(set([x.email for x in Employee.objects.filter(empdni_id__in=mpl)]))
+            data['option'] = 'APROBAR PEDIDO'
+            data['project'] = obj.proyecto_id
+            data['projectname'] = obj.proyecto.nompro
+            data['user'] = '%s %s' % (usr.firstname, usr.lastname)
             data['status']= True
         except ObjectDoesNotExist, e:
             data['status']= False
@@ -732,11 +743,12 @@ def post_approved_orders(request):
         return HttpResponse(json.dumps(data), mimetype='application/json')
 
 # cancel orders
+@login_required(login_url='/')
 def post_cancel_orders(request):
     if request.method == 'POST':
         data = {}
         try:
-            obj = Pedido.objects.get(pedido_id=request.POST.get('oid'))
+            obj = Pedido.objects.get(pedido_id=request.POST['oid'])
             if obj.dsector_id != None:
                 try:
                     det = Detpedido.objects.filter(pedido_id=request.POST.get('oid'))
@@ -812,10 +824,20 @@ def post_cancel_orders(request):
             obj.status = 'AN'
             obj.flag = False
             obj.save()
+            data['bedside'] = request.POST['oid']
+            data['company'] = request.session['company']['name']
+            usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni)
+            data['cc'] = usr.email
+            mpl = [obj.proyecto.empdni_id, obj.empdni_id]
+            data['to'] = ','.join(set([x.email for x in Employee.objects.filter(empdni_id__in=mpl)]))
+            data['option'] = 'ANULAR PEDIDO'
+            data['project'] = obj.proyecto_id
+            data['projectname'] = obj.proyecto.nompro
+            data['user'] = '%s %s' % (usr.firstname, usr.lastname)
             data['status']= True
         except ObjectDoesNotExist, e:
             data['status']= False
-            data['msg']= e.__str__()
+            data['msg']= str(e)
         return HttpResponse(json.dumps(data), mimetype='application/json')
 
 # get list carrier XHR XMLHttpRequest

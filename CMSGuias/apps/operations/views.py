@@ -1448,7 +1448,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     context['status'] = False if itemsfail.__len__() else True
                     if context['status']:
                         context['company'] = request.session['company']['name']
-                        context['cc'] = request.user.get_profile().empdni.email
+                        context['cc'] = Employee.objects.get(empdni_id=request.user.get_profile().empdni).email
                         order = Pedido.objects.get(pedido_id=orderpk)
                         context['project'] = order.proyecto_id
                         context['projectname'] = order.proyecto.nompro

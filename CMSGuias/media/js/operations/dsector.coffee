@@ -1051,10 +1051,10 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
                 mailer =
                   to: "almacen@icrperusa.com" #"cvaldezch@outlook.com" #
                   cc: response.cc
-                  subject: "Pedido Generado #{bedside}"
+                  subject: "Pedido #{bedside}"
                   body: """<p><strong><strong>#{response.company} |
                   </strong></strong> Operaciones Frecuentes</p>
-                  <p>Pedido Generado Número #{bedside} |
+                  <p>Pedido Generado Número <strong>#{bedside}</strong> |
                   <strong>#{new Date().toString()}</strong></p>
                   <p><strong>Proyecto:&nbsp;#{response.project} #{response.projectname}</strong></p>"""
                 mailing.Mailing()
@@ -1323,9 +1323,11 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           else
             $scope.setToastStatic "Items Eliminados", "check", 1800
             $scope.listTemps('D')
+            $scope.removeToastStatic()
             return
         else
           $scope.setToastStatic "#{result['raise']} #{result['objerr']}", "ban", 2600
+          $scope.removeToastStatic()
           return
       return
     preload().then (param) ->
@@ -1342,6 +1344,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
             html: true
           , (isConfirm) ->
             if isConfirm
+              $scope.setToastStatic "Procesando...!", "cog", "undefined", true
               console.log param
               execDel(param['param'])
             return
