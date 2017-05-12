@@ -620,9 +620,11 @@
             $("#nipple" + data.materiales + "observation").val("");
             setTimeout(function() {
               $(".rf" + data.materiales).trigger("click");
+              $("#nipple" + data.materiales + "measure").focus();
             }, 100);
           } else {
             swal("Error", "No se a guardado el niple.", "error");
+            $("#nipple" + data.materiales + "measure").focus();
           }
         });
       }
@@ -1236,8 +1238,8 @@
                   mailer = {
                     to: "almacen@icrperusa.com",
                     cc: response.cc,
-                    subject: "Pedido Generado " + bedside,
-                    body: "<p><strong><strong>" + response.company + " |\n</strong></strong> Operaciones Frecuentes</p>\n<p>Pedido Generado Número " + bedside + " |\n<strong>" + (new Date().toString()) + "</strong></p>\n<p><strong>Proyecto:&nbsp;" + response.project + " " + response.projectname + "</strong></p>"
+                    subject: "Pedido " + bedside,
+                    body: "<p><strong><strong>" + response.company + " |\n</strong></strong> Operaciones Frecuentes</p>\n<p>Pedido Generado Número <strong>" + bedside + "</strong> |\n<strong>" + (new Date().toString()) + "</strong></p>\n<p><strong>Proyecto:&nbsp;" + response.project + " " + response.projectname + "</strong></p>"
                   };
                   mailing.Mailing();
                   mailing.geturls().success(function(rurl) {
@@ -1513,9 +1515,11 @@
             } else {
               $scope.setToastStatic("Items Eliminados", "check", 1800);
               $scope.listTemps('D');
+              $scope.removeToastStatic();
             }
           } else {
             $scope.setToastStatic(result['raise'] + " " + result['objerr'], "ban", 2600);
+            $scope.removeToastStatic();
           }
         });
       };
@@ -1533,6 +1537,7 @@
             html: true
           }, function(isConfirm) {
             if (isConfirm) {
+              $scope.setToastStatic("Procesando...!", "cog", "undefined", true);
               console.log(param);
               execDel(param['param']);
             }
@@ -1632,6 +1637,13 @@
     };
     $scope.toRound = function(number) {
       return (Math.round(number * 100)) / 100;
+    };
+    $scope.addfocusNiple = function(mid) {
+      $scope.sdnip[mid] = !$scope.sdnip[mid];
+      console.log("#nipple" + mid + "measure");
+      setTimeout(function() {
+        return $("#nipple" + mid + "measure").focus();
+      }, 800);
     };
     $scope.$watch('ascsector', function() {
       if ($scope.ascsector) {

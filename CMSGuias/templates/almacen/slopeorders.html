@@ -1,137 +1,172 @@
 {% extends 'base.html' %}
-{% block script %}
-<script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
-<script type="text/javascript">
-	var app = angular.module("slopeApp", []).config(function ($httpProvider) {
-					$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-					$httpProvider.defaults.xsrfCookieName = 'csrftoken';
-  				$httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-				});
-	app.controller('CtrSlope', ['$scope','$http', function($scope, $http){
-		$scope.ordersSlope = []
-		angular.element(document).ready(function () {
-			$scope.getListSlope();
-		});
-		$scope.getListSlope = function () {
-			var data = {glist: true}
-			$http.get("", {params: data}).success(function (response){
-				console.log(response);
-				if (response.status) {
-					$scope.ordersSlope = response.list;
-				}else{
-					swal("Alerta!", "No hay datos para mostrar.", "warning");
-				};
-			});
-		}
-	}]);
-</script>
-<script>
-	$(document).ready(function() {
-		$(document).on("click", ".btn-approved", function(event) {
-			console.warn(this);
-			//event.preventDefault();
-			var item = this;
-			$().toastmessage('showToast',{
-				text: 'Desea aprobar el pedido a almacén '+item.value,
-				sticky : true,
-				type : 'confirm',
-				buttons: [{value: 'Aprobar'},{value:'Atender'},{value:'Anular'} ],
-				success : function (result) {
-					if(result == 'Aprobar'){
-						approvedOrder(item.value,'nothing');
-					}else if (result == 'Atender') {
-						approvedOrder(item.value,'atender');
-					}else if(result == 'Anular'){
-						cancelOrder(item.value);
-					};
-				}
-			});
-		});
-	});
-	var approvedOrder = function (id,sts) {
-		if (id != "") {
-			data = {"csrfmiddlewaretoken": $("[name=csrfmiddlewaretoken]").val(), "oid": id }
-			$.post('/json/post/approved/orders/', data, function(response) {
-				console.warn(response);
-				if (response.status) {
-					sts == 'atender' ? location.href='/almacen/order/attend/'+id+'/' : location.reload()
-				}else{
-					$().toastmessage("showWarningToast","No se a podido aprobar el pedido.");
-				};
-			});
-		};
-	}
-	var cancelOrder = function (id) {
-		if (id != "") {
-			data = {"csrfmiddlewaretoken": $("[name=csrfmiddlewaretoken]").val(), "oid": id }
-			$.post('/json/post/cancel/orders/', data, function(response) {
-				if (response.status) {
-					location.reload()
-				}else{
-					$().toastmessage("showWarningToast","No se a podido anular el pedido. "+response.raise);
-				};
-			});
-		};
-	}
-</script>
-{% endblock %}
 {% block menu %}
-	{% include "menus/storage_menu.htm" %}
+    {% include "menus/storage_menu.htm" %}
 {% endblock menu %}
 {% block content %}
-<div class="container" ng-app="slopeApp" ng-controller="CtrSlope">
-	<div class="well">
-	<h1 class="text-primary">Pedidos Pendientes</h1>
-		{% csrf_token %}
-		<!--<input type="hidden" class="empdni" value="{{user.get_profile.empdni}}">-->
-		<div class="row show-grid">
-			<div class="col-md-12">
-				<div class="table-responsive">
-					<table class="table table-hover table-bordered table-condensed">
-						<caption>
-							<div class="form-group text-left">
-								<label class="control-label">Busqueda</label>
-								<input type="text" ng-model="search" class="form-control">
-							</div>
-						</caption>
-						<thead>
-							<tr class="brand-warning">
-								<th class="text-center">Item</th>
-								<th></th>
-								<th class="text-center">Codigo</th>
-								<th>Proyecto</th>
-								<th>Almacén</th>
-								<th class="text-center">Fecha Traslado</th>
-								<th class="text-center">Estado</th>
-								<th class="text-center">Vista Previa</th>
-							</tr>
-						</thead>
-						<tbody>
-						{% verbatim %}
-							<tr class="warning tr-{{x.pedido_id}}" ng-repeat="x in ordersSlope|filter:search">
-								<td class="text-center">{{ $index+1 }}</td>
-								<td class="text-center">
-									<button class="btn btn-xs btn-link text-black btn-approved" value="{{x.pk}}">
-										<span class="glyphicon glyphicon-ok"></span>
-									</button>
-								</td>
-								<td>{{ x.pk }}</td>
-								<td>{{ x.fields.proyecto.pk }} - {{ x.fields.proyecto.fields.nompro }}</td>
-								<td>{{ x.fields.almacen.fields.nombre }}</td>
-								<td class="text-center">{{ x.fields.traslado }}</td>
-								<td class="text-center">{{ x.fields.status }}</td>
-								<td class="text-center">
-									<a href="/reports/orders/{{x.pk}}/{{x.fields.status}}/" target="_blank" class="btn btn-xs btn-link text-black" value="{{ x.pk }}">
-										<span class="fa fa-file-pdf-o"></span>
-									</a>
-								</td>
-							</tr>
-						{% endverbatim %}
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
+<link rel="stylesheet" href="{{ MEDIA_URL }}/vendor/materialize/dist/css/materialize.min.css">
+<div class="" ng-app="slopeApp" ng-controller="CtrSlope">
+    <div class="well">
+    <br>
+    <br>
+    <h4 class="green-text">Pedidos Pendientes</h4>
+        {% csrf_token %}
+        <!--<input type="hidden" class="empdni" value="{{user.get_profile.empdni}}">-->
+        <div class="row show-grid">
+            <div class="col-md-12">
+                <div class="">
+                    <div class="input-field">
+                        <i class="fa fa-filter prefix"></i>
+                        <input type="text" ng-model="search">
+                        <label class="control-label">Busqueda</label>
+                    </div>
+                    <table class="table responsive-table highlight hovered">
+                        <thead>
+                            <tr class="lime">
+                                <th class="text-center">Item</th>
+                                <th></th>
+                                <th class="text-center">Codigo</th>
+                                <th>Proyecto</th>
+                                <th>Almacén</th>
+                                <th class="text-center">Fecha Traslado</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Vista Previa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% verbatim %}
+                            <tr class="warning tr-{{x.pk}}" ng-repeat="x in ordersSlope|filter:search">
+                                <td class="text-center">{{ $index+1 }}</td>
+                                <td class="text-center">
+                                    <button class=" btn text-black" value="{{x.pk}}" ng-click="approved(x.pk)">
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    </button>
+                                </td>
+                                <td>{{ x.pk }}</td>
+                                <td>{{ x.fields.proyecto.pk }} - {{ x.fields.proyecto.fields.nompro }}</td>
+                                <td>{{ x.fields.almacen.fields.nombre }}</td>
+                                <td class="text-center">{{ x.fields.traslado }}</td>
+                                <td class="text-center">{{ x.fields.status }}</td>
+                                <td class="text-center">
+                                    <a href="/reports/orders/{{x.pk}}/{{x.fields.status}}/" target="_blank" class="waves-effect btn-flat" value="{{ x.pk }}">
+                                        <span class="fa fa-file-pdf-o"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endverbatim %}
+                        </tbody>
+                        <tbody ng-hide="ordersSlope.length">
+                            <tr>
+                                <td colspan="8">
+                                    <div class="progress green">
+                                        <div class="indeterminate green lighten-4"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<!-- block script -->
+<script defer src="{{ MEDIA_URL }}/vendor/materialize/dist/js/materialize.min.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
+<script type="text/javascript">
+    var app = angular.module("slopeApp", []).config(function ($httpProvider) {
+                    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+                    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+                  $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+                });
+    app.controller('CtrSlope', ['$scope','$http', function($scope, $http){
+        $scope.ordersSlope = [];
+        angular.element(document).ready(function () {
+            $scope.getListSlope();
+        });
+        $scope.getListSlope = function () {
+            $scope.ordersSlope = [];
+            var data = {glist: true}
+            $http.get("", {params: data}).success(function (response){
+                console.log(response);
+                if (response.status) {
+                    $scope.ordersSlope = response.list;
+                }else{
+                    swal("Alerta!", "No hay datos para mostrar.", "warning");
+                };
+            });
+        };
+        $scope.approved = function (order) {
+            $().toastmessage('showToast',{
+                text: 'Desea aprobar el pedido a almacén '+order,
+                sticky : true,
+                type : 'confirm',
+                buttons: [{value: 'Aprobar'},{value:'Atender'},{value:'Anular'} ],
+                success : function (result) {
+                    if(result == 'Aprobar'){
+                        $scope.approvedOrder(order,'nothing');
+                    }else if (result == 'Atender') {
+                        $scope.approvedOrder(order,'atender');
+                    }else if(result == 'Anular'){
+                        $scope.cancelOrder(order);
+                    };
+                }
+            });
+        }
+        $scope.approvedOrder = function (id, sts) {
+            if (id != "") {
+                data = {"csrfmiddlewaretoken": $("[name=csrfmiddlewaretoken]").val(), "oid": id }
+                $.post('/json/post/approved/orders/', data, function(response) {
+                    console.warn(response);
+                    if (response.status) {
+                        $scope.sendmail(response);
+                        // sts == 'atender' ? location.href='/almacen/order/attend/'+id+'/' : location.reload()
+                    }else{
+                        $().toastmessage("showWarningToast","No se a podido aprobar el pedido.");
+                    };
+                });
+            };
+        }
+        $scope.cancelOrder = function (id) {
+            if (id != "") {
+                data = {"csrfmiddlewaretoken": $("[name=csrfmiddlewaretoken]").val(), "oid": id }
+                $.post('/json/post/cancel/orders/', data, function(response) {
+                    if (response.status) {
+                        $scope.sendmail(response);
+                    }else{
+                        $().toastmessage("showWarningToast","No se a podido anular el pedido. "+response.raise);
+                    };
+                });
+            };
+        }
+        $scope.sendmail = function(response) {
+            $scope.getListSlope();
+            Materialize.toast("<i class=\"envelope-o\"></i>&nbsp;Enviado correo!", "undefined", "toast-remove");
+            mailer = {
+                "to": response['to'],
+                "cc": response['cc'],
+                "subject": "Pedido "+ response['bedside'],
+                "body": "<p><strong><strong>" + response['company']+ " |" +
+                    "</strong></strong> Operaciones Frecuentes</p>" +
+                    "<p>Seguimiento de Pedido Número "+ response['bedside'] +" se ha realizado la siguiente acción " + response['option'] +" |</p>" +
+                    "<p>Acción realizado por: "+ response['user'] + "</p>"+
+                    "<p><strong>"+ new Date().toString() + "</strong></p>" +
+                    "<p><strong>Proyecto:&nbsp;" + response['project'] +" "+ response['projectname']+ "</strong></p>"}
+            console.log(mailer);
+            mailing.Mailing()
+            mailing.geturls().success(function (rurl) {
+                if (rurl.status) {
+                    mailer['server'] = rurl['servermail']
+                    sender = mailing.send(mailer)
+                    sender.success(function (res){
+                        if (res.status)
+                            angular.element(".toast").remove()
+                        else
+                            Materialize.toast("Correo no enviado #{res.raise}", 6000);
+                    });
+                }
+            });
+        }
+    }]);
+</script>
 {% endblock %}

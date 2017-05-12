@@ -523,11 +523,13 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           $("#nipple#{data.materiales}observation").val ""
           setTimeout ->
             $(".rf#{data.materiales}").trigger "click"
+            $("#nipple#{data.materiales}measure").focus()
             return
           , 100
           return
         else
           swal "Error", "No se a guardado el niple.", "error"
+          $("#nipple#{data.materiales}measure").focus()
           return
     return
   $scope.showModify = ->
@@ -1049,10 +1051,10 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
                 mailer =
                   to: "almacen@icrperusa.com" #"cvaldezch@outlook.com" #
                   cc: response.cc
-                  subject: "Pedido Generado #{bedside}"
+                  subject: "Pedido #{bedside}"
                   body: """<p><strong><strong>#{response.company} |
                   </strong></strong> Operaciones Frecuentes</p>
-                  <p>Pedido Generado Número #{bedside} |
+                  <p>Pedido Generado Número <strong>#{bedside}</strong> |
                   <strong>#{new Date().toString()}</strong></p>
                   <p><strong>Proyecto:&nbsp;#{response.project} #{response.projectname}</strong></p>"""
                 mailing.Mailing()
@@ -1321,9 +1323,11 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           else
             $scope.setToastStatic "Items Eliminados", "check", 1800
             $scope.listTemps('D')
+            $scope.removeToastStatic()
             return
         else
           $scope.setToastStatic "#{result['raise']} #{result['objerr']}", "ban", 2600
+          $scope.removeToastStatic()
           return
       return
     preload().then (param) ->
@@ -1340,6 +1344,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
             html: true
           , (isConfirm) ->
             if isConfirm
+              $scope.setToastStatic "Procesando...!", "cog", "undefined", true
               console.log param
               execDel(param['param'])
             return
@@ -1441,6 +1446,14 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   # other functions
   $scope.toRound = (number) ->
     return ((Math.round(number * 100)) / 100)
+
+  $scope.addfocusNiple = (mid) ->
+    $scope.sdnip[mid]=!$scope.sdnip[mid];
+    console.log "#nipple#{mid}measure"
+    setTimeout ->
+      $("#nipple#{mid}measure").focus()
+    , 800
+    return
 
   $scope.$watch 'ascsector', ->
     if $scope.ascsector
