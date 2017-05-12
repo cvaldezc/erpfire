@@ -620,9 +620,11 @@
             $("#nipple" + data.materiales + "observation").val("");
             setTimeout(function() {
               $(".rf" + data.materiales).trigger("click");
+              $("#nipple" + data.materiales + "measure").focus();
             }, 100);
           } else {
             swal("Error", "No se a guardado el niple.", "error");
+            $("#nipple" + data.materiales + "measure").focus();
           }
         });
       }
@@ -1632,6 +1634,13 @@
     };
     $scope.toRound = function(number) {
       return (Math.round(number * 100)) / 100;
+    };
+    $scope.addfocusNiple = function(mid) {
+      $scope.sdnip[mid] = !$scope.sdnip[mid];
+      console.log("#nipple" + mid + "measure");
+      setTimeout(function() {
+        return $("#nipple" + mid + "measure").focus();
+      }, 800);
     };
     $scope.$watch('ascsector', function() {
       if ($scope.ascsector) {

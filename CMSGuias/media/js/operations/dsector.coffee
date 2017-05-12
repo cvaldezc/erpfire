@@ -523,11 +523,13 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
           $("#nipple#{data.materiales}observation").val ""
           setTimeout ->
             $(".rf#{data.materiales}").trigger "click"
+            $("#nipple#{data.materiales}measure").focus()
             return
           , 100
           return
         else
           swal "Error", "No se a guardado el niple.", "error"
+          $("#nipple#{data.materiales}measure").focus()
           return
     return
   $scope.showModify = ->
@@ -1441,6 +1443,14 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   # other functions
   $scope.toRound = (number) ->
     return ((Math.round(number * 100)) / 100)
+
+  $scope.addfocusNiple = (mid) ->
+    $scope.sdnip[mid]=!$scope.sdnip[mid];
+    console.log "#nipple#{mid}measure"
+    setTimeout ->
+      $("#nipple#{mid}measure").focus()
+    , 800
+    return
 
   $scope.$watch 'ascsector', ->
     if $scope.ascsector

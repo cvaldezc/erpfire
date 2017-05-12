@@ -368,7 +368,7 @@
                                     <div class="row">
                                         <div class="col l2">
                                             <br>
-                                            <button type="button" class="btn waves-effect grey lighten-5 grey-text text-darken-3 sdnip{{x.fields.materials.pk}}" ng-model="sdnip[x.fields.materials.pk]" ng-init="sdnip[x.fields.materials.pk]=false;" ng-click="sdnip[x.fields.materials.pk]=!sdnip[x.fields.materials.pk]" ng-if="perarea == 'administrator' || perarea == 'ventas' || perarea == 'operaciones' || percharge == 'jefe de almacen'">
+                                            <button type="button" class="btn waves-effect grey lighten-5 grey-text text-darken-3 sdnip{{x.fields.materials.pk}}" ng-model="sdnip[x.fields.materials.pk]" ng-init="sdnip[x.fields.materials.pk]=false;" ng-click="addfocusNiple(x.fields.materials.pk)" ng-if="perarea == 'administrator' || perarea == 'ventas' || perarea == 'operaciones' || percharge == 'jefe de almacen'">
                                                 <i class="fa fa-plus"></i>
                                             </button>
                                             <button type="button" class="btn waves-effect grey lighten-5 grey-text text-darken-3 rf{{x.fields.materials.pk}}" ng-click="listNipple()" data-materials="{{x.fields.materials.pk}}">
@@ -376,9 +376,9 @@
                                             </button>
                                         </div>
                                         <div class="col l2 input-field" ng-show="sdnip[x.fields.materials.pk]">
-                                            <input type="number" class="right-align" id="nipple{{x.fields.materials.pk}}measure" ng-model="nipple[x.fields.materials.pk].measure">
+                                            <input type="text" class="right-align" id="nipple{{x.fields.materials.pk}}measure" ng-model="nipple[x.fields.materials.pk].measure">
                                             <label class="active">Medida cm</label>
-                                            <input type="hidden" id="nipple{{x.fields.materials.pk}}edit">
+                                            <input type="hidden" id="nipple{{x.fields.materials.pk}}edit" ng-focus="sdnip[x.fields.materials.pk]">
                                         </div>
                                         <div class="col l2 input-field" ng-show="sdnip[x.fields.materials.pk]">
                                             <label class="active">Tipo</label>
@@ -857,7 +857,7 @@
     <!-- utils -->
     <select id="typenip" class="hide">
         {% verbatim %}
-            <option ng-repeat="(k, v) in tnipple" value="{{k}}">{{v}}</option>
+            <option ng-repeat="(k, v) in tnipple" value="{{k}}" ng-selected="k=='B'">{{v}}</option>
         {% endverbatim %}
     </select>
     <!-- modal  -->
