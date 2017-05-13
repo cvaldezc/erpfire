@@ -749,7 +749,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
               $scope.sendmail response
               angular.element('.toast-quit').remove()
               angular.element("#mguide").modal('close')
-              Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia &nbsp;<strong>#{response.code}</strong>", 4000
+              Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia &nbsp;<strong>#{response.code}</strong>", 10000
               $timeout ->
                 $scope.vgenrem = true
                 $scope.nroguide = response.code
