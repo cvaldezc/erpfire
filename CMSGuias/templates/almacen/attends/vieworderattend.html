@@ -131,7 +131,7 @@
                     Todos
                 </label>
             </div>
-            <table class="responsive-table highlight">
+            <table class="table responsive-table highlight hovered">
                 <thead>
                     <tr class="lime lighten-3">
                         <th>#</th>
@@ -306,7 +306,7 @@
             <button type="button" class="modal-action modal-close btn waves-effect waves-light grey lighten-5 grey-text text-darken-3 right">
                 <i class="fa fa-times"></i>
             </button>
-            <table class="responsive-table highlight">
+            <table class="table responsive-table highlight">
                 <thead>
                     <tr>
                         <th></th>
@@ -352,21 +352,21 @@
                 <i class="fa fa-times-circle-o"></i>
                 <span class="hide-on-small-only">DEJAR EN CERO</span>
             </button> {% endverbatim %}
-            <table class="responsive-table highlight">
+            <table class="table responsive-table highlight hovered">
                 <thead>
-                    <tr>
+                    <tr class="lime lighten-5">
                         <th>#</th>
                         <th></th>
                         <th>Marca</th>
                         <th>Modelo</th>
                         <th>Unidad</th>
-                        <th width="2cm">Stock Disponible</th>
-                        <th></th>
+                        <th class="col-3">Stock Disponible</th>
+                        <th class="col-2"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% verbatim %}
-                    <tr ng-repeat="x in istock|orderBy:'-fields.stock'" ng-class="{'red': x.fields.stock <= 1, 'amber lighten-3': x.fields.stock > 1 && x.fields.stock < 10 }">
+                    <tr ng-repeat="x in istock|orderBy:'-fields.stock'" ng-class="{'red': x.fields.stock <= 1, 'amber lighten-3': x.fields.stock > 1 && x.fields.stock < 10 }" ng-if="x.fields.stock != 0">
                         <td>{{$index + 1}}</td>
                         <td>
                             <input type="checkbox" id="stks{{$index}}" ng-model="stks[$index].chk" ng-init="stks[$index].chk=false" ng-change="stks[$index].quantity=(!stks[$index].chk?0:stks[$index].quantity)">
@@ -677,6 +677,7 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js" defer></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular-filter/dist/angular-filter.min.js" defer></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/trumbowyg/dist/trumbowyg.min.js" defer></script>
+<script defer type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/almacen/order-attend.js" defer></script>
 <link rel="stylesheet" href="{{ MEDIA_URL }}vendor/trumbowyg/dist/ui/trumbowyg.min.css"/>
 {% endblock content %}

@@ -729,9 +729,9 @@ def post_approved_orders(request):
             data['bedside'] = request.POST['oid']
             data['company'] = request.session['company']['name']
             usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni)
-            data['cc'] = usr.email
-            mpl = [obj.proyecto.empdni_id, obj.empdni_id]
-            data['to'] = ','.join(set([x.email for x in Employee.objects.filter(empdni_id__in=mpl)]))
+            data['cc'] = '%s,%s'% (usr.email, globalVariable.mailcc)
+            mpl = [obj.proyecto.empdni.email, obj.empdni.email]
+            data['to'] = ','.join(set(mpl))
             data['option'] = 'APROBAR PEDIDO'
             data['project'] = obj.proyecto_id
             data['projectname'] = obj.proyecto.nompro
@@ -827,9 +827,9 @@ def post_cancel_orders(request):
             data['bedside'] = request.POST['oid']
             data['company'] = request.session['company']['name']
             usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni)
-            data['cc'] = usr.email
-            mpl = [obj.proyecto.empdni_id, obj.empdni_id]
-            data['to'] = ','.join(set([x.email for x in Employee.objects.filter(empdni_id__in=mpl)]))
+            data['cc'] = '%s,%s'% (usr.email, globalVariable.mailcc)
+            mpl = [obj.proyecto.empdni.email, obj.empdni.email]
+            data['to'] = ','.join(set(mpl))
             data['option'] = 'ANULAR PEDIDO'
             data['project'] = obj.proyecto_id
             data['projectname'] = obj.proyecto.nompro

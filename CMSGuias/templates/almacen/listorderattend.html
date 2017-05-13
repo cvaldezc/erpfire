@@ -3,24 +3,27 @@
   {% include "menus/storage_menu.htm" %}
 {% endblock menu %}
 {% block content %}
-<div class="container" ng-app="appAO" ng-controller="CtrlAO">
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/materialize/dist/css/materialize.min.css">
+<div ng-app="appAO" ng-controller="CtrlAO">
   <input type="hidden" ng-init="area='{{request.user.get_profile.empdni.charge.area|lower}}'" ng-model="area">
   <input type="hidden" ng-init="cargo='{{request.user.get_profile.empdni.charge.cargos|lower}}'" ng-model="cargo">
   <div class="well">
-  <h1 class="text-danger">Atender Pedidos</h1>
+    <br>
+    <br>
+    <br>
+  <h4 class="blue-text">Atender Pedidos</h4>
     <!--<input type="hidden" class="empdni" value="{{user.get_profile.empdni}}">-->
     <div class="row show-grid">
       <div class="col-md-12">
-        <div class="table-responsive">
-          <table class="table table-hovered table-bordered table-condensed table-float">
-            <caption>
-              <div class="form-group text-left">
-                <label for="" class="control-label text-left">Busqueda</label>
-                <input type="text" ng-model="search" class="form-control">
-              </div>
-            </caption>
+        <div class="input-field">
+          <i class="fa fa-filter prefix"></i>
+          <input type="text" id="search" ng-model="search">
+          <label for="search">Busqueda</label>
+        </div>
+        <div class="">
+          <table class="table hovered highlight table-float responsive-table">
             <thead>
-              <tr class="brand-danger text-white">
+              <tr class="blue text-white">
                 <th class="text-center">Item</th>
                 <th class="text-center">Codigo</th>
                 <th>Proyecto</th>
@@ -30,7 +33,7 @@
                 <th class="text-center">Vista Previa</th>
                 <th class="text-center">Atender</th>
                 {% if request.user.get_profile.empdni.charge.area|lower == 'administrator' %}
-                  <th>Anular</th>
+                  <th class="center-align">Anular</th>
                 {% endif %}
               </tr>
             </thead>
@@ -51,18 +54,18 @@
                 <td class="text-center">{{x.fields.traslado}}</td>
                 <td class="text-center">{{x.fields.status}}</td>
                 <td class="text-center">
-                  <a href="/reports/orders/{{x.pk}}/{{x.fields.status}}/" target="_blank" class="btn btn-xs btn-link text-black">
+                  <a href="/reports/orders/{{x.pk}}/{{x.fields.status}}/" target="_blank" class="btn-flat text-black">
                     <span class="fa fa-file-text"></span>
                   </a>
                 </td>
                 <td class="text-center">
-                  <a  class="btn btn-xs btn-link text-black" href="/almacen/order/attend/{{x.pk}}/">
+                  <a  class="btn-flat blue-text" href="/almacen/order/attend/{{x.pk}}/">
                     <span class="glyphicon glyphicon-shopping-cart"></span>
                   </a>
                 </td>
                 <td class="text-center" ng-if="area == 'administrator' || cargo == 'jefe de almacen'">
-                  <a href="#" class="btn btn-xs text-black" ng-click="cancelOrder($event)" data-order="{{x.pk}}">
-                    <i class="fa fa-fire"></i>
+                  <a href="#" class="btn-flat red-text" ng-click="cancelOrder($event)" data-order="{{x.pk}}">
+                    <i class="fa fa-free-code-camp"></i>
                   </a>
                 </td>
               </tr>
@@ -76,6 +79,8 @@
 </div>
 {% csrf_token %}
 <script defer type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/materialize/dist/js/materialize.min.js"></script>
 <script defer type="text/javascript" src="{{ MEDIA_URL }}js/floatThead.js"></script>
+<script defer type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
 <script defer type="text/javascript" src="{{ MEDIA_URL }}js/almacen/listorderattend.js"></script>
 {% endblock %}

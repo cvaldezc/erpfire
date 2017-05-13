@@ -71,8 +71,8 @@
 </div>
 <!-- block script -->
 <script defer src="{{ MEDIA_URL }}/vendor/materialize/dist/js/materialize.min.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
+<script defer type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script defer type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
 <script type="text/javascript">
     var app = angular.module("slopeApp", []).config(function ($httpProvider) {
                     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -152,7 +152,7 @@
                     "<p>Acción realizado por: "+ response['user'] + "</p>"+
                     "<p><strong>"+ new Date().toString() + "</strong></p>" +
                     "<p><strong>Proyecto:&nbsp;" + response['project'] +" "+ response['projectname']+ "</strong></p>"}
-            console.log(mailer);
+            // console.log(mailer);
             mailing.Mailing()
             mailing.geturls().success(function (rurl) {
                 if (rurl.status) {
@@ -162,7 +162,7 @@
                         if (res.status)
                             angular.element(".toast").remove()
                         else
-                            Materialize.toast("Correo no enviado #{res.raise}", 6000);
+                            Materialize.toast("Correo no enviado " + res.raise, 6000);
                     });
                 }
             });
