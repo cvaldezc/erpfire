@@ -70,15 +70,15 @@
     </div>
 </div>
 <!-- block script -->
-<script defer src="{{ MEDIA_URL }}/vendor/materialize/dist/js/materialize.min.js"></script>
-<script defer type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/materialize/dist/js/materialize.min.js"></script>
 <script defer type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
-<script type="text/javascript">
+<script defer type="text/javascript">
     var app = angular.module("slopeApp", []).config(function ($httpProvider) {
-                    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-                    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-                  $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-                });
+        $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+        $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+    });
     app.controller('CtrSlope', ['$scope','$http', function($scope, $http){
         $scope.ordersSlope = [];
         angular.element(document).ready(function () {
