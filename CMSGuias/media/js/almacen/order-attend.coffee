@@ -67,7 +67,7 @@ factories = ($http, $cookies) ->
     $http.get "/json/get/list/conductor/#{options.ruc}/", params: options
   obj.genGuideRemision = (options = {}) ->
     $http.post "", formd(options), transformRequest: angular.identity, headers: "Content-Type": undefined
-    
+
   obj
 
 app.factory 'attendFactory', factories
@@ -581,7 +581,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
         amount = parseFloat(Number(summ).toFixed(3))
         console.info $scope.gbrand
         console.info $scope.gmodel
-        if amount > $scope.stks[$scope.indexshownip].stock 
+        if amount > $scope.stks[$scope.indexshownip].stock
           Materialize.toast "<i class='fa fa-times red-text'></i>&nbsp; Stock es menor a lo seleccionado.", 8000
           $scope.snip = new Array()
           angular.element("#snip").modal('close')
@@ -710,7 +710,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
       # console.log $scope.guide
       prms = $scope.guide
       if isNaN(Date.parse(prms.transfer))
-        Materialize.toast "<i class='fa fa-exclamation-circle amber-text fa-2x'></i>&nbsp;Fecha de traslado Inconrecta!", 8000				
+        Materialize.toast "<i class='fa fa-exclamation-circle amber-text fa-2x'></i>&nbsp;Fecha de traslado Inconrecta!", 8000
         return false
       if !prms.hasOwnProperty 'carrier'
         Materialize.toast "<i class='fa fa-exclamation-circle amber-text fa-2x'></i>&nbsp;Seleccione Transportista!", 8000
@@ -746,9 +746,10 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
           .success (response) ->
             $scope.ngvalid = true
             if response.status
+              $scope.sendmail response
               angular.element('.toast-quit').remove()
               angular.element("#mguide").modal('close')
-              Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia &nbsp;<strong>#{response.code}</strong>", 4000
+              Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia &nbsp;<strong>#{response.code}</strong>", 10000
               $timeout ->
                 $scope.vgenrem = true
                 $scope.nroguide = response.code
@@ -765,6 +766,36 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
     else
       Materialize.toast "<i class='fa fa-exclamation red-text fa-2x'></i>&nbsp;Datos Incorrectos!", 8000
       console.log "No valido"
+    return
+
+  $scope.sendmail = (response) ->
+    Materialize.toast("<i class=\"envelope-o\"></i>&nbsp;Enviando correo!", "undefined", "toast-remove")
+    mailer =
+      "to": response['to'],
+      "cc": response['cc'],
+      "subject": "Pedido "+ response['order'],
+      "body": "<p><strong><strong>" + response['company'] + " |" +
+          "</strong></strong> Operaciones Frecuentes</p>" +
+          "<p>Seguimiento de Pedido Número " + response['order'] "</p>" +
+          "<p>" + response['option'] + " GENERADA CON NRO " +
+          " <strong>" + response['code'] + "</strong> |</p>" +
+          "<p>Acción realizado por: "+ response['user'] + "</p>" +
+          "<p><strong>"+ new Date().toString() + "</strong></p>" +
+          "<p><strong>Proyecto:&nbsp;" + response['project'] + " " + response['projectname'] + "</strong></p>"
+    console.log mailer
+    mailing.Mailing()
+    mailing.geturls().success (rurl) ->
+      if (rurl.status)
+        mailer['server'] = rurl['servermail']
+        sender = mailing.send(mailer)
+        sender.success (res) ->
+          if (res.status)
+            angular.element(".toast").remove()
+            return
+          else
+            Materialize.toast("Correo no enviado #{res.raise}", 6000)
+            return
+      return
     return
 
   $scope.showPrint = (type) ->

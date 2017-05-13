@@ -927,8 +927,8 @@ def view_orders_pending(request):
                 return HttpResponse(
                     json.dumps(context), mimetype='application/json')
             return render_to_response(
-                            'almacen/slopeorders.html',
-                            context_instance=RequestContext(request))
+                'almacen/slopeorders.html',
+                context_instance=RequestContext(request))
     except TemplateDoesNotExist, e:
         messages('Error template not found')
         raise Http404(e)
@@ -942,15 +942,13 @@ def view_orders_list_approved(request):
             if request.is_ajax():
                 lst = Pedido.objects.filter(
                     flag=True).exclude(
-                    Q(status='PE') | Q(status='AN') | Q(status='CO') |
-                    Q(status='DI')).order_by('-registrado')
+                        Q(status='PE') | Q(status='AN') | Q(status='CO') |
+                        Q(status='DI')).order_by('-registrado')
                 context['list'] = json.loads(
                     serializers.serialize(
                         'json', lst, relations=('proyecto', 'almacen')))
                 context['status'] = True
-                return HttpResponse(
-                        json.dumps(context),
-                        mimetype='application/json')
+                return JSONResponseMixin().render_to_json_response(context)
             return render_to_response(
                 'almacen/listorderattend.html',
                 context_instance=RequestContext(request))
@@ -2875,6 +2873,9 @@ class AttendOrder(JSONResponseMixin, TemplateView):
                 return self.render_to_json_response(context)
             else:
                 context['order'] = Pedido.objects.get(pedido_id=kwargs['order'])
+                # guide = GuiaRemision.objects.get(guia_id='001-10019104')
+                # print guide.pedido.proyecto.empdni.email
+                # print guide.pedido.empdni.email
                 return render(request, 'almacen/attends/vieworderattend.html', context)
         except TemplateDoesNotExist as e:
             raise Http404(e)
@@ -2940,6 +2941,30 @@ class AttendOrder(JSONResponseMixin, TemplateView):
                                     order_id=kwargs['order'])
                                 ng.save()
                 context['code'] = code
+                ## data for mail
+                #order = Pedido.objects.get(pedido_id=kwargs['order'])
+                try:
+                    emails = list()
+                    emails.append(guide.pedido.proyecto.empdni.email)
+                    emails.append(guide.pedido.empdni.email)
+                    usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni)
+                    context['company'] = request.session['company']['name']
+                    context['order'] = guide.pedido_id
+                    context['project'] = guide.pedido.proyecto_id
+                    context['projectname'] = guide.pedido.proyecto.nompro
+                    context['user'] = '%s %s' % (usr.firstname, usr.lastname)
+                    context['to'] = ','.join(set(emails))
+                    context['cc'] = '%s,%s'% (usr.email, globalVariable.mailcc)
+                    context['option'] = 'Guia de Remisión'
+                except Exception as ex:
+                    context['company'] = context['company'] if 'company' in context else ''
+                    context['order'] = context['order'] if 'order' in context else ''
+                    context['project'] = context['project'] if 'project' in context else ''
+                    context['projectname'] = context['projectname'] if 'projectname' in context else ''
+                    context['user'] = context['user'] if 'user' in context else ''
+                    context['to'] = context['to'] if 'to' in context else ''
+                    context['cc'] = context['cc'] if 'cc' in context else ''
+                    context['option'] = context['option'] if 'option' in context else ''
                 context['status'] = True
         except (ObjectDoesNotExist, Exception) as e:
             context['raise'] = str(e)
