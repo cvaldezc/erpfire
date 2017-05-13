@@ -830,7 +830,15 @@
         "to": response['to'],
         "cc": response['cc'],
         "subject": "Pedido " + response['order'],
-        "body": "<p><strong><strong>" + response['company'] + " |" + "</strong></strong> Operaciones Frecuentes</p>" + "<p>Seguimiento de Pedido Número " + response['order']("</p>" + "<p>" + response['option'] + " GENERADA CON NRO " + " <strong>" + response['code'] + "</strong> |</p>" + "<p>Acción realizado por: " + response['user'] + "</p>" + "<p><strong>" + new Date().toString() + "</strong></p>" + "<p><strong>Proyecto:&nbsp;" + response['project'] + " " + response['projectname'] + "</strong></p>")
+        "body": "<p><strong><strong>" + response['company'] + " |" +
+        "</strong></strong> Operaciones Frecuentes</p>" +
+        "<p>Seguimiento de Pedido Número " + response['order'] + "</p>" +
+        "<p>" + response['option'] + " GENERADA CON NRO " +
+        " <strong>" + response['code'] + "</strong> |</p>" +
+        "<p>Acción realizado por: " + response['user'] + "</p>" +
+        "<p><strong>" + new Date().toString() + "</strong></p>" +
+        "<p><strong>Proyecto:&nbsp;" + response['project'] + " " +
+         response['projectname'] + "</strong></p>"
       };
       console.log(mailer);
       mailing.Mailing();
