@@ -803,7 +803,7 @@
                 $scope.sendmail(response);
                 angular.element('.toast-quit').remove();
                 angular.element("#mguide").modal('close');
-                Materialize.toast("<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia &nbsp;<strong>" + response.code + "</strong>", 4000);
+                Materialize.toast("<i class='fa fa-check fa-2x green-text'></i>&nbsp;Felicidades!, Se genero la guia &nbsp;<strong>" + response.code + "</strong>", 10000);
                 $timeout(function() {
                   $scope.vgenrem = true;
                   $scope.nroguide = response.code;
@@ -830,7 +830,7 @@
         "to": response['to'],
         "cc": response['cc'],
         "subject": "Pedido " + response['order'],
-        "body": "<p><strong><strong>" + response['company'] + " |" + "</strong></strong> Operaciones Frecuentes</p>" + "<p>Seguimiento de Pedido Número " + response['order'] + " se ha realizado la siguiente acción " + response['option'] + " <strong>" + response['code'] + "</strong> |</p>" + "<p>Acción realizado por: " + response['user'] + "</p>" + "<p><strong>" + new Date().toString() + "</strong></p>" + "<p><strong>Proyecto:&nbsp;" + response['project'] + " " + response['projectname'] + "</strong></p>"
+        "body": "<p><strong><strong>" + response['company'] + " |" + "</strong></strong> Operaciones Frecuentes</p>" + "<p>Seguimiento de Pedido Número " + response['order']("</p>" + "<p>" + response['option'] + " GENERADA CON NRO " + " <strong>" + response['code'] + "</strong> |</p>" + "<p>Acción realizado por: " + response['user'] + "</p>" + "<p><strong>" + new Date().toString() + "</strong></p>" + "<p><strong>Proyecto:&nbsp;" + response['project'] + " " + response['projectname'] + "</strong></p>")
       };
       console.log(mailer);
       mailing.Mailing();
