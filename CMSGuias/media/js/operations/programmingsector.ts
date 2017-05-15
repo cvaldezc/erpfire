@@ -268,7 +268,7 @@ app.controller('programingCtrl', function($scope, $http, $cookies, $timeout) {
                 data.issue = "Info. sectorización Aprodado " + (angular.element('#nproject').text());
                 data.body = "<p>Se ha aprobado la sectorización del Proyecto <strong>\"" + (angular.element('#nproject').text()) + "\"</strong> para el sector <strong>\"" + (angular.element('#nsector').text()) + "\".</strong><br></p><p>Fecha Registrada: " + (new Date()) + "</p><p>Para:&nbsp;<strong>" + (angular.element('#enterprice').val()) + "</strong></p><p><br data-mce-bogus=\"1\"></p>";
                 $.ajax({
-                  url: "http://190.41.246.91:3000/mailer/",
+                  url: "http://172.16.0.1:3000/mailer/",
                   type: "GET",
                   crossDomain: true,
                   data: $.param(data),

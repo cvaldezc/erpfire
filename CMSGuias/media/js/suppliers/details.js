@@ -196,7 +196,7 @@ saveBedside = function(event) {
         data.para = "logistica@icrperusa.com";
         data.asunto = "Respuesta de Cotización";
         parameter = $.param(data);
-        url = "http://190.41.246.91:3000/?" + parameter;
+        url = "http://172.16.0.1:3000/?" + parameter;
         windowmsg = window.open(url, "Send Msg", "toolbar=no, scrollbars=no, resizable=no, width=100, height=100");
         setTimeout(function() {
           windowmsg.close();

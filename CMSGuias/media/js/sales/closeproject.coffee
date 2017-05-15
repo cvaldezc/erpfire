@@ -322,7 +322,7 @@ do ->
             issue: "PIN DE CIERRE PROYECTO #{response.pro}"
             body: """<p><strong><strong>#{response.company} |</strong></strong> Operaciones Frecuentes</p><p>Generar PIN para cierre de proyecto | <strong>#{new Date().toString()}</strong></p><p><strong>PIN:&nbsp;#{response.pin}</strong></p><p><strong>Proyecto:&nbsp;#{response.pro} #{response.name}</strong></p>"""
             callback: 'JSON_CALLBACK'
-          cpFactory.formCross "http://190.41.246.91:3000/mailer/", prm
+          cpFactory.formCross "http://172.16.0.1:3000/mailer/", prm
           .success (rescross) ->
             if rescross.status
               angular.element(".toast-static").remove()
@@ -344,7 +344,7 @@ do ->
         issue: options.issue
         body: options.body
         callback: 'JSON_CALLBACK'
-      cpFactory.formCross "http://190.41.246.91:3000/mailer/", prm
+      cpFactory.formCross "http://172.16.0.1:3000/mailer/", prm
       # cpFactory.formCross "", prm
       .success (rescross) ->
         if rescross.status
