@@ -238,7 +238,7 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                     context['status'] = True
                 if 'getstatus' in request.GET:
                     gs = Proyecto.objects.all().distinct('status').order_by('status')
-                    context['gstatus'] = [{'key': x.status, 'val': globalVariable.status[x.status]} for x in gs] 
+                    context['gstatus'] = [{'key': x.status, 'val': globalVariable.status[x.status]} for x in gs]
                     context['status'] = True
                 if 'sgproject' in request.GET:
                     cnom = request.user.get_profile().empdni.charge.cargos.lower()
@@ -264,7 +264,7 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                             projects = Proyecto.objects.filter(
                                         Q(flag=True),
                                         Q(status=request.GET['status'])).order_by('-registrado')
-                    
+
                     context['projects'] = json.loads(
                         serializers.serialize(
                             'json',
@@ -2691,11 +2691,13 @@ class PaintingView(JSONResponseMixin, TemplateView):
         try:
             try:
                 kwargs['paint'] = Painting.objects.get(project_id=kwargs['pro'])
+                kwargs['exist'] = True
             except Painting.DoesNotExist:
                 kwargs['paint'] = {'nlayers': 0, 'nfilmb': 0, 'nfilmc': 0}
-
-            if kwargs['paint'].project.status != 'AC' and kwargs['paint'].project.status != 'PE':
-                return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
+            # print kwargs
+            if 'exist' in kwargs:
+                if kwargs['paint'].project.status != 'AC' and kwargs['paint'].project.status != 'PE':
+                    return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
             return render(request, 'sales/paintingproject.html', kwargs)
         except (TemplateDoesNotExist or Exception) as e:
             raise Http404(e)
