@@ -255,7 +255,7 @@ sendGlobalMailer = (event) ->
             data.pwdmailer = $("input[name=globalPwdMailer]").val()
 
     $.ajax
-        url: "http://190.41.246.91:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
+        url: "http://172.16.0.1:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
         type: "GET"
         crossDomain: true
         data: $.param data

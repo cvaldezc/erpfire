@@ -239,7 +239,7 @@ assignedResponsible = ->
                 setTimeout ->
                     location.reload()
                 , 2600
-                
+
                 param =
                     'getfors': true
                     'name': $pro.attr "data-name"
@@ -252,7 +252,7 @@ assignedResponsible = ->
                         console.log data
                         location.reload()
                         # $.ajax
-                        #     url: "http://190.41.246.91:3000/mailer/"
+                        #     url: "http://172.16.0.1:3000/mailer/"
                         #     type: "GET"
                         #     crossDomain: true
                         #     data: $.param data
@@ -822,7 +822,7 @@ genKeyConfirmationResponsible = (event) ->
             data.issue = "Código de confirmación"
             data.body = "<p><span style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\" data-mce-style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\">Tu código de confirmación para asignar al responsable es: <strong>#{response.key}</strong>. Ingresa este código en la casilla de verificacion para continuar.</span></p><p>Generado:&nbsp; #{$("input[name=user-email]").attr "data-name"}</p><p>Proyecto:&nbsp; <strong>\"#{$pro.attr "data-name"}\"</strong></p><p>Ejecutado por:&nbsp; <strong>\"#{reason}\"</strong></p><p>Fecha y hora: #{new Date().toString()}</p><p><span data-mce-style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\" style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\">Si no has realizado esta operación o tienes cualquier duda respecto código, puedes comunicarte con nosotros 01 371-0443.</span></p>"
             $.ajax
-                url: "http://190.41.246.91:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
+                url: "http://172.16.0.1:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
                 type: "GET"
                 crossDomain: true
                 data: $.param data
@@ -853,7 +853,7 @@ genKeyConfirmationApproved = (event) ->
             data.issue = "Código de confirmación"
             data.body = "<p><span style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\" data-mce-style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\">Tu código de confirmación para Aprobar el Proyecto es: <strong>#{response.key}</strong>. Ingresa este código en la casilla de verificacion para continuar.</span></p><p>Generado:&nbsp; #{$("input[name=user-email]").attr "data-name"}</p><p>Proyecto:&nbsp; <strong>\"#{$pro.attr "data-name"}\"</strong></p><p>Ejecutado por:&nbsp; <strong>\"#{reason}\"</strong></p><p>Fecha y hora: #{new Date().toString()}</p><p><span data-mce-style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\" style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\">Si no has realizado esta operación o tienes cualquier duda respecto código, puedes comunicarte con nosotros 01 371-0443.</span></p>"
             $.ajax
-                url: "http://190.41.246.91:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
+                url: "http://172.16.0.1:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
                 type: "GET"
                 crossDomain: true
                 data: $.param data
@@ -1381,7 +1381,7 @@ genKeyConfirmationClosureProject = (event) ->
             data.issue = "Código de confirmación"
             data.body = "<p><span style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\" data-mce-style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\">Tu código de confirmación para Aprobar el cierre de; Proyecto es: <strong>#{response.key}</strong>. Ingresa este código en la casilla de verificacion para continuar.</span></p><p>Generado:&nbsp; #{$("input[name=user-email]").attr "data-name"}</p><p>Proyecto:&nbsp; <strong>\"#{$pro.attr "data-name"}\"</strong></p><p>Ejecutado por:&nbsp; <strong>\"#{reason}\"</strong></p><p>Fecha y hora: #{new Date().toString()}</p><p><span data-mce-style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\" style=\"color: rgb(33, 33, 33); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 19.7999992370605px;\">Si no has realizado esta operación o tienes cualquier duda respecto código, puedes comunicarte con nosotros 01 371-0443.</span></p>"
             $.ajax
-                url: "http://190.41.246.91:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
+                url: "http://172.16.0.1:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
                 type: "GET"
                 crossDomain: true
                 data: $.param data

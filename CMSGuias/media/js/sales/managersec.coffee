@@ -2311,7 +2311,7 @@ sendAlertModified = (event) ->
                 <p>Hola Luis Martinez, este&nbsp; mensaje es para avisarte que he terminado de modificar la lista de materiales del sector <strong>#{$sec.val()} - #{$sec.attr "data-name"}</strong> del proyecto <strong>#{$pro.val()} - #{$pro.attr "data-name"}</strong>.</p><p>Espero tu pronta respuesta y aprobación de las modificaciones.</p><p>Atte&nbsp; #{$user.attr "data-name"}<br></p><p><strong>#{$company.val()}</strong><br data-mce-bogus=\"1\"></p><p>Hora local #{new Date()}<br data-mce-bogus=\"1\"></p>
                 "
                 $.ajax
-                    url: "http://190.41.246.91:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
+                    url: "http://172.16.0.1:3000/mailer/" #url: "http://127.0.0.1:3000/mailer/"
                     type: "GET"
                     crossDomain: true
                     data: $.param context

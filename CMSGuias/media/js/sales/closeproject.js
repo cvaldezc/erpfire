@@ -384,7 +384,7 @@
             body: "<p><strong><strong>" + response.company + " |</strong></strong> Operaciones Frecuentes</p><p>Generar PIN para cierre de proyecto | <strong>" + (new Date().toString()) + "</strong></p><p><strong>PIN:&nbsp;" + response.pin + "</strong></p><p><strong>Proyecto:&nbsp;" + response.pro + " " + response.name + "</strong></p>",
             callback: 'JSON_CALLBACK'
           };
-          cpFactory.formCross("http://190.41.246.91:3000/mailer/", prm).success(function(rescross) {
+          cpFactory.formCross("http://172.16.0.1:3000/mailer/", prm).success(function(rescross) {
             if (rescross.status) {
               angular.element(".toast-static").remove();
               Materialize.toast('<i class="fa fa-paper-plane-o fa-lg"></i>&nbsp; Se a envio correntamente el correo', 4000);
@@ -409,7 +409,7 @@
         body: options.body,
         callback: 'JSON_CALLBACK'
       };
-      cpFactory.formCross("http://190.41.246.91:3000/mailer/", prm).success(function(rescross) {
+      cpFactory.formCross("http://172.16.0.1:3000/mailer/", prm).success(function(rescross) {
         if (rescross.status) {
           angular.element(".toast-static").remove();
           Materialize.toast('<i class="fa fa-paper-plane-o fa-lg"></i>&nbsp; Enviado correntamente!', 4000);

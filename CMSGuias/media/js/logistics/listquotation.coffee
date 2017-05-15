@@ -128,7 +128,7 @@ showMessage = (event) ->
                 <p><strong>Nro Cotización:</strong> #{ quote }</p>
                 <p><strong>AutoKey : </strong> #{ key }</p>
                 <p>Uds. puedén acceder directamente a nuestro sitio web desde estos enlaces:</p>
-                <ul><li>Presione <a href=\"http://190.41.246.91/proveedor/\" data-mce-href=\"http://190.41.246.91/proveedor/\" target=\"_blank\" title=\"ICR PERU SA\">aquí</a> para ir al sitio web.<br></li><li><a title=\"ICR PERU SA\" href=\"http://190.41.246.91/proveedor/\" target=\"_blank\" data-mce-href=\"http://190.41.246.91/proveedor/\">http://190.41.246.91/proveedor/</a></li></ul>
+                <ul><li>Presione <a href=\"http://172.16.0.1/proveedor/\" data-mce-href=\"http://172.16.0.1/proveedor/\" target=\"_blank\" title=\"ICR PERU SA\">aquí</a> para ir al sitio web.<br></li><li><a title=\"ICR PERU SA\" href=\"http://172.16.0.1/proveedor/\" target=\"_blank\" data-mce-href=\"http://172.16.0.1/proveedor/\">http://172.16.0.1/proveedor/</a></li></ul>
                 <p><br data-mce-bogus=\"1\"></p>
                 <p>Saludos.</p>
                 <p><br data-mce-bogus=\"1\"></p>
@@ -153,7 +153,7 @@ sendMessages = ->
         data.para = $("input[name=for]").val()
         data.asunto = $("input[name=issue]").val()
         parameter = $.param data
-        url = "http://190.41.246.91:3000/?#{ parameter }"
+        url = "http://172.16.0.1:3000/?#{ parameter }"
         windowmsg = window.open url, "Send Msg", "toolbar=no, scrollbars=no, resizable=no, width=100, height=100"
         $(".mmail").modal "hide"
         setTimeout ->

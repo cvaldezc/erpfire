@@ -1963,7 +1963,7 @@ approvedModify = function(event) {
           "tag":tag,
           "comment": comment}
       return
-  
+
   $("table.table-modify > tbody > tr").each (index, element) ->
       $td = $(element).find("td")
       tag = ""
@@ -1983,10 +1983,10 @@ approvedModify = function(event) {
           "price": $td.eq(8).find("input").val(),
           "tag": tag}
       return
-  
+
   console.table tbla
   console.table tblb
-  
+
   for x of tblb
       count = 0
       qmodify = 0
@@ -2003,7 +2003,7 @@ approvedModify = function(event) {
           else
               count++
               continue
-  
+
       console.log "cantidad de count #{count}"
       if tbla.length is count
           console.info tblb[x].materials
@@ -2047,7 +2047,7 @@ approvedModify = function(event) {
               tblb[x].dev = 0
               console.info "modify equal original"
               console.error tblb[x].tag
-  
+
   console.table tblb
    */
   var context, data;
@@ -2469,7 +2469,7 @@ sendAlertModified = function(event) {
         context.issue = "Modificación de Sector " + ($sec.val()) + " - " + ($sec.attr("data-name")) + " del Proyecto " + ($pro.val()) + " - " + ($pro.attr("data-name"));
         context.body = "<p>Hola Luis Martinez, este&nbsp; mensaje es para avisarte que he terminado de modificar la lista de materiales del sector <strong>" + ($sec.val()) + " - " + ($sec.attr("data-name")) + "</strong> del proyecto <strong>" + ($pro.val()) + " - " + ($pro.attr("data-name")) + "</strong>.</p><p>Espero tu pronta respuesta y aprobación de las modificaciones.</p><p>Atte&nbsp; " + ($user.attr("data-name")) + "<br></p><p><strong>" + ($company.val()) + "</strong><br data-mce-bogus=\"1\"></p><p>Hora local " + (new Date()) + "<br data-mce-bogus=\"1\"></p>";
         return $.ajax({
-          url: "http://190.41.246.91:3000/mailer/",
+          url: "http://172.16.0.1:3000/mailer/",
           type: "GET",
           crossDomain: true,
           data: $.param(context),
