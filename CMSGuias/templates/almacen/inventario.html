@@ -1,5 +1,4 @@
 {% extends "basemd.html" %}
-{% extends "div.html %"}
 {% block title %}
   Inventario
 {% endblock %}
@@ -35,10 +34,14 @@
           <input placeholder=""  type="text" class="herstock" readonly>
           <label for="herstock" >Herramienta</label>
       </div>
-        <div class="input-field col s2">
-          <input placeholder="" id="ingcant" name="ingcant" type="text" class="ingcant">
-          <label for="ingcant" >Ingresar Cantidad</label>
-        </div>
+      <div class="input-field col s2">
+        <input placeholder="" id="ingcant" name="ingcant" type="text" class="ingcant">
+        <label for="ingcant" >Ingresar Cantidad</label>
+      </div>
+      <div class="input-field col s2">
+          <input placeholder="" id="ingprice" name="ingprice" type="text" class="ingprice">
+          <label for="ingprice" >Ingresar Precio</label>
+      </div>
         <div class="input-field col s2">
           <button type="button" id="btnaddstock" name="btnaddstock" class="btn waves-effect grey btnaddstock">
             <i class="fa fa-check-square-o"></i>
@@ -47,7 +50,7 @@
         </div>
       </div>
     </div>
-  </div> 
+  </div>
 
     <table class="tabla-invent" id="tabla-invent">
 
@@ -58,26 +61,30 @@
             <th class="titherra">Herramienta</th>
             <th class="titmarca">Marca</th>
             <th class="titstock">Stock</th>
+            <th class="center-align">Precio</th>
             <th class="titaddstock"></th>
-            
+
           </tr>
         </thead>
         <tbody id="fbody" class="bodydetailinvent">
-          {% for x in linvent %}                    
+          {% for x in linvent %}
           <tr class="fer">
             <td class="titnum">{{ forloop.counter }}</td>
             <td class="titcodinvent">{{ x.herramienta_id }}</td>
             <td class="titherra">{{ x.herramienta.nombre }} {{ x.herramienta.medida }}</td>
             <td class="titmarca">{{ x.herramienta.marca.brand }}</td>
             <td class="titstock">{{ x.cantalmacen }}</td>
+            <td class="right-align">
+              {{ x.price }}
+            </td>
             <td class="titaddstock">
               <button value="{{ x.herramienta_id }}" data-herrastock="{{ x.herramienta.nombre }} - {{ x.herramienta.medida }} - {{ x.herramienta.marca.brand }}" type="button" class="transparent btnviewdivstock" style="border:none;"><i class="fa fa-plus-square"></i>
               </button>
             </td>
           </tr>
-          {% endfor %}  
-          </tbody>  
-    </table> 
+          {% endfor %}
+          </tbody>
+    </table>
 </div>
 
 {% csrf_token %}

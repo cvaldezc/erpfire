@@ -679,8 +679,6 @@ class Inventario(JSONResponseMixin, TemplateView):
                 context['status'] = False
             return self.render_to_json_response(stk)
 
-
-
         lherra = Herramienta.objects.all().order_by('nombre')
         linvent = InventarioHerra.objects.all().order_by('herramienta__nombre')
         return render(request,'almacen/inventario.html',{
@@ -706,6 +704,7 @@ class Inventario(JSONResponseMixin, TemplateView):
                             )
                         updt.stock = request.POST.get('sum')
                         updt.cantalmacen = request.POST.get('sum')
+                        updt.price = request.POST['price']
                         updt.save()
 
                         context['status'] = True
@@ -1028,7 +1027,7 @@ class Cargar(TemplateView):
     @method_decorator(login_required)
     def post(serlf, request, *args, **kwargs):
         try:
-            
+
             lherram = []
             arch = request.FILES['files[]']
             exep = ""
@@ -1046,6 +1045,7 @@ class Cargar(TemplateView):
                         hmedida = sheet.cell(m, 4).value
                         hunid = sheet.cell(m, 5).value
                         hstock = sheet.cell(m, 6).value
+                        price = sheet.cell(m, 7).value
 
                         if hstock == '' or hstock == '-':
                             hstock = 0
@@ -1057,10 +1057,12 @@ class Cargar(TemplateView):
                                 stockfinal = y.cantalmacen + hstock
                                 herra = InventarioHerra.objects.get(herramienta_id=hcod)
                                 herra.cantalmacen = stockfinal
+                                herra.price = price
                                 herra.save()
                             continue
                         except Herramienta.DoesNotExist, e:
                             try:
+                                hmarca = hmarca.strip()
                                 if hmarca == '' or hmarca == '-':
                                     hmarca = 'S/M'
                                 br = Brand.objects.get(brand=hmarca)
@@ -1079,7 +1081,8 @@ class Cargar(TemplateView):
                                 'marc': br.brand_id,
                                 'med': hmedida,
                                 'unid': un.unidad_id,
-                                'stock': hstock})
+                                'stock': hstock,
+                                'price': price})
 
                     cont = 0
                     while cont < len(lmat):
@@ -1092,7 +1095,8 @@ class Cargar(TemplateView):
                         h.save()
                         inv = InventarioHerra(
                             herramienta_id=lmat[cont]['codi'],
-                            cantalmacen=lmat[cont]['stock'])
+                            cantalmacen=lmat[cont]['stock'],
+                            price=lmat[cont]['price'])
                         inv.save()
                         # try:
                         #     InventarioHerra.objects.get(
@@ -1116,7 +1120,7 @@ class Cargar(TemplateView):
                     uploadFiles.deleteFile(filename)
                 if exep:
                     return HttpResponse('<h1>Error al procesar el archivo</h1><p>%s</p>' % exep)
-                return render(request, 
+                return render(request,
                     'almacen/form/resultherra.html',
                     {"lisherra": lherram})
             else:

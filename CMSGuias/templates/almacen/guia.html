@@ -1,5 +1,5 @@
 {% extends "basemd.html" %}
-{% extends "div.html %"}
+
 {% block title %}
   Guia
 {% endblock %}
@@ -77,7 +77,7 @@
           </tr>
         </thead>
         <tbody id="fbody" class="bodydetailsguia">
-          {% for x in lguiape %}                    
+          {% for x in lguiape %}
           <tr class="{{ x.proyecto_id }}">
             <td class="tnum">{{ forloop.counter }}</td>
             <td class="tproy"><strong>{{ x.proyecto_id }}</strong>  {{ x.proyecto.nompro }}</td>
@@ -108,9 +108,9 @@
               </ul>
             </td>
           </tr>
-          {% endfor %}  
-          </tbody>  
-    </table> 
+          {% endfor %}
+          </tbody>
+    </table>
   </div>
 
   <div id="divtableguiagene" style="display:none;">
@@ -127,7 +127,7 @@
           </tr>
         </thead>
         <tbody id="fbody" class="bodydetailsguiagene">
-          {% for x in lguiagene %}                    
+          {% for x in lguiagene %}
           <tr class="{{ x.proyecto_id }}">
             <td class="tnum">{{ forloop.counter }}</td>
             <td class="tproy"><strong>{{ x.proyecto_id }}</strong>  {{ x.proyecto.nompro }}</td>
@@ -137,14 +137,14 @@
             <td class="">
               <button type="button" style="border:none;font-weight:bold;" class="transparent btnshowdetalle" id="btnshowdetalle" data-dsuperv="{{ x.proyecto.empdni.lastname }} {{ x.proyecto.empdni.firstname }}" data-dllega="{{ x.proyecto.direccion }}" data-ddest="{{ x.proyecto.ruccliente.razonsocial }}" data-dnomproy="{{ x.proyecto_id }} {{ x.proyecto.nompro }}" data-dnumguia="{{ x.guia_id }}" data-dproyid="{{ x.proyecto_id }}" data-dtrans="{{ x.traruc.tranom }}" data-dcond="{{ x.condni.connom }}" data-dplaca="{{ x.nropla_id }} {{ x.nropla.marca }}" data-dfsalid="{{ x.fechsalida }}" data-dcoment="{{ x.comentario }}" value="{{ x.guia_id }}"><i class="fa fa-info-circle"></i></button>
 
-              <button type="button" style="border:none;font-weight:bold;" class="transparent btnviewguiaherrapdf" id="btndev" value="{{ x.guia_id }}"><i class="fa fa-file-pdf-o"></i></button> 
-              <button type="button" style="border:none;font-weight:bold;" class="transparent btndev" id="btndev" value="{{ x.guia_id }}"><small>devolucion</small></button> 
+              <button type="button" style="border:none;font-weight:bold;" class="transparent btnviewguiaherrapdf" id="btndev" value="{{ x.guia_id }}"><i class="fa fa-file-pdf-o"></i></button>
+              <button type="button" style="border:none;font-weight:bold;" class="transparent btndev" id="btndev" value="{{ x.guia_id }}"><small>devolucion</small></button>
             </td>
 
           </tr>
-          {% endfor %}  
-          </tbody>  
-    </table> 
+          {% endfor %}
+          </tbody>
+    </table>
   </div>
 
 
@@ -162,7 +162,7 @@
           </tr>
         </thead>
         <tbody id="fbody" class="bodydetailsguia">
-          {% for x in lguiaco %}                    
+          {% for x in lguiaco %}
           <tr class="{{ x.proyecto_id }}">
             <td class="tnum">{{ forloop.counter }}</td>
             <td class="tproy"><strong>{{ x.proyecto_id }}</strong>  {{ x.proyecto.nompro }}</td>
@@ -173,9 +173,9 @@
               <button type="button" style="border:none;font-weight:bold;" class="transparent btnviewguiacopdf" id="btnguiaco" value="{{ x.guia_id }}"><i class="fa fa-file-pdf-o"></i></button>
             </td>
           </tr>
-          {% endfor %}  
-        </tbody>  
-    </table> 
+          {% endfor %}
+        </tbody>
+    </table>
   </div>
 
 

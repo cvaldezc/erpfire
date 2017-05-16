@@ -1,5 +1,4 @@
 {% extends "basemd.html" %}
-{% extends "div.html %"}
 {% block title %}
   Herramienta
 {% endblock %}
@@ -44,11 +43,11 @@
             <th class="teditherra"></th>
             <!--<th class="titedit"></th>-->
             <!--<th></th>-->
-            
+
           </tr>
         </thead>
         <tbody id="fbody" class="bodydetailsherra">
-          {% for x in lherra %}                    
+          {% for x in lherra %}
           <tr class="fer">
             <td class="tnumherra">{{ forloop.counter }}</td>
             <td class="tcodherra">{{ x.herramienta_id }}</td>
@@ -64,9 +63,9 @@
 			</td>
       -->
           </tr>
-          {% endfor %}  
-          </tbody>  
-    </table> 
+          {% endfor %}
+          </tbody>
+    </table>
 </div>
 
 {% csrf_token %}

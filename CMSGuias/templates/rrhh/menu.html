@@ -1,5 +1,5 @@
 {% extends "basemd.html" %}
-{% extends "div.html %"}
+
 {% block title %}
   Empleados
 {% endblock %}
@@ -31,7 +31,7 @@
 
       </div>
    </div>
-    
+
 
 {% include "rrhh/formaddempl.html" %}
 
@@ -49,11 +49,11 @@
             <th class="colmant">Editar</th>
             <th class="colmant">Info</th>
             <th></th>
-            
+
           </tr>
         </thead>
         <tbody id="fbody" class="bodydetails">
-          {% for x in list %}                    
+          {% for x in list %}
           <tr class="fer">
             <td class="colnum">{{ forloop.counter }}</td>
             <td class="colname">{{x.lastname}} {{x.firstname}}</td>
@@ -68,7 +68,7 @@
                 <a><i class="fa fa-list"></i></a>
                   <ul>
                     <li class="lit"><a class="title">
-                    <i class="fa fa-angle-double-left"></i> Ficha de Datos</a>            
+                    <i class="fa fa-angle-double-left"></i> Ficha de Datos</a>
                       <ul>
                         <li>
                           <button  style="border:none;" type="button" data-emple='btneditemple' value='{{x.empdni_id}}' class="transparent btnshowedit"><a class="subtitle">Empleado</a></button>
@@ -126,7 +126,7 @@
                 </li>
               </ul>
             </td>
-          
+
             <td class="colmant">
                 <a type="button" href="{% url 'emple_details' x.empdni_id %}" value='{{x.empdni_id}}' class="btn"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
             </td>
@@ -134,10 +134,10 @@
                 <button type="button" style="border:none;color:red;font-weight:bold;" class="transparent btndardebaja" name="nbtndardebaja" data-motrname="{{ x.lastname }}" data-motrdni="{{ x.empdni_id }}"><small>Dar de Baja</small></button>
             </td>
           </tr>
-          {% endfor %}  
-          </tbody>  
-    </table> 
-  
+          {% endfor %}
+          </tbody>
+    </table>
+
   </div>
   <!--bootstrap row table-->
   <div id="contextMenu" class="dropdown clearfix">
@@ -169,7 +169,7 @@
         <i class="fa fa-file" aria-hidden="true"></i>
       <button type="button" name="btndocumento" class="transparent btnnewdocumento" data-documento="btnnewdocumento" style="border:none;">Documento</button>
       </li>
-    
+
       <li>
       <i class="fa fa-file-text" aria-hidden="true"></i>
       <button type="button" name="btnproyecto" class="transparent btnnewproyecto" data-proyecto="btnnewproyecto" style="border:none;">Proyecto</button>
