@@ -510,6 +510,7 @@ addMaterial = (event) ->
             if response.status
                 listMaterials()
                 tmpObjectDetailsGroupMaterials = new Object
+                swal "Felicidades!", "Material agregado correctamente.", "success"
             else
                 $().toastmessage "showErrorToast", "No found Transaction #{response.raise }"
         , "json"
@@ -2744,18 +2745,30 @@ uploadFilePreSales = ->
             "closeOnConfirm": true
         , (isConfirm) ->
             if isConfirm
-                FormData data = new FormData()
+                data = new FormData()
                 data.append "loadfilematerials", true
                 data.append "materials", $("input#ufpsales")[0].files[0]
                 data.append "csrfmiddlewaretoken", $("[name=csrfmiddlewaretoken]").val()
-                $.post "", data, (response) ->
-                    if response.status
-                        location.reload()
-                        return
-                    else
-                        swal "Error al cargar el archivo", "#{response.raise}", "error"
-                        return
-                , "json"
+                swal("Procesando!", "...", "info")
+                $.ajax
+                    url: ""
+                    data: data
+                    type: "POST"
+                    dataType: "json"
+                    cache: false
+                    contentType: false
+                    processData: false
+                    success: (response) ->
+                        if response.status
+                            swal("Felicidades!", "archivo procesado correctamente", "success")
+                            setTimeout ->
+                                location.reload()
+                                return
+                            , 3600
+                            return
+                        else
+                            swal "Error al cargar el archivo", "#{response.raise}", "error"
+                            return
                 return
             else
                 $fc = $("input#ufpsales").prev().clone()

@@ -576,7 +576,8 @@
         var tmpObjectDetailsGroupMaterials;
         if (response.status) {
           listMaterials();
-          return tmpObjectDetailsGroupMaterials = new Object;
+          tmpObjectDetailsGroupMaterials = new Object;
+          return swal("Felicidades!", "Material agregado correctamente.", "success");
         } else {
           return $().toastmessage("showErrorToast", "No found Transaction " + response.raise);
         }
@@ -2950,17 +2951,30 @@
       }, function(isConfirm) {
         var $fc, data;
         if (isConfirm) {
-          FormData(data = new FormData());
+          data = new FormData();
           data.append("loadfilematerials", true);
           data.append("materials", $("input#ufpsales")[0].files[0]);
           data.append("csrfmiddlewaretoken", $("[name=csrfmiddlewaretoken]").val());
-          $.post("", data, function(response) {
-            if (response.status) {
-              location.reload();
-            } else {
-              swal("Error al cargar el archivo", "" + response.raise, "error");
+          swal("Procesando!", "...", "info");
+          $.ajax({
+            url: "",
+            data: data,
+            type: "POST",
+            dataType: "json",
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+              if (response.status) {
+                swal("Felicidades!", "archivo procesado correctamente", "success");
+                setTimeout(function() {
+                  location.reload();
+                }, 3600);
+              } else {
+                swal("Error al cargar el archivo", "" + response.raise, "error");
+              }
             }
-          }, "json");
+          });
         } else {
           $fc = $("input#ufpsales").prev().clone();
           $("input#ufpsales").remove();
