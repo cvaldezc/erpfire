@@ -2193,7 +2193,7 @@ class SectorManage(JSONResponseMixin, View):
                 if 'readNOrders' in request.POST:
                     path = '/storage/Temp/'
                     name = uploadFiles.upload(path, request.FILES['fOrders'])
-                    wb = load_workbook(filename=name, read_only=True)
+                    wb = load_workbook(filename=name, read_only=True, data_only=True)
                     ws = wb['ORDEN']
                     nrow = ws.max_row
                     # ncol = ws.max_column
@@ -2503,6 +2503,33 @@ class SectorManage(JSONResponseMixin, View):
                     context['result'] = 'orders'
                     context['orders'] = gkey
                     context['status'] = True
+                # block add 2017-05-17 12:27:14
+                # @christian valdez
+                if 'loadfilematerials' in request.POST:
+                    # functions for ingress metproject
+                    def insertMetProject(obj={}):
+                        pass
+                    # upload file
+                    isvalid = False
+                    filen = ''
+                    if 'materials' in request.FILES:
+                        filen = uploadFiles.upload(path, request.FILES['materials'])
+                        isvalid = True
+                    if isvalid:
+                        wbook = load_workbook(filename=filen, read_only=True, data_only=True)
+                        wsheet = wbook['sector']
+                        for xrow in range(1, wsheet):
+                            if wsheet.cell(row=xrow, column=1) != '' and len(wsheet.cell(row=xrow, column=6).value) > 12:
+                                insertMetProject({
+                                    'materials': wsheet.cell(row=xrow, column=1).value,
+                                    'brand': wsheet.cell(row=xrow, column=4).value,
+                                    'model': wsheet.cell(row=xrow, column=5).value,
+                                    'quantity': wsheet.cell(row=xrow, column=6).value,
+                                    'purchase': wsheet.cell(row=xrow, column=7).value,
+                                    'sales': wsheet.cell(row=xrow, column=8).value,
+                                    'observation': wsheet.cell(row=xrow, column=6).value,})
+                    # reader file
+                    context['status'] = isvalid
             except ObjectDoesNotExist, e:
                 context['raise'] = e.__str__()
                 context['status'] = False

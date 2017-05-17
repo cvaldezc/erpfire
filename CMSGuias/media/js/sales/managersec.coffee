@@ -182,6 +182,8 @@ $(document).ready ->
         $(@).floatThead "reflow"
     getPercentAttend()
     getCountDSector()
+    $(".upload-materials").on "click", triggerUpload
+    $(document).on "change", "input#ufpsales", uploadFilePreSales
     return
 
 tableUp = (event) ->
@@ -2718,4 +2720,48 @@ cancelRequeriment = ->
     $requestRequireTmp = null
     $("stmrequire > tbody").empty()
     $("#mstrequire").modal("hide")
+    return
+
+# modify 2017-05-17 10:10
+# @christian
+# function for upload file with content materials
+
+triggerUpload = ->
+    $("input#ufpsales").click()
+    return
+
+uploadFilePreSales = ->
+    $file = $("input#ufpsales")[0]
+    if $file.files.length > 0
+        swal
+            "title": "Realmente desea subir el archivo"
+            "text": ""
+            "type": "warning"
+            "showCancelButton": true
+            "confirmButtonColor": "#dd6b55"
+            "confirmButtonText": "Si"
+            "closeOnCancel": true
+            "closeOnConfirm": true
+        , (isConfirm) ->
+            if isConfirm
+                FormData data = new FormData()
+                data.append "loadfilematerials", true
+                data.append "materials", $("input#ufpsales")[0].files[0]
+                data.append "csrfmiddlewaretoken", $("[name=csrfmiddlewaretoken]").val()
+                $.post "", data, (response) ->
+                    if response.status
+                        location.reload()
+                        return
+                    else
+                        swal "Error al cargar el archivo", "#{response.raise}", "error"
+                        return
+                , "json"
+                return
+            else
+                $fc = $("input#ufpsales").prev().clone()
+                $("input#ufpsales").remove()
+                $("input#ufpsales").insertAfter($fc)
+                $(".upload-materials").on "click", triggerUpload
+                $("input#ufpsales").on "change", uploadFilePreSales
+                return
     return
