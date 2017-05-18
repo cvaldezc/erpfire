@@ -599,6 +599,7 @@ addstockherra = function () {
       data = new Object;
       data.herra = $(".hercod").val();
       data.canti = $("input[name=ingcant]").val();
+      data.price = $("input#ingprice").val();
       data.ingresoherra = true;
       data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
       data.sum = total;

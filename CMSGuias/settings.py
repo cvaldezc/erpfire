@@ -205,6 +205,6 @@ LOGGING = {
     }
 }
 
-SOUTH_TESTS_MIGRATE = True
+SOUTH_TESTS_MIGRATE = False
 
 # TEST_RUNNER = 'CMSGuias.apps.operations.test.SimpleTest.test_basic_addition'

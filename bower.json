@@ -1,6 +1,6 @@
 {
   "name": "erpfire",
-  "version": "0.0.4",
+  "version": "4.4.3",
   "homepage": "https://github.com/christian6/CMSGuias",
   "description": "Libraries",
   "main": "bower.js",
@@ -11,7 +11,7 @@
   "authors": [
     "Christian Valdez"
   ],
-  "license": "MIT",
+  "license": "LICENSE PRIVATE",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -36,7 +36,7 @@
     "angular-filter": "^0.5.9",
     "trumbowyg": "^2.2.0",
     "chosen": "^1.6.2",
-    "materialize": "^0.97.8",
+    "materialize": ">=0.97.8",
     "showdown": "^1.6.4"
   }
 }

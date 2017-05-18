@@ -238,7 +238,7 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                     context['status'] = True
                 if 'getstatus' in request.GET:
                     gs = Proyecto.objects.all().distinct('status').order_by('status')
-                    context['gstatus'] = [{'key': x.status, 'val': globalVariable.status[x.status]} for x in gs] 
+                    context['gstatus'] = [{'key': x.status, 'val': globalVariable.status[x.status]} for x in gs]
                     context['status'] = True
                 if 'sgproject' in request.GET:
                     cnom = request.user.get_profile().empdni.charge.cargos.lower()
@@ -264,7 +264,7 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                             projects = Proyecto.objects.filter(
                                         Q(flag=True),
                                         Q(status=request.GET['status'])).order_by('-registrado')
-                    
+
                     context['projects'] = json.loads(
                         serializers.serialize(
                             'json',
@@ -2193,7 +2193,7 @@ class SectorManage(JSONResponseMixin, View):
                 if 'readNOrders' in request.POST:
                     path = '/storage/Temp/'
                     name = uploadFiles.upload(path, request.FILES['fOrders'])
-                    wb = load_workbook(filename=name, read_only=True)
+                    wb = load_workbook(filename=name, read_only=True, data_only=True)
                     ws = wb['ORDEN']
                     nrow = ws.max_row
                     # ncol = ws.max_column
@@ -2503,6 +2503,96 @@ class SectorManage(JSONResponseMixin, View):
                     context['result'] = 'orders'
                     context['orders'] = gkey
                     context['status'] = True
+                # block add 2017-05-17 12:27:14
+                # @christian valdez
+                if 'loadfilematerials' in request.POST:
+                    """
+                    request for load data in table metradoventa by a file of excel
+                    """
+                    # search brand
+                    def searchBrand(brand=''):
+                        _brand = ''
+                        try:
+                            if brand != '' and brand != 'S/M':
+                                _brand = Brand.objects.get(brand=brand).brand_id
+                            else:
+                                _brand = 'BR000'
+                        except Brand.ObjectDoesNotExist:
+                            _tb = Brand.objects.create(brand_id=genkeys.GenerateIdBrand(), brand=str(brand).upper())
+                            _brand = _tb.brand_id
+                        return _brand
+                    # search model
+                    def searchModel(brand='BR000',model=''):
+                        _model = ''
+                        try:
+                            if model != '' and model != 'S/M':
+                                _model = Model.objects.get(brand_id=brand,model=model).model_id
+                            else:
+                                _model = 'MO000'
+                        except Model.ObjectDoesNotExist:
+                            _tb = Model.objects.create(model_id=genkeys.GenerateIdModel(), model=str(brand).upper())
+                            _model = _tb.model_id
+                        return _model
+                    # functions for ingress metproject
+                    def insertMetProject(obj={}):
+                        sub = kwargs['sub'] if kwargs['sub'] != unicode(None) else None
+                        brand = searchBrand(obj['brand'])
+                        model = searchModel(brand, obj['model'])
+                        try:
+                            metv = Metradoventa.objects.get(proyecto_id=kwargs['pro'],
+                                subproyecto_id=sub, sector_id=kwargs['sec'],
+                                materiales_id=obj['materials'],
+                                brand_id=brand, model_id=model)
+                            metv.cantidad += obj['quantity']
+                            metv.precio = obj['purchase']
+                            metv.sales = obj['sales']
+                            metv.save()
+                        except Metradoventa.DoesNotExist as ex:
+                            context['raise'] = str(ex)
+                            Metradoventa.objects.create(
+                                proyecto_id=kwargs['pro'],
+                                subproyecto_id=sub,
+                                sector_id=kwargs['sec'],
+                                materiales_id=obj['materials'],
+                                brand_id=brand,
+                                model_id=model,
+                                cantidad=obj['quantity'],
+                                precio=obj['purchase'],
+                                sales=obj['sales'])
+                    # upload file
+                    isvalid = False
+                    filen = ''
+                    if 'materials' in request.FILES:
+                        path = '{0}storage{0}temp{0}'.format(os.path.sep)
+                        filen = uploadFiles.upload(path, request.FILES['materials'], {'name': kwargs['sec']})
+                        isvalid = True
+                    if isvalid:
+                        try:
+                            wbook = load_workbook(filename=filen, read_only=True, data_only=True)
+                            wsheet = wbook['sector']
+                            blank = 0
+                            for xrow in range(2, wsheet.max_row + 1):
+                                materials = str(wsheet.cell(row=xrow, column=1).value).strip()
+                                if materials != '' and len(materials) > 12:
+                                    insertMetProject({
+                                        'materials': wsheet.cell(row=xrow, column=1).value,
+                                        'brand': wsheet.cell(row=xrow, column=4).value,
+                                        'model': wsheet.cell(row=xrow, column=5).value,
+                                        'quantity': wsheet.cell(row=xrow, column=6).value,
+                                        'purchase': wsheet.cell(row=xrow, column=7).value,
+                                        'sales': wsheet.cell(row=xrow, column=8).value,})
+                                        #'observation': wsheet.cell(row=xrow, column=9).value,
+                                else:
+                                    blank += 1
+                                if blank > 10:
+                                    break
+                        except Exception as ex:
+                            context['raise'] = '{0} {1}'.format(str(ex), context['raise'] if 'raise' in context else '')
+                            isvalid = False
+                        # wbook.save(filen)
+                        uploadFiles.deleteFile(filen)
+                    # reader file
+                    context['status'] = isvalid
             except ObjectDoesNotExist, e:
                 context['raise'] = e.__str__()
                 context['status'] = False
@@ -2691,11 +2781,13 @@ class PaintingView(JSONResponseMixin, TemplateView):
         try:
             try:
                 kwargs['paint'] = Painting.objects.get(project_id=kwargs['pro'])
+                kwargs['exist'] = True
             except Painting.DoesNotExist:
                 kwargs['paint'] = {'nlayers': 0, 'nfilmb': 0, 'nfilmc': 0}
-
-            if kwargs['paint'].project.status != 'AC' and kwargs['paint'].project.status != 'PE':
-                return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
+            # print kwargs
+            if 'exist' in kwargs:
+                if kwargs['paint'].project.status != 'AC' and kwargs['paint'].project.status != 'PE':
+                    return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
             return render(request, 'sales/paintingproject.html', kwargs)
         except (TemplateDoesNotExist or Exception) as e:
             raise Http404(e)

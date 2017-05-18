@@ -357,7 +357,7 @@ class LoadAssistance(JSONResponseMixin, TemplateView):
                     # load and validate format file
                     try:
                         # upload file in the path
-                        path = '\\storage\\assistance\\'
+                        path = '{0}storage{0}assistance{0}' % os.path.sep
                         filename = upload(path, request.FILES['files'])
                         raises = list()
                         print filename

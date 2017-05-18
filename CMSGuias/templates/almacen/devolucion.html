@@ -1,5 +1,5 @@
 {% extends "basemd.html" %}
-{% extends "div.html %"}
+
 {% block title %}
   Devolucion
 {% endblock %}
@@ -16,7 +16,7 @@
           <div class="input-field col s12">
             <i class="prefix fa fa-search"></i>
             <input class="txtbuscardoc" style="width:90%;" type="search" placeholder="Buscar Documento" name="txtbuscardoc" id="txtbuscardoc" >
-          </div> 
+          </div>
         </div>
       </div>
     <table class="tabla-listdev" id="tabla-listdev">
@@ -32,7 +32,7 @@
           </tr>
         </thead>
         <tbody id="fbody" class="bodydetlistdev">
-          {% for x in listadocdev %}                    
+          {% for x in listadocdev %}
           <tr class="fer">
             <td class="colnum">{{ forloop.counter }}</td>
             <td>{{ x.docdev.docdev_id }}</td>
@@ -44,9 +44,9 @@
             <button type="button" style="border:none;font-weight:bold;" class="transparent btnviewdocdevpdf" id="" value="{{ x.docdev_id }}"><i class="fa fa-file-pdf-o"></i></button>
             <button type="button" style="border:none;font-weight:bold;" class="transparent viewherradocdev" id="" value="{{ x.docdev_id }}"><i class="fa fa-briefcase"></i></button></td>
           </tr>
-          {% endfor %}  
-          </tbody>  
-    </table> 
+          {% endfor %}
+          </tbody>
+    </table>
 </div>
 
 {% csrf_token %}

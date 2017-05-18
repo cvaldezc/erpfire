@@ -5,12 +5,21 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+class SimpleTest(SimpleTestCase):
+    def test_addition(self):
         """
         Tests that 1 + 1 always equals 2.
         """
         self.assertEqual(1 + 1, 2)
+
+
+class UnitTest(TestCase):
+    def loop(self):
+        """
+            Test for loop
+        """
+        for x in xrange(0, 10):
+            print x

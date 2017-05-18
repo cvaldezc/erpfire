@@ -514,6 +514,10 @@ class InventarioHerra(models.Model):
     reparacion = models.FloatField(null=True, blank=True, default=0)
     observacion = models.CharField(max_length=200, null=True, blank=True)
     cantalmacen = models.FloatField(null=True, blank=True, default=0)
+    price = models.FloatField(default=0)
+
+    def __unicode__(self):
+        return '%s %s %f %f' % (self.herramienta, self.ingreso, self.cantalmacen, self.price)
 
 class ReparacionHerra(models.Model):
     herramienta = models.ForeignKey(Herramienta, to_field='herramienta_id')

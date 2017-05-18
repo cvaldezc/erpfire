@@ -182,6 +182,8 @@ $(document).ready ->
         $(@).floatThead "reflow"
     getPercentAttend()
     getCountDSector()
+    $(".upload-materials").on "click", triggerUpload
+    $(document).on "change", "input#ufpsales", uploadFilePreSales
     return
 
 tableUp = (event) ->
@@ -508,6 +510,7 @@ addMaterial = (event) ->
             if response.status
                 listMaterials()
                 tmpObjectDetailsGroupMaterials = new Object
+                swal "Felicidades!", "Material agregado correctamente.", "success"
             else
                 $().toastmessage "showErrorToast", "No found Transaction #{response.raise }"
         , "json"
@@ -626,6 +629,7 @@ editMaterials = (event) ->
                 .attr "data-purchase", data.precio
                 .attr "data-sales", data.sales
                 $(".medit").modal "toggle"
+                swal "Felicidades!", "Material modificado correctamente.", "info"
                 calcAmountSector()
             else
                 $().toastmessage "showWarningToast", "No se edito el material."
@@ -2718,4 +2722,60 @@ cancelRequeriment = ->
     $requestRequireTmp = null
     $("stmrequire > tbody").empty()
     $("#mstrequire").modal("hide")
+    return
+
+# modify 2017-05-17 10:10
+# @christian
+# function for upload file with content materials
+
+triggerUpload = ->
+    $("input#ufpsales").click()
+    return
+
+uploadFilePreSales = ->
+    $file = $("input#ufpsales")[0]
+    if $file.files.length > 0
+        swal
+            "title": "Realmente desea subir el archivo"
+            "text": ""
+            "type": "warning"
+            "showCancelButton": true
+            "confirmButtonColor": "#dd6b55"
+            "confirmButtonText": "Si"
+            "closeOnCancel": true
+            "closeOnConfirm": true
+        , (isConfirm) ->
+            if isConfirm
+                data = new FormData()
+                data.append "loadfilematerials", true
+                data.append "materials", $("input#ufpsales")[0].files[0]
+                data.append "csrfmiddlewaretoken", $("[name=csrfmiddlewaretoken]").val()
+                swal("Procesando!", "...", "info")
+                $.ajax
+                    url: ""
+                    data: data
+                    type: "POST"
+                    dataType: "json"
+                    cache: false
+                    contentType: false
+                    processData: false
+                    success: (response) ->
+                        if response.status
+                            swal("Felicidades!", "archivo procesado correctamente", "success")
+                            setTimeout ->
+                                location.reload()
+                                return
+                            , 3600
+                            return
+                        else
+                            swal "Error al cargar el archivo", "#{response.raise}", "error"
+                            return
+                return
+            else
+                $fc = $("input#ufpsales").prev().clone()
+                $("input#ufpsales").remove()
+                $("input#ufpsales").insertAfter($fc)
+                $(".upload-materials").on "click", triggerUpload
+                $("input#ufpsales").on "change", uploadFilePreSales
+                return
     return
