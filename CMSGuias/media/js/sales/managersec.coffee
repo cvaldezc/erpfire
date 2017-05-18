@@ -629,6 +629,7 @@ editMaterials = (event) ->
                 .attr "data-purchase", data.precio
                 .attr "data-sales", data.sales
                 $(".medit").modal "toggle"
+                swal "Felicidades!", "Material modificado correctamente.", "info"
                 calcAmountSector()
             else
                 $().toastmessage "showWarningToast", "No se edito el material."
