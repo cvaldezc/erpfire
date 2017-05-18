@@ -26,6 +26,7 @@ showGlobalEnvelop = (event) ->
         $("footer").append globalTmpMailer
         initializeBodyMailer()
     if $("#mailer").is(":hidden")
+        initializeBodyMailer()
         $("#mailer").modal "show"
         if globalMailerData.hasOwnProperty "issue"
             $("input[name=globalmissue]").val globalMailerData.issue.toString()
