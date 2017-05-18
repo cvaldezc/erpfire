@@ -3,15 +3,21 @@
   Inventario
 {% endblock %}
 {% block menu %}
-  {% include "menus/almherramd.html" %}
+  {% include "menus/storagemd.htm" %}
 {% endblock %}
 {% block content %}
 <script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
 <link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
 <script src="/media/js/almacen/guiaherramienta.js"></script>
 <link rel="stylesheet" href="/media/css/almacen/guiaherramienta.css">
-<div>
-<h5 align="center">INGRESO DE STOCK DE HERRAMIENTAS</h5>
+<div class="">
+  <h5>
+    INGRESO DE STOCK DE HERRAMIENTAS
+    <a href="/json/inventory/tools/export/" class="waves-effect btn-flat right">
+      <i class="fa fa-file-excel-o"></i>
+      <span class="hide-on-small-only">EXPORTAR</span>
+    </a>
+  </h5>
   <div class="card" style="margin-left:70px;width:90%;">
     <div class="action-card">
       <div class="row">

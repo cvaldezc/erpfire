@@ -89,4 +89,5 @@ urlpatterns = patterns(
     url(r'^get/emails/starts/$', EmailsForsProject.as_view()),
     # url(r'restful/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^settings/$', RESTFulSettings.as_view()),
+    url(r'^inventory/tools/(?P<export>\w{6})/$', RestInventoryTools.as_view()),
 )

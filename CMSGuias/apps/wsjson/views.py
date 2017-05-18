@@ -1496,3 +1496,27 @@ class RESTFulSettings(JSONResponseMixin, TemplateView):
             return self.render_to_json_response(kwargs)
         except TemplateDoesNotExist as exs:
             raise Http404(exs)
+
+
+# add 2017-05-18 15:55:33
+# @cvaldezch - Christian Valdez
+class RestInventoryTools(JSONResponseMixin, View):
+    """
+    Class that provide support rest for inventory tools
+    """
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        """
+        this fucntion export data from table inventory tools
+        """
+        if kwargs['export'] == 'export':
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="lista_herramienta.csv"'
+            writer = csv.writer(response)
+            writer.writerow(['CODIGO','HERRAMIENTA', 'MEDIDA','PRECIO'])
+            data = list(InventarioHerra.objects.all().values_list('herramienta_id','herramienta__nombre','herramienta__medida','price'))
+            y = 0
+            for x in data:
+                writer.writerow([x[y],x[y+1],x[y+2].encode("utf-8"),x[y+3]])
+            return response
