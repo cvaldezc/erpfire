@@ -1,0 +1,75 @@
+thead.tabcabec{
+    background-color: #9e9e9e;
+    color: white;
+    font-size: 20px;
+}
+
+.modal{
+    max-height: 100%;
+}
+.modal.bottom-sheet {
+    max-height: 100%;
+}
+
+.listdetped{
+    margin-top: -60px;
+    width: 95%;
+    height: 98%;
+}
+
+.listcodgrupo{
+    width: 95%;
+    height: 82%;
+}
+
+.eddetgrupo{
+    width: 95%;
+    height: 95%;
+    margin-top:-60px;
+}
+
+.btnsalirmodal{
+    margin-top:10px;
+    width:200px;
+    height:50px;
+    color:white;
+    font-weight:bold;
+}
+
+.bodylcodsgrupo{
+    display: block;
+    overflow: auto;
+    height: 400px;
+}
+
+.bodydetped{
+display: block;
+overflow: auto;
+height: 460px;
+}
+
+.bodytabdetgrupo{
+display: block;
+overflow: auto;
+height: 500px;
+}
+
+.col5{
+    width: 5%;
+    text-align: center;
+}
+
+.col10{
+    width: 10%;
+}
+
+.col15{
+    width: 15%;
+}
+
+.col40{
+    width: 40%;
+}
+.col35{
+    width: 35%;
+}

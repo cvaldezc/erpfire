@@ -2,6 +2,8 @@
 #-*- conding: utf-8 -*-
 
 import json
+
+from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.shortcuts import render_to_response
@@ -22,6 +24,7 @@ from .models import *
 from CMSGuias.apps.tools import genkeys, globalVariable, uploadFiles
 from xlrd import open_workbook, XL_CELL_EMPTY
 from CMSGuias.apps.almacen.models import *
+from ..home.models import SettingsApp
 
 
 class JSONResponseMixin(object):
@@ -32,6 +35,7 @@ class JSONResponseMixin(object):
             mimetype='application/json',
             **response_kwargs
         )
+
     def convert_context_to_json(self, context):
         return json.dumps(context, encoding='utf-8', cls=DjangoJSONEncoder)
 
@@ -1170,3 +1174,811 @@ class DevMaterial(JSONResponseMixin, TemplateView):
 
 
         return render(request,'almacen/devolucionmaterial.html')
+
+"""
+2017-05-19 09:12:07
+Return item from guide for the project
+@ Juan Julcapari
+"""
+class Pedidoap(JSONResponseMixin, TemplateView):
+    def get(self,request,*args,**kwargs):
+        context = dict();
+        if request.is_ajax():
+            try:
+                if 'getlpedido' in request.GET:
+                    lpedido = []
+                    count = 1
+                    for x in Pedido.objects.filter(
+                        Q(status = 'AP') | Q(status = 'IN'),
+                        proyecto_id = request.GET.get('idproy'),
+                        flag = True, stgrupo=True).order_by('pedido_id'):
+                        lpedido.append({
+                            'count': count,
+                            'cod_ped': x.pedido_id,
+                            'asunto':x.asunto,
+                            'almacen':x.almacen.nombre,
+                            'fechatraslado':x.traslado
+                            })
+                        count += 1
+                        if len(lpedido) == 0:
+                            context['lpedidosize'] = False
+                        else:
+                            context['lpedido'] = lpedido
+                            context['lpedidosize'] = True
+
+                    context['status'] = True
+
+                if 'getldetped' in request.GET:
+                    ldetpedido = []
+                    countcod = 0
+                    for x in Detpedido.objects.filter(
+                        pedido_id = request.GET.get('codped'),
+                        flag = True,
+                        flagcantenv = False).order_by('materiales__matnom'):
+                        ldetpedido.append({
+                            'idtabdetped':x.id,
+                            'codmat': x.materiales_id,
+                            'namemat': x.materiales.matnom,
+                            'medmat':x.materiales.matmed,
+                            'idbrand':x.brand_id,
+                            'namemarca':x.brand.brand,
+                            'idmodel':x.model_id,
+                            'namemodel':x.model.model,
+                            'cantidad':x.cantidad,
+                            'cantenv':x.cantenv,
+                            'codpedido':x.pedido_id,
+                            'countcod':countcod
+                            })
+                        countcod += 1
+                        context['ldetpedido'] = ldetpedido
+                    context['status'] = True
+
+                if 'getlistadetped' in request.GET:
+                    ldetped = []
+                    lped = request.GET.getlist("lped[]")
+                    lpedsize = len(lped)
+                    i = 0
+                    while i < lpedsize:
+                        for x in Detpedido.objects.filter(
+                            pedido_id = lped[i],
+                            flag = True):
+                            ldetped.append({
+                                'codped':x.pedido_id,
+                                'codmat':x.materiales_id,
+                                'codbr':x.brand_id,
+                                'codmod':x.model_id,
+                                'cantidad':float(x.cantidad) - float(x.cantenv),
+                                'cantenv':x.cantenv
+                                })
+                        i = i + 1
+                    context['ldetped'] = ldetped
+                    context['status'] = True
+
+                if 'lcodgrupo' in request.GET:
+                    print 'abv'
+                    lcgrupo = []
+                    estado =  request.GET.get('estado')
+                    for x in GrupoPedido.objects.filter(
+                        flagdetalle = True if estado=='true' else False):
+                        lcgrupo.append({
+                            'codgrup':xcodgrupo_id,
+                            'codproy':x.proyecto_id,
+                            'nompro':x.proyecto.nompro,
+                            'ftrasl':x.fechtraslado
+                            })
+                        context['lcgrupo'] = lcgrupo
+                    context['status'] = True
+
+                if 'existmat' in request.GET:
+                    lexistmat = []
+                    lmat = json.loads(request.GET.get('lmat'))
+                    print lmat
+                    count = 0
+                    for y in lmat:
+                        for x in detGrupoPedido.objects.filter(
+                            codgrupo_id = request.GET.get('codgrupo'),
+                            material_id = y['codmat'],
+                            marca_id=y['codbrad'],
+                            model_id=y['codmodel']):
+                            lexistmat.append({
+                                'count':count,
+                                'codigomat':x.material_id,
+                                'namemat':x.material.matnom
+                                })
+                            count = count + 1;
+                        context['lexistmat'] = lexistmat
+                    if len(lexistmat) == 0:
+                        context['stlexistmat'] = False
+                    else:
+                        context['stlexistmat'] = True
+                    context['status'] =True
+                if 'existniple' in request.GET:
+                    ldetniple = json.loads(request.GET.get('ldetped'))
+                    ldet = []
+                    for x in ldetniple:
+                        for y in Niple.objects.filter(
+                            pedido_id = x['codped'],
+                            materiales_id = x['codmat'],
+                            brand_id = x['codbr'],
+                            model_id = x['codmod'],
+                            flagcantenv = False):
+                            ldet.append({
+                                'idtable':y.id,
+                                'codped':y.pedido_id,
+                                'codmat':y.materiales_id,
+                                'codbr':y.brand_id,
+                                'codmod':y.model_id,
+                                'metrado':y.metrado,
+                                'tipo':y.tipo,
+                                'cantidad':y.cantidad,
+                                'niple':'true',
+                                'cantenv':y.cantenv,
+                                'restcant':float(y.cantidad) - float(y.cantenv)
+                                })
+                    context['ldet'] = ldet
+                    context['status'] = True
+                if 'nipexist' in request.GET:
+                    lexistmat = []
+                    ldetnip = json.loads(request.GET.get('ldetnip'))
+                    count = 0
+                    for y in ldetnip:
+                        for x in GrupoPedNiple.objects.filter(
+                            idref_id = y['idtable'],
+                            codgrupo_id = request.GET.get('codgrupo')):
+                            lexistmat.append({
+                                'count':count,
+                                'codigomat':x.material_id,
+                                'namemat':x.material.matnom
+                                })
+                            count = count + 1;
+                        context['lexistmat'] = lexistmat
+                    print len(lexistmat)
+                    if len(lexistmat) == 0:
+                        context['stlexistmat'] = False
+                    else:
+                        context['stlexistmat'] = True
+                    context['status'] =True
+                if 'getlniple' in request.GET:
+                    listnip = []
+                    countcod = 0
+                    for x in Niple.objects.filter(
+                        pedido_id = request.GET.get('codped'),
+                        materiales_id = request.GET.get('codmat'),
+                        brand_id = request.GET.get('codbr'),
+                        model_id = request.GET.get('codmod'),
+                        flag = True):
+                        listnip.append({
+                            'idtable':x.id,
+                            'codped':x.pedido_id,
+                            'codmat':x.materiales_id,
+                            'namemat':x.materiales.matnom,
+                            'medmat':x.materiales.matmed,
+                            'codbr':x.brand_id,
+                            'namebran':x.brand.brand,
+                            'codmod':x.model_id,
+                            'namemod':x.model.model,
+                            'cantidad':x.cantidad,
+                            'metrado':x.metrado,
+                            'cenv':x.cantenv,
+                            'countcod':countcod,
+                            'tipo':x.tipo
+                            })
+                        countcod = countcod + 1
+                    context['listnip'] = listnip
+                    print len(listnip)
+                    if len(listnip) > 0:
+                        context['stlistnip'] = True
+                    else:
+                        context['stlistnip'] = False
+                    context['status'] = True
+                if 'getfech' in request.GET:
+                    context = GrupoPedido.objects.values(
+                                'fechtraslado'
+                                ).get(codgrupo_id=request.GET.get('cgrupo'))
+                    context['status'] = True
+
+            except ObjectDoesNotExist, e:
+                context['raise'] = str(e)
+                context['status'] = False
+            return self.render_to_json_response(context)
+        listaproyectos = Proyecto.objects.filter(status = 'AC').order_by('-registrado')
+        return render(request,'almacen/pedidoap.html',{
+            'listaproyectos': listaproyectos
+            })
+
+
+    def post(self,request,*args,**kwargs):
+        try:
+            context = dict()
+            if request.is_ajax():
+                try:
+                    if 'cantenvdetped' in request.POST:
+                        can = Detpedido.objects.get(
+                            pedido_id=request.POST.get('idped'),
+                            materiales_id = request.POST.get('idmat'),
+                            brand_id = request.POST.get('idbrand'),
+                            model_id = request.POST.get('idmodel'))
+                        can.cantenv = request.POST.get('canttot')
+                        can.save()
+                        context['status'] = True
+                    if 'gencodgrupo' in request.POST:
+                        codgrupo = genkeys.GenerateIdGrupoPedido()
+                        cgr = GrupoPedido.objects.create(
+                            codgrupo_id = codgrupo,
+                            proyecto_id = request.POST.get('codpro'),
+                            empdni_id = request.user.get_profile().empdni_id,
+                            fechtraslado = None,
+                            estado = 'GE')
+                        cgr.save()
+                        context['codgrupo'] = codgrupo
+                        context['status'] = True
+                    if 'savedetgrupo' in request.POST:
+                        lmat = json.loads(request.POST.get('lmat'))
+                        for x in lmat:
+                            det = detGrupoPedido.objects.create(
+                                codgrupo_id = request.POST.get('codgrupo'),
+                                pedido_id = x['idped'],
+                                material_id = x['codmat'],
+                                marca_id = x['codbrand'],
+                                model_id = x['codmodel'],
+                                cantidad = round(float(x['inputcant'])*100)/100,
+                                flag = True if request.POST.get('estado') =='true' else False)
+                            det.save()
+
+                        context['status'] = True
+
+                    if 'savedetniple' in request.POST:
+                        ldetnip = json.loads(request.POST.get('ldetnip'))
+                        cntsum=0
+                        for x in ldetnip:
+                            dnip = GrupoPedNiple.objects.create(
+                                codgrupo_id=request.POST.get('codgrupo'),
+                                pedido_id=x['codped'],
+                                material_id=x['codmat'],
+                                marca_id=x['codbrand'],
+                                model_id=x['codmod'],
+                                cantidad=round(float(x['inputcant'])*100)/100,
+                                metrado=x['metrado'],
+                                tipo=x['tipo'],
+                                idref_id=x['idtable'])
+                            # dnip.save()
+
+                            cantdiv = float(x['metrado'])/100
+                            cantmult = float(cantdiv)*float(x['inputcant'])
+                            cntsum = cntsum + float(cantmult)
+
+                        dped = Detpedido.objects.get(
+                            pedido_id=request.POST.get('cped'),
+                            materiales_id=request.POST.get('cmat'),
+                            brand_id=request.POST.get('cbr'),
+                            model_id=request.POST.get('cmod')
+                            )
+                        dped.cantenv = float(cntsum) + float(request.POST.get('cenviada'))
+                        dped.save()
+
+
+                        context['status'] = True
+
+
+
+                    if 'upddetped' in request.POST:
+                        lmat = json.loads(request.POST.get('lmat'))
+                        for x in lmat:
+                            det = Detpedido.objects.get(
+                                pedido_id = request.POST.get('idped'),
+                                materiales_id = x['codmat'],
+                                brand_id = x['codbrand'],
+                                model_id = x['codmodel'])
+                            det.cantenv = x['cantupd']
+                            det.save()
+                        context['status'] = True
+
+                    if 'savealldetgrupo' in request.POST:
+                        listmat = json.loads(request.POST.get('listmat'))
+                        print 'bvbnc'
+                        print listmat
+                        for x in listmat:
+                            print '--------------------'
+                            print 'cmat', x['codmat']
+                            print 'solo',x['cantidad']
+                            print 'float', float(x['cantidad'])
+                            print 'round', round(float(x['cantidad'])*100)/100
+
+                            try:
+                                detGrupoPedido.objects.get(
+                                    codgrupo_id=request.POST.get('codgrupo'),
+                                    material_id=x['codmat'],
+                                    marca_id=x['codbr'],
+                                    model_id=x['codmod'],
+                                    pedido_id=x['codped'])
+
+                                detail=detGrupoPedido.objects.get(
+                                        codgrupo_id=request.POST.get('codgrupo'),
+                                        material_id=x['codmat'],
+                                        marca_id=x['codbr'],
+                                        model_id=x['codmod'],
+                                        pedido_id=x['codped'])
+                                print 'juhdus', x['codmat']
+
+                                detail.cantidad=float(x['cantenv'])+float(x['cantidad'])
+                                detail.save()
+
+                            except detGrupoPedido.DoesNotExist, e:
+                                print 'xxxx', x['codmat']
+                                print 'cccc', float(x['cantidad'])
+                                det = detGrupoPedido.objects.create(
+                                    codgrupo_id = request.POST.get('codgrupo'),
+                                    material_id = x['codmat'],
+                                    pedido_id = x['codped'],
+                                    marca_id = x['codbr'],
+                                    model_id = x['codmod'],
+                                    cantidad = float(x['cantidad']),
+                                    flag = True if request.POST.get('estado') =='true' else False)
+                                # det.save()
+                        context['status'] = True
+
+                    if 'updalldetped' in request.POST:
+                        lalldetped = json.loads(request.POST.get('lmaterials'))
+                        for x in lalldetped:
+                            det = Detpedido.objects.get(
+                                pedido_id = x['codped'],
+                                materiales_id = x['codmat'],
+                                brand_id = x['codbr'],
+                                model_id = x['codmod'])
+                            det.cantenv = float(x['cantenv']) + float(x['cantidad'])
+                            det.save()
+                        context['status'] = True
+
+                    if 'updfech' in request.POST:
+                        fec = GrupoPedido.objects.get(
+                            codgrupo_id = request.POST.get('cgrupo'))
+                        fec.fechtraslado = request.POST.get('fechatrasl')
+                        fec.save()
+                        context['status'] = True
+
+                    if 'updniple' in request.POST:
+                        ldetniple = json.loads(request.POST.get('ldetnip'))
+                        for x in ldetniple:
+                            detnip = Niple.objects.get(
+                                id = x['idtable'])
+                            detnip.cantenv = float(x['inputcant']) + float(x['cenviado'])
+                            detnip.save()
+                        context['status'] = True
+
+                    if 'savealldetniple' in request.POST:
+                        ldetniple = json.loads(request.POST.get('ldet'))
+                        for x in ldetniple:
+                            dniple = GrupoPedNiple.objects.create(
+                                codgrupo_id=request.POST.get('codgrupo'),
+                                pedido_id=x['codped'],
+                                material_id=x['codmat'],
+                                marca_id=x['codbr'],
+                                model_id=x['codmod'],
+                                cantidad=round(float(x['restcant'])*100)/100,
+                                metrado=x['metrado'],
+                                tipo=x['tipo'],
+                                idref_id=x['idtable'])
+                            # dniple.save()
+
+                            nip = Niple.objects.get(
+                                id = x['idtable'])
+                            nip.cantenv = float(x['cantidad'])
+                            nip.save()
+                        context['status'] = True
+
+                except Exception, e:
+                    context['raise'] = str(e)
+                    context['status'] = False
+                return self.render_to_json_response(context)
+        except Exception, e:
+            print e.__str__()
+
+
+class GrupPedido(JSONResponseMixin, TemplateView):
+    def get(self,request,*args,**kwargs):
+        context = dict();
+        if request.is_ajax():
+            try:
+                if 'getldetgrupo' in request.GET:
+                    ldetgrupo = []
+                    for x in detGrupoPedido.objects.filter(
+                        codgrupo_id = request.GET.get('codgrupo')).order_by('pedido','material__matnom'):
+                        ldetgrupo.append({
+                            'id':x.id,
+                            'codgrup':x.codgrupo_id,
+                            'codmat': x.material_id,
+                            'namemat':x.material.matnom,
+                            'medmat':x.material.matmed,
+                            'codmarca': x.marca_id,
+                            'namemarca':x.marca.brand,
+                            'codmod':x.model_id,
+                            'namemodel':x.model.model,
+                            'cantidad':float(x.cantidad),
+                            'codped':x.pedido_id
+                            })
+                        context['ldetgrupo'] = ldetgrupo
+                    print 'lengrupo'
+                    if len(ldetgrupo) > 0:
+                        context['lengrupo'] = True
+                    print len(ldetgrupo)
+                    context['status'] = True
+
+                if 'getcantdetped' in request.GET:
+                    context = Detpedido.objects.values(
+                                'pedido_id',
+                                'materiales_id',
+                                'brand_id',
+                                'model_id',
+                                'cantidad',
+                                'cantenv'
+                                ).get(
+                                    pedido_id=request.GET.get('cped'),
+                                    materiales_id=request.GET.get('cmat'),
+                                    brand_id=request.GET.get('cbr'),
+                                    model_id=request.GET.get('cmod'))
+                    if len(context) > 0:
+                        context['status'] = True
+
+                if 'listgrupo' in request.GET:
+                    lgrupo = []
+                    for x in GrupoPedido.objects.filter(
+                        flagdetalle=True, estado=request.GET.get('estgr')).order_by('codgrupo_id'):
+                        lgrupo.append({
+                            'codgrupo_id': x.codgrupo_id,
+                            'codproy': x.proyecto_id,
+                            'nameproy': x.proyecto.nompro,
+                            'codemple': x.empdni_id,
+                            'nameemple': x.empdni.lastname + ', ' + x.empdni.firstname,
+                            'fechtrasl': x.fechtraslado
+                            })
+                        context['lgrupo'] = lgrupo
+                    context['servreport'] = SettingsApp.objects.values().get(flag=True)['serverreport']
+                    context['status'] = True
+
+                if 'getcantdetniple' in request.GET:
+                    lcantdnip = []
+                    for x in Niple.objects.filter(
+                        pedido_id = request.GET.get('codped'),
+                        materiales_id = request.GET.get('codmat'),
+                        brand_id = request.GET.get('codbr'),
+                        model_id = request.GET.get('codmod')):
+                        lcantdnip.append({
+                            'idped':x.pedido_id,
+                            'idmat':x.materiales_id,
+                            'idbr':x.brand_id,
+                            'idmod':x.model_id
+                            })
+                        context['lcantdnip'] = lcantdnip
+                    if len(lcantdnip) > 0:
+                        context['stlcantdnip'] = True
+                    else:
+                        context['stlcantdnip'] = False
+                    context['status'] = True
+
+                if 'lgrpedniple' in request.GET:
+                    lgrniple=[]
+                    for x in GrupoPedNiple.objects.filter(
+                        codgrupo_id = request.GET.get('codgroup'),
+                        material_id= request.GET.get('codmat'),
+                        marca_id=request.GET.get('codbr'),
+                        model_id=request.GET.get('codmod')).order_by('tipo'):
+                        lgrniple.append({
+                            'idtable':x.id,
+                            'idref':x.idref_id,
+                            'codmat':x.material_id,
+                            'codmarca':x.marca_id,
+                            'codmod':x.model_id,
+                            'cantidad':x.cantidad,
+                            'metrado':x.metrado,
+                            'tipo':x.tipo,
+                            'cpedi':x.pedido_id
+                            })
+                        context['lgrniple'] = lgrniple
+                    context['status'] = True
+
+                if 'getdetniple' in request.GET:
+                    context = Niple.objects.values(
+                                'id',
+                                'cantidad',
+                                'cantenv',
+                                'metrado',
+                                'pedido',
+                                'materiales',
+                                'brand',
+                                'model'
+                                ).get(
+                                    id=request.GET.get('idtabniple'))
+                    if len(context) > 0:
+                        context['status'] = True
+
+                if 'getsizegrnip' in request.GET:
+                    lgrnipl=[]
+                    lstatus=[]
+                    ldetgrupo = json.loads(request.GET.get('ldetgrupo'))
+                    for x in ldetgrupo:
+                        print x['codmat']
+                        for y in GrupoPedNiple.objects.filter(
+                            codgrupo_id=x['codgrup'],
+                            material_id=x['codmat'],
+                            marca_id=x['codmarca'],
+                            model_id=x['codmod']):
+                            lgrnipl.append({
+                                'cgr':y.codgrupo_id,
+                                'codped':y.pedido_id,
+                                'codmat':y.material_id,
+                                })
+
+                        if len(lgrnipl) > 0:
+                            stat=True
+                        else:
+                            stat=False
+                        lstatus.append({
+                            'estado':stat
+                            })
+
+                    # context['lstatus']= lstatus
+                    context['status'] = True
+
+
+
+                if 'getlstatus' in request.GET:
+
+                    lst=[]
+                    ldetsum = json.loads(request.GET.get('ldetsum'))
+                    for x in ldetsum:
+                        lgrni=[]
+                        for y in GrupoPedNiple.objects.filter(
+                            codgrupo_id=x['codgrup'],
+                            material_id=x['codmat'],
+                            marca_id=x['codmarca'],
+                            model_id=x['codmod']):
+                            lgrni.append({
+                                'cgr':y.codgrupo_id,
+                                'codped':y.pedido_id,
+                                'codmat':y.material_id,
+                                })
+
+                        if len(lgrni) > 0:
+                            stat=True
+                        else:
+                            stat=False
+                        print 'qw',len(lgrni), stat
+                        lst.append({
+                            'estado':stat
+                            })
+
+                    context['lstat']= lst
+                    context['status'] = True
+
+                if 'getdetnip' in request.GET:
+                    ldgr=[]
+                    print request.GET.get('codgrupo')
+                    for x in GrupoPedNiple.objects.filter(
+                        codgrupo_id=request.GET.get('codgrupo')):
+                        ldgr.append({
+                            'id':x.id,
+                            'codgr':x.codgrupo_id,
+                            'codped':x.pedido_id,
+                            'codmat':x.material_id,
+                            'codbr':x.marca_id,
+                            'codmod':x.model_id,
+                            'cantid':x.cantidad,
+                            'metrado':x.metrado,
+                            'idnipleref':x.idref_id
+                            })
+                    context['ldgr'] = ldgr
+                    context['status'] = True
+
+                if 'getdetpedido' in request.GET:
+                    listadped =[]
+                    ldetgrupo = json.loads(request.GET.get('ldetgrupo'))
+                    for x in ldetgrupo:
+                        for y in Detpedido.objects.filter(
+                            pedido_id=x['codped'],
+                            materiales_id=x['codmat'],
+                            brand_id=x['codmarca'],
+                            model_id=x['codmod']):
+                            listadped.append({
+                                'idped':y.pedido_id,
+                                'idmat':y.materiales_id,
+                                'idbr':y.brand_id,
+                                'idmod':y.model_id,
+                                'canenviada':y.cantenv,
+                                'cantrest':y.cantenv - x['cantidad']
+                                })
+
+                    context['listadped'] = listadped
+                    context['status'] = True
+
+
+                if 'gniple' in request.GET:
+                    lgniple = []
+                    lsumdetnip = json.loads(request.GET.get('lsumdetnip'))
+                    for x in lsumdetnip:
+                        for y in Niple.objects.filter(
+                            id=x['idnipleref']):
+                            lgniple.append({
+                                'idniple':y.id,
+                                'cantidad':y.cantenv,
+                                'cantres':float(y.cantenv) - float(x['cantid'])
+                                })
+                    context['lgniple'] = lgniple
+                    context['status'] = True
+
+                if 'getcantdetgrped' in request.GET:
+                    context = detGrupoPedido.objects.values(
+                                'id',
+                                'cantidad'
+                                ).get(
+                                    codgrupo_id=request.GET.get('codgrupo'),
+                                    material_id=request.GET.get('cmat'),
+                                    marca_id=request.GET.get('cbr'),
+                                    model_id=request.GET.get('cmod'),
+                                    pedido_id=request.GET.get('cped'))
+                    if len(context) > 0:
+                        context['status'] = True
+
+
+
+
+            except ObjectDoesNotExist, e:
+                context['raise'] = str(e)
+                context['status'] = False
+            return self.render_to_json_response(context)
+        return render(request,'almacen/grupopedido.html')
+
+
+    def post(self,request,*args,**kwargs):
+        try:
+            context = dict()
+            if request.is_ajax():
+                try:
+                    if 'updcantdetped' in request.POST:
+                        can = Detpedido.objects.get(
+                            pedido_id=request.POST.get('idped'),
+                            materiales_id = request.POST.get('idmat'),
+                            brand_id = request.POST.get('idbr'),
+                            model_id = request.POST.get('idmod'))
+                        can.cantenv = request.POST.get('cantidad')
+                        can.save()
+                        context['status'] = True
+
+                    if 'updcatndetgrupo' in request.POST:
+                        can = detGrupoPedido.objects.get(
+                            codgrupo_id = request.POST.get('codgrupo'),
+                            material_id = request.POST.get('matid'),
+                            marca_id = request.POST.get('brid'),
+                            model_id = request.POST.get('modid'))
+                        can.cantidad = request.POST.get('cantidad')
+                        can.save()
+                        context['status'] = True
+
+                    if 'deldetmat' in request.POST:
+                        detGrupoPedido.objects.get(
+                            id=request.POST.get('idtable')).delete()
+                        context['status'] = True
+
+                    if 'delallgrupo' in request.POST:
+                        ldetgrupo = json.loads(request.POST.get('ldetgrupo'))
+                        for x in ldetgrupo:
+                            detGrupoPedido.objects.get(
+                                id=x['id']).delete()
+                        context['status'] = True
+
+
+                    if 'updcenvdetped' in request.POST:
+                        ldetgrupo = json.loads(request.POST.get('ldetgrupo'))
+                        for y in ldetgrupo:
+                            cenv=Detpedido.objects.get(
+                                pedido_id=y['codped'],
+                                materiales_id=y['codmat'],
+                                brand_id=y['codmarca'],
+                                model_id=y['codmod'])
+                            cenv.cantenv = 0
+                            cenv.save()
+                        context['status'] = True
+
+                    if 'updcantenv' in request.POST:
+                        nip = Niple.objects.get(
+                            id=request.POST.get('idnip'))
+                        nip.cantenv=request.POST.get('edcantsend')
+                        nip.save()
+
+                        grped = GrupoPedNiple.objects.get(
+                            id=request.POST.get('idtab'))
+                        grped.cantidad = request.POST.get('cant')
+                        grped.save()
+
+                        dgrped = detGrupoPedido.objects.get(
+                            id=request.POST.get('codtabdetgrped'))
+                        dgrped.cantidad= request.POST.get('total')
+                        dgrped.save()
+
+                        dped = Detpedido.objects.get(
+                            pedido_id=request.POST.get('cped'),
+                            materiales_id=request.POST.get('cmat'),
+                            brand_id=request.POST.get('cbr'),
+                            model_id=request.POST.get('cmod'))
+                        dped.cantenv=request.POST.get('edcantdetped')
+                        dped.save()
+
+                        context['status'] = True
+
+                    if 'upddelniple' in request.POST:
+
+                        nip = Niple.objects.get(
+                            id=request.POST.get('idnip'))
+                        nip.cantenv = request.POST.get('cant')
+                        nip.save()
+
+                        GrupoPedNiple.objects.get(
+                                id=request.POST.get('idtab')).delete()
+
+                        detped = Detpedido.objects.get(
+                            pedido_id=request.POST.get('cped'),
+                            materiales_id=request.POST.get('cmat'),
+                            brand_id=request.POST.get('cbr'),
+                            model_id=request.POST.get('cmod'))
+                        detped.cantenv=request.POST.get('cantdped')
+                        detped.save()
+
+                        detgrped = detGrupoPedido.objects.get(
+                            codgrupo_id=request.POST.get('codgrupo'),
+                            material_id=request.POST.get('cmat'),
+                            marca_id=request.POST.get('cbr'),
+                            model_id=request.POST.get('cmod'),
+                            pedido_id=request.POST.get('cped'))
+                        detgrped.cantidad=request.POST.get('cantdetgrped')
+                        detgrped.save()
+
+                        context['status'] = True
+
+                    if 'updanulgrup' in request.POST:
+                        listadped = json.loads(request.POST.get('listadped'))
+                        lgniple = json.loads(request.POST.get('lgniple'))
+                        ldgr = json.loads(request.POST.get('ldgr'))
+                        ldetgrupo = json.loads(request.POST.get('ldetgrupo'))
+
+                        for x in listadped:
+                            dped = Detpedido.objects.get(
+                                pedido_id=x['idped'],
+                                materiales_id=x['idmat'],
+                                brand_id=x['idbr'],
+                                model_id=x['idmod'])
+                            dped.cantenv=x['cantrest']
+                            dped.save()
+
+                        for y in lgniple:
+                            nip=Niple.objects.get(
+                                id=y['idniple'])
+                            nip.cantenv=y['cantres']
+                            nip.save()
+
+                        for b in ldetgrupo:
+                            grped = detGrupoPedido.objects.get(
+                                id=b['id']).delete()
+
+                        for z in ldgr:
+                            gr = GrupoPedNiple.objects.get(
+                                id=z['id']
+                                ).delete()
+
+                        grp = GrupoPedido.objects.get(
+                            codgrupo_id=request.POST.get('delcodgrupo')).delete()
+
+                        context['status'] = True
+
+                    if 'updstgrped' in request.POST:
+                        gru=GrupoPedido.objects.get(
+                            codgrupo_id=request.POST.get('codgrupo'))
+                        gru.estado=request.POST.get('estado')
+                        gru.save()
+                        context['status']=True
+
+                except Exception, e:
+                    context['raise'] = str(e)
+                    context['status'] = False
+                return self.render_to_json_response(context)
+        except Exception, e:
+            print str(e)
+

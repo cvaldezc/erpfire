@@ -24,7 +24,7 @@ from CMSGuias.apps.home.models import (
                                         Proveedor, Documentos, FormaPago,
                                         Almacene, Moneda, Configuracion,
                                         LoginProveedor, Brand, Model,
-                                        Employee, Unidade, Materiale)
+                                        Employee, Unidade, Materiale, SettingsApp)
 from .models import (
                         Compra, Cotizacion, CotCliente, CotKeys, DetCotizacion,
                         DetCompra, tmpcotizacion, tmpcompra, ServiceOrder,
@@ -817,6 +817,7 @@ class ListPurchase(JSONResponseMixin, TemplateView):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         try:
+            context['servreport'] = SettingsApp.objects.values().get(flag=True)['serverreport']
             context = dict()
             if request.is_ajax():
                 try:
@@ -1872,7 +1873,7 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                                     print e
                     # we walk for delete items
                     dels = json.loads(request.POST['del'])
-                    if len(dels) > 0: 
+                    if len(dels) > 0:
                         for x in dels:
                             if x['model'] != 'add':
                                 try:

@@ -1,0 +1,262 @@
+<!--
+add 2017-05-19 09:02:22
+@ Juan Julcapari
+-->
+{% extends "basemd.html" %}
+{% block title %}
+  Pedido
+{% endblock %}
+{% block menu %}
+  {% include "menus/storagemd.htm" %}
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/media/css/almacen/pedidoap.css">
+<script src="/media/js/almacen/pedidoap.js"></script>
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+
+<div style="margin:1%;">
+    <div class="card">
+        <div class="card-action" style="height:200px;">
+            <div class="row">
+                <h6><strong>Agrupar en un grupo nuevo o en uno ya generado</strong></h6>
+                <div class="input-field col s7" id="divcboproy">
+                    <select id="cboproy" class="cboproy">
+                        <option value="" disabled selected>Seleccione un Proyecto</option>
+                        {% for x in listaproyectos %}
+                        <option value="{{ x.proyecto_id }}">{{ x.proyecto_id }} {{ x.nompro}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-field col s0" id="divbtnopencodsgr">
+                    <button type="button" class="btn waves-effect teal ligthen-1 btnopencodsgrupo">
+                        <i class="fa fa-list"></i>
+                        <span><strong>Grupos</strong></span>
+                    </button>
+                </div>
+                <div class="input-field col s4" id="divcodgrupo" style="display:none;border:1px solid;border-color:#039be5;border-radius:15px;">
+                    <div class="panel-group">
+                        <div class="panel" style="margin-left:20px;margin-right:20px;">
+                            <div class="panel-heading" style="">
+                                <div class="row">
+                                    <div class="input-field col s0">
+                                        <h6 style="font-weight:bold">Codigo Generado: </h6>
+                                    </div>
+                                    <div class="input-field col s0">
+                                        <h6 class="lblcodgrupo"></h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-collapse collapse in">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <h6 class="lblcodproyecto" style="display:none"></h6>
+                                        <h6 class="lbldetgrupo"></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="divgencodigo" style="display:none">
+                <button type="button" class="btn waves-effect teal ligthen-1 btngencodgrupo">
+                    <i class="fa fa-file"></i>
+                    <span><strong>Generar Codigo</strong></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="divtxtbuscarped" style="display:none">
+        <div class="input-field col s9">
+            <i class="prefix fa fa-search"></i>
+            <input class="txtbuscarped" name="txtbuscarped" style="width:90%;" id="txtbuscarped" type="search" placeholder="Codigo de Pedido">
+        </div>
+        <div class="input-field col s3">
+            <button type="button" class="btn waves-effect teal lighten-1 btngengrupo">
+              <i class="fa fa-file"></i>
+              <span><strong>Agrupar Pedidos completos</strong></span>
+            </button>
+        </div>
+    </div>
+
+    <hr>
+
+    <div id="divtabpedido" style="display:none;">
+        <div class="row">
+            <div class="input-field col" style="margin-top:25px;">
+                <h6>Seleccionar:</h6>
+            </div>
+            <div class="input-field col">
+                <input onclick="javascript:viewallnone();" name="estped" type="radio" id="radioall" value="viewallnone"/>
+                <label for="radioall" style="font-size:15px;font-weight:bold;color:black;">Todo</label>
+                <input onclick="javascript:viewallnone();" name="estped" type="radio" id="radionone" value="viewallnone"/>
+                <label for="radionone" style="font-size:15px;font-weight:bold;color:black;">Nada</label>
+            </div>
+            <div class="input-field col" style="margin-left:5%;">
+                <h5 class="lbldescproy"></h5>
+            </div>
+        </div>
+        <hr>
+        <table class="table table-condensed highlight tab-pedido" id="tab-pedido">
+            <thead class="tabcabec">
+                <tr>
+                    <th class="col5">Item</th>
+                    <th class="col15">Pedido</th>
+                    <th class="col5"></th>
+                    <th class="col40">Asunto</th>
+                    <th class="col15">Almacen</th>
+                    <th class="col10">F.traslado</th>
+                    <th class="col10" style="text-align:center">Detalle</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="modal listdetped">
+    <div class="modal-content">
+        <div class="row">
+            <div class="input-field col s0">
+                <h6 class="lblcodped" style="font-weight:bold;"></h6>
+            </div>
+            <div class="input-field col s6">
+                <h6 class="lbldesped"></h6>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="input-field col s8">
+                <i class="prefix fa fa-search"></i>
+                <input class="txtbustabdetped" name="txtbustabdetped" style="width:90%;height:30px;" id="txtbustabdetped" type="search" placeholder="Codigo o Material">
+            </div>
+            <div class="input-field col s2" style="margin-left:15%;">
+                <button type="button" class="btn waves-effect teal lighten-1 btnsavdetped">
+                    <i class="fa fa-floppy-o"></i>
+                    <span><strong>Guardar</strong></span>
+                </button>
+            </div>
+        </div>
+        <table class="table table-condensed highlight tab-detped" id="tab-detped" style="cursor:pointer">
+            <thead class="tabcabec">
+                <tr>
+                    <th class="col5">Item</th>
+                    <th class="col10">Codigo</th>
+                    <th class="col35">Material</th>
+                    <th class="col10">Medida</th>
+                    <th class="col10">Marca</th>
+                    <th class="col10">Modelo</th>
+                    <th class="col5">Cant.</th>
+                    <th class="col5">Env.</th>
+                    <th class="col10" style="text-align:center;">Enviar</th>
+                </tr>
+            </thead>
+            <tbody class="bodydetped"></tbody>
+        </table>
+        <div align="right">
+            <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+            <i class="fa fa-times"></i>
+            <span><strong>SALIR</strong></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!--MODAL LISTA DE CODIGOS DE GRUPO-->
+<div class="modal listcodgrupo">
+    <div class="modal-content">
+        <div class="row">
+            <div class="input-field col">
+                <h6><strong>Detalle</strong></h6>
+            </div>
+            <div class="input-field col" style="margin-top:3px;">
+                <input checked="true" onclick="javascript:viewtabgrupo();" name="estgrupo" type="radio" id="radiosi" value="viewtabgrupo"/>
+                <label for="radiosi" style="font-size:15px;font-weight:bold;color:black;">SI</label>
+                <input onclick="javascript:viewtabgrupo();" name="estgrupo" type="radio" id="radiono" value="viewtabgrupo"/>
+                <label for="radiono" style="font-size:15px;font-weight:bold;color:black;">NO</label>
+            </div>
+            <div class="input-field col s6" style="margin-left:20%;">
+                <i class="prefix fa fa-search"></i>
+                <input class="txtbustabgrupo" name="txtbustabgrupo" style="width:90%;height:30px;" id="txtbustabgrupo" type="search" placeholder="Grupo o Proyecto">
+            </div>
+        </div>
+        <table class="table table-condensed highlight tab-lcodsgrupo" id="tab-lcodsgrupo">
+            <thead class="tabcabec">
+                <tr>
+                    <th>#</th>
+                    <th>Grupo</th>
+                    <th>Proyecto</th>
+                    <th>F.traslado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="bodylcodsgrupo"></tbody>
+        </table>
+        <div align="right">
+            <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+            <i class="fa fa-times"></i>
+            <span><strong>SALIR</strong></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!--MODAL LISTA DE NIPLES-->
+
+<div class="modal bottom-sheet listdetniple">
+    <div class="modal-content">
+        <div class="row">
+            <div class="input-field col">
+                <h5 class="lblnipcmat"></h5>
+            </div>
+            <div class="input-field col">
+                <h5 class="lblnipdesmat"></h5>
+            </div>
+            <div class="input-field col">
+                <h5 class="lblnipmedmat"></h5>
+            </div>
+            <div class="input-field col" style="display:none">
+                <h5 class="lblnipedcbr"></h5>
+            </div>
+            <div class="input-field col" style="display:none">
+                <h5 class="lblnipedcmod"></h5>
+            </div>
+            <div class="input-field col">
+                <button type="button" class="btn waves-effect teal lighten-1 btnsavdetniple">
+                    <i class="fa fa-floppy-o"></i>
+                    <span><strong>Guardar</strong></span>
+                </button>
+            </div>
+            <div class="input-field col">
+                <button style="height:36px;margin-top:0px;width:160px;" type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+                    <i class="fa fa-times"></i>
+                    <span><strong>SALIR</strong></span>
+                </button>
+            </div>
+        </div>
+        <hr>
+        <table class="table table-condensed highlight tab-detniple" id="tab-detniple">
+            <thead class="tabcabec">
+                <tr>
+                    <th>#</th>
+                    <th>Cantidad</th>
+                    <th>Metrado</th>
+                    <th>Tipo</th>
+                    <th>Enviado</th>
+                    <th>Enviar</th>
+                </tr>
+            </thead>
+            <tbody class="bodydetniple"></tbody>
+        </table>
+    </div>
+
+</div>
+
+{% csrf_token %}
+
+
+{% endblock %}

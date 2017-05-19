@@ -509,11 +509,11 @@ class Balance(models.Model):
 
     def __unicode__(self):
         return '%s %s %s %f' % (self.materials_id, self.brand.brand, self.model.model, self.balance)
-# 2017-05-18 16:54:27
-# @Juan Julcapari
-'''
-    Block Models for Tools
-'''
+"""
+Block Models for Tools
+2017-05-18 16:54:27
+@Juan Julcapari
+"""
 class Herramienta(models.Model):
     herramienta_id = models.CharField(max_length=15, primary_key=True)
     nombre = models.CharField(max_length=200)
