@@ -817,8 +817,8 @@ class ListPurchase(JSONResponseMixin, TemplateView):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         try:
-            context['servreport'] = SettingsApp.objects.values().get(flag=True)['serverreport']
             context = dict()
+            context['servreport'] = SettingsApp.objects.values().get(flag=True)['serverreport']
             if request.is_ajax():
                 try:
                     if 'code' in request.GET:

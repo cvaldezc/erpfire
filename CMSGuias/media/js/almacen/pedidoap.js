@@ -752,7 +752,7 @@ listgrupo = function(){
                 "<td>{{ nameemple }}</td>" +
                 "<td>{{ fechtrasl }}</td>" +
                 "<td>" +
-                "<a class=\"transparent btnviewpdf\" style=\"border:none;font-size:22px;\" href=\""+ response['servreport'] + "orders/group/view?idgroup={{ codgrupo_id }}\"> " +
+                "<a class=\"transparent btnviewpdf\" style=\"border:none;font-size:22px;\" href=\""+ response['servreport'] + "order/group?groupid={{ codgrupo_id }}\"> " +
                 "<i class=\"fa fa-file-pdf-o\"></i></a></td>" +
                 "</tr>";
 

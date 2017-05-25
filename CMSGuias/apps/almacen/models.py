@@ -608,7 +608,7 @@ class GrupoPedido(models.Model):
     estado = models.CharField(max_length=2)
 
     def __unicode__(self):
-        return '{0} {1} {2}'.format(self.codgroup_id, self.register, self.estado)
+        return '{} {} {}'.format(self.codgrupo_id, self.registro, self.estado)
 
 
 class detGrupoPedido(models.Model):
