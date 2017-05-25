@@ -7,7 +7,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Max
 
 from CMSGuias.apps.almacen.models import (
-    Pedido, GuiaRemision, Suministro, NoteIngress, Restoration, devolucionHerra)
+    Pedido, GuiaRemision, Suministro, NoteIngress, Restoration, devolucionHerra,
+    GrupoPedido)
 from CMSGuias.apps.logistica.models import Cotizacion, Compra, ServiceOrder
 from CMSGuias.apps.ventas.models import Proyecto
 from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado, Rubro
@@ -697,6 +698,28 @@ def GenerateIdGuiaDev():
         else:
             counter = 1
         id = '%s%s' % ('DO', '{:0>5d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+"""
+add 2017-05-18 17:25:51
+@ Juan Julcapari
+"""
+def GenerateIdGrupoPedido():
+    """
+    generate group order
+    """
+    id = ""
+    try:
+        code = GrupoPedido.objects.aggregate(max=Max('codgrupo_id'))
+        id = code['max']
+        if id is not None:
+            counter = int(id[2:7])
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('GR', '{:0>5d}'.format(counter))
     except ObjectDoesNotExist, e:
         raise e
     return id

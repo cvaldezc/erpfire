@@ -11,7 +11,13 @@ from CMSGuias.apps.logistica.models import Compra
 
 
 class Pedido(models.Model):
+    """
+    struct for storage order
+    """
     def url(self, filename):
+        """
+        function for load order
+        """
         ext = filename.split('.')[-1]
         year = self.proyecto.registrado.strftime('%Y')
         ruta = 'storage/projects/%s/%s/orders/%s.%s' % (
@@ -38,6 +44,7 @@ class Pedido(models.Model):
     status = models.CharField(max_length=2, null=False, default='PE')
     flag = models.BooleanField(default=True)
     orderfile = models.FileField(upload_to=url, null=True, blank=True)
+    stgrupo = models.BooleanField(blank=True, default=True)
 
     audit_log = AuditLog()
 
@@ -58,6 +65,8 @@ class Detpedido(models.Model):
     tag = models.CharField(max_length=1, default='0', null=False)
     spptag = models.BooleanField(default=False)
     comment = models.CharField(max_length=250, default='', null=True)
+    cantenv = models.FloatField(blank=True, default=0)
+    flagcantenv = models.BooleanField(blank=True, default=False)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -85,6 +94,9 @@ class tmppedido(models.Model):
 
 
 class Niple(models.Model):
+    """
+    class for define struct for niples
+    """
     pedido = models.ForeignKey(Pedido, to_field='pedido_id')
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproyecto = models.ForeignKey(
@@ -109,6 +121,8 @@ class Niple(models.Model):
     comment = models.CharField(
         max_length=250, default='', null=True, blank=True)
     related = models.IntegerField(null=True, blank=True, default=0)
+    cantenv = models.FloatField(blank=True, default=0)
+    flagcantenv = models.BooleanField(blank=True, default=False)
 
     audit_log = AuditLog()
 
@@ -495,10 +509,11 @@ class Balance(models.Model):
 
     def __unicode__(self):
         return '%s %s %s %f' % (self.materials_id, self.brand.brand, self.model.model, self.balance)
-
-'''
-    Block Models for Tools
-'''
+"""
+Block Models for Tools
+2017-05-18 16:54:27
+@Juan Julcapari
+"""
 class Herramienta(models.Model):
     herramienta_id = models.CharField(max_length=15, primary_key=True)
     nombre = models.CharField(max_length=200)
@@ -573,3 +588,60 @@ class MovInventario(models.Model):
     cantidad = models.IntegerField(null=True, blank=True)
     estado = models.CharField(max_length=10, null=True, blank=True)
     registro = models.DateTimeField(auto_now_add=True)
+
+
+"""
+Models for group order storages
+2017-05-18 16:55:35
+@ Juan Julcapari
+"""
+class GrupoPedido(models.Model):
+    """
+    header for document group orders
+    """
+    codgrupo_id = models.CharField(max_length=7, primary_key=True)
+    proyecto = models.ForeignKey(Proyecto, to_field="proyecto_id")
+    empdni = models.ForeignKey(Employee, related_name='AuthAsEmployeegr', null=True, blank=True)
+    registro = models.DateTimeField(auto_now=True)
+    fechtraslado = models.DateField(null=True, blank=True)
+    flagdetalle = models.BooleanField()
+    estado = models.CharField(max_length=2)
+
+    def __unicode__(self):
+        return '{} {} {}'.format(self.codgrupo_id, self.registro, self.estado)
+
+
+class detGrupoPedido(models.Model):
+    """
+    details of document group orders
+    """
+    codgrupo = models.ForeignKey(GrupoPedido, to_field='codgrupo_id')
+    pedido = models.ForeignKey(Pedido, to_field='pedido_id')
+    material = models.ForeignKey(Materiale, to_field='materiales_id')
+    marca = models.ForeignKey(Brand, to_field='brand_id')
+    model = models.ForeignKey(Model, to_field='model_id')
+    cantidad = models.FloatField()
+    flag = models.BooleanField()
+
+    def __unicode__(self):
+        return '{0} {1} {2} {3}'.format(self.codgrupo, self.pedido, self.material, self.cantidad)
+
+
+class GrupoPedNiple(models.Model):
+    """
+    details for detail of group order storage fields as type measure, order, brand, model
+    """
+    codgrupo = models.ForeignKey(GrupoPedido, to_field='codgrupo_id')
+    pedido = models.ForeignKey(Pedido, to_field='pedido_id')
+    material = models.ForeignKey(Materiale, to_field='materiales_id')
+    marca = models.ForeignKey(Brand, to_field='brand_id')
+    model = models.ForeignKey(Model, to_field='model_id')
+    cantidad = models.FloatField()
+    metrado = models.FloatField()
+    tipo = models.CharField(max_length=1)
+    idref = models.ForeignKey(Niple, to_field='id')
+
+    def __unicode__(self):
+        return '{} {} {} {} {} {}'.format(
+            self.codgrupo, self.pedido, self.material, self.tipo, self.cantidad, self.metrado)
+

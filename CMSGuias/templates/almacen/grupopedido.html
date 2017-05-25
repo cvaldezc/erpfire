@@ -1,0 +1,134 @@
+<!--
+add 2017-05-19 09:02:22
+@ Juan Julcapari
+-->
+{% extends "basemd.html" %}
+{% block title %}
+  Pedido
+{% endblock %}
+{% block menu %}
+  {% include "menus/storagemd.htm" %}
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/media/css/almacen/pedidoap.css">
+<script src="/media/js/almacen/pedidoap.js"></script>
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+
+<div style="margin:1%">
+    <div class="card">
+        <div class="card-action" style="">
+            <div class="input-field col s9">
+                <i class="prefix fa fa-search"></i>
+                <input class="txtbusgr" name="txtbusgr" style="width:90%;" id="txtbusgr" type="search" placeholder="Codigo de grupo">
+            </div>
+        </div>
+    </div>
+    <div style="margin:20px;">
+        <input onclick="javascript:viewgrupoxest();" name="estgr" type="radio" id="radpdfpe" checked="true"/>
+        <label for="radpdfpe" style="font-size:15px;font-weight:bold;color:black;">Por Generar PDF</label>
+        <input onclick="javascript:viewgrupoxest();" name="estgr" type="radio" id="radpdfge"/>
+        <label for="radpdfge" style="font-size:15px;font-weight:bold;color:black;">PDF Generados</label>
+    </div>
+    <div id="divtablegrupo">
+        <table class="table table-condensed highlight tab-grupo responsive-table" id="tab-grupo">
+            <thead class="brown lighten-4">
+                <tr>
+                    <th class="center-align col-1">#</th>
+                    <th class="center-align">Codigo</th>
+                    <th class="center-align">Proyecto</th>
+                    <th class="center-align">Generado Por</th>
+                    <th class="center-align">F.Traslado</th>
+                    <th class="center-align"></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="modal eddetgrupo">
+    <div class="modal-content">
+        <div class="row">
+            <div class="input-field col">
+                <h5>Grupo: </h5>
+            </div>
+            <div class="input-field col">
+                <h5 class="lblgrupo"></h5>
+            </div>
+            <div class="input-field col s6">
+                <i class="prefix fa fa-search"></i>
+                <input class="txtbusdetgroup" name="txtbusdetgroup" style="width:90%;" id="txtbusdetgroup" type="search" placeholder="Pedido o Material">
+            </div>
+        </div>
+        <table class="table table-condensed highlight tab-detgrupo" id="tab-detgrupo">
+            <thead class="tabcabec">
+                <tr>
+                    <th class="col5" style="text-align:center">#</th>
+                    <th class="col10">Pedido</th>
+                    <th class="col10">Codigo</th>
+                    <th class="col35">Material</th>
+                    <th class="col10">Medida</th>
+                    <th class="col10">Marca</th>
+                    <th class="col10">Modelo</th>
+                    <th class="col5">Cant.</th>
+                    <th class="col5"></th>
+                </tr>
+            </thead>
+            <tbody class="bodytabdetgrupo"></tbody>
+        </table>
+        <div align="right">
+            <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+            <i class="fa fa-times"></i>
+            <span><strong>SALIR</strong></span>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+
+
+<div class="modal bottom-sheet leditdetnip">
+    <div class="modal-content">
+        <div class="row">
+            <div class="input-field col">
+                <h5 class="lblednipcodmat"></h5>
+            </div>
+            <div class="input-field col">
+                <h5 class="lblednipnamemat"></h5>
+            </div>
+            <div class="input-field col">
+                <h5 class="lblednipmedmat"></h5>
+            </div>
+            <div class="input-field col" style="margin-left:20%">
+                <button style="height:36px;margin-top:0px;width:160px;" type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+                    <i class="fa fa-times"></i>
+                    <span><strong>SALIR</strong></span>
+                </button>
+            </div>
+        </div>
+        <hr>
+        <table class="table table-condensed highlight tab-eddetnip" id="tab-eddetnip">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Cantidad</th>
+                    <th>Metrado</th>
+                    <th>Tipo</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+{% csrf_token %}
+{% endblock %}

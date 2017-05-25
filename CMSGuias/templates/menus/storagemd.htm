@@ -42,6 +42,11 @@
     <li><a class="black-text" href="{% url 'vista_list_approved' %}"> Aprobados</a></li>
     <li class="divider"></li>
     <li><a href="{% url 'vista_summary_orders' %}" class="grey-text text-darken-1"> Para Suministro</a></li>
+    <li class="divider"></li>
+    <!-- block return item -->
+    <li><a class="black-text" href="{% url 'viewpedidopap' %}">Agrupar</a></li>
+    <li><a class="black-text" href="{% url 'viewgrupoped' %}">Grupos Generados</a></li>
+    <!-- end block -->
   </ul>
   <ul id="user-setting" class="dropdown-content">
     <li><a class="black-text">Cargo: {{ user.get_profile.empdni.charge.cargos }}</a></li>
