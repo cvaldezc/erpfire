@@ -1621,8 +1621,7 @@ class GrupPedido(JSONResponseMixin, TemplateView):
 
                 if 'listgrupo' in request.GET:
                     lgrupo = []
-                    for x in GrupoPedido.objects.filter(
-                        flagdetalle=True, estado=request.GET.get('estgr')).order_by('codgrupo_id'):
+                    for x in GrupoPedido.objects.filter(estado=request.GET.get('estgr')).order_by('codgrupo_id'):
                         lgrupo.append({
                             'codgrupo_id': x.codgrupo_id,
                             'codproy': x.proyecto_id,
@@ -1631,7 +1630,7 @@ class GrupPedido(JSONResponseMixin, TemplateView):
                             'nameemple': x.empdni.lastname + ', ' + x.empdni.firstname,
                             'fechtrasl': x.fechtraslado
                             })
-                        context['lgrupo'] = lgrupo
+                    context['lgrupo'] = lgrupo
                     context['servreport'] = SettingsApp.objects.values().get(flag=True)['serverreport']
                     context['status'] = True
 

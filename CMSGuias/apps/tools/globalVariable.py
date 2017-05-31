@@ -90,7 +90,7 @@ months_name = {
     '12': 'Diciembre'
 }
 # VARABLE FOR MAILS CC
-mailcc = 'sandra.atencio@icrperusa.com'
+mailcc = ''
 # List of emails
 emails = [
     # 'almacen@icrperusa.com',
