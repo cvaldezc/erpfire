@@ -15,9 +15,12 @@ $(document).ready ->
     $("button[name=esave]").on "click", editMaterial
     $(document).on "click", "[name=btn-del]", deleteMaterial
     $(".btn-trash").on "click", deleteAll
-    $(".btn-read").on "click", -> $(".mfile").modal "show"
+    $(".btn-read").on "click", ->
+        $(".mfile").modal "show"
+        return
     $(".show-input-file-temp").click ->
         $("input[name=read]").click()
+        return
     $("[name=btn-upload]").on "click", uploadReadFile
     $(".show-bedside").on "click", showBedside
     $("input[name=discount],input[name=edist]").on "blur", blurRange
@@ -46,6 +49,18 @@ $(document).ready ->
         menubar: false
         toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify"
         toolbar_items_size: 'small'
+    $('.observationmaterials').trumbowyg
+        btns:[
+            ['viewHTML'],
+            ['formatting'],
+            'btnGrp-semantic',
+            ['superscript', 'subscript'],
+            ['link'],
+            'btnGrp-justify',
+            'btnGrp-lists',
+            ['horizontalRule'],
+            ['removeformat'],
+            ['fullscreen']]
     return
 
 showMaterials = (event) ->
@@ -156,7 +171,7 @@ listTmpBuy = (event) ->
 showObservation = ->
     console.log $(this).a
     $(".odesc").text "#{$(this).attr "data-desc"} #{$(this).attr "data-brand"} #{$(this).attr "data-model"}"
-    $("#obs").html "#{$(this).attr "data-obs"}"
+    $('.observationmaterials').trumbowyg 'html', "#{$(this).attr "data-obs"}"
     $("#saveComment").val $(this).val()
     $("#mobservation").modal "show"
     return
@@ -420,14 +435,14 @@ saveOrderPurchase = ->
 
 saveComment = ->
     data =
-        comment: $("#obs").val()
+        comment: $('.observationmaterials').trumbowyg 'html'
         saveComment: true
         id: $(this).val()
         'csrfmiddlewaretoken': $("[name=csrfmiddlewaretoken]").val()
     $.post "", data, (response) ->
         console.log response
         if response.status
-            $("#obs").val()
+            $('.observationmaterials').trumbowyg 'html', ''
             listTmpBuy()
             $("#mobservation").modal "hide"
             return

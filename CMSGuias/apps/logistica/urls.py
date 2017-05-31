@@ -42,4 +42,7 @@ urlpatterns = patterns(
     url(r'^services/orders/edit/(?P<oservice>\w{10})/$',
         EditServiceOrder.as_view(), name='edorderservice_view'),
     url(r'^services/orders/$', ListServiceOrders.as_view(), name='oslist_view'),
+    # add @Christian 2017-05-31 17:24:27
+    url(r'^purchase/edit/(?P<purchaseid>\w{10})/', EditOrderPurchase.as_view(),
+        name='logisticspurchaseedit'),
 )

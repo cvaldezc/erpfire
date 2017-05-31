@@ -923,7 +923,7 @@ class ListPurchase(JSONResponseMixin, TemplateView):
                     context['status'] = False
                 return self.render_to_json_response(context)
             obj = Compra.objects.filter(
-                    status='PE', flag=True).order_by('-registrado')
+                    status='PE', flag=True).order_by('-registrado')[:25]
             context['document'] = Documentos.objects.filter(
                                     flag=True).order_by('documento')
             context['payment'] = FormaPago.objects.filter(
@@ -1045,6 +1045,23 @@ class ListPurchase(JSONResponseMixin, TemplateView):
                 context['raise'] = e.__str__()
                 context['status'] = False
             return self.render_to_json_response(context)
+
+
+class EditOrderPurchase(JSONResponseMixin, TemplateView):
+"""
+add class for edir order purchase
+@Christian @status new
+2017-05-31 17:09:39
+"""
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                return self.render_to_json_response(kwargs)
+            return render(request, 'logistics/purchaseedit.html', kwargs)
+        except Exception as ex:
+            raise Http404(ex)
 
 
 class LoginSupplier(JSONResponseMixin, TemplateView):
