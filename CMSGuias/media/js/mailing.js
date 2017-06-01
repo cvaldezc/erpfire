@@ -54,3 +54,4 @@ var mailing;
     }());
     mailing.Mailing = Mailing;
 })(mailing || (mailing = {}));
+//# sourceMappingURL=mailing.js.map

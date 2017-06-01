@@ -1048,11 +1048,11 @@ class ListPurchase(JSONResponseMixin, TemplateView):
 
 
 class EditOrderPurchase(JSONResponseMixin, TemplateView):
-"""
-add class for edir order purchase
-@Christian @status new
-2017-05-31 17:09:39
-"""
+    """
+    add class for edit order purchase
+    @Christian @status new
+    2017-05-31 17:09:39
+    """
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):

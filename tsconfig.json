@@ -2,12 +2,20 @@
     "sourceMap": true,
     "compileOnSave": true,
     "compilerOptions": {
+        "module": "commonjs",
         "target": "es5",
+        "noImplicitAny": false,
+        "sourceMap": true,
         "watch": true,
         "types": [
-            "angularjs",
-            "jquery"
-        ]
+            "angular",
+            "jquery",
+            "node"
+        ],
+        "typeRoots": [
+            // add path to @types
+            "node_modules/@types"
+         ]
     },
     "include": [ "./CMSGuias/media/js/*" ],
     "exclude": [

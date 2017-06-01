@@ -2,12 +2,24 @@
 {% block title %}
     Edit Purchase - {{ purchaseid }}
 {% endblock title %}
+
+{% block menu %}
+    {% include "menus/logisticsmd.htm" %}
+{% endblock menu %}
+
 {% block content %}
-<section>
+<section ng-app="app" ng-controller="MarvelController">
     <h4>Editar Orden de Compra {{ purchaseid }}</h4>
+    <h1 ng-model="name"></h1>
+
+    {% verbatim %}
+        <ul>
+            <li ng-repeat="x in heroes">{{x}}</li>
+        </ul>
+    {% endverbatim %}
 </section>
 <!-- block scripts -->
-<script src="{{MEDIA_URL}}vendor/angularjs/angular.min/js"></script>
-<script src="{{MEDIA_URL}}vendor/angular-cookies/angular-cookies.min.js"></script>
-<script src="{{MEDIA_URL}}js/logistics/editpurchase.js"></script>
+<script src="{{MEDIA_URL}}vendor/angularjs/angular.min.js"></script>
+<!--<script src="{{MEDIA_URL}}vendor/angular-cookies/angular-cookies.min.js"></script>-->
+<script src="{{MEDIA_URL}}js/logistics/viewpurchase.js"></script>
 {% endblock content %}
