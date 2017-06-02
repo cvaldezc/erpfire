@@ -1,9 +1,9 @@
 {
-    "sourceMap": true,
+    "sourceMap": false,
     "compileOnSave": true,
     "compilerOptions": {
-        "module": "commonjs",
         "target": "es5",
+        "module": "commonjs",
         "noImplicitAny": false,
         "sourceMap": true,
         "watch": true,
@@ -17,7 +17,7 @@
             "node_modules/@types"
          ]
     },
-    "include": [ "./CMSGuias/media/js/*" ],
+    "include": [ "CMSGuias/media/js/*" ],
     "exclude": [
         "node_modules",
         "**/*.spec.ts"
