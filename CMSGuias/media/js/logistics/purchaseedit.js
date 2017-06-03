@@ -19,10 +19,9 @@ var Controller;
             this.$log = $log;
             this.proxy = proxy;
             this.purchase = purchase;
-            // this.$scope.purchaseid = this._purchaseid;
-            // this.purchase = "OC1700000";
             this.$log.info("controller ready!");
             this.name = 'Christian';
+            angular.element("select").select2();
         }
         PurchaseController.prototype.getBedside = function (id) {
             this.$log.log("This click here!");

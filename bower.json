@@ -37,6 +37,7 @@
     "trumbowyg": "^2.2.0",
     "chosen": "^1.6.2",
     "materialize": ">=0.97.8",
-    "showdown": "^1.6.4"
+    "showdown": "^1.6.4",
+    "select2": "4.0.3"
   }
 }

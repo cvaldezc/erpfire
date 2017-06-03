@@ -17,20 +17,35 @@ module Service {
 }
 
 module Controller {
+
     interface IPurchase {
         purchase: string;
     }
+    class Method {
+
+    }
     export class PurchaseController implements IPurchase {
         static $inject = ['$log', 'sproxy'];
-        // public purchaseid: string;
-        // public getBedside: (id: string) => void;
         private name: string;
-
+        private docpayment: object;
+        private methodpayment: object;
         constructor(private $log: angular.ILogService, private proxy: Service.Proxy, public purchase: string) {
-            // this.$scope.purchaseid = this._purchaseid;
-            // this.purchase = "OC1700000";
             this.$log.info("controller ready!");
             this.name = 'Christian';
+            angular.element("select").select2();
+        }
+
+        getDataInitiliaze() {
+            this.proxy.get("/", {'initialize': true}).then(
+                (response: object) => {
+                    if (response['status']) {
+
+                    }
+                },
+                (error: any) => {
+                    this.$log.debug("ERROR ", error);
+                }
+            )
         }
 
         getBedside(id: string) {
