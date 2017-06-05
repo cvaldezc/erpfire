@@ -4,7 +4,7 @@
     {% include "menus/logisticsmd.htm" %}
 {% endblock menu %}
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}vendor/select2/dist/css/select2.min.css">
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
 <section ng-app="app" ng-controller="ctrlpurchase as vm">
     <h4>Editar Orden de Compra {{ purchaseid }}</h4>
     <a href="" class="waves-effect btn-flat grey lighten-5 grey-text text-darken-3">
@@ -15,8 +15,8 @@
     <div class="card-panel">
         <div class="row">
             <div class="col l6 m6 s12 input-field">
-                <label for="supplier">PROVEEDOR</label>
-                <select id="supplier" class="browser-default">
+                <label for="supplier" class="active">PROVEEDOR</label>
+                <select id="supplier" class="browser-default browser-default supplier">
                     <option value="">-- SELECCIONE --</option>
                 </select>
             </div>
@@ -25,29 +25,34 @@
                 <label for="dotarrival">Lugar de Entrega</label>
             </div>
             <div class="col l4 m4 s12 input-field">
-                <select class="" name="document">
-                    <option value="">-- SELECCIONE --</option>
-                </select>
                 <label class="active" for="document">Documente de Pago</label>
-            </div>
-            <div class="col l4 m4 s12 input-field">
-                <select class="" name="method">
+                <select class="browser-default chosen-select documentpayment" name="document">
                     <option value="">-- SELECCIONE --</option>
+                    <option value="{{x.pk}}" ng-repeat="x in vm.docpayment">{{x.fields.documento}}</option>
                 </select>
+            </div>
+
+            <div class="col l4 m4 s12 input-field">
                 <label class="active" for="method">Metodo de Pago</label>
-            </div>
-            <div class="col l4 m4 s12 input-field">
-                <select class="" name="currency">
+                <select class="browser-default chosen-select methodpayment" name="method">
                     <option value="">-- SELECCIONE --</option>
+                    <option value="" ng-repeat="x in vm.methodpayment"></option>
                 </select>
+            </div>
+
+            <div class="col l4 m4 s12 input-field">
                 <label class="active" for="currency">Moneda</label>
+                <select class="browser-default chosen-select currency" name="currency" >
+                    <option value="">-- SELECCIONE --</option>
+                    <option value="" ng-repeat="x in vm.currency"></option>
+                </select>
             </div>
         </div>
     </div>
     {% endverbatim %}
 </section>
 <!-- block scripts -->
-<script defer src="{{MEDIA_URL}}vendor/select2/dist/js/select2.min.js"></script>
+<script defer src="{{MEDIA_URL}}vendor/chosen/chosen.jquery.js"></script>
 <script defer src="{{MEDIA_URL}}vendor/angularjs/angular.min.js"></script>
 <script defer src="{{MEDIA_URL}}vendor/angular-cookies/angular-cookies.min.js"></script>
 <script defer src="{{MEDIA_URL}}js/logistics/purchaseedit.js"></script>

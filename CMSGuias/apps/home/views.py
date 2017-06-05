@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#
+# !/usr/b'json'
+# in/env python
 # -*- coding: utf-8 -*-
 #
 import json
@@ -39,7 +41,7 @@ class JSONResponseMixin(object):
         )
 
     def convert_context_to_json(self, context):
-        return simplejson.dumps(context, encoding='utf-8')
+        return json.dumps(context, encoding='utf-8')
 
 
 class HomeManager(ListView):
@@ -1171,4 +1173,89 @@ class DataMaterials(JSONResponseMixin, View):
                     context['status'] = False
                 return self.render_to_json_response(context)
         except TemplateDoesNotExist, e:
-            raise Http404(e.__str__())
+            raise Http404(str(e))
+
+
+class DocumentPayment(JSONResponseMixin, View):
+    """
+    keep document payment
+    @Christian
+    2017-06-05 09:38:18
+    """
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            # print request.is_ajax()
+            if request.is_ajax():
+                try:
+                    if 'list' in request.GET:
+                        kwargs['list'] = json.loads(
+                            serializers.serialize('json',
+                            Documentos.objects.filter(flag=True)),
+                            encoding='utf-8')
+                        kwargs['status'] = True
+                except ObjectDoesNotExist as oex:
+                    kwargs['status'] = False
+                    kwargs['raise'] = str(oex)
+                return self.render_to_json_response(kwargs)
+            else:
+                return render(request, '', kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)
+
+
+class MethodPayment(JSONResponseMixin, View):
+    """
+    Payment
+    @Christian
+    2017-06-05 09:38:18
+    """
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    if 'list' in request.GET:
+                        kwargs['list'] = json.loads(
+                            serializers.serialize('json',
+                            FormaPago.objects.filter(flag=True)),
+                            encoding='utf-8')
+                        kwargs['status'] = True
+                except ObjectDoesNotExist as oex:
+                    kwargs['status'] = False
+                    kwargs['raise'] = str(oex)
+                return self.render_to_json_response(kwargs)
+            else:
+                return render(request, '', kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)
+
+
+class Currency(JSONResponseMixin, View):
+    """
+    Currency
+    @Christian
+    2017-06-05 10:14:05
+    """
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    kwargs['list'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            Moneda.objects.filter(flag=True)),
+                        encoding='utf-8')
+                    kwargs['status'] = True
+                except ObjectDoesNotExist as oex:
+                    kwargs['raise'] = str(oex)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+            else:
+                return render(request, '', kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)

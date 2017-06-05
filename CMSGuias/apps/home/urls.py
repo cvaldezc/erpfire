@@ -145,6 +145,14 @@ charge_urls = patterns(
     '',
     url(r'^$', ChargeView.as_view()),
 )
+# @Christian 2017-06-05 09:30:37
+keepurls = patterns(
+    '',
+    url('document/payment/$', DocumentPayment.as_view(), name='homekeepdocumentpayment'),
+    url('method/payment/$', MethodPayment.as_view(), name='homekeepmethodpayment'),
+    url('currency/$', Currency.as_view(), name='homekeepcurrency'),
+)
+
 # urls main
 urlpatterns = patterns(
     '',
@@ -165,4 +173,6 @@ urlpatterns = patterns(
     url(r'^manpower/', include(manpower_urls)),
     url(r'^tools/', include(tools_urls)),
     url(r'^charge/', include(charge_urls)),
+    # @Christian mofidy 2017-06-05 09:29:49
+    url(r'^keep/', include(keepurls)),
 )
