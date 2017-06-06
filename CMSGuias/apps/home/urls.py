@@ -148,9 +148,10 @@ charge_urls = patterns(
 # @Christian 2017-06-05 09:30:37
 keepurls = patterns(
     '',
-    url('document/payment/$', DocumentPayment.as_view(), name='homekeepdocumentpayment'),
-    url('method/payment/$', MethodPayment.as_view(), name='homekeepmethodpayment'),
-    url('currency/$', Currency.as_view(), name='homekeepcurrency'),
+    url(r'^document/payment/$', DocumentPayment.as_view(), name='homekeepdocumentpayment'),
+    url(r'^method/payment/$', MethodPayment.as_view(), name='homekeepmethodpayment'),
+    url(r'^currency/$', Currency.as_view(), name='homekeepcurrency'),
+    url(r'^supplier/$', SupplierKeep.as_view(), name='homekeepsupplier'),
 )
 
 # urls main

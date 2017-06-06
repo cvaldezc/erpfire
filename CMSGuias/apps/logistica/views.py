@@ -1058,6 +1058,14 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         try:
             if request.is_ajax():
+                if 'purchase' in request.GET:
+                    kwargs['purchase'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            Compra.objects.filter(compra_id=request.GET['purchase'])
+                        )
+                    )[0]
+                    kwargs['status'] = True
                 return self.render_to_json_response(kwargs)
             return render(request, 'logistics/purchaseedit.html', kwargs)
         except Exception as ex:

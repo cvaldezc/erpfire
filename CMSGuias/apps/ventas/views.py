@@ -236,6 +236,14 @@ class ProjectsList(JSONResponseMixin, TemplateView):
                             ~Q(status='DA')
                             ).order_by('-proyecto_id')))
                     context['status'] = True
+                if 'projects' in request.GET:
+                    context['list'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            Proyecto.objects.filter(status=request.GET['status']).order_by('nompro')
+                        )
+                    )
+                    context['status'] = True
                 if 'getstatus' in request.GET:
                     gs = Proyecto.objects.all().distinct('status').order_by('status')
                     context['gstatus'] = [{'key': x.status, 'val': globalVariable.status[x.status]} for x in gs]

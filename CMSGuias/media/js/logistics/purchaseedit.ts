@@ -21,31 +21,95 @@ module Service {
 module Controller {
 
     interface IPurchase {
-        purchase: string;
+        purchase: object;
     }
 
     export class PurchaseController implements IPurchase {
 
         static $inject = ['$log', 'sproxy'];
         private name: string;
-        private docpayment: object;
-        private methodpayment: object;
-        private currency: object;
+        private docpayments: object;
+        private methodpayments: object;
+        private currencies: object;
+        private suppliers: object;
+        private projects: object;
 
-        constructor(private $log: angular.ILogService, private proxy: Service.Proxy, public purchase: string) {
+        constructor(private $log: angular.ILogService, private proxy: Service.Proxy, public purchase: object) {
             this.$log.info("controller ready!");
             this.name = 'Christian';
+            this.getProjects();
+            this.getSuppliers();
             this.getDocumentPayment();
             this.getMethodPayment();
             this.getCurrency();
             angular.element("select").chosen({width: "100%"});
+            angular.element("#observation").trumbowyg({
+                btns: [
+                    ['viewHTML'],
+                    ['formatting'],
+                    'btnGrp-semantic',
+                    ['superscript', 'subscript'],
+                    ['link'],
+                    'btnGrp-justify',
+                    'btnGrp-lists',
+                    ['horizontalRule'],
+                    ['removeformat'],
+                    ['fullscreen']
+                ]
+            });
+        }
+
+        initialize() {
+            this.purchase['fields']['projects'] = this.purchase['fields']['projects'].split(',');
+            angular.element("#observation").trumbowyg("html", this.purchase['fields']['observation']);
+            setTimeout(() => {
+                angular.element(".projects").trigger("chosen:updated");
+                angular.element(".suppliers").trigger("chosen:updated");
+                angular.element(".documentpayment").trigger("chosen:updated");
+                angular.element(".methodpayment").trigger("chosen:updated");
+                angular.element(".currency").trigger("chosen:updated");
+            }, 400);
+        }
+
+        getPurchase() {
+            this.proxy.get("", {'purchase': this.purchase['id']}).then((response: object) => {
+                if (response['data']['status']) {
+                    this.purchase['fields'] = response['data']['purchase']['fields'];
+                    this.initialize();
+                }
+            });
+        }
+
+        getProjects() {
+            this.proxy.get("/sales/projects/", {'projects': true, 'status': 'AC'}).then((response: object) => {
+                if (response['data']['status']) {
+                    this.projects = response['data']['list'];
+                    setTimeout(() => {
+                        angular.element(".projects").trigger("chosen:updated");
+                        this.getPurchase();
+                    }, 900);
+                }
+            });
+        }
+
+        getSuppliers() {
+            this.proxy.get("/keep/supplier/", {'list': true}).then((response: object) => {
+                if (response['data']['status']){
+                    this.suppliers = response['data']['list'];
+                    setTimeout(() => {
+                        angular.element(".suppliers").trigger("chosen:updated");
+                    }, 800);
+                }
+            });
         }
 
         getDocumentPayment() {
             this.proxy.get("/keep/document/payment/", {'list': true}).then((response: object) => {
                 if (response['data']['status']){
-                    this.docpayment = response['data']['list'];
-                    angular.element(".documentpayment").trigger("chosen:updated");
+                    this.docpayments = response['data']['list'];
+                    setTimeout(() => {
+                        angular.element(".documentpayment").trigger("chosen:updated");
+                    }, 800);
                 }
             });
         }
@@ -54,8 +118,10 @@ module Controller {
             this.proxy.get("/keep/method/payment/", {'list': true}).then(
                 (response: object) => {
                     if (response['data']['status']) {
-                        this.methodpayment = response['data']['list'];
-                        angular.element(".methodpyment").trigger("chosen:updated");
+                        this.methodpayments = response['data']['list'];
+                        setTimeout(() => {
+                            angular.element(".methodpayment").trigger("chosen:updated");
+                        }, 800);
                     }
                 });
         }
@@ -64,8 +130,10 @@ module Controller {
             this.proxy.get("/keep/currency/", {'list': true}).then(
                 (response: object) => {
                     if (response['data']['status']) {
-                        this.currency = response['data']['list'];
-                        angular.element(".currency").trigger("chosen:updated");
+                        this.currencies = response['data']['list'];
+                        setTimeout(() => {
+                            angular.element(".currency").trigger("chosen:updated");
+                        }, 800);
                     }
                 });
         }

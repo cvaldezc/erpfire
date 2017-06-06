@@ -326,6 +326,20 @@ ul.tabs.idenred > .indicator {
   height: 100% !important;
   max-height: 100% !important;
 }
+.chosen-container {
+  margin-top: 10px;
+}
+.chosen-container a.chosen-single {
+  border: none;
+  border-bottom: 2px solid #9e9e9e;
+  border-radius: 0px;
+  height: 30px;
+  line-height: 30px;
+}
+.chosen-container ul.chosen-choices {
+  border: none;
+  border-bottom: 1px solid #9e9e9e;
+}
 @media screen and (max-width: 992px) {
   tbody tr td {
     padding: 15px 5px 15px 5px !important;

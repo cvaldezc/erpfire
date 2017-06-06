@@ -5,47 +5,90 @@
 {% endblock menu %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}vendor/trumbowyg/dist/ui/trumbowyg.min.css">
 <section ng-app="app" ng-controller="ctrlpurchase as vm">
     <h4>Editar Orden de Compra {{ purchaseid }}</h4>
-    <a href="" class="waves-effect btn-flat grey lighten-5 grey-text text-darken-3">
+    <input type="hidden" ng-init="vm.purchase['id']='{{purchaseid}}'">
+    <a href="{% url 'view_purchase_list' %}" class="waves-effect btn-flat grey lighten-5 grey-text text-darken-3">
         <i class="fa fa-arrow-left"></i>
         <span class="hide-on-small-only">REGRESAR</span>
     </a>
+    <button type="button" class="right waves-effect btn blue">
+        <i class="fa fa-floppy-o"></i>
+        <span class="hide-on-small-only">GUARDAR</span>
+    </button>
+    <a href="#" class="right btn-flat grey-text text-darken-3" ng-model="shead" ng-init="shead=true" ng-click="shead=!shead">
+        <i class="fa" ng-class="{'fa-chevron-up': shead, 'fa-chevron-down': !shead}"></i></a>
     {% verbatim %}
     <div class="card-panel">
-        <div class="row">
+        <div class="progress">
+            <div class="indeterminate"></div>
+        </div>
+        <div class="row" ng-show="shead">
             <div class="col l6 m6 s12 input-field">
-                <label for="supplier" class="active">PROVEEDOR</label>
-                <select id="supplier" class="browser-default browser-default supplier">
-                    <option value="">-- SELECCIONE --</option>
+                 <select id="supplier" class="browser-default browser-default suppliers" ng-model="vm.purchase['fields']['proveedor']">
+                    <!--<option value="">-- SELECCIONE --</option>-->
+                    <option value="{{x.pk}}" ng-repeat="x in vm.suppliers">{{x.pk}} {{x.fields.razonsocial}}</option>
                 </select>
+                <label for="supplier" class="active">Proveedor</label>
             </div>
             <div class="col l6 m6 s12 input-field">
-                <input type="text" name="dotarrival">
-                <label for="dotarrival">Lugar de Entrega</label>
+                <select id="projects" class="browser-default browser-default projects" multiple ng-model="vm.purchase['fields']['projects']">
+                    <option value="{{x.pk}}" ng-repeat="x in vm.projects">{{x.fields.nompro}}</option>
+                </select>
+                <label for="projects" class="active">Proyectos</label>
+            </div>
+            <div class="col l12 m12 s12 input-field">
+                <input type="text" name="dotarrival" ng-model="vm.purchase['fields']['lugent']">
+                <label for="dotarrival" ng-class="{'active': vm.purchase['fields']['lugent'] != null}">Lugar de Entrega</label>
             </div>
             <div class="col l4 m4 s12 input-field">
-                <label class="active" for="document">Documente de Pago</label>
-                <select class="browser-default chosen-select documentpayment" name="document">
-                    <option value="">-- SELECCIONE --</option>
-                    <option value="{{x.pk}}" ng-repeat="x in vm.docpayment">{{x.fields.documento}}</option>
+                <select class="browser-default chosen-select documentpayment" name="document" ng-model="vm.purchase['fields']['documento']">
+                    <!--<option value="">-- SELECCIONE --</option>-->
+                    <option value="{{x.pk}}" ng-repeat="x in vm.docpayments">{{x.fields.documento}}</option>
                 </select>
+                <label class="active" for="document">Documente de Pago</label>
             </div>
 
             <div class="col l4 m4 s12 input-field">
                 <label class="active" for="method">Metodo de Pago</label>
-                <select class="browser-default chosen-select methodpayment" name="method">
-                    <option value="">-- SELECCIONE --</option>
-                    <option value="" ng-repeat="x in vm.methodpayment"></option>
+                <select class="browser-default chosen-select methodpayment" name="method" ng-model="vm.purchase['fields']['pagos']">
+                    <!--<option value="">-- SELECCIONE --</option>-->
+                    <option value="{{x.pk}}" ng-repeat="x in vm.methodpayments">{{x.fields.pagos}}</option>
                 </select>
             </div>
 
             <div class="col l4 m4 s12 input-field">
                 <label class="active" for="currency">Moneda</label>
-                <select class="browser-default chosen-select currency" name="currency" >
-                    <option value="">-- SELECCIONE --</option>
-                    <option value="" ng-repeat="x in vm.currency"></option>
+                <select class="browser-default chosen-select currency" name="currency" ng-model="vm.purchase['fields']['moneda']">
+                    <!--<option value="">-- SELECCIONE --</option>-->
+                    <option value="{{x.pk}}" ng-repeat="x in vm.currencies">{{x.fields.moneda}}</option>
                 </select>
+            </div>
+            <div class="input-field col l2 m3 s12">
+                <input type="text" id="transfer" ng-model="vm.purchase['fields']['traslado']">
+                <label for="transfer" ng-class="{'active': vm.purchase['fields']['traslado'] != null}">Traslado</label>
+            </div>
+            <div class="input-field col l2 m3 s12">
+                <input type="text" id="quotation" ng-model="vm.purchase['fields']['cotizacion']">
+                <label for="quotation" ng-class="{'active': vm.purchase['fields']['cotizacion'] != null}">Cotización</label>
+            </div>
+            <div class="input-field col l3 m4 s12">
+                <input type="text" id="contact" ng-model="vm.purchase['fields']['contacto']">
+                <label for="contact" ng-class="{'active': vm.purchase['fields']['contacto'] != null}">Contanto</label>
+            </div>
+            <div class="file-field input-field col l5 m2 s12">
+                <div class="btn">
+                    <span>Deposito</span>
+                    <input type="file">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+                <a href="/media/storage{{vm.purchase['fields']['deposito']}}" ng-if="vm.purchase['fields']['deposito']"><i class="fa fa-file"></i></a>
+            </div>
+            <div class="input-field col l12 m12 s12">
+                <div id="observation"></div>
             </div>
         </div>
     </div>
@@ -55,5 +98,6 @@
 <script defer src="{{MEDIA_URL}}vendor/chosen/chosen.jquery.js"></script>
 <script defer src="{{MEDIA_URL}}vendor/angularjs/angular.min.js"></script>
 <script defer src="{{MEDIA_URL}}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{MEDIA_URL}}vendor/trumbowyg/dist/trumbowyg.min.js"></script>
 <script defer src="{{MEDIA_URL}}js/logistics/purchaseedit.js"></script>
 {% endblock content %}

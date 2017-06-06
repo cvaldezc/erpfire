@@ -24,17 +24,78 @@ var Controller;
             this.purchase = purchase;
             this.$log.info("controller ready!");
             this.name = 'Christian';
+            this.getProjects();
+            this.getSuppliers();
             this.getDocumentPayment();
             this.getMethodPayment();
             this.getCurrency();
             angular.element("select").chosen({ width: "100%" });
+            angular.element("#observation").trumbowyg({
+                btns: [
+                    ['viewHTML'],
+                    ['formatting'],
+                    'btnGrp-semantic',
+                    ['superscript', 'subscript'],
+                    ['link'],
+                    'btnGrp-justify',
+                    'btnGrp-lists',
+                    ['horizontalRule'],
+                    ['removeformat'],
+                    ['fullscreen']
+                ]
+            });
         }
+        PurchaseController.prototype.initialize = function () {
+            this.purchase['fields']['projects'] = this.purchase['fields']['projects'].split(',');
+            angular.element("#observation").trumbowyg("html", this.purchase['fields']['observation']);
+            setTimeout(function () {
+                angular.element(".projects").trigger("chosen:updated");
+                angular.element(".suppliers").trigger("chosen:updated");
+                angular.element(".documentpayment").trigger("chosen:updated");
+                angular.element(".methodpayment").trigger("chosen:updated");
+                angular.element(".currency").trigger("chosen:updated");
+            }, 400);
+        };
+        PurchaseController.prototype.getPurchase = function () {
+            var _this = this;
+            this.proxy.get("", { 'purchase': this.purchase['id'] }).then(function (response) {
+                if (response['data']['status']) {
+                    _this.purchase['fields'] = response['data']['purchase']['fields'];
+                    _this.initialize();
+                }
+            });
+        };
+        PurchaseController.prototype.getProjects = function () {
+            var _this = this;
+            this.proxy.get("/sales/projects/", { 'projects': true, 'status': 'AC' }).then(function (response) {
+                if (response['data']['status']) {
+                    _this.projects = response['data']['list'];
+                    setTimeout(function () {
+                        angular.element(".projects").trigger("chosen:updated");
+                        _this.getPurchase();
+                    }, 900);
+                }
+            });
+        };
+        PurchaseController.prototype.getSuppliers = function () {
+            var _this = this;
+            this.proxy.get("/keep/supplier/", { 'list': true }).then(function (response) {
+                if (response['data']['status']) {
+                    _this.suppliers = response['data']['list'];
+                    setTimeout(function () {
+                        angular.element(".suppliers").trigger("chosen:updated");
+                    }, 800);
+                }
+            });
+        };
         PurchaseController.prototype.getDocumentPayment = function () {
             var _this = this;
             this.proxy.get("/keep/document/payment/", { 'list': true }).then(function (response) {
                 if (response['data']['status']) {
-                    _this.docpayment = response['data']['list'];
-                    angular.element(".documentpayment").trigger("chosen:updated");
+                    _this.docpayments = response['data']['list'];
+                    setTimeout(function () {
+                        angular.element(".documentpayment").trigger("chosen:updated");
+                    }, 800);
                 }
             });
         };
@@ -42,8 +103,10 @@ var Controller;
             var _this = this;
             this.proxy.get("/keep/method/payment/", { 'list': true }).then(function (response) {
                 if (response['data']['status']) {
-                    _this.methodpayment = response['data']['list'];
-                    angular.element(".methodpyment").trigger("chosen:updated");
+                    _this.methodpayments = response['data']['list'];
+                    setTimeout(function () {
+                        angular.element(".methodpayment").trigger("chosen:updated");
+                    }, 800);
                 }
             });
         };
@@ -51,8 +114,10 @@ var Controller;
             var _this = this;
             this.proxy.get("/keep/currency/", { 'list': true }).then(function (response) {
                 if (response['data']['status']) {
-                    _this.currency = response['data']['list'];
-                    angular.element(".currency").trigger("chosen:updated");
+                    _this.currencies = response['data']['list'];
+                    setTimeout(function () {
+                        angular.element(".currency").trigger("chosen:updated");
+                    }, 800);
                 }
             });
         };

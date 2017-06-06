@@ -1192,7 +1192,7 @@ class DocumentPayment(JSONResponseMixin, View):
                     if 'list' in request.GET:
                         kwargs['list'] = json.loads(
                             serializers.serialize('json',
-                            Documentos.objects.filter(flag=True)),
+                            Documentos.objects.filter(flag=True).order_by('documento')),
                             encoding='utf-8')
                         kwargs['status'] = True
                 except ObjectDoesNotExist as oex:
@@ -1220,7 +1220,7 @@ class MethodPayment(JSONResponseMixin, View):
                     if 'list' in request.GET:
                         kwargs['list'] = json.loads(
                             serializers.serialize('json',
-                            FormaPago.objects.filter(flag=True)),
+                            FormaPago.objects.filter(flag=True).order_by('pagos')),
                             encoding='utf-8')
                         kwargs['status'] = True
                 except ObjectDoesNotExist as oex:
@@ -1248,7 +1248,34 @@ class Currency(JSONResponseMixin, View):
                     kwargs['list'] = json.loads(
                         serializers.serialize(
                             'json',
-                            Moneda.objects.filter(flag=True)),
+                            Moneda.objects.filter(flag=True).order_by('moneda')),
+                        encoding='utf-8')
+                    kwargs['status'] = True
+                except ObjectDoesNotExist as oex:
+                    kwargs['raise'] = str(oex)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+            else:
+                return render(request, '', kwargs)
+        except TemplateDoesNotExist as ext:
+            raise Http404(ext)
+
+class SupplierKeep(JSONResponseMixin, View):
+    """
+    Supplier
+    @Christian
+    2017-06-06 08:56:06
+    """
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.is_ajax():
+                try:
+                    kwargs['list'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            Proveedor.objects.filter(flag=True).order_by('razonsocial')),
                         encoding='utf-8')
                     kwargs['status'] = True
                 except ObjectDoesNotExist as oex:
