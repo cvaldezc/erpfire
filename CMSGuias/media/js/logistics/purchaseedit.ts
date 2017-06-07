@@ -33,6 +33,7 @@ module Controller {
         private currencies: object;
         private suppliers: object;
         private projects: object;
+        private igv: number;
 
         constructor(private $log: angular.ILogService, private proxy: Service.Proxy, public purchase: object) {
             this.$log.info("controller ready!");
@@ -72,9 +73,11 @@ module Controller {
         }
 
         getPurchase() {
-            this.proxy.get("", {'purchase': this.purchase['id']}).then((response: object) => {
+            this.proxy.get("", {'purchase': true}).then((response: object) => {
                 if (response['data']['status']) {
                     this.purchase['fields'] = response['data']['purchase']['fields'];
+                    this.purchase['details'] = response['data']['purchase']['details'];
+                    this.igv = response['data']['igv']
                     this.initialize();
                 }
             });

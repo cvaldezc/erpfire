@@ -20,10 +20,10 @@
     <a href="#" class="right btn-flat grey-text text-darken-3" ng-model="shead" ng-init="shead=true" ng-click="shead=!shead">
         <i class="fa" ng-class="{'fa-chevron-up': shead, 'fa-chevron-down': !shead}"></i></a>
     {% verbatim %}
+    <div class="light-blue lighten-4 progress" ng-hide="vm.purchase['fields'].status != null">
+        <div class="indeterminate light-blue"></div>
+    </div>
     <div class="card-panel">
-        <div class="progress">
-            <div class="indeterminate"></div>
-        </div>
         <div class="row" ng-show="shead">
             <div class="col l6 m6 s12 input-field">
                  <select id="supplier" class="browser-default browser-default suppliers" ng-model="vm.purchase['fields']['proveedor']">
@@ -88,7 +88,105 @@
                 <a href="/media/storage{{vm.purchase['fields']['deposito']}}" ng-if="vm.purchase['fields']['deposito']"><i class="fa fa-file"></i></a>
             </div>
             <div class="input-field col l12 m12 s12">
+                <label class="active">Observaciones</label>
                 <div id="observation"></div>
+            </div>
+        </div>
+    </div>
+    <div class="">
+        <div class="row">
+            <div class="col l12 m12 s12">
+                <input type="hidden" ng-model="vm.purchase['samount']" ng-init="vm.purchase['samount']=0">
+                <table class="table responsive-table highlight condensed">
+                    <thead class="red lighten-1">
+                        <tr>
+                            <th>#</th>
+                            <th></th>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th class="col-1">Unidad</th>
+                            <th class="col-2">Marca</th>
+                            <th class="col-2">Modelo</th>
+                            <th class="col-2">Cantidad</th>
+                            <th class="col-2">Precio</th>
+                            <th class="col-1">Desct%</th>
+                            <th class="col-1">Perc%</th>
+                            <th class="col-2">Importe</th>
+                            <th class="col-1"></th>
+                            <th class="col-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="x in vm.purchase['details']">
+                            <td>{{$index+1}}</td>
+                            <td>
+                                <input type="hidden" ng-model="vm.purchase['modify'][x.pk]" ng-init="vm.purchase['modify'][x.pk]=x.fields">
+                                <input type="checkbox" id="chk{{x.pk}}" class="filled-in" ng-model="vm.purchase['modify'][x.pk]['status']" ng-init="vm.purchase['modify'][x.pk]['status']=false">
+                                <label for="chk{{x.pk}}"></label>
+                            </td>
+                            <td><small>{{x.fields.materiales.pk}}</small></td>
+                            <td><small>{{x.fields.materiales.fields.matnom}} - {{x.fields.materiales.fields.matmed}}</small></td>
+                            <td>{{x.fields.materiales.fields.unidad != x.fields.unit ? x.fields.unit : x.fields.materiales.fields.unidad}}</td>
+                            <td>{{x.fields.brand.fields.brand}}</td>
+                            <td>{{x.fields.model.fields.model}}</td>
+                            <td class="right-align">{{x.fields.cantstatic}}</td>
+                            <td class="right-align">{{x.fields.precio}}</td>
+                            <td class="right-align">{{x.fields.discount}}%</td>
+                            <td class="right-align">{{x.fields.perception}}%</td>
+                            <td class="right-align">
+                                <input type="hidden" ng-model="vm.purchase['modify'][x.pk]['amount']" ng-init="vm.purchase['modify'][x.pk]['amount']=(x.fields.cantstatic * ((x.fields.precio - (x.fields.precio * (x.fields.discount / 100)))) * ((x.fields.perception / 100)+1))">
+                                {{ vm.purchase['modify'][x.pk]['amount'] | number:"2"}}
+                            </td>
+                            <td class="center-align" ng-init="vm.purchase['samount'] = (vm.purchase['modify'][x.pk]['amount'] + vm.purchase['samount'])">
+                                <a href="#comment" class="grey-text text-darken-3">
+                                    <i class="fa fa-font"></i>
+                                </a>
+                            </td>
+                            <td class="center-align">
+                                <a href="#edit" class="blue-text">
+                                    <i class="fa fa-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr ng-hide="vm.purchase['details'].length > 0">
+                            <td colspan="13">
+                                <div class="progress red lighten-5">
+                                    <div class="indeterminate red"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10"></td>
+                            <th>Subtotal</th>
+                            <td class="right-align">{{vm.purchase['samount'] | number:"2"}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="10"></td>
+                            <th>Dsct {{vm.purchase['fields']['discount']}}%</th>
+                            <td class="right-align">
+                                <input type="hidden" ng-model="vm.purchase['discount']" ng-init="vm.purchase['discount']=0">
+                                {{ vm.purchase['discount'] = (vm.purchase['samount'] * (vm.purchase['fields']['discount']/100)) | number:"2"}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10"></td>
+                            <th>IGV {{vm.igv}}%</th>
+                            <td class="right-align">
+                                <input type="hidden" ng-model="vm.purchase['sigv']" ng-init="vm.purchase['sigv']=0">
+                                {{vm.purchase['sigv']=((vm.purchase['samount'] + vm.purchase['discount']) * (vm.igv/100)) | number:"2"}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10"></td>
+                            <th>Total</th>
+                            <td class="right-align">
+                                {{( (vm.purchase['samount'] - vm.purchase['discount']) + vm.purchase['sigv']) | number:"2" }}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
     </div>

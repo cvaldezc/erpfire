@@ -58,9 +58,11 @@ var Controller;
         };
         PurchaseController.prototype.getPurchase = function () {
             var _this = this;
-            this.proxy.get("", { 'purchase': this.purchase['id'] }).then(function (response) {
+            this.proxy.get("", { 'purchase': true }).then(function (response) {
                 if (response['data']['status']) {
                     _this.purchase['fields'] = response['data']['purchase']['fields'];
+                    _this.purchase['details'] = response['data']['purchase']['details'];
+                    _this.igv = response['data']['igv'];
                     _this.initialize();
                 }
             });

@@ -1058,14 +1058,27 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         try:
             if request.is_ajax():
-                if 'purchase' in request.GET:
-                    kwargs['purchase'] = json.loads(
-                        serializers.serialize(
-                            'json',
-                            Compra.objects.filter(compra_id=request.GET['purchase'])
+                try:
+                    if 'purchase' in request.GET:
+                        purchasebedside = Compra.objects.filter(compra_id=kwargs['purchaseid'])
+                        kwargs['purchase'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                purchasebedside
+                            )
+                        )[0]
+                        kwargs['purchase']['details'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                DetCompra.objects.filter(compra_id=kwargs['purchaseid']),
+                                relations=('materiales', 'brand', 'model')
+                            )
                         )
-                    )[0]
-                    kwargs['status'] = True
+                        kwargs['igv'] = Configuracion.objects.filter(periodo=purchasebedside[0].registrado.strftime('%Y'))[0].igv
+                        kwargs['status'] = True
+                except ObjectDoesNotExist as oex:
+                    kwargs['raise'] = str(oex)
+                    kwargs['status'] = False
                 return self.render_to_json_response(kwargs)
             return render(request, 'logistics/purchaseedit.html', kwargs)
         except Exception as ex:
