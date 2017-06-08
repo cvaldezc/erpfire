@@ -101,7 +101,7 @@
                     <thead class="red lighten-1">
                         <tr>
                             <th>#</th>
-                            <th></th>
+                            <th class="col-1"></th>
                             <th>Código</th>
                             <th>Descripción</th>
                             <th class="col-1">Unidad</th>
@@ -126,9 +126,9 @@
                             </td>
                             <td><small>{{x.fields.materiales.pk}}</small></td>
                             <td><small>{{x.fields.materiales.fields.matnom}} - {{x.fields.materiales.fields.matmed}}</small></td>
-                            <td>{{x.fields.materiales.fields.unidad != x.fields.unit ? x.fields.unit : x.fields.materiales.fields.unidad}}</td>
-                            <td>{{x.fields.brand.fields.brand}}</td>
-                            <td>{{x.fields.model.fields.model}}</td>
+                            <td><small>{{x.fields.materiales.fields.unidad != x.fields.unit ? x.fields.unit : x.fields.materiales.fields.unidad}}</small></td>
+                            <td><small>{{x.fields.brand.fields.brand}}</small></td>
+                            <td><small>{{x.fields.model.fields.model}}</small></td>
                             <td class="right-align">{{x.fields.cantstatic}}</td>
                             <td class="right-align">{{x.fields.precio}}</td>
                             <td class="right-align">{{x.fields.discount}}%</td>
@@ -139,7 +139,7 @@
                             </td>
                             <td class="center-align" ng-init="vm.purchase['samount'] = (vm.purchase['modify'][x.pk]['amount'] + vm.purchase['samount'])">
                                 <a href="#comment" class="grey-text text-darken-3">
-                                    <i class="fa fa-font"></i>
+                                    <i class="fa fa-commenting-o"></i>
                                 </a>
                             </td>
                             <td class="center-align">
@@ -187,6 +187,17 @@
                         </tr>
                     </tfoot>
                 </table>
+            </div>
+        </div>
+    </div>
+    <!-- block modal -->
+    <div class="row">
+        <div class="col l12 m12 s12">
+            <div id="mcomment" class="modal">
+                <div class="modal-content">
+                    <label>Observaciones</label>
+                    <div id="itemobservation"></div>
+                </div>
             </div>
         </div>
     </div>
