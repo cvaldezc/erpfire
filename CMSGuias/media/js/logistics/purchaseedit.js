@@ -128,9 +128,32 @@ var Controller;
     PurchaseController.$inject = ['$log', 'sproxy'];
     Controller.PurchaseController = PurchaseController;
 })(Controller || (Controller = {}));
+var Directivies;
+(function (Directivies) {
+    var ComponentSearchMaterials = (function () {
+        function ComponentSearchMaterials() {
+            this.restrict = 'E';
+            this.template = "<select><option value=''>nothing template</option></select>";
+            this.scope = { item: '=' };
+            this.replace = true;
+        }
+        ComponentSearchMaterials.instance = function () {
+            return new ComponentSearchMaterials();
+        };
+        // private _filter: ng.IFilterDate;
+        // require = 'ngModel';
+        ComponentSearchMaterials.prototype.link = function (scope, element, attrs, ctrl) {
+            console.log("Directive is called!");
+        };
+        return ComponentSearchMaterials;
+    }());
+    ComponentSearchMaterials.$inject = [''];
+    Directivies.ComponentSearchMaterials = ComponentSearchMaterials;
+})(Directivies || (Directivies = {}));
 var app = angular.module('app', ['ngCookies']);
 app.service('sproxy', Service.Proxy);
 app.controller('ctrlpurchase', Controller.PurchaseController);
+app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
 var httpConfig = function ($httpProvider) {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';

@@ -145,9 +145,34 @@ module Controller {
 
 }
 
+module Directivies {
+
+    export class ComponentSearchMaterials implements ng.IDirective {
+
+        static $inject: Array<string> = [''];
+
+        static instance(): ng.IDirective {
+            return new ComponentSearchMaterials();
+        }
+
+        constructor() {}
+        restrict = 'E';
+        template: string = "<select><option value=''>nothing template</option></select>";
+        scope = { item : '=' };
+        replace = true;
+        // private _filter: ng.IFilterDate;
+        // require = 'ngModel';
+        link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
+            console.log("Directive is called!");
+        }
+
+    }
+}
+
 let app = angular.module('app', ['ngCookies']);
 app.service('sproxy', Service.Proxy);
 app.controller('ctrlpurchase', Controller.PurchaseController);
+app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
 let httpConfig = ($httpProvider: ng.IHttpProvider) => {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
