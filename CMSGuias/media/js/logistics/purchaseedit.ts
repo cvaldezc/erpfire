@@ -156,8 +156,8 @@ module Directivies {
         }
 
         constructor() {}
-        restrict = 'E';
-        template: string = "<select><option value=''>nothing template</option></select>";
+        restrict = 'AE';
+        template: string = '<div class="row"><div class="col s12 m6 l6"><label for="mdescription">Descripción</label><select id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción"><option value=""></option></select></div><div class="col s12 m2 l2 input-field"><input type="text" id="mid" placeholder="000000000000000" maxlength="15" esmc><label for="mid">Código de Material</label></div><div class="col s12 m4 l4"><label for="mmeasure">Medida</label><select id="mmeasure" class="browser-default chosen-select" data-placeholder="Seleccione un medida"></select></div></div>';
         scope = { item : '=' };
         replace = true;
         // private _filter: ng.IFilterDate;
@@ -167,12 +167,27 @@ module Directivies {
         }
 
     }
+
+    export class EventKeyCode implements ng.IDirective {
+        static $inject: Array<string> = [''];
+        static instance(): ng.IDirective {
+            return new EventKeyCode();
+        }
+        constructor() {}
+        scope = { item: '='}
+        link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any){
+            element.bind('click', () => {
+                console.log('this click in element');
+            });
+        }
+    }
 }
 
 let app = angular.module('app', ['ngCookies']);
 app.service('sproxy', Service.Proxy);
 app.controller('ctrlpurchase', Controller.PurchaseController);
 app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
+app.directive('esmc', Directivies.EventKeyCode.instance);
 let httpConfig = ($httpProvider: ng.IHttpProvider) => {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';

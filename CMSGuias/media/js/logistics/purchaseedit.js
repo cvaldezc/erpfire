@@ -132,8 +132,8 @@ var Directivies;
 (function (Directivies) {
     var ComponentSearchMaterials = (function () {
         function ComponentSearchMaterials() {
-            this.restrict = 'E';
-            this.template = "<select><option value=''>nothing template</option></select>";
+            this.restrict = 'AE';
+            this.template = '<div class="row"><div class="col s12 m6 l6"><label for="mdescription">Descripción</label><select id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción"><option value=""></option></select></div><div class="col s12 m2 l2 input-field"><input type="text" id="mid" placeholder="000000000000000" maxlength="15" esmc><label for="mid">Código de Material</label></div><div class="col s12 m4 l4"><label for="mmeasure">Medida</label><select id="mmeasure" class="browser-default chosen-select" data-placeholder="Seleccione un medida"></select></div></div>';
             this.scope = { item: '=' };
             this.replace = true;
         }
@@ -149,11 +149,28 @@ var Directivies;
     }());
     ComponentSearchMaterials.$inject = [''];
     Directivies.ComponentSearchMaterials = ComponentSearchMaterials;
+    var EventKeyCode = (function () {
+        function EventKeyCode() {
+            this.scope = { item: '=' };
+        }
+        EventKeyCode.instance = function () {
+            return new EventKeyCode();
+        };
+        EventKeyCode.prototype.link = function (scope, element, attrs, ctrl) {
+            element.bind('click', function () {
+                console.log('this click in element');
+            });
+        };
+        return EventKeyCode;
+    }());
+    EventKeyCode.$inject = [''];
+    Directivies.EventKeyCode = EventKeyCode;
 })(Directivies || (Directivies = {}));
 var app = angular.module('app', ['ngCookies']);
 app.service('sproxy', Service.Proxy);
 app.controller('ctrlpurchase', Controller.PurchaseController);
 app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
+app.directive('esmc', Directivies.EventKeyCode.instance);
 var httpConfig = function ($httpProvider) {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';

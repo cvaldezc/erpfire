@@ -69,6 +69,9 @@ select:focus:not([readonly]) + label {
 .cursor-hand {
   cursor: pointer;
 }
+.wfull {
+  width: 100% !important;
+}
 .col-1 {
 /*max-width 40px*/
   min-width: 40px;
