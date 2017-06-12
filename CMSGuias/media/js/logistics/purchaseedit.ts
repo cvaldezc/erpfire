@@ -1,3 +1,5 @@
+'use strict'
+
 module Service {
     export interface IProxy {
         get: (uri: string, options: object) => ng.IHttpPromise<any>;
@@ -157,8 +159,21 @@ module Directivies {
 
         constructor() {}
         restrict = 'AE';
-        template: string = '<div class="row"><div class="col s12 m6 l6"><label for="mdescription">Descripción</label><select id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción"><option value=""></option></select></div><div class="col s12 m2 l2 input-field"><input type="text" id="mid" placeholder="000000000000000" maxlength="15" esmc><label for="mid">Código de Material</label></div><div class="col s12 m4 l4"><label for="mmeasure">Medida</label><select id="mmeasure" class="browser-default chosen-select" data-placeholder="Seleccione un medida"></select></div></div>';
-        scope = { item : '=' };
+        template: string = `<div class="row">
+            <div class="col s12 m6 l6">
+                <label for="mdescription">Descripción</label>
+                <select esdesc id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción">
+                <option value=""></option>
+                <option value="{{x.description}}" ng-repeat="x in descriptions">{{x.description}}</option>
+                </select>
+            </div>
+            <div class="col s12 m2 l2 input-field">
+                <input type="text" id="mid" placeholder="000000000000000" maxlength="15" esmc>
+                <label for="mid">Código de Material</label></div>
+            <div class="col s12 m4 l4">
+                <label for="mmeasure">Medida</label>
+                <select id="mmeasure" class="browser-default chosen-select" data-placeholder="Seleccione un medida"></select></div></div>`;
+        scope = { descriptions: '=' };
         replace = true;
         // private _filter: ng.IFilterDate;
         // require = 'ngModel';
@@ -174,11 +189,47 @@ module Directivies {
             return new EventKeyCode();
         }
         constructor() {}
-        scope = { item: '='}
+        scope = { item: '=' }
         link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any){
             element.bind('click', () => {
                 console.log('this click in element');
             });
+        }
+    }
+
+    export class EventDescription implements ng.IDirective {
+        private _storedsc: string = '';
+        static $inject: Array<string> = ['sproxy'];
+        static instance(): ng.IDirective {
+            return new EventDescription();
+        }
+
+        constructor(private http: Service.Proxy) {}
+
+        scope = { descriptions: '=' }
+        link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
+            // load directive
+            setInterval(() => {
+                this.getDescription(angular.element('#mdescription + div > div input.chosen-search-input').val());
+            }, 2000);
+
+            element.bind('change', () => {
+                console.log(element.value);
+                console.log('Execute when select description change');
+            });
+        }
+
+        getDescription(description: string) {
+            console.info(description);
+            description = description.trim();
+            if (description != '' && description != this._storedsc){
+                this._storedsc = description;
+                this.http.get('', {}).then( (response: object) => {
+                    if (response['data']['status']) {
+
+                    }
+                });
+            }
         }
     }
 }
@@ -188,6 +239,7 @@ app.service('sproxy', Service.Proxy);
 app.controller('ctrlpurchase', Controller.PurchaseController);
 app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
 app.directive('esmc', Directivies.EventKeyCode.instance);
+app.directive('esdesc', Directivies.EventDescription.instance);
 let httpConfig = ($httpProvider: ng.IHttpProvider) => {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';

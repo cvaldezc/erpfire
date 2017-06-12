@@ -1,3 +1,4 @@
+'use strict';
 var Service;
 (function (Service) {
     var Proxy = (function () {
@@ -133,8 +134,8 @@ var Directivies;
     var ComponentSearchMaterials = (function () {
         function ComponentSearchMaterials() {
             this.restrict = 'AE';
-            this.template = '<div class="row"><div class="col s12 m6 l6"><label for="mdescription">Descripción</label><select id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción"><option value=""></option></select></div><div class="col s12 m2 l2 input-field"><input type="text" id="mid" placeholder="000000000000000" maxlength="15" esmc><label for="mid">Código de Material</label></div><div class="col s12 m4 l4"><label for="mmeasure">Medida</label><select id="mmeasure" class="browser-default chosen-select" data-placeholder="Seleccione un medida"></select></div></div>';
-            this.scope = { item: '=' };
+            this.template = "<div class=\"row\">\n            <div class=\"col s12 m6 l6\">\n                <label for=\"mdescription\">Descripci\u00F3n</label>\n                <select esdesc id=\"mdescription\" class=\"browser-default chosen-select\" data-placeholder=\"Ingrese una descripci\u00F3n\">\n                <option value=\"\"></option>\n                <option value=\"{{x.description}}\" ng-repeat=\"x in descriptions\">{{x.description}}</option>\n                </select>\n            </div>\n            <div class=\"col s12 m2 l2 input-field\">\n                <input type=\"text\" id=\"mid\" placeholder=\"000000000000000\" maxlength=\"15\" esmc>\n                <label for=\"mid\">C\u00F3digo de Material</label></div>\n            <div class=\"col s12 m4 l4\">\n                <label for=\"mmeasure\">Medida</label>\n                <select id=\"mmeasure\" class=\"browser-default chosen-select\" data-placeholder=\"Seleccione un medida\"></select></div></div>";
+            this.scope = { descriptions: '=' };
             this.replace = true;
         }
         ComponentSearchMaterials.instance = function () {
@@ -165,12 +166,47 @@ var Directivies;
     }());
     EventKeyCode.$inject = [''];
     Directivies.EventKeyCode = EventKeyCode;
+    var EventDescription = (function () {
+        function EventDescription() {
+            this._storedsc = '';
+            this.scope = { descriptions: '=' };
+        }
+        EventDescription.instance = function () {
+            return new EventDescription();
+        };
+        EventDescription.prototype.link = function (scope, element, attrs, ctrl) {
+            var _this = this;
+            // load directive
+            setInterval(function () {
+                _this.getDescription(angular.element('#mdescription + div > div input.chosen-search-input').val());
+            }, 2000);
+            element.bind('change', function () {
+                console.log(element.value);
+                console.log('Execute when select description change');
+            });
+        };
+        EventDescription.prototype.getDescription = function (description) {
+            console.info(description);
+            description = description.trim();
+            if (description != '' && description != this._storedsc) {
+                this._storedsc = description;
+                this.http.get('', {}).then(function (response) {
+                    if (response['data']['status']) {
+                    }
+                });
+            }
+        };
+        return EventDescription;
+    }());
+    EventDescription.$inject = ['sproxy'];
+    Directivies.EventDescription = EventDescription;
 })(Directivies || (Directivies = {}));
 var app = angular.module('app', ['ngCookies']);
 app.service('sproxy', Service.Proxy);
 app.controller('ctrlpurchase', Controller.PurchaseController);
 app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
 app.directive('esmc', Directivies.EventKeyCode.instance);
+app.directive('esdesc', Directivies.EventDescription.instance);
 var httpConfig = function ($httpProvider) {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
