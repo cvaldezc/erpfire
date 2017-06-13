@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import csv
 import json
 import datetime
@@ -48,7 +50,7 @@ def get_description_materials(request):
             name = Materiale.objects.values('matnom').filter(
                 matnom__icontains=request.GET.get('nom')).distinct(
                     'matnom').order_by('matnom')
-            context['name'] = [{'matnom': x['matnom']} for x in name]
+            context['name'] = [{'matnom': x['matnom'], 'name': x['matnom']} for x in name]
             context['status'] = True
         except ObjectDoesNotExist:
             context['status'] = False
@@ -65,6 +67,8 @@ def get_meter_materials(request):
                 matnom__exact=request.GET['matnom']).order_by('matmed')
             context['list'] = [{
                 'materiales_id': x['materiales_id'],
+                'pk': x['materiales_id'],
+                'measure': x['matmed'],
                 'matmed': x['matmed']}
                                for x in meter]
             context['status'] = True

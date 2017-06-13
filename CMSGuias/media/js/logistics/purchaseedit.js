@@ -133,9 +133,13 @@ var Directivies;
 (function (Directivies) {
     var ComponentSearchMaterials = (function () {
         function ComponentSearchMaterials() {
+            this._storedsc = '';
+            this.scope = {
+                descriptions: '=',
+                smat: '='
+            };
             this.restrict = 'AE';
-            this.template = "<div class=\"row\">\n            <div class=\"col s12 m6 l6\">\n                <label for=\"mdescription\">Descripci\u00F3n</label>\n                <select esdesc id=\"mdescription\" class=\"browser-default chosen-select\" data-placeholder=\"Ingrese una descripci\u00F3n\">\n                <option value=\"\"></option>\n                <option value=\"{{x.description}}\" ng-repeat=\"x in descriptions\">{{x.description}}</option>\n                </select>\n            </div>\n            <div class=\"col s12 m2 l2 input-field\">\n                <input type=\"text\" id=\"mid\" placeholder=\"000000000000000\" maxlength=\"15\" esmc>\n                <label for=\"mid\">C\u00F3digo de Material</label></div>\n            <div class=\"col s12 m4 l4\">\n                <label for=\"mmeasure\">Medida</label>\n                <select id=\"mmeasure\" class=\"browser-default chosen-select\" data-placeholder=\"Seleccione un medida\"></select></div></div>";
-            this.scope = { descriptions: '=' };
+            this.template = "<div class=\"row\">\n            <div class=\"col s12 m6 l6\">\n                <label for=\"mdescription\">Descripci\u00F3n</label>\n                <select esdesc id=\"mdescription\" class=\"browser-default chosen-select\" data-placeholder=\"Ingrese una descripci\u00F3n\" ng-model=\"smat\">\n                <option value=\"\"></option>\n                <option value=\"{{x.name}}\" ng-repeat=\"x in descriptions\">{{x.name}}</option>\n                </select>\n            </div>\n            <div class=\"col s12 m2 l2 input-field\">\n                <input type=\"text\" id=\"mid\" placeholder=\"000000000000000\" maxlength=\"15\" esmc>\n                <label for=\"mid\">C\u00F3digo de Material</label></div>\n            <div class=\"col s12 m4 l4\">\n                <label for=\"mmeasure\">Medida</label>\n                <select id=\"mmeasure\" class=\"browser-default chosen-select\" data-placeholder=\"Seleccione un medida\"></select></div></div>";
             this.replace = true;
         }
         ComponentSearchMaterials.instance = function () {
@@ -144,7 +148,26 @@ var Directivies;
         // private _filter: ng.IFilterDate;
         // require = 'ngModel';
         ComponentSearchMaterials.prototype.link = function (scope, element, attrs, ctrl) {
+            var _this = this;
             console.log("Directive is called!");
+            setInterval(function () {
+                var valdesc = angular.element('#mdescription + div > div input.chosen-search-input').val();
+                _this.getDescription(valdesc);
+                // scope.$applyAsync();
+                scope.$apply();
+            }, 2000);
+        };
+        ComponentSearchMaterials.prototype.getDescription = function (descany) {
+            var _this = this;
+            // console.info(description);
+            descany = descany.trim();
+            if (descany != '' && descany != this._storedsc) {
+                this._storedsc = descany;
+                angular.element.getJSON('/json/get/materials/name/', { 'nom': descany }, function (response, textStatus, xhr) {
+                    console.log(response);
+                    _this.scope.descriptions = response;
+                });
+            }
         };
         return ComponentSearchMaterials;
     }());
@@ -166,47 +189,32 @@ var Directivies;
     }());
     EventKeyCode.$inject = [''];
     Directivies.EventKeyCode = EventKeyCode;
-    var EventDescription = (function () {
-        function EventDescription() {
-            this._storedsc = '';
-            this.scope = { descriptions: '=' };
-        }
-        EventDescription.instance = function () {
-            return new EventDescription();
-        };
-        EventDescription.prototype.link = function (scope, element, attrs, ctrl) {
-            var _this = this;
-            // load directive
-            setInterval(function () {
-                _this.getDescription(angular.element('#mdescription + div > div input.chosen-search-input').val());
-            }, 2000);
-            element.bind('change', function () {
-                console.log(element.value);
-                console.log('Execute when select description change');
-            });
-        };
-        EventDescription.prototype.getDescription = function (description) {
-            console.info(description);
-            description = description.trim();
-            if (description != '' && description != this._storedsc) {
-                this._storedsc = description;
-                this.http.get('', {}).then(function (response) {
-                    if (response['data']['status']) {
-                    }
-                });
-            }
-        };
-        return EventDescription;
-    }());
-    EventDescription.$inject = ['sproxy'];
-    Directivies.EventDescription = EventDescription;
+    // export class EventDescription implements ng.IDirective {
+    //     private _storedsc: string = '';
+    //     static $inject: Array<string> = [];
+    //     static instance(): ng.IDirective {
+    //         return new EventDescription();
+    //     }
+    //     constructor() {}
+    //     scope = { descriptions: '=' }
+    //     link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
+    //         // load directive
+    //         console.log("load tag");
+    //         setInterval(() => {
+    //         }, 2000);
+    //         element.bind('change', () => {
+    //             console.log(element.value);
+    //             console.log('Execute when select description change');
+    //         });
+    //     }
+    // }
 })(Directivies || (Directivies = {}));
 var app = angular.module('app', ['ngCookies']);
 app.service('sproxy', Service.Proxy);
 app.controller('ctrlpurchase', Controller.PurchaseController);
-app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
 app.directive('esmc', Directivies.EventKeyCode.instance);
-app.directive('esdesc', Directivies.EventDescription.instance);
+// app.directive('esdesc', Directivies.EventDescription.instance);
+app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
 var httpConfig = function ($httpProvider) {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';

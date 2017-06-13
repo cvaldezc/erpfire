@@ -36,6 +36,7 @@ module Controller {
         private suppliers: object;
         private projects: object;
         private igv: number;
+        private descriptions: object;
 
         constructor(private $log: angular.ILogService, private proxy: Service.Proxy, public purchase: object) {
             this.$log.info("controller ready!");
@@ -157,14 +158,20 @@ module Directivies {
             return new ComponentSearchMaterials();
         }
 
+        private _storedsc: string = '';
+
         constructor() {}
+        scope = {
+            descriptions: '=',
+            smat: '='
+         };
         restrict = 'AE';
         template: string = `<div class="row">
             <div class="col s12 m6 l6">
                 <label for="mdescription">Descripción</label>
-                <select esdesc id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción">
+                <select esdesc id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción" ng-model="smat">
                 <option value=""></option>
-                <option value="{{x.description}}" ng-repeat="x in descriptions">{{x.description}}</option>
+                <option value="{{x.name}}" ng-repeat="x in descriptions">{{x.name}}</option>
                 </select>
             </div>
             <div class="col s12 m2 l2 input-field">
@@ -173,12 +180,29 @@ module Directivies {
             <div class="col s12 m4 l4">
                 <label for="mmeasure">Medida</label>
                 <select id="mmeasure" class="browser-default chosen-select" data-placeholder="Seleccione un medida"></select></div></div>`;
-        scope = { descriptions: '=' };
         replace = true;
         // private _filter: ng.IFilterDate;
         // require = 'ngModel';
         link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
             console.log("Directive is called!");
+            setInterval( () => {
+                let valdesc: string = angular.element('#mdescription + div > div input.chosen-search-input').val();
+                this.getDescription(valdesc);
+                // scope.$applyAsync();
+                scope.$apply()
+            }, 2000);
+        }
+
+        getDescription(descany: string) {
+            // console.info(description);
+            descany = descany.trim();
+            if (descany != '' && descany != this._storedsc){
+                this._storedsc = descany;
+                angular.element.getJSON('/json/get/materials/name/', {'nom': descany}, (response, textStatus, xhr) => {
+                    console.log(response);
+                    this.scope.descriptions = response;
+                });
+            }
         }
 
     }
@@ -197,49 +221,38 @@ module Directivies {
         }
     }
 
-    export class EventDescription implements ng.IDirective {
-        private _storedsc: string = '';
-        static $inject: Array<string> = ['sproxy'];
-        static instance(): ng.IDirective {
-            return new EventDescription();
-        }
+    // export class EventDescription implements ng.IDirective {
+    //     private _storedsc: string = '';
+    //     static $inject: Array<string> = [];
+    //     static instance(): ng.IDirective {
+    //         return new EventDescription();
+    //     }
+    //     constructor() {}
 
-        constructor(private http: Service.Proxy) {}
+    //     scope = { descriptions: '=' }
+    //     link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
+    //         // load directive
+    //         console.log("load tag");
+    //         setInterval(() => {
 
-        scope = { descriptions: '=' }
-        link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
-            // load directive
-            setInterval(() => {
-                this.getDescription(angular.element('#mdescription + div > div input.chosen-search-input').val());
-            }, 2000);
+    //         }, 2000);
 
-            element.bind('change', () => {
-                console.log(element.value);
-                console.log('Execute when select description change');
-            });
-        }
+    //         element.bind('change', () => {
+    //             console.log(element.value);
+    //             console.log('Execute when select description change');
+    //         });
+    //     }
 
-        getDescription(description: string) {
-            console.info(description);
-            description = description.trim();
-            if (description != '' && description != this._storedsc){
-                this._storedsc = description;
-                this.http.get('', {}).then( (response: object) => {
-                    if (response['data']['status']) {
 
-                    }
-                });
-            }
-        }
-    }
+    // }
 }
 
 let app = angular.module('app', ['ngCookies']);
 app.service('sproxy', Service.Proxy);
 app.controller('ctrlpurchase', Controller.PurchaseController);
-app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
 app.directive('esmc', Directivies.EventKeyCode.instance);
-app.directive('esdesc', Directivies.EventDescription.instance);
+// app.directive('esdesc', Directivies.EventDescription.instance);
+app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
 let httpConfig = ($httpProvider: ng.IHttpProvider) => {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
