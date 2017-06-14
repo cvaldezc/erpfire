@@ -36,7 +36,8 @@ module Controller {
         private suppliers: object;
         private projects: object;
         private igv: number;
-        private descriptions: object;
+        private descriptions: object = {};
+        private smat: string;
 
         constructor(private $log: angular.ILogService, private proxy: Service.Proxy, public purchase: object) {
             this.$log.info("controller ready!");
@@ -162,7 +163,6 @@ module Directivies {
 
         constructor() {}
         scope = {
-            descriptions: '=',
             smat: '='
          };
         restrict = 'AE';
@@ -187,22 +187,34 @@ module Directivies {
             console.log("Directive is called!");
             setInterval( () => {
                 let valdesc: string = angular.element('#mdescription + div > div input.chosen-search-input').val();
-                this.getDescription(valdesc);
-                // scope.$applyAsync();
-                scope.$apply()
+                valdesc = valdesc.trim();
+                if (angular.element('#mdescription + div > div ul.chosen-results li').length == 1){
+                    if (valdesc != '' && valdesc != this._storedsc) {
+                        //scope.$apply(() => {
+                            this._storedsc = valdesc;
+                            this.getDescription(valdesc).then((response) => {
+                                console.log('Load Response in select');
+                                // console.info([{name: 'a'}, {name: 'b'},{name: 'c'}]);
+                                scope['descriptions'] = response;
+                                scope.$apply();
+                                angular.element('#mdescription').trigger('chosen:updated');
+                            });
+                            // scope['descriptions'] = [{name: 'a'}, {name: 'b'},{name: 'c'}]; //response;
+                        //});
+                    }
+                }
+                // console.log(scope);
+                // scope['vm']['descriptions'] = {}
             }, 2000);
         }
 
-        getDescription(descany: string) {
-            // console.info(description);
-            descany = descany.trim();
-            if (descany != '' && descany != this._storedsc){
-                this._storedsc = descany;
+        getDescription(descany: string): Promise<Array<object>> {
+            return new Promise((resolve) => {
                 angular.element.getJSON('/json/get/materials/name/', {'nom': descany}, (response, textStatus, xhr) => {
                     console.log(response);
-                    this.scope.descriptions = response;
+                    resolve(response['names']);
                 });
-            }
+            });
         }
 
     }

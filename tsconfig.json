@@ -10,7 +10,8 @@
         "types": [
             "angular",
             "jquery",
-            "node"
+            "node",
+            "core-js"
         ],
         "typeRoots": [
             // add path to @types
