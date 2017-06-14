@@ -35,8 +35,12 @@ module Controller {
         private currencies: object;
         private suppliers: object;
         private projects: object;
+        private brands: Array<object>;
+        private models: Array<object>;
+        private units: Array<object>;
         private igv: number;
         private descriptions: object = {};
+        private measures: object = {};
         private smat: string;
 
         constructor(private $log: angular.ILogService, private proxy: Service.Proxy, public purchase: object) {
@@ -47,6 +51,9 @@ module Controller {
             this.getDocumentPayment();
             this.getMethodPayment();
             this.getCurrency();
+            this.getBrand();
+            this.getModel();
+            this.getUnits();
             angular.element("select").chosen({width: "100%"});
             angular.element("#observation").trumbowyg({
                 btns: [
@@ -73,6 +80,9 @@ module Controller {
                 angular.element(".documentpayment").trigger("chosen:updated");
                 angular.element(".methodpayment").trigger("chosen:updated");
                 angular.element(".currency").trigger("chosen:updated");
+                angular.element(".brands").trigger("chosen:updated");
+                angular.element(".models").trigger("chosen:updated");
+                angular.element(".units").trigger("chosen:updated");
             }, 400);
         }
 
@@ -145,6 +155,45 @@ module Controller {
                 });
         }
 
+        getBrand(): void {
+            this.proxy.get('/json/brand/list/option/', {}).then(
+                (response: object) => {
+                    if (response['data']['status']) {
+                        this.brands = response['data']['brand'];
+                        setTimeout(() => {
+                            angular.element('.brands').trigger('chosen:updated');
+                        }, 800);
+                    }
+                }
+            );
+        }
+
+        getModel(): void {
+            this.proxy.get('/json/model/list/option/', {}).then(
+                (response: object) => {
+                    if (response['data']['status']) {
+                        this.models = response['data']['model'];
+                        setTimeout(() => {
+                            angular.element('.models').trigger('chosen:updated');
+                        }, 800);
+                    }
+                }
+            );
+        }
+
+        getUnits(): void {
+            this.proxy.get('/unit/list/', {}).then(
+                (response: object) => {
+                    if (response['data']['status']) {
+                        this.units = response['data']['lunit'];
+                        setTimeout(() => {
+                            angular.element('.units').trigger('chosen:updated');
+                        }, 800);
+                    }
+                }
+            );
+        }
+
     }
 
 }
@@ -163,11 +212,13 @@ module Directivies {
 
         constructor() {}
         scope = {
-            smat: '='
+            smat: '=',
+            smeasure: '=',
+            sid: '='
          };
         restrict = 'AE';
-        template: string = `<div class="row">
-            <div class="col s12 m6 l6">
+        template: string = `<div>
+            <div class="col s12 m6 l6 input-field">
                 <label for="mdescription">Descripción</label>
                 <select esdesc id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción" ng-model="smat">
                 <option value=""></option>
@@ -175,11 +226,13 @@ module Directivies {
                 </select>
             </div>
             <div class="col s12 m2 l2 input-field">
-                <input type="text" id="mid" placeholder="000000000000000" maxlength="15" esmc>
+                <input type="text" id="mid" placeholder="000000000000000" maxlength="15" ng-model="sid" esmc>
                 <label for="mid">Código de Material</label></div>
-            <div class="col s12 m4 l4">
+            <div class="col s12 m4 l4 input-field">
                 <label for="mmeasure">Medida</label>
-                <select id="mmeasure" class="browser-default chosen-select" data-placeholder="Seleccione un medida"></select></div></div>`;
+                <select id="mmeasure" class="browser-default chosen-select" ng-model="smeasure" data-placeholder="Seleccione un medida" esmmeasure>
+                <option value="{{msr.pk}}" ng-repeat="msr in measures">{{msr.measure}}</option>
+                </select></div></div>`;
         replace = true;
         // private _filter: ng.IFilterDate;
         // require = 'ngModel';
@@ -190,33 +243,29 @@ module Directivies {
                 valdesc = valdesc.trim();
                 if (angular.element('#mdescription + div > div ul.chosen-results li').length == 1){
                     if (valdesc != '' && valdesc != this._storedsc) {
-                        //scope.$apply(() => {
-                            this._storedsc = valdesc;
-                            this.getDescription(valdesc).then((response) => {
-                                console.log('Load Response in select');
-                                // console.info([{name: 'a'}, {name: 'b'},{name: 'c'}]);
-                                scope['descriptions'] = response;
-                                scope.$apply();
-                                angular.element('#mdescription').trigger('chosen:updated');
-                            });
-                            // scope['descriptions'] = [{name: 'a'}, {name: 'b'},{name: 'c'}]; //response;
-                        //});
+                        this._storedsc = valdesc;
+                        this.getDescription(valdesc).then((response) => {
+                            console.log('Load Response in select');
+                            scope['descriptions'] = response;
+                            scope.$apply();
+                            angular.element('#mdescription').trigger('chosen:updated');
+                        });
                     }
                 }
-                // console.log(scope);
-                // scope['vm']['descriptions'] = {}
-            }, 2000);
+            }, 1000);
         }
 
         getDescription(descany: string): Promise<Array<object>> {
             return new Promise((resolve) => {
                 angular.element.getJSON('/json/get/materials/name/', {'nom': descany}, (response, textStatus, xhr) => {
-                    console.log(response);
-                    resolve(response['names']);
+                    if (response['status']) {
+                        resolve(response['names']);
+                    }else{
+                        resolve([]);
+                    }
                 });
             });
         }
-
     }
 
     export class EventKeyCode implements ng.IDirective {
@@ -230,41 +279,70 @@ module Directivies {
             element.bind('click', () => {
                 console.log('this click in element');
             });
+            // change code
+            element.bind('change', () => {
+                console.info(scope['sid']);
+            });
         }
     }
 
-    // export class EventDescription implements ng.IDirective {
-    //     private _storedsc: string = '';
-    //     static $inject: Array<string> = [];
-    //     static instance(): ng.IDirective {
-    //         return new EventDescription();
-    //     }
-    //     constructor() {}
+    export class EventDescription implements ng.IDirective {
+        static $inject: Array<string> = [];
+        static instance(): ng.IDirective {
+            return new EventDescription();
+        }
+        constructor() {}
+        link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
+            element.bind('change', () => {
+                console.log(element.val());
+                console.log('Execute when select description change');
+                console.log(scope['smat']);
+                this.getMeasure(element.val()).then( (resolve) => {
+                    scope['measures'] = resolve;
+                    scope.$apply();
+                    setTimeout( () => {
+                        angular.element("#mmeasure").trigger('chosen:updated');
+                    }, 200);
+                });
+            });
+        }
 
-    //     scope = { descriptions: '=' }
-    //     link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
-    //         // load directive
-    //         console.log("load tag");
-    //         setInterval(() => {
+        getMeasure(description: string): Promise<Array<object>> {
+            return new Promise( (resolve) => {
+                angular.element.getJSON('/json/get/meter/materials/', {'matnom': description}, (response) => {
+                    if (response['status']) {
+                        resolve(response['list'])
+                    }else{
+                        resolve([])
+                    }
+                } );
+            });
+        }
+    }
 
-    //         }, 2000);
-
-    //         element.bind('change', () => {
-    //             console.log(element.value);
-    //             console.log('Execute when select description change');
-    //         });
-    //     }
-
-
-    // }
+    export class EventMeasure implements ng.IDirective {
+        static $inject: Array<string> = [];
+        static instance(): ng.IDirective {
+            return new EventMeasure();
+        }
+        constructor() {}
+        link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
+            element.bind('change', () => {
+                console.log('Execute when select measure change');
+                console.info(scope['smeasure']);
+            });
+        }
+    }
 }
 
 let app = angular.module('app', ['ngCookies']);
 app.service('sproxy', Service.Proxy);
 app.controller('ctrlpurchase', Controller.PurchaseController);
-app.directive('esmc', Directivies.EventKeyCode.instance);
-// app.directive('esdesc', Directivies.EventDescription.instance);
 app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
+
+app.directive('esdesc', Directivies.EventDescription.instance);
+app.directive('esmc', Directivies.EventKeyCode.instance);
+app.directive('esmmeasure', Directivies.EventMeasure.instance);
 let httpConfig = ($httpProvider: ng.IHttpProvider) => {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';

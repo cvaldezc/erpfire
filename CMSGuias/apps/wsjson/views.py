@@ -64,13 +64,12 @@ def get_meter_materials(request):
         context = {}
         try:
             meter = Materiale.objects.values('materiales_id', 'matmed').filter(
-                matnom__exact=request.GET['matnom']).order_by('matmed')
+                matnom=request.GET['matnom']).order_by('matmed')
             context['list'] = [{
                 'materiales_id': x['materiales_id'],
                 'pk': x['materiales_id'],
                 'measure': x['matmed'],
-                'matmed': x['matmed']}
-                               for x in meter]
+                'matmed': x['matmed']} for x in meter]
             context['status'] = True
         except ObjectDoesNotExist:
             context['status'] = False

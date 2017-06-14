@@ -101,43 +101,51 @@
                     <span class="hide-on-small-only">Agregar</span>
                 </button>
                 <button type="button" class="waves-effect waves-light btn red">
+                    <i class="fa fa-check-square"></i>
+                    <i class="fa fa-long-arrow-right"></i>
                     <i class="fa fa-trash"></i>
                     <span class="hide-on-small-only">Eliminar</span>
                 </button>
                 <div class="row" ng-show="vm.badd">
                     <div class="col s12 m12 l12">
-                        <smaterials smat="vm.smat"></smaterials>
+                        <smaterials smat="vm.smat" smeasure="vm.smeasure" sid="vm.sid"></smaterials>
                     </div>
                     <div class="col s12 m6 l6">
                         <div class="row">
-                            <div class="col s12 m4 l4">
-                                <label for="">Marca</label>
-                                <select name="" class="browser-default" id=""></select>
+                            <div class="col s12 m4 l4 input-field">
+                                <label for="brand" class="active">Marca</label>
+                                <select id="brand" class="browser-default brands" ng-model="sbrand">
+                                    <option value="{{x.brand_id}}" ng-repeat="x in vm.brands">{{x.brand}}</option>
+                                </select>
                             </div>
-                            <div class="col s12 m4 l4">
-                                <label for="">Modelo</label>
-                                <select name="" class="browser-default" id=""></select>
+                            <div class="col s12 m4 l4 input-field">
+                                <label for="model" class="active">Modelo</label>
+                                <select id="model" class="browser-default models" ng-model="smodel">
+                                    <option value="{{x.model_id}}" ng-repeat="x in vm.models">{{x.model}}</option>
+                                </select>
                             </div>
-                            <div class="col s12 m4 l4">
-                                <label for="">Unidad</label>
-                                <select name="" class="browser-default" id=""></select>
+                            <div class="col s12 m4 l4 input-field">
+                                <label for="unit" class="active">Unidad</label>
+                                <select id="unit" class="browser-default units" ng-model="sunit">
+                                    <option value="{{x.unidad_id}}" ng-repeat="x in vm.units">{{x.uninom}}</option>
+                                </select>
                             </div>
                             <div class="col l4 m4 s6 input-field">
-                                <input type="text" id="price" name="price" value="0" class="right-align">
+                                <input type="text" id="price" name="price" value="0" ng-model="sprice" class="right-align">
                                 <label for="price">Precio</label>
                             </div>
                             <div class="col l4 m4 s6 input-field">
-                                <input type="text" id="quantity" name="quantity" value="0" class="right-align">
+                                <input type="text" id="quantity" name="quantity" value="0" ng-model="squantity" class="right-align">
                                 <label for="price">Cantidad</label>
                             </div>
                             <div class="col l2 m2 s6 input-field">
-                                <input type="text" name="itemdiscount" value="0" class="right-align">
+                                <input type="text" name="itemdiscount" value="0" class="right-align" ng-model="sdiscount">
                                 <label for="itemdiscount">Descuento%</label>
                             </div>
                             <div class="col l2 m2 s6 input-field">
                                 <label for="per" class="active">Percepción%</label>
                                 <p class="input-field">
-                                    <input type="checkbox" id="percention" name="percention">
+                                    <input type="checkbox" id="percention" name="percention" ng-model="sperception">
                                     <label for="percention"></label>
                                 </p>
                             </div>
