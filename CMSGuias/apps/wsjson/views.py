@@ -219,8 +219,8 @@ def get_resumen_details_materiales(request):
                     'ppurchase'] if 'ppurchase' in materials else materials['purchase'],
                 'quantity': 0}]
             context['status'] = True
-        except ObjectDoesNotExist:
-            context['raise'] = e.__str__()
+        except ObjectDoesNotExist as e:
+            context['raise'] = str(e)
             context['status'] = False
         return JSONResponseMixin().render_to_json_response(context)
         #return HttpResponse(json.dumps(context),

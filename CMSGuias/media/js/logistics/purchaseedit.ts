@@ -42,6 +42,7 @@ module Controller {
         private descriptions: object = {};
         private measures: object = {};
         private smat: string;
+        private summary: object = {code: '', name: '', unit: ''};
 
         constructor(private $log: angular.ILogService, private proxy: Service.Proxy, public purchase: object) {
             this.$log.info("controller ready!");
@@ -193,9 +194,7 @@ module Controller {
                 }
             );
         }
-
     }
-
 }
 
 module Directivies {
@@ -230,8 +229,8 @@ module Directivies {
                 <label for="mid">Código de Material</label></div>
             <div class="col s12 m4 l4 input-field">
                 <label for="mmeasure">Medida</label>
-                <select id="mmeasure" class="browser-default chosen-select" ng-model="smeasure" data-placeholder="Seleccione un medida" esmmeasure>
-                <option value="{{msr.pk}}" ng-repeat="msr in measures">{{msr.measure}}</option>
+                <select id="mmeasure" class="browser-default chosen-select" ng-model="smeasure" data-placeholder="Seleccione un medida" ng-options="msr.pk as msr.measure for msr in measures" esmmeasure>
+
                 </select></div></div>`;
         replace = true;
         // private _filter: ng.IFilterDate;
@@ -249,6 +248,9 @@ module Directivies {
                             scope['descriptions'] = response;
                             scope.$apply();
                             angular.element('#mdescription').trigger('chosen:updated');
+                            setTimeout( () => {
+                                angular.element('#mdescription').trigger('chosen:updated');
+                            }, 800);
                         });
                     }
                 }
@@ -274,14 +276,31 @@ module Directivies {
             return new EventKeyCode();
         }
         constructor() {}
-        scope = { item: '=' }
-        link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any){
-            element.bind('click', () => {
-                console.log('this click in element');
+        link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
+            element.bind('keyup', (event) => {
+                if (event.keyCode == 13) {
+                    console.log(event.keyCode);
+                    console.log( 'Materials code by search ' + scope.$parent['vm']['sid']);
+                    this.getSummary(scope.$parent['vm']['sid']).then( (resolve) => {
+                        let data = resolve[0];
+                        scope.$parent['vm']['summary']['code'] = data['materialesid'];
+                        scope.$parent['vm']['summary']['name'] = `${data['matnom']} ${data['matmed']}`;
+                        scope.$parent['vm']['summary']['unit'] = data['unidad'];
+                        scope.$apply();
+                    });
+                }
             });
-            // change code
-            element.bind('change', () => {
-                console.info(scope['sid']);
+        }
+
+        getSummary(mid: string): Promise<Array<object>> {
+            return new Promise( (resolve) => {
+                angular.element.getJSON('/json/get/resumen/details/materiales/', {'matid': mid}, (response: object) => {
+                    if (response['status']) {
+                        resolve(response['list']);
+                    }else{
+                        resolve([]);
+                    }
+                });
             });
         }
     }
@@ -295,16 +314,27 @@ module Directivies {
         link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
             element.bind('change', () => {
                 console.log(element.val());
-                console.log('Execute when select description change');
                 console.log(scope['smat']);
                 this.getMeasure(element.val()).then( (resolve) => {
+                    angular.element('#mmeasure option').remove();
                     scope['measures'] = resolve;
                     scope.$apply();
-                    setTimeout( () => {
-                        angular.element("#mmeasure").trigger('chosen:updated');
-                    }, 200);
+                    this.setUpdateMeasure(angular.element('#mmeasure option').length - 1, resolve.length);
                 });
             });
+        }
+
+        setUpdateMeasure(len: number, obj: number): void {
+            setTimeout(() => {
+                console.log('call set trigger chosen measure');
+                if (len == obj) {
+                    angular.element('#mmeasure').trigger('chosen:updated');
+                }else{
+                    console.log('this called new other');
+                    this.setUpdateMeasure(angular.element('#mmeasure option').length - 1, obj);
+                }
+            }, 800);
+            angular.element('#mmeasure').trigger('chosen:updated');
         }
 
         getMeasure(description: string): Promise<Array<object>> {
@@ -329,7 +359,26 @@ module Directivies {
         link(scope: ng.IScope, element: ng.IAugmentedJQuery, attrs: ng.IAttributes, ctrl: any) {
             element.bind('change', () => {
                 console.log('Execute when select measure change');
-                console.info(scope['smeasure']);
+                this.getSummary(scope.$parent['vm']['smeasure']).then( (resolve) => {
+                    let data = resolve[0];
+                    scope.$parent['vm']['summary']['code'] = data['materialesid'];
+                    scope.$parent['vm']['summary']['name'] = `${data['matnom']} ${data['matmed']}`;
+                    scope.$parent['vm']['summary']['unit'] = data['unidad'];
+                    scope.$apply();
+                    angular.element('#mmeasure').trigger('chosen:updated');
+                });
+            });
+        }
+
+        getSummary(mid: string): Promise<Array<object>> {
+            return new Promise( (resolve) => {
+                angular.element.getJSON('/json/get/resumen/details/materiales/', {'matid': mid}, (response: object) => {
+                    if (response['status']) {
+                        resolve(response['list']);
+                    }else{
+                        resolve([]);
+                    }
+                });
             });
         }
     }

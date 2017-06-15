@@ -24,6 +24,7 @@ var Controller;
             this.purchase = purchase;
             this.descriptions = {};
             this.measures = {};
+            this.summary = { code: '', name: '', unit: '' };
             this.$log.info("controller ready!");
             this.name = 'Christian';
             this.getProjects();
@@ -183,8 +184,8 @@ var Directivies;
                 <label for="mid">Código de Material</label></div>
             <div class="col s12 m4 l4 input-field">
                 <label for="mmeasure">Medida</label>
-                <select id="mmeasure" class="browser-default chosen-select" ng-model="smeasure" data-placeholder="Seleccione un medida" esmmeasure>
-                <option value="{{msr.pk}}" ng-repeat="msr in measures">{{msr.measure}}</option>
+                <select id="mmeasure" class="browser-default chosen-select" ng-model="smeasure" data-placeholder="Seleccione un medida" ng-options="msr.pk as msr.measure for msr in measures" esmmeasure>
+
                 </select></div></div>`;
             this.replace = true;
         }
@@ -206,6 +207,9 @@ var Directivies;
                             scope['descriptions'] = response;
                             scope.$apply();
                             angular.element('#mdescription').trigger('chosen:updated');
+                            setTimeout(() => {
+                                angular.element('#mdescription').trigger('chosen:updated');
+                            }, 800);
                         });
                     }
                 }
@@ -227,19 +231,35 @@ var Directivies;
     ComponentSearchMaterials.$inject = [''];
     Directivies.ComponentSearchMaterials = ComponentSearchMaterials;
     class EventKeyCode {
-        constructor() {
-            this.scope = { item: '=' };
-        }
+        constructor() { }
         static instance() {
             return new EventKeyCode();
         }
         link(scope, element, attrs, ctrl) {
-            element.bind('click', () => {
-                console.log('this click in element');
+            element.bind('keyup', (event) => {
+                if (event.keyCode == 13) {
+                    console.log(event.keyCode);
+                    console.log('Materials code by search ' + scope.$parent['vm']['sid']);
+                    this.getSummary(scope.$parent['vm']['sid']).then((resolve) => {
+                        let data = resolve[0];
+                        scope.$parent['vm']['summary']['code'] = data['materialesid'];
+                        scope.$parent['vm']['summary']['name'] = `${data['matnom']} ${data['matmed']}`;
+                        scope.$parent['vm']['summary']['unit'] = data['unidad'];
+                        scope.$apply();
+                    });
+                }
             });
-            // change code
-            element.bind('change', () => {
-                console.info(scope['sid']);
+        }
+        getSummary(mid) {
+            return new Promise((resolve) => {
+                angular.element.getJSON('/json/get/resumen/details/materiales/', { 'matid': mid }, (response) => {
+                    if (response['status']) {
+                        resolve(response['list']);
+                    }
+                    else {
+                        resolve([]);
+                    }
+                });
             });
         }
     }
@@ -253,16 +273,27 @@ var Directivies;
         link(scope, element, attrs, ctrl) {
             element.bind('change', () => {
                 console.log(element.val());
-                console.log('Execute when select description change');
                 console.log(scope['smat']);
                 this.getMeasure(element.val()).then((resolve) => {
+                    angular.element('#mmeasure option').remove();
                     scope['measures'] = resolve;
                     scope.$apply();
-                    setTimeout(() => {
-                        angular.element("#mmeasure").trigger('chosen:updated');
-                    }, 200);
+                    this.setUpdateMeasure(angular.element('#mmeasure option').length - 1, resolve.length);
                 });
             });
+        }
+        setUpdateMeasure(len, obj) {
+            setTimeout(() => {
+                console.log('call set trigger chosen measure');
+                if (len == obj) {
+                    angular.element('#mmeasure').trigger('chosen:updated');
+                }
+                else {
+                    console.log('this called new other');
+                    this.setUpdateMeasure(angular.element('#mmeasure option').length - 1, obj);
+                }
+            }, 800);
+            angular.element('#mmeasure').trigger('chosen:updated');
         }
         getMeasure(description) {
             return new Promise((resolve) => {
@@ -287,7 +318,26 @@ var Directivies;
         link(scope, element, attrs, ctrl) {
             element.bind('change', () => {
                 console.log('Execute when select measure change');
-                console.info(scope['smeasure']);
+                this.getSummary(scope.$parent['vm']['smeasure']).then((resolve) => {
+                    let data = resolve[0];
+                    scope.$parent['vm']['summary']['code'] = data['materialesid'];
+                    scope.$parent['vm']['summary']['name'] = `${data['matnom']} ${data['matmed']}`;
+                    scope.$parent['vm']['summary']['unit'] = data['unidad'];
+                    scope.$apply();
+                    angular.element('#mmeasure').trigger('chosen:updated');
+                });
+            });
+        }
+        getSummary(mid) {
+            return new Promise((resolve) => {
+                angular.element.getJSON('/json/get/resumen/details/materiales/', { 'matid': mid }, (response) => {
+                    if (response['status']) {
+                        resolve(response['list']);
+                    }
+                    else {
+                        resolve([]);
+                    }
+                });
             });
         }
     }
