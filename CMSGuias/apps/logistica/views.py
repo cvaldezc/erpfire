@@ -1076,6 +1076,15 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
                         )
                         kwargs['igv'] = Configuracion.objects.filter(periodo=purchasebedside[0].registrado.strftime('%Y'))[0].igv
                         kwargs['status'] = True
+                    if 'details' in request.GET:
+                        kwargs['details'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                DetCompra.objects.filter(compra_id=kwargs['purchaseid']),
+                                relations=('materiales', 'brand', 'model')
+                            )
+                        )
+                        kwargs['status'] = True
                 except ObjectDoesNotExist as oex:
                     kwargs['raise'] = str(oex)
                     kwargs['status'] = False
@@ -1083,6 +1092,68 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
             return render(request, 'logistics/purchaseedit.html', kwargs)
         except Exception as ex:
             raise Http404(ex)
+
+    # create 2017-06-16 14:36:58
+    # by @Christian
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            try:
+                if 'ucpurchase' in request.POST:
+                    old = False
+                    # define search if object exists
+                    def findObject():
+                        find = DetCompra.objects.filter(
+                            compra_id=kwargs['purchaseid'],
+                            materiales_id=request.POST['materials'],
+                            brand_id=request.POST['brand'],
+                            model_id=request.POST['model'])
+                        if find.count() >= 1:
+                            old = True
+                            return find[0]
+                        else:
+                            return DetCompra()
+                    def oldquantity(qcurrent, qstatic, qnew):
+                        quantity = [0, 0, False]
+                        if qstatic < qnew:
+                            diff = (qnew - qstatic)
+                            quantity[1] = (qcurrent + diff)
+                            quantity[0] = (qstatic + diff)
+                        else:
+                            diff = (qstatic - qnew)
+                            qstatic -= diff
+                            if qstatic < qcurrent:
+                                qstatic = qcurrent
+                                quantity[2] = True
+                            else:
+                                qcurrent -= diff
+                            quantity[1] = qcurrent
+                            quantity[0] = qstatic
+                        return
+
+                    # save object
+                    def saveOject(x):
+                        dbuy = findObject()
+                        dbuy.materiales_id = x['materials']
+                        dbuy.brand_id = x['brand']
+                        dbuy.model_id = x['model']
+                        dbuy.precio = x['price']
+                        dbuy.discount = x['discount']
+                        dbuy.unit = x['unit']
+                        dbuy.perception = x['perception']
+                        if not old:
+                            dbuy.cantstatic = x['quantity']
+                            dbuy.cantidad = x['quantity']
+                        else:
+                            quantity = oldquantity(dbuy.cantidad, dbuy.cantstatic, x['quantity'])
+                            dbuy.cantstatic = quantity[0]
+                            dbuy.cantidad = quantity[1]
+                            kwargs['minor'] = 'cantidad ingresada es menor a la disponible'
+                    kwargs['status'] = True
+            except (ObjectDoesNotExist or Exception) as jex:
+                kwargs['status'] = False
+                kwargs['raise'] = str(jex)
+            return self.convert_context_to_json(kwargs)
 
 
 class LoginSupplier(JSONResponseMixin, TemplateView):

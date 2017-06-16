@@ -65,19 +65,28 @@
                     <option value="{{x.pk}}" ng-repeat="x in vm.currencies">{{x.fields.moneda}}</option>
                 </select>
             </div>
-            <div class="input-field col l2 m3 s12">
-                <input type="text" id="transfer" ng-model="vm.purchase['fields']['traslado']">
+            <div class="input-field col l4 m4 s12">
+                <label ng-class="{'active': vm.purchase['fields']['sigv'] != null}">Ingresar IGV</label>
+                <input type="checkbox" id="sigv" ng-model="vm.purchase['fields']['sigv']">
+                <label  for="sigv">IGV</label>
+            </div>
+            <div class="input-field col l4 m4 s12">
+                <input type="text" id="quotation" ng-model="vm.purchase['fields']['quotation']" maxlength="25" class="right-align">
+                <label for="quotation" ng-class="{'active': vm.purchase['fields']['quotation'] != null}">Cotización</label>
+            </div>
+            <div class="input-field col l4 m4 s12">
+                <input type="text" id="discount" ng-model="vm.purchase['fields']['discount']" maxlength="3" class="right-align">
+                <label for="discount" ng-class="{'active': vm.purchase['fields']['discount'] != null}">Ingresar Descuento %</label>
+            </div>
+            <div class="col l4 m4 s12 input-field">
+                <input type="text" id="transfer" ng-model="vm.purchase['fields']['traslado']" maxlength="10" class="right-align">
                 <label for="transfer" ng-class="{'active': vm.purchase['fields']['traslado'] != null}">Traslado</label>
             </div>
-            <div class="input-field col l2 m3 s12">
-                <input type="text" id="quotation" ng-model="vm.purchase['fields']['cotizacion']">
-                <label for="quotation" ng-class="{'active': vm.purchase['fields']['cotizacion'] != null}">Cotización</label>
-            </div>
-            <div class="input-field col l3 m4 s12">
+            <div class="input-field col l4 m4 s12">
                 <input type="text" id="contact" ng-model="vm.purchase['fields']['contacto']">
                 <label for="contact" ng-class="{'active': vm.purchase['fields']['contacto'] != null}">Contanto</label>
             </div>
-            <div class="file-field input-field col l5 m2 s12">
+            <div class="file-field input-field col l4 m4 s12">
                 <div class="btn">
                     <span>Deposito</span>
                     <input type="file">
@@ -114,43 +123,40 @@
                         <div class="row">
                             <div class="col s12 m4 l4 input-field">
                                 <label for="brand" class="active">Marca</label>
-                                <select id="brand" class="browser-default brands" ng-model="sbrand">
+                                <select id="brand" class="browser-default brands" ng-model="uc.brand">
                                     <option value="{{x.brand_id}}" ng-repeat="x in vm.brands">{{x.brand}}</option>
                                 </select>
                             </div>
                             <div class="col s12 m4 l4 input-field">
                                 <label for="model" class="active">Modelo</label>
-                                <select id="model" class="browser-default models" ng-model="smodel">
+                                <select id="model" class="browser-default models" ng-model="uc.model">
                                     <option value="{{x.model_id}}" ng-repeat="x in vm.models">{{x.model}}</option>
                                 </select>
                             </div>
                             <div class="col s12 m4 l4 input-field">
                                 <label for="unit" class="active">Unidad</label>
-                                <select id="unit" class="browser-default units" ng-model="sunit">
+                                <select id="unit" class="browser-default units" ng-model="uc.unit">
                                     <option value="{{x.unidad_id}}" ng-repeat="x in vm.units">{{x.uninom}}</option>
                                 </select>
                             </div>
                             <div class="col l4 m4 s6 input-field">
-                                <input type="text" id="price" name="price" value="0" ng-model="sprice" class="right-align">
+                                <input type="text" id="price" name="price" value="0" ng-model="uc.price" class="right-align">
                                 <label for="price">Precio</label>
                             </div>
                             <div class="col l4 m4 s6 input-field">
-                                <input type="text" id="quantity" name="quantity" value="0" ng-model="squantity" class="right-align">
+                                <input type="text" id="quantity" name="quantity" value="0" ng-model="uc.quantity" class="right-align">
                                 <label for="price">Cantidad</label>
                             </div>
                             <div class="col l2 m2 s6 input-field">
-                                <input type="text" name="itemdiscount" value="0" class="right-align" ng-model="sdiscount">
+                                <input type="text" name="itemdiscount" class="right-align" ng-model="uc.discount" ng-init="uc.discount=0">
                                 <label for="itemdiscount">Descuento%</label>
                             </div>
                             <div class="col l2 m2 s6 input-field">
                                 <label for="per" class="active">Percepción%</label>
-                                <p class="input-field">
-                                    <input type="checkbox" id="percention" name="percention" ng-model="sperception">
-                                    <label for="percention"></label>
-                                </p>
+                                <input type="checkbox" id="percention" name="percention" ng-model="uc.perception" ng-init="uc.perception">
                             </div>
                             <div class="col s12 m12 l12">
-                                <button class="waves-effect waves-light btn green lighten-3 wfull">
+                                <button type="button" class="waves-effect waves-light btn green lighten-3 wfull" ng-click="vm.saveDetails()">
                                     <i class="fa fa-plus"></i>
                                     <span class="hide-on-small-only">Agregar</span>
                                 </button>
@@ -255,7 +261,7 @@
                         <th>Dsct {{vm.purchase['fields']['discount']}}%</th>
                         <td class="right-align">
                             <input type="hidden" ng-model="vm.purchase['discount']" ng-init="vm.purchase['discount']=0">
-                            {{ vm.purchase['discount'] = (vm.purchase['samount'] * (vm.purchase['fields']['discount']/100)) | number:"2"}}
+                            {{ vm.purchase['discount'] = ((vm.purchase['samount'] * (vm.purchase['fields']['discount']/100))) | number:"2"}}
                         </td>
                     </tr>
                     <tr>
@@ -263,7 +269,7 @@
                         <th>IGV {{vm.igv}}%</th>
                         <td class="right-align">
                             <input type="hidden" ng-model="vm.purchase['sigv']" ng-init="vm.purchase['sigv']=0">
-                            {{vm.purchase['sigv']=((vm.purchase['samount'] + vm.purchase['discount']) * (vm.igv/100)) | number:"2"}}
+                            {{ vm.purchase['sigv'] = ( (vm.purchase['fields']['sigv'] ) ? ((vm.purchase['samount'] + vm.purchase['discount']) * (vm.igv/100)): 0) | number:"2" }}
                         </td>
                     </tr>
                     <tr>

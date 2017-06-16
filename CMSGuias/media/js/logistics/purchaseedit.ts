@@ -3,6 +3,8 @@
 module Service {
     export interface IProxy {
         get: (uri: string, options: object) => ng.IHttpPromise<any>;
+
+        post: (url: string, options: object) => ng.IHttpPromise<any>;
     }
 
     export class Proxy implements IProxy {
@@ -17,6 +19,21 @@ module Service {
             return this.$http.get(uri, {params: options});
         }
 
+        post(uri: string, options: object) {
+            return this.$http.post(uri, this.transformData(options), {transformRequest: angular.identity, headers: {'Content-Type': undefined}})
+        }
+
+        private transformData(data: object): FormData {
+            let form = new FormData();
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) {
+                    let element = data[key];
+                    form.append(key, element);
+                }
+            }
+            return form;
+        }
+
     }
 }
 
@@ -24,27 +41,46 @@ module Controller {
 
     interface IPurchase {
         purchase: object;
+        name: string;
+        docpayments: object;
+        methodpayments: object;
+        currencies: object;
+        suppliers: object;
+        projects: object;
+        brands: Array<object>;
+        models: Array<object>;
+        units: Array<object>;
+        igv: number;
+        descriptions: object;
+        measures: object;
+        smat: string;
+        summary: object;
+        uc: object;
+        modifyMaterial: boolean;
     }
 
     export class PurchaseController implements IPurchase {
+        purchase: object;
+        name: string;
+        docpayments: object;
+        methodpayments: object;
+        currencies: object;
+        suppliers: object;
+        projects: object;
+        brands: object[];
+        models: object[];
+        units: object[];
+        igv: number;
+        descriptions: object;
+        measures: object;
+        smat: string;
+        summary: object = { code: '', name: '', unit: '' };
+        uc: object;
+        modifyMaterial: boolean = false;
 
         static $inject = ['$log', 'sproxy'];
-        private name: string;
-        private docpayments: object;
-        private methodpayments: object;
-        private currencies: object;
-        private suppliers: object;
-        private projects: object;
-        private brands: Array<object>;
-        private models: Array<object>;
-        private units: Array<object>;
-        private igv: number;
-        private descriptions: object = {};
-        private measures: object = {};
-        private smat: string;
-        private summary: object = {code: '', name: '', unit: ''};
 
-        constructor(private $log: angular.ILogService, private proxy: Service.Proxy, public purchase: object) {
+        constructor(private $log: angular.ILogService, private proxy: Service.Proxy) {
             this.$log.info("controller ready!");
             this.name = 'Christian';
             this.getProjects();
@@ -70,9 +106,17 @@ module Controller {
                     ['fullscreen']
                 ]
             });
+            angular.element("#transfer").pickadate({
+                container: "body",
+                closeOnSelect: true,
+                min: new Date(),
+                selectMonths: true,
+                selectYears: 15,
+                format: 'yyyy-mm-dd'
+            })
         }
 
-        initialize() {
+        initialize(): void {
             this.purchase['fields']['projects'] = this.purchase['fields']['projects'].split(',');
             angular.element("#observation").trumbowyg("html", this.purchase['fields']['observation']);
             setTimeout(() => {
@@ -87,18 +131,27 @@ module Controller {
             }, 400);
         }
 
-        getPurchase() {
+        getPurchase(): void {
             this.proxy.get("", {'purchase': true}).then((response: object) => {
                 if (response['data']['status']) {
                     this.purchase['fields'] = response['data']['purchase']['fields'];
-                    this.purchase['details'] = response['data']['purchase']['details'];
+                    // this.purchase['details'] = response['data']['purchase']['details'];
                     this.igv = response['data']['igv']
+                    this.getPurchaseDetails();
                     this.initialize();
                 }
             });
         }
 
-        getProjects() {
+        getPurchaseDetails(): void {
+            this.proxy.get("", {'details': true}).then((response: object) => {
+                if (response['data']['status']) {
+                    this.purchase['details'] = response['data']['details'];
+                }
+            });
+        }
+
+        getProjects(): void {
             this.proxy.get("/sales/projects/", {'projects': true, 'status': 'AC'}).then((response: object) => {
                 if (response['data']['status']) {
                     this.projects = response['data']['list'];
@@ -110,7 +163,7 @@ module Controller {
             });
         }
 
-        getSuppliers() {
+        getSuppliers(): void {
             this.proxy.get("/keep/supplier/", {'list': true}).then((response: object) => {
                 if (response['data']['status']){
                     this.suppliers = response['data']['list'];
@@ -121,7 +174,7 @@ module Controller {
             });
         }
 
-        getDocumentPayment() {
+        getDocumentPayment(): void {
             this.proxy.get("/keep/document/payment/", {'list': true}).then((response: object) => {
                 if (response['data']['status']){
                     this.docpayments = response['data']['list'];
@@ -132,7 +185,7 @@ module Controller {
             });
         }
 
-        getMethodPayment() {
+        getMethodPayment(): void {
             this.proxy.get("/keep/method/payment/", {'list': true}).then(
                 (response: object) => {
                     if (response['data']['status']) {
@@ -144,7 +197,7 @@ module Controller {
                 });
         }
 
-        getCurrency() {
+        getCurrency(): void {
             this.proxy.get("/keep/currency/", {'list': true}).then(
                 (response: object) => {
                     if (response['data']['status']) {
@@ -193,6 +246,34 @@ module Controller {
                     }
                 }
             );
+        }
+        // 2017-06-16 10:44:58
+        // @Christian
+        saveMaterial(): void {
+            // collection data for save
+            let data: object = this.purchase['fields'];
+            // data['']
+        }
+
+        saveDetails(): void {
+            // launch toast
+            Materialize.toast('<b>Procesando...!<b>', parseInt('undefined'), 'toast-remove');
+
+            // get object data for send
+            let save: object = this.uc;
+            save['materials'] = this.summary['code'];
+            save['ucpurchase'] = true
+            this.proxy.post('', save).then( (response: object) => {
+                angular.element('.toast-remove').remove();
+                if (response['data']['status'])
+                {
+                    Materialize.toast('<i class="fa fa-check fa-2x"></i> Guardado!', 2600);
+                    this.getPurchaseDetails();
+                }else{
+                    // ${response['data']['raise']}
+                    Materialize.toast(`<i class="fa fa-times fa-2x"></i> &nbsp;Error ${response['data']['raise']}`, 6000);
+                }
+            });
         }
     }
 }

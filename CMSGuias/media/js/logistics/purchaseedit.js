@@ -11,6 +11,19 @@ var Service;
         get(uri, options) {
             return this.$http.get(uri, { params: options });
         }
+        post(uri, options) {
+            return this.$http.post(uri, this.transformData(options), { transformRequest: angular.identity, headers: { 'Content-Type': undefined } });
+        }
+        transformData(data) {
+            let form = new FormData();
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) {
+                    let element = data[key];
+                    form.append(key, element);
+                }
+            }
+            return form;
+        }
     }
     Proxy.$inject = ['$http', '$cookies'];
     Service.Proxy = Proxy;
@@ -18,13 +31,11 @@ var Service;
 var Controller;
 (function (Controller) {
     class PurchaseController {
-        constructor($log, proxy, purchase) {
+        constructor($log, proxy) {
             this.$log = $log;
             this.proxy = proxy;
-            this.purchase = purchase;
-            this.descriptions = {};
-            this.measures = {};
             this.summary = { code: '', name: '', unit: '' };
+            this.modifyMaterial = false;
             this.$log.info("controller ready!");
             this.name = 'Christian';
             this.getProjects();
@@ -50,6 +61,14 @@ var Controller;
                     ['fullscreen']
                 ]
             });
+            angular.element("#transfer").pickadate({
+                container: "body",
+                closeOnSelect: true,
+                min: new Date(),
+                selectMonths: true,
+                selectYears: 15,
+                format: 'yyyy-mm-dd'
+            });
         }
         initialize() {
             this.purchase['fields']['projects'] = this.purchase['fields']['projects'].split(',');
@@ -69,9 +88,17 @@ var Controller;
             this.proxy.get("", { 'purchase': true }).then((response) => {
                 if (response['data']['status']) {
                     this.purchase['fields'] = response['data']['purchase']['fields'];
-                    this.purchase['details'] = response['data']['purchase']['details'];
+                    // this.purchase['details'] = response['data']['purchase']['details'];
                     this.igv = response['data']['igv'];
+                    this.getPurchaseDetails();
                     this.initialize();
+                }
+            });
+        }
+        getPurchaseDetails() {
+            this.proxy.get("", { 'details': true }).then((response) => {
+                if (response['data']['status']) {
+                    this.purchase['details'] = response['data']['details'];
                 }
             });
         }
@@ -153,6 +180,32 @@ var Controller;
                     setTimeout(() => {
                         angular.element('.units').trigger('chosen:updated');
                     }, 800);
+                }
+            });
+        }
+        // 2017-06-16 10:44:58
+        // @Christian
+        saveMaterial() {
+            // collection data for save
+            let data = this.purchase['fields'];
+            // data['']
+        }
+        saveDetails() {
+            // launch toast
+            Materialize.toast('<b>Procesando...!<b>', parseInt('undefined'), 'toast-remove');
+            // get object data for send
+            let save = this.uc;
+            save['materials'] = this.summary['code'];
+            save['ucpurchase'] = true;
+            this.proxy.post('', save).then((response) => {
+                angular.element('.toast-remove').remove();
+                if (response['data']['status']) {
+                    Materialize.toast('<i class="fa fa-check fa-2x"></i> Guardado!', 2600);
+                    this.getPurchaseDetails();
+                }
+                else {
+                    // ${response['data']['raise']}
+                    Materialize.toast(`<i class="fa fa-times fa-2x"></i> &nbsp;Error ${response['data']['raise']}`, 6000);
                 }
             });
         }

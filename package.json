@@ -30,6 +30,7 @@
     "nib": "^1.1.0"
   },
   "dependencies": {
-    "@types/core-js": "^0.9.41"
+    "@types/core-js": "^0.9.41",
+    "@types/materialize-css": "^0.98.3"
   }
 }
