@@ -14,28 +14,26 @@ class TestResta(SimpleTestCase):
         Tests that 1 + 1 always equals 2.
         """
         def oldquantity(qcurrent, qstatic, qnew):
+
             quantity = [0, 0, False]
-            qin = (qstatic - qcurrent)
-            if qin <= 0:
+            if qnew > qstatic:
                 diff = (qnew - qstatic)
                 quantity[1] = (qcurrent + diff)
                 quantity[0] = (qstatic + diff)
             else:
-                diff = (qstatic - qnew)
-                qstatic -= diff
-                if qcurrent < diff:
+                qin = (qstatic - qcurrent)
+                if qnew <= qin:
                     qstatic = qin
                     qcurrent = 0
-                elif qstatic < qcurrent:
-                    qstatic = qcurrent
                     quantity[2] = True
                 else:
-                    qcurrent -= diff
+                    qstatic = qnew
+                    qcurrent = (qnew - qin)
                 quantity[1] = qcurrent # quantity current post 1
                 quantity[0] = qstatic # quantity static post 0
             return quantity
-        a = oldquantity(5, 10, 4)
-        print a
-        print a[0]
-        print a[1]
-        #self.assertEqual(1 + 1, 2)
+        result = oldquantity(10, 10, 8)
+        print result
+        print result[0]
+        print result[1]
+        self.assertEqual(result[0], 8)

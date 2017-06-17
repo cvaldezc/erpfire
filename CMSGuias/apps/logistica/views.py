@@ -1097,63 +1097,71 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
     # by @Christian
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
-        if request.is_ajax():
-            try:
-                if 'ucpurchase' in request.POST:
-                    old = False
-                    # define search if object exists
-                    def findObject():
-                        find = DetCompra.objects.filter(
-                            compra_id=kwargs['purchaseid'],
-                            materiales_id=request.POST['materials'],
-                            brand_id=request.POST['brand'],
-                            model_id=request.POST['model'])
-                        if find.count() >= 1:
-                            old = True
-                            return find[0]
+        try:
+            if 'ucpurchase' in request.POST:
+                # define search if object exists
+                def findObject():
+                    find = DetCompra.objects.filter(
+                        compra_id=kwargs['purchaseid'],
+                        materiales_id=request.POST['materials'],
+                        brand_id=request.POST['brand'],
+                        model_id=request.POST['model'])
+                    if find.count() >= 1:
+                        return find[0]
+                    else:
+                        return DetCompra()
+                def oldquantity(qcurrent, qstatic, qnew):
+                    quantity = [0, 0, False]
+                    if qnew > qstatic:
+                        diff = (qnew - qstatic)
+                        quantity[1] = (qcurrent + diff)
+                        quantity[0] = (qstatic + diff)
+                    else:
+                        qin = (qstatic - qcurrent)
+                        if qnew <= qin:
+                            qstatic = qin
+                            qcurrent = 0
+                            quantity[2] = True
                         else:
-                            return DetCompra()
-                    def oldquantity(qcurrent, qstatic, qnew):
-                        quantity = [0, 0, False]
-                        if qstatic < qnew:
-                            diff = (qnew - qstatic)
-                            quantity[1] = (qcurrent + diff)
-                            quantity[0] = (qstatic + diff)
-                        else:
-                            diff = (qstatic - qnew)
-                            qstatic -= diff
-                            if qstatic < qcurrent:
-                                qstatic = qcurrent
-                                quantity[2] = True
-                            else:
-                                qcurrent -= diff
-                            quantity[1] = qcurrent
-                            quantity[0] = qstatic
-                        return
+                            qstatic = qnew
+                            qcurrent = (qnew - qin)
+                        quantity[1] = qcurrent # quantity current post 1
+                        quantity[0] = qstatic # quantity static post 0
+                    return quantity
 
-                    # save object
-                    def saveOject(x):
-                        dbuy = findObject()
-                        dbuy.materiales_id = x['materials']
-                        dbuy.brand_id = x['brand']
-                        dbuy.model_id = x['model']
-                        dbuy.precio = x['price']
-                        dbuy.discount = x['discount']
-                        dbuy.unit = x['unit']
-                        dbuy.perception = x['perception']
-                        if not old:
-                            dbuy.cantstatic = x['quantity']
-                            dbuy.cantidad = x['quantity']
-                        else:
-                            quantity = oldquantity(dbuy.cantidad, dbuy.cantstatic, x['quantity'])
-                            dbuy.cantstatic = quantity[0]
-                            dbuy.cantidad = quantity[1]
+                # save object
+                def saveOject(x):
+                    dbuy = findObject()
+                    dbuy.compra_id = kwargs['purchaseid']
+                    dbuy.materiales_id = x['materials']
+                    dbuy.brand_id = x['brand']
+                    dbuy.model_id = x['model']
+                    dbuy.precio = x['price']
+                    dbuy.discount = x['discount']
+                    dbuy.unit_id = x['unit']
+                    dbuy.perception = x['perception']
+                    print dbuy.cantstatic
+                    print type(dbuy.cantstatic)
+                    print dbuy.cantstatic is None
+                    print dbuy.cantstatic == None
+                    if dbuy.cantstatic is None:
+                        dbuy.cantstatic = x['quantity']
+                        dbuy.cantidad = x['quantity']
+                    else:
+                        quantity = oldquantity(float(dbuy.cantidad), float(dbuy.cantstatic), float(x['quantity']))
+                        dbuy.cantstatic = quantity[0]
+                        dbuy.cantidad = quantity[1]
+                        if quantity[2]:
                             kwargs['minor'] = 'cantidad ingresada es menor a la disponible'
-                    kwargs['status'] = True
-            except (ObjectDoesNotExist or Exception) as jex:
-                kwargs['status'] = False
-                kwargs['raise'] = str(jex)
-            return self.convert_context_to_json(kwargs)
+                    dbuy.save()
+                print request.POST
+                print request.is_ajax()
+                saveOject(request.POST)
+                kwargs['status'] = True
+        except (ObjectDoesNotExist or Exception) as jex:
+            kwargs['status'] = False
+            kwargs['raise'] = str(jex)
+        return self.render_to_json_response(kwargs)
 
 
 class LoginSupplier(JSONResponseMixin, TemplateView):

@@ -37,15 +37,8 @@ var Controller;
             this.summary = { code: '', name: '', unit: '' };
             this.modifyMaterial = false;
             this.$log.info("controller ready!");
+            this.initialize();
             this.name = 'Christian';
-            this.getProjects();
-            this.getSuppliers();
-            this.getDocumentPayment();
-            this.getMethodPayment();
-            this.getCurrency();
-            this.getBrand();
-            this.getModel();
-            this.getUnits();
             angular.element("select").chosen({ width: "100%" });
             angular.element("#observation").trumbowyg({
                 btns: [
@@ -69,8 +62,19 @@ var Controller;
                 selectYears: 15,
                 format: 'yyyy-mm-dd'
             });
+            // angular.element('.chips').material_chip();
         }
         initialize() {
+            this.getProjects();
+            this.getSuppliers();
+            this.getDocumentPayment();
+            this.getMethodPayment();
+            this.getCurrency();
+            this.getBrand();
+            this.getModel();
+            this.getUnits();
+        }
+        parseSelect() {
             this.purchase['fields']['projects'] = this.purchase['fields']['projects'].split(',');
             angular.element("#observation").trumbowyg("html", this.purchase['fields']['observation']);
             setTimeout(() => {
@@ -91,13 +95,14 @@ var Controller;
                     // this.purchase['details'] = response['data']['purchase']['details'];
                     this.igv = response['data']['igv'];
                     this.getPurchaseDetails();
-                    this.initialize();
+                    this.parseSelect();
                 }
             });
         }
         getPurchaseDetails() {
             this.proxy.get("", { 'details': true }).then((response) => {
                 if (response['data']['status']) {
+                    this.purchase['samount'] = 0;
                     this.purchase['details'] = response['data']['details'];
                 }
             });
@@ -207,7 +212,25 @@ var Controller;
                     // ${response['data']['raise']}
                     Materialize.toast(`<i class="fa fa-times fa-2x"></i> &nbsp;Error ${response['data']['raise']}`, 6000);
                 }
+            }, (error) => {
+                Materialize.toast(error, 8000);
             });
+        }
+        checkedItems() {
+            for (var key in this.purchase['modify']) {
+                this.purchase['modify'][key]['status'] = this.chkdetails;
+            }
+        }
+        delDetails() {
+            for (var key in this.purchase['modify']) {
+                if (this.purchase['modify'].hasOwnProperty(key)) {
+                    console.log('key from object ', key);
+                    let element = this.purchase['modify'][key];
+                    if (element['status']) {
+                        this.$log.log('this element del ', element);
+                    }
+                }
+            }
         }
     }
     PurchaseController.$inject = ['$log', 'sproxy'];

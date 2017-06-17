@@ -57,9 +57,11 @@ module Controller {
         summary: object;
         uc: object;
         modifyMaterial: boolean;
+        chkdetails: boolean;
     }
 
     export class PurchaseController implements IPurchase {
+        chkdetails: boolean;
         purchase: object;
         name: string;
         docpayments: object;
@@ -82,15 +84,8 @@ module Controller {
 
         constructor(private $log: angular.ILogService, private proxy: Service.Proxy) {
             this.$log.info("controller ready!");
+            this.initialize();
             this.name = 'Christian';
-            this.getProjects();
-            this.getSuppliers();
-            this.getDocumentPayment();
-            this.getMethodPayment();
-            this.getCurrency();
-            this.getBrand();
-            this.getModel();
-            this.getUnits();
             angular.element("select").chosen({width: "100%"});
             angular.element("#observation").trumbowyg({
                 btns: [
@@ -113,10 +108,23 @@ module Controller {
                 selectMonths: true,
                 selectYears: 15,
                 format: 'yyyy-mm-dd'
-            })
+            });
+            // angular.element('.chips').material_chip();
         }
 
         initialize(): void {
+            this.getProjects();
+            this.getSuppliers();
+            this.getDocumentPayment();
+            this.getMethodPayment();
+            this.getCurrency();
+            this.getBrand();
+            this.getModel();
+            this.getUnits();
+        }
+
+        parseSelect(): void {
+
             this.purchase['fields']['projects'] = this.purchase['fields']['projects'].split(',');
             angular.element("#observation").trumbowyg("html", this.purchase['fields']['observation']);
             setTimeout(() => {
@@ -138,7 +146,7 @@ module Controller {
                     // this.purchase['details'] = response['data']['purchase']['details'];
                     this.igv = response['data']['igv']
                     this.getPurchaseDetails();
-                    this.initialize();
+                    this.parseSelect();
                 }
             });
         }
@@ -146,6 +154,7 @@ module Controller {
         getPurchaseDetails(): void {
             this.proxy.get("", {'details': true}).then((response: object) => {
                 if (response['data']['status']) {
+                    this.purchase['samount'] = 0;
                     this.purchase['details'] = response['data']['details'];
                 }
             });
@@ -272,7 +281,48 @@ module Controller {
                 }else{
                     // ${response['data']['raise']}
                     Materialize.toast(`<i class="fa fa-times fa-2x"></i> &nbsp;Error ${response['data']['raise']}`, 6000);
+                }},
+                (error) => {
+                    Materialize.toast(error, 8000);
                 }
+            );
+        }
+
+        checkedItems(): void {
+            for (var key in this.purchase['modify']) {
+                this.purchase['modify'][key]['status'] = this.chkdetails;
+            }
+        }
+
+        delDetails(): void {
+            this.odel().then( (result) => {
+                if (result.length > 0){
+                    swal({
+                        title: 'Desea eliminar los materiales seleccionados?',
+                        type: 'warning',
+                        closeOnConfirm: true,
+                        closeOnCancel: true,
+                        confirmButtonText: 'Si!',
+                        cancelButtoText: 'No!'
+                    });
+                }
+            });
+        }
+
+        private odel(): Promise<Array<object>> {
+            return new Promise( (resolve) => {
+                let promises: Array<string>;
+                for (var key in this.purchase['modify']) {
+                    if (this.purchase['modify'].hasOwnProperty(key)) {
+                        // // console.log('key from object ', key);
+                        // let element = this.purchase['modify'][key];
+                        // if (element['status']){
+                        //     // this.$log.log('this element del ', element);
+                        // }
+                        promises.push(key);
+                    }
+                }
+                resolve(promises);
             });
         }
     }

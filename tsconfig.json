@@ -12,7 +12,8 @@
             "jquery",
             "node",
             "core-js",
-            "materialize-css"
+            "materialize-css",
+            "sweetalert"
         ],
         "typeRoots": [
             // add path to @types

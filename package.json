@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@types/core-js": "^0.9.41",
-    "@types/materialize-css": "^0.98.3"
+    "@types/materialize-css": "^0.98.3",
+    "@types/sweetalert": "^1.1.27"
   }
 }
