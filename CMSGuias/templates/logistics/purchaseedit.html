@@ -259,7 +259,7 @@
                                     {{ vm.purchase['modify'][x.pk]['amount'] | number:"2"}}
                                 </td>
                                 <td class="center-align" ng-init="vm.purchase['samount'] = (vm.purchase['modify'][x.pk]['amount'] + vm.purchase['samount'])">
-                                    <a href="#comment" class="grey-text text-darken-3">
+                                    <a href="#comment" class="grey-text text-darken-3" ng-click="vm.showComment(x.pk, x.fields.observation)">
                                         <i class="fa fa-commenting-o"></i>
                                     </a>
                                 </td>
@@ -317,8 +317,10 @@
         <div class="col l12 m12 s12">
             <div id="mcomment" class="modal">
                 <div class="modal-content">
-                    <label>Observaciones</label>
-                    <div id="itemobservation"></div>
+                    <strong>Observación</strong>
+                    <a href="#scomment" class="btn"><i class="fa fa-floppy-o"></i><span class="hide-on-small-only"> Guardar</span></a>
+                    <a href="#" class="right modal-action modal-close" ng-comment="vm.comments={pk: '', text: ''}"><i class="fa fa-times"></i></a>
+                    <textarea class="itemobservation"></textarea>
                 </div>
             </div>
         </div>

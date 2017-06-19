@@ -58,9 +58,11 @@ module Controller {
         uc: object;
         modifyMaterial: boolean;
         chkdetails: boolean;
+        comments: object;
     }
 
     export class PurchaseController implements IPurchase {
+        comments: object = {pk: '', text: ''};
         chkdetails: boolean;
         purchase: object;
         name: string;
@@ -109,6 +111,8 @@ module Controller {
                 selectYears: 15,
                 format: 'yyyy-mm-dd'
             });
+            angular.element('.modal').modal({dismissible: false});
+            angular.element('.itemobservation').trumbowyg();
             // angular.element('.chips').material_chip();
         }
 
@@ -295,31 +299,59 @@ module Controller {
         }
 
         delDetails(): void {
-            this.odel().then( (result) => {
+            this.odel().then( (result: object[]) => {
+                console.log(result);
                 if (result.length > 0){
+                    this.$log.log(result);
                     swal({
                         title: 'Desea eliminar los materiales seleccionados?',
                         type: 'warning',
                         closeOnConfirm: true,
                         closeOnCancel: true,
+                        showCancelButton: true,
                         confirmButtonText: 'Si!',
-                        cancelButtoText: 'No!'
+                        confirmButtonColor: '#fe6969',
+                        cancelButtonText: 'No!',
+                    }, (answer: boolean) => {
+                        if (answer) {
+                            // send data for delete
+                            Materialize.toast(`<i class="fa fa-cog fa-2x fa-spin"></i>&nbsp;Procesando...!`, parseInt(undefined), 'toast-remove');
+                            let param: object = {
+                                delitems: true,
+                                data: JSON.stringify(result)
+                            };
+                            this.proxy.post('', param).then( (response: object) => {
+                                angular.element('.toast-remove').remove();
+                                if (response['data']['status']) {
+                                    this.getPurchaseDetails();
+                                    Materialize.toast('<i class="fa fa-check fa-2x"></i>&nbsp;Materiales eliminados!', 2600 );
+                                }
+                            });
+                        }
                     });
                 }
             });
         }
 
+        showComment(id: number, text: string): void {
+            this.comments = {pk: id, text: text}
+            angular.element('.itemobservation').trumbowyg('html', text);
+            angular.element('#mcomment').modal('open');
+        }
+
+        /**
+         * Block function privates or auxiliars
+         */
+
         private odel(): Promise<Array<object>> {
             return new Promise( (resolve) => {
-                let promises: Array<string>;
+                let promises: Array<string> = [];
                 for (var key in this.purchase['modify']) {
                     if (this.purchase['modify'].hasOwnProperty(key)) {
-                        // // console.log('key from object ', key);
-                        // let element = this.purchase['modify'][key];
-                        // if (element['status']){
-                        //     // this.$log.log('this element del ', element);
-                        // }
-                        promises.push(key);
+                        let element = this.purchase['modify'][key];
+                        if (element['status']){
+                            promises.push(key);
+                        }
                     }
                 }
                 resolve(promises);

@@ -34,6 +34,7 @@ var Controller;
         constructor($log, proxy) {
             this.$log = $log;
             this.proxy = proxy;
+            this.comments = { pk: '', text: '' };
             this.summary = { code: '', name: '', unit: '' };
             this.modifyMaterial = false;
             this.$log.info("controller ready!");
@@ -62,6 +63,8 @@ var Controller;
                 selectYears: 15,
                 format: 'yyyy-mm-dd'
             });
+            angular.element('.modal').modal({ dismissible: false });
+            angular.element('.itemobservation').trumbowyg();
             // angular.element('.chips').material_chip();
         }
         initialize() {
@@ -222,15 +225,60 @@ var Controller;
             }
         }
         delDetails() {
-            for (var key in this.purchase['modify']) {
-                if (this.purchase['modify'].hasOwnProperty(key)) {
-                    console.log('key from object ', key);
-                    let element = this.purchase['modify'][key];
-                    if (element['status']) {
-                        this.$log.log('this element del ', element);
+            this.odel().then((result) => {
+                console.log(result);
+                if (result.length > 0) {
+                    this.$log.log(result);
+                    swal({
+                        title: 'Desea eliminar los materiales seleccionados?',
+                        type: 'warning',
+                        closeOnConfirm: true,
+                        closeOnCancel: true,
+                        showCancelButton: true,
+                        confirmButtonText: 'Si!',
+                        confirmButtonColor: '#fe6969',
+                        cancelButtonText: 'No!',
+                    }, (answer) => {
+                        if (answer) {
+                            // send data for delete
+                            Materialize.toast(`<i class="fa fa-cog fa-2x fa-spin"></i>&nbsp;Procesando...!`, parseInt(undefined), 'toast-remove');
+                            let param = {
+                                delitems: true,
+                                data: JSON.stringify(result)
+                            };
+                            this.proxy.post('', param).then((response) => {
+                                angular.element('.toast-remove').remove();
+                                if (response['data']['status']) {
+                                    this.getPurchaseDetails();
+                                    Materialize.toast('<i class="fa fa-check fa-2x"></i>&nbsp;Materiales eliminados!', 2600);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        showComment(id, text) {
+            this.comments = { pk: id, text: text };
+            angular.element('.itemobservation').trumbowyg('html', text);
+            angular.element('#mcomment').modal('open');
+        }
+        /**
+         * Block function privates or auxiliars
+         */
+        odel() {
+            return new Promise((resolve) => {
+                let promises = [];
+                for (var key in this.purchase['modify']) {
+                    if (this.purchase['modify'].hasOwnProperty(key)) {
+                        let element = this.purchase['modify'][key];
+                        if (element['status']) {
+                            promises.push(key);
+                        }
                     }
                 }
-            }
+                resolve(promises);
+            });
         }
     }
     PurchaseController.$inject = ['$log', 'sproxy'];

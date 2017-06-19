@@ -1158,6 +1158,16 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
                 print request.is_ajax()
                 saveOject(request.POST)
                 kwargs['status'] = True
+            if 'delitems' in request.POST:
+                def delItem(pkdbuy):
+                    try:
+                        DetCompra.objects.get(id=pkdbuy).delete()
+                    except ObjectDoesNotExist as oex:
+                        kwargs['raise'] += str(oex)
+
+                for x in json.loads(request.POST['data']):
+                    delItem(x)
+                kwargs['status'] = True
         except (ObjectDoesNotExist or Exception) as jex:
             kwargs['status'] = False
             kwargs['raise'] = str(jex)
