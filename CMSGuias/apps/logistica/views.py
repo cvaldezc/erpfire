@@ -1098,14 +1098,28 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         try:
+            """
+            block transaction for bedside
+            """
+            if 'savebedside' in request.POST:
+                kwargs['status'] = True
+            """
+            block transaction for details
+            """
             if 'ucpurchase' in request.POST:
                 # define search if object exists
                 def findObject():
+                    """
+                    Find an object in purchase details to generate a new instance or return an object from the table.
+                    This way you can create or update at the same time
+                    """
+                    brand = request.POST['oldbrand'] if 'oldbrand' in request.POST else request.POST['brand']
+                    model = request.POST['oldmodel'] if 'oldmodel' in request.POST else request.POST['model']
                     find = DetCompra.objects.filter(
                         compra_id=kwargs['purchaseid'],
                         materiales_id=request.POST['materials'],
-                        brand_id=request.POST['brand'],
-                        model_id=request.POST['model'])
+                        brand_id=brand,
+                        model_id=model)
                     if find.count() >= 1:
                         return find[0]
                     else:
@@ -1140,10 +1154,10 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
                     dbuy.discount = x['discount']
                     dbuy.unit_id = x['unit']
                     dbuy.perception = x['perception']
-                    print dbuy.cantstatic
-                    print type(dbuy.cantstatic)
-                    print dbuy.cantstatic is None
-                    print dbuy.cantstatic == None
+                    # print dbuy.cantstatic
+                    # print type(dbuy.cantstatic)
+                    # print dbuy.cantstatic is None
+                    # print dbuy.cantstatic == None
                     if dbuy.cantstatic is None:
                         dbuy.cantstatic = x['quantity']
                         dbuy.cantidad = x['quantity']
@@ -1154,16 +1168,22 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
                         if quantity[2]:
                             kwargs['minor'] = 'cantidad ingresada es menor a la disponible'
                     dbuy.save()
-                print request.POST
-                print request.is_ajax()
+
                 saveOject(request.POST)
+                kwargs['status'] = True
+            if 'savecomment' in request.POST:
+                def commentObj(x):
+                    obj = DetCompra.objects.get(id=x['pk'])
+                    obj.observation = x['comment']
+                    obj.save()
+                commentObj(request.POST)
                 kwargs['status'] = True
             if 'delitems' in request.POST:
                 def delItem(pkdbuy):
                     try:
                         DetCompra.objects.get(id=pkdbuy).delete()
                     except ObjectDoesNotExist as oex:
-                        kwargs['raise'] += str(oex)
+                        kwargs['raise'] = str(oex)
 
                 for x in json.loads(request.POST['data']):
                     delItem(x)

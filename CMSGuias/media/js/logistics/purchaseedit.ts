@@ -59,10 +59,12 @@ module Controller {
         modifyMaterial: boolean;
         chkdetails: boolean;
         comments: object;
+        badd: boolean;
     }
 
     export class PurchaseController implements IPurchase {
-        comments: object = {pk: '', text: ''};
+        badd: boolean = false;
+        comments: object = { pk: '', text: '' };
         chkdetails: boolean;
         purchase: object;
         name: string;
@@ -104,7 +106,7 @@ module Controller {
                 ]
             });
             angular.element("#transfer").pickadate({
-                container: "body",
+                container: "#bedside",
                 closeOnSelect: true,
                 min: new Date(),
                 selectMonths: true,
@@ -112,7 +114,18 @@ module Controller {
                 format: 'yyyy-mm-dd'
             });
             angular.element('.modal').modal({dismissible: false});
-            angular.element('.itemobservation').trumbowyg();
+            angular.element('.itemobservation').trumbowyg({
+                btns: [['viewHTML'],
+                    ['formatting'],
+                    'btnGrp-semantic',
+                    ['superscript', 'subscript'],
+                    ['link'],
+                    'btnGrp-justify',
+                    'btnGrp-lists',
+                    ['horizontalRule'],
+                    ['removeformat'],
+                    ['fullscreen']]
+            });
             // angular.element('.chips').material_chip();
         }
 
@@ -282,6 +295,20 @@ module Controller {
                 {
                     Materialize.toast('<i class="fa fa-check fa-2x"></i> Guardado!', 2600);
                     this.getPurchaseDetails();
+                    // clean data
+                    this.summary['code'] = '';
+                    this.summary['name'] = '';
+                    this.summary['unit'] = '';
+                    // data for form
+                    // this.uc['brand'] = edit['brand']['pk'];
+                    // this.uc['model'] = edit['model']['pk'];
+                    // this.uc['oldbrand'] = edit['brand']['pk'];
+                    // this.uc['oldmodel'] = edit['model']['pk'];
+                    // this.uc['unit'] = (edit['unit'] == '') ? edit['materiales']['fields']['unidad'] : edit['unit'];
+                    this.uc['price'] = 0;
+                    this.uc['quantity'] = 0;
+                    this.uc['discount'] = 0;
+                    this.uc['perception'] = 0;
                 }else{
                     // ${response['data']['raise']}
                     Materialize.toast(`<i class="fa fa-times fa-2x"></i> &nbsp;Error ${response['data']['raise']}`, 6000);
@@ -337,6 +364,44 @@ module Controller {
             this.comments = {pk: id, text: text}
             angular.element('.itemobservation').trumbowyg('html', text);
             angular.element('#mcomment').modal('open');
+        }
+
+        saveComment(pk: number): void {
+            let params: object = {
+                pk: pk,
+                savecomment: true,
+                comment: angular.element('.itemobservation').trumbowyg('html')
+            }
+            this.proxy.post('', params).then( (response: object) => {
+                if (response['data']['status']) {
+                    this.getPurchaseDetails();
+                }
+            });
+        }
+
+        showDataModify(edit: object): void {
+            // add view summary materials
+            this.summary['code'] = edit['materiales']['pk'];
+            this.summary['name'] = `${edit['materiales']['fields']['matnom']} ${edit['materiales']['fields']['matmed']}`;
+            this.summary['unit'] = edit['materiales']['fields']['unidad'];
+            // data for form
+            this.uc['brand'] = edit['brand']['pk'];
+            this.uc['model'] = edit['model']['pk'];
+            this.uc['oldbrand'] = edit['brand']['pk'];
+            this.uc['oldmodel'] = edit['model']['pk'];
+            this.uc['unit'] = (edit['unit'] == '') ? edit['materiales']['fields']['unidad'] : edit['unit'];
+            this.uc['price'] = edit['precio'];
+            this.uc['quantity'] = edit['cantstatic'];
+            this.uc['discount'] = edit['discount'];
+            this.uc['perception'] = edit['perception'];
+            this.badd = true;
+            setTimeout( () => {
+                angular.element(".brands").trigger("chosen:updated");
+                angular.element(".models").trigger("chosen:updated");
+                angular.element(".units").trigger("chosen:updated");
+            }, 800);
+            // show block and position
+            window.scrollTo(0, angular.element('.block-details').position().top);
         }
 
         /**

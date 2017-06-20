@@ -40,7 +40,7 @@
             <div class="light-blue lighten-4 progress" ng-hide="vm.purchase['fields'].status != null">
                 <div class="indeterminate light-blue"></div>
             </div>
-            <div class="card">
+            <div id="bedside" class="card">
                 <div class="row" ng-show="shead">
                     <div class="col l6 m6 s12 input-field">
                         <select id="supplier" class="browser-default browser-default suppliers" ng-model="vm.purchase['fields']['proveedor']">
@@ -121,7 +121,7 @@
             </div>
             <div class="row">
                 <div class="col l12 m12 s12">
-                    <div class="card-panel">
+                    <div class="card-panel block-details">
                         <button type="button" class="waves-effect waves-light btn" ng-model="vm.badd" ng-init="vm.badd=false" ng-click="vm.badd=!vm.badd">
                             <i class="fa fa-plus"></i>
                             <span class="hide-on-small-only">Agregar</span>
@@ -264,7 +264,7 @@
                                     </a>
                                 </td>
                                 <td class="center-align">
-                                    <a href="#edit" class="blue-text">
+                                    <a href="#edit" class="blue-text" ng-click="vm.showDataModify(vm.purchase['modify'][x.pk])">
                                         <i class="fa fa-pencil"></i>
                                     </a>
                                 </td>
@@ -318,7 +318,7 @@
             <div id="mcomment" class="modal">
                 <div class="modal-content">
                     <strong>Observación</strong>
-                    <a href="#scomment" class="btn"><i class="fa fa-floppy-o"></i><span class="hide-on-small-only"> Guardar</span></a>
+                    <a href="#scomment" class="btn blue" ng-click="vm.saveComment()"><i class="fa fa-floppy-o"></i><span class="hide-on-small-only"> Guardar</span></a>
                     <a href="#" class="right modal-action modal-close" ng-comment="vm.comments={pk: '', text: ''}"><i class="fa fa-times"></i></a>
                     <textarea class="itemobservation"></textarea>
                 </div>

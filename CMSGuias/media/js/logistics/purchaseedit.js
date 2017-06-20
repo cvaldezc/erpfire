@@ -34,6 +34,7 @@ var Controller;
         constructor($log, proxy) {
             this.$log = $log;
             this.proxy = proxy;
+            this.badd = false;
             this.comments = { pk: '', text: '' };
             this.summary = { code: '', name: '', unit: '' };
             this.modifyMaterial = false;
@@ -56,7 +57,7 @@ var Controller;
                 ]
             });
             angular.element("#transfer").pickadate({
-                container: "body",
+                container: "#bedside",
                 closeOnSelect: true,
                 min: new Date(),
                 selectMonths: true,
@@ -64,7 +65,18 @@ var Controller;
                 format: 'yyyy-mm-dd'
             });
             angular.element('.modal').modal({ dismissible: false });
-            angular.element('.itemobservation').trumbowyg();
+            angular.element('.itemobservation').trumbowyg({
+                btns: [['viewHTML'],
+                    ['formatting'],
+                    'btnGrp-semantic',
+                    ['superscript', 'subscript'],
+                    ['link'],
+                    'btnGrp-justify',
+                    'btnGrp-lists',
+                    ['horizontalRule'],
+                    ['removeformat'],
+                    ['fullscreen']]
+            });
             // angular.element('.chips').material_chip();
         }
         initialize() {
@@ -210,6 +222,20 @@ var Controller;
                 if (response['data']['status']) {
                     Materialize.toast('<i class="fa fa-check fa-2x"></i> Guardado!', 2600);
                     this.getPurchaseDetails();
+                    // clean data
+                    this.summary['code'] = '';
+                    this.summary['name'] = '';
+                    this.summary['unit'] = '';
+                    // data for form
+                    // this.uc['brand'] = edit['brand']['pk'];
+                    // this.uc['model'] = edit['model']['pk'];
+                    // this.uc['oldbrand'] = edit['brand']['pk'];
+                    // this.uc['oldmodel'] = edit['model']['pk'];
+                    // this.uc['unit'] = (edit['unit'] == '') ? edit['materiales']['fields']['unidad'] : edit['unit'];
+                    this.uc['price'] = 0;
+                    this.uc['quantity'] = 0;
+                    this.uc['discount'] = 0;
+                    this.uc['perception'] = 0;
                 }
                 else {
                     // ${response['data']['raise']}
@@ -262,6 +288,42 @@ var Controller;
             this.comments = { pk: id, text: text };
             angular.element('.itemobservation').trumbowyg('html', text);
             angular.element('#mcomment').modal('open');
+        }
+        saveComment(pk) {
+            let params = {
+                pk: pk,
+                savecomment: true,
+                comment: angular.element('.itemobservation').trumbowyg('html')
+            };
+            this.proxy.post('', params).then((response) => {
+                if (response['data']['status']) {
+                    this.getPurchaseDetails();
+                }
+            });
+        }
+        showDataModify(edit) {
+            // add view summary materials
+            this.summary['code'] = edit['materiales']['pk'];
+            this.summary['name'] = `${edit['materiales']['fields']['matnom']} ${edit['materiales']['fields']['matmed']}`;
+            this.summary['unit'] = edit['materiales']['fields']['unidad'];
+            // data for form
+            this.uc['brand'] = edit['brand']['pk'];
+            this.uc['model'] = edit['model']['pk'];
+            this.uc['oldbrand'] = edit['brand']['pk'];
+            this.uc['oldmodel'] = edit['model']['pk'];
+            this.uc['unit'] = (edit['unit'] == '') ? edit['materiales']['fields']['unidad'] : edit['unit'];
+            this.uc['price'] = edit['precio'];
+            this.uc['quantity'] = edit['cantstatic'];
+            this.uc['discount'] = edit['discount'];
+            this.uc['perception'] = edit['perception'];
+            this.badd = true;
+            setTimeout(() => {
+                angular.element(".brands").trigger("chosen:updated");
+                angular.element(".models").trigger("chosen:updated");
+                angular.element(".units").trigger("chosen:updated");
+            }, 800);
+            // show block and position
+            window.scrollTo(0, angular.element('.block-details').position().top);
         }
         /**
          * Block function privates or auxiliars
