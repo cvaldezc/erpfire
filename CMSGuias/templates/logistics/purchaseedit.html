@@ -30,7 +30,7 @@
                     </button>
                     {% comment %}<button class="right btn"></button>{% endcomment %}
                     <label class="right">&nbsp;&nbsp;</label>
-                    <button type="button" class="right waves-effect waves-light btn blue pulse">
+                    <button type="button" class="right waves-effect waves-light btn blue pulse" ng-click="vm.saveHeadPurchase()">
                         <i class="fa fa-floppy-o"></i>
                         <span class="hide-on-small-only">GUARDAR</span>
                     </button>
@@ -106,7 +106,7 @@
                     <div class="file-field input-field col l4 m4 s12">
                         <div class="btn">
                             <span>Deposito</span>
-                            <input type="file">
+                            <input type="file" id="deposit">
                         </div>
                         <div class="file-path-wrapper">
                             <input class="file-path validate" type="text">

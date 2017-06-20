@@ -325,6 +325,27 @@ var Controller;
             // show block and position
             window.scrollTo(0, angular.element('.block-details').position().top);
         }
+        saveHeadPurchase() {
+            Materialize.toast(`<i class="fa fa-cog fa-spin fa-2x"></i>&nbsp;Procesando...!`, parseInt(undefined), 'toast-remove');
+            // collect all data and generating params
+            let params = this.purchase['fields'];
+            params['observation'] = angular.element("#observation").trumbowyg('html');
+            params['projects'] = params['projects'].join();
+            let deposit = angular.element("#deposit")[0];
+            if (deposit.files.length) {
+                params['deposit'] = deposit.files[0];
+            }
+            params['savebedside'] = true;
+            this.proxy.post('', params).then((response) => {
+                angular.element('.toast-remove').remove();
+                if (response['data']['status']) {
+                    location.href = '/logistics/purchase/list/';
+                }
+                else {
+                    Materialize.toast(`<i class="fa fa-times fa-2x"></i>&nbsp;${response['data']['raise']}`, 8000);
+                }
+            });
+        }
         /**
          * Block function privates or auxiliars
          */
@@ -358,21 +379,21 @@ var Directivies;
             };
             this.restrict = 'AE';
             this.template = `<div>
-            <div class="col s12 m6 l6 input-field">
-                <label for="mdescription">Descripción</label>
-                <select esdesc id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción" ng-model="smat">
-                <option value=""></option>
-                <option value="{{x.name}}" ng-repeat="x in descriptions">{{x.name}}</option>
-                </select>
-            </div>
-            <div class="col s12 m2 l2 input-field">
-                <input type="text" id="mid" placeholder="000000000000000" maxlength="15" ng-model="sid" esmc>
-                <label for="mid">Código de Material</label></div>
-            <div class="col s12 m4 l4 input-field">
-                <label for="mmeasure">Medida</label>
-                <select id="mmeasure" class="browser-default chosen-select" ng-model="smeasure" data-placeholder="Seleccione un medida" ng-options="msr.pk as msr.measure for msr in measures" esmmeasure>
+			<div class="col s12 m6 l6 input-field">
+				<label for="mdescription">Descripción</label>
+				<select esdesc id="mdescription" class="browser-default chosen-select" data-placeholder="Ingrese una descripción" ng-model="smat">
+				<option value=""></option>
+				<option value="{{x.name}}" ng-repeat="x in descriptions">{{x.name}}</option>
+				</select>
+			</div>
+			<div class="col s12 m2 l2 input-field">
+				<input type="text" id="mid" placeholder="000000000000000" maxlength="15" ng-model="sid" esmc>
+				<label for="mid">Código de Material</label></div>
+			<div class="col s12 m4 l4 input-field">
+				<label for="mmeasure">Medida</label>
+				<select id="mmeasure" class="browser-default chosen-select" ng-model="smeasure" data-placeholder="Seleccione un medida" ng-options="msr.pk as msr.measure for msr in measures" esmmeasure>
 
-                </select></div></div>`;
+				</select></div></div>`;
             this.replace = true;
         }
         static instance() {
