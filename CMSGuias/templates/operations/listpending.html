@@ -44,7 +44,7 @@
             <input type="text" ng-model="filtergdetails">
             <label for="">Filtar en Tabla</label>
         </div>
-        <table class="highlight hovered responsive-table" ng-show="gdata">
+        <table class="table highlight responsive-table" ng-show="gdata">
             <thead>
                 <tr>
                     <th></th>
@@ -63,9 +63,9 @@
                         <td>{{$index+1}}</td>
                         <td>{{x.materials}}</td>
                         <td>
-                            <button type="button" class="btn-flat waves-effect waves-light" ng-click="getDetails(x.materials)">
-                                <i class="fa fa-bars"></i>
-                            </button>
+                            <a href="#" class="waves-effect waves-light" ng-click="getDetails(x.materials)">
+                                <i class="fa fa-bars fa-lg"></i>
+                            </a>
                         </td>
                         <td>{{x.matnom}} {{x.matmed}}</td>
                         <td>{{x.unit}}</td>
@@ -97,38 +97,42 @@
                 <i class="fa fa-filter prefix"></i>
                 <input type="text" ng-model="filtergd">
             </div>
-            <table class="highlight hovered responsive-table">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                    </tr>
-                </thead>
-                <tbody ng-show="sg">
-                    <tr ng-repeat="x in sg | filter: filtergd">
-                        <td>{{$index + 1}}</td>
-                        <td>
-                            <input type="checkbox" id="{{x.pk}}" class="filled-in"  ng-model="selected[x.pk]" ng-value="{{x.pk}}">
-                            <label for="{{x.pk}}"></label>
-                        </td>
-                        <td>{{x.pk}}</td>
-                        <td>{{x.fields.name}}</td>
-                    </tr>
-                </tbody>
-                <tbody ng-show="ds">
-                    <tr ng-repeat="x in ds | filter: filtergd ">
-                        <td>{{$index + 1}}</td>
-                        <td>
-                            <input type="checkbox" id="{{x.pk}}" class="filled-in"  ng-model="selected[x.pk]" ng-value="{{x.pk}}">
-                            <label for="{{x.pk}}"></label>
-                        </td>
-                        <td>{{x.pk}}</td>
-                        <td>{{x.fields.name}}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="row">
+                <div class="col l12 m12 s12">
+                    <table class="table highlight responsive-table">
+                        <thead class="brown lighten-2">
+                            <tr>
+                                <th class="col-1"></th>
+                                <th class="col-1"></th>
+                                <th class="col-3">Código</th>
+                                <th>Nombre</th>
+                            </tr>
+                        </thead>
+                        <tbody ng-show="sg">
+                            <tr ng-repeat="x in sg | filter: filtergd">
+                                <td>{{$index + 1}}</td>
+                                <td>
+                                    <input type="checkbox" id="{{x.pk}}" class="filled-in blue"  ng-model="selected[x.pk]" ng-value="{{x.pk}}">
+                                    <label for="{{x.pk}}"></label>
+                                </td>
+                                <td>{{x.pk}}</td>
+                                <td>{{x.fields.name}}</td>
+                            </tr>
+                        </tbody>
+                        <tbody ng-show="ds">
+                            <tr ng-repeat="x in ds | filter: filtergd ">
+                                <td>{{$index + 1}}</td>
+                                <td>
+                                    <input type="checkbox" id="{{x.pk}}" class="filled-in amber"  ng-model="selected[x.pk]" ng-value="{{x.pk}}">
+                                    <label for="{{x.pk}}"></label>
+                                </td>
+                                <td>{{x.pk}}</td>
+                                <td>{{x.fields.name}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
         <div class="modal-footer">
             <a href="#" class="waves-effect waves-green btn-flat modal-action modal-close left">
@@ -144,7 +148,7 @@
     <!-- Modal Details Inside -->
     <div id="mdetails" class="modal bottom-sheet modal-fixed-footer" style="max-height:85%">
         <div class="modal-content">
-            <table class="hovered hightlight responsive-table">
+            <table class="table hightlight responsive-table">
                 <thead>
                     <tr>
                         <th>Item</th>

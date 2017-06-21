@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import csv
 import json
 import datetime
@@ -48,7 +50,7 @@ def get_description_materials(request):
             name = Materiale.objects.values('matnom').filter(
                 matnom__icontains=request.GET.get('nom')).distinct(
                     'matnom').order_by('matnom')
-            context['name'] = [{'matnom': x['matnom']} for x in name]
+            context['names'] = [{'matnom': x['matnom'], 'name': x['matnom']} for x in name]
             context['status'] = True
         except ObjectDoesNotExist:
             context['status'] = False
@@ -62,11 +64,12 @@ def get_meter_materials(request):
         context = {}
         try:
             meter = Materiale.objects.values('materiales_id', 'matmed').filter(
-                matnom__exact=request.GET['matnom']).order_by('matmed')
+                matnom=request.GET['matnom']).order_by('matmed')
             context['list'] = [{
                 'materiales_id': x['materiales_id'],
-                'matmed': x['matmed']}
-                               for x in meter]
+                'pk': x['materiales_id'],
+                'measure': x['matmed'],
+                'matmed': x['matmed']} for x in meter]
             context['status'] = True
         except ObjectDoesNotExist:
             context['status'] = False
@@ -216,8 +219,8 @@ def get_resumen_details_materiales(request):
                     'ppurchase'] if 'ppurchase' in materials else materials['purchase'],
                 'quantity': 0}]
             context['status'] = True
-        except ObjectDoesNotExist:
-            context['raise'] = e.__str__()
+        except ObjectDoesNotExist as e:
+            context['raise'] = str(e)
             context['status'] = False
         return JSONResponseMixin().render_to_json_response(context)
         #return HttpResponse(json.dumps(context),

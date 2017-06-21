@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/cvaldezc/erpfire#readme",
   "devDependencies": {
-    "@types/angularjs": "^1.5.14-alpha",
+    "@types/angular": "^1.5.7",
+    "@types/angular-cookies": "^1.4.3",
     "@types/jquery": "^2.0.32",
+    "@types/node": "^7.0.23",
     "gulp": "^3.9.0",
     "gulp-coffee": "^2.3.1",
     "gulp-plumber": "^1.0.1",
@@ -26,5 +28,10 @@
     "gulp-uglify": "^2.0.0",
     "gulp-watch": "^4.3.1",
     "nib": "^1.1.0"
+  },
+  "dependencies": {
+    "@types/core-js": "^0.9.41",
+    "@types/materialize-css": "^0.98.3",
+    "@types/sweetalert": "^1.1.27"
   }
 }

@@ -1,15 +1,26 @@
 {
-    "sourceMap": true,
+    "sourceMap": false,
     "compileOnSave": true,
     "compilerOptions": {
         "target": "es5",
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "sourceMap": true,
         "watch": true,
         "types": [
-            "angularjs",
-            "jquery"
-        ]
+            "angular",
+            "jquery",
+            "node",
+            "core-js",
+            "materialize-css",
+            "sweetalert"
+        ],
+        "typeRoots": [
+            // add path to @types
+            "node_modules/@types"
+         ]
     },
-    "include": [ "./CMSGuias/media/js/*" ],
+    "include": [ "CMSGuias/media/js/*" ],
     "exclude": [
         "node_modules",
         "**/*.spec.ts"

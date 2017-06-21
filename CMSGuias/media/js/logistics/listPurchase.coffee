@@ -123,11 +123,12 @@ showActions = (event) ->
     return
 
 showEditPurchasae = (event) ->
-    $(".mactions").modal "hide"
+    #$(".mactions").modal "hide"
     $(".nrop").text @value
-    getDataPurchase @value
-    $(".step-one").fadeOut 150
-    $(".step-two").fadeIn 800
+    location.href = "/logistics/purchase/edit/#{@value}/"
+    #getDataPurchase @value
+    #$(".step-one").fadeOut 150
+    #$(".step-two").fadeIn 800
     return
 
 showStepOne = (event) ->
