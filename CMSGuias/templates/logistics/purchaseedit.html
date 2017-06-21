@@ -59,7 +59,7 @@
                     </div>
                     <div class="col l6 m6 s12 input-field">
                         <select id="projects" class="browser-default browser-default projects" multiple ng-model="vm.purchase['fields']['projects']">
-                            <option value="{{x.pk}}" ng-repeat="x in vm.projects">{{x.fields.nompro}}</option>
+                            <option value="{{x.pk}}" ng-repeat="x in vm.projects">{{x.pk}} - {{x.fields.nompro}}</option>
                         </select>
                         <label for="projects" class="active">Proyectos</label>
                     </div>
