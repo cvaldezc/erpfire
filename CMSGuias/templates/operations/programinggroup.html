@@ -34,25 +34,25 @@
       </div>
       <div class="card-action">
       {% if status == 'PE' %}
-        <button type="button" class="btn blue blue-lighten-3 waves-effect waves-light " data-target="mgroup" ng-if="area == 'administrator' || area == 'ventas' ">
+        <button type="button" class="btn blue blue-lighten-3 waves-effect waves-light " data-target="mgroup" ng-if="area == 'administrator' || area == 'ventas' || perdni == '71744452'">
           <i class="fa fa-plus"></i> Agregar Grupo
         </button>
       {% endif %}
-        <button type="button" class="btn blue blue-lighten-3" ng-click="listGroup()" ng-if="area == 'administrator' || area == 'ventas' || perdni == '46377134'">
+        <button type="button" class="btn blue blue-lighten-3" ng-click="listGroup()" ng-if="area == 'administrator' || area == 'ventas' || perdni == '71744452'">
           <i class="fa fa-list"></i> Lista Grupo
         </button>
       </div>
-    
+
     <div class="card-content">
       <h5>Área</h5>
     </div>
     <div class="card-action">
       {% if status == 'PE' %}
-        <button type="button" class="btn green lighten-2 waves-effect waves-light " data-target="mdsector" ng-if="area == 'administrator' || area == 'ventas'">
+        <button type="button" class="btn green lighten-2 waves-effect waves-light " data-target="mdsector" ng-if="area == 'administrator' || area == 'ventas' || perdni == '71744452'">
           <i class="fa fa-plus"></i>
           <span>Agregar Area</span>
         </button>
-        <button type="button" class="btn green lighten-2 waves-effect waves-light " data-target="mexcel" ng-if="area == 'administrator' || area == 'ventas' || perdni == '46377134' || area == 'operaciones'">
+        <button type="button" class="btn green lighten-2 waves-effect waves-light " data-target="mexcel" ng-if="area == 'administrator' || area == 'ventas' || perdni == '71744452' || area == 'operaciones'">
           <i class="fa fa-file-excel-o"></i>
           <span>Archivo</span>
         </button>
@@ -166,11 +166,16 @@
       {% endverbatim %}
             <div class="card-action">
             {% if request.user.get_profile.empdni.charge.area|lower == 'administrator' or request.user.get_profile.empdni.charge.area|lower == 'ventas' %}
-              <a class="red-text text-lighten-1" href="#" ng-click="delarea($event)" {% verbatim %}data-dsector="{{x.pk}}"{% endverbatim %}><i class="fa fa-trash"></i></a>
-              <a class="amber-text text-darken-1" href="#!" ng-click="showArea()"><i class="fa fa-pencil"></i> EDITAR</a>
+              <a class="red-text text-lighten-1" href="#" ng-click="delarea($event)" {% verbatim %}data-dsector="{{x.pk}}"{% endverbatim %}>
+                <i class="fa fa-trash"></i></a>
+              <a class="amber-text text-darken-1" href="#!" ng-click="showArea()">
+                <i class="fa fa-pencil"></i> EDITAR</a>
             {% endif %}
       {% verbatim %}
-              <a class="light-blue-text text-darken-1 right" href="/operations/area/{{x.fields.sgroup.pk}}/{{x.pk}}/{% endverbatim %}{{project.proyecto_id}}/{{sector.sector_id}}/{{sector.subproyecto_id}}/{% verbatim %}"><i class="fa fa-eye"></i> VER</a>
+              <a class="light-blue-text text-darken-1 right" href="/operations/area/{{x.fields.sgroup.pk}}/{{x.pk}}/{% endverbatim %}{{project.proyecto_id}}/{{sector.sector_id}}/{{sector.subproyecto_id}}/{% verbatim %}">
+                <span>INGRESAR</span>
+                <i class="fa fa-caret-square-o-right"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -184,7 +189,7 @@
             <div class="card">
               <div class="card-content">
                 <div class="collection">
-                  <a href="#!" data-pk="{{x.pk}}" data-index="{{$index}}" class="collection-item grey-text text-darken-3" ng-repeat="x in sglist" ng-click="getAreasByGroup(x.pk, $index)" ng-class="{'active': $index == selected}">
+                  <a href="#!group={{x.pk}}#name={{ x.fields.name }}" data-pk="{{x.pk}}" data-index="{{$index}}" class="collection-item grey-text text-darken-3" ng-repeat="x in sglist" ng-click="getAreasByGroup(x.pk, $index)" ng-class="{'active': $index == selected}">
                     <i class="fa fa-tags"></i> {{ x.fields.name }}
                   </a>
                 </div>
@@ -205,16 +210,19 @@
                   <div class="col l4 m6 s12" ng-repeat="x in lareas | filter: sname">
                     <div class="card" style="height: 200px;">
                       <div class="card-content" style="background: {{x.fields.sgroup.fields.colour}}">
-                        <strong>{{x.fields.sgroup.fields.name}} | {{x.fields.name}}</strong>
+                        <strong>
+                          <i class="fa fa-cube"></i> {{x.fields.sgroup.fields.name}}
+                          <br> <i class="fa fa-caret-right"></i> {{x.fields.name}}
+                        </strong>
                         <p>{{x.fields.description}}</p>
                         <p>
                           <div class="progress red lighten-4">
                             <div class="determinate red lighten-1" style="width: 0%"></div>
                           </div>
                         </p>
-                        <p class="right-align">
+                        <!--<p class="right-align">
                           <span class="right-align">$</span>
-                        </p>
+                        </p>-->
                       </div>
                       {% endverbatim %}
                       <div class="card-action">
@@ -223,7 +231,10 @@
                         <a class="amber-text text-darken-1" href="#!" ng-click="showArea()"><i class="fa fa-pencil"></i> EDITAR</a>
                       {% endif %}
                       {% verbatim %}
-                        <a class="light-blue-text text-darken-1 right" href="/operations/area/{{x.fields.sgroup.pk}}/{{x.pk}}/{% endverbatim %}{{project.proyecto_id}}/{{sector.sector_id}}/{{sector.subproyecto_id}}/{% verbatim %}"><i class="fa fa-eye"></i> VER</a>
+                        <a class="right light-blue-text text-darken-1" href="/operations/area/{{x.fields.sgroup.pk}}/{{x.pk}}/{% endverbatim %}{{project.proyecto_id}}/{{sector.sector_id}}/{{sector.subproyecto_id}}/{% verbatim %}">
+                          <span>INGRESAR</span>
+                          <i class="fa fa-caret-square-o-right"></i>
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -305,9 +316,19 @@
               <i class="fa fa-cogs"></i>
             </button>
             <ul id="{{x.pk}}" class="dropdown-content">
-              <li ng-hide="x.fields.status == 'AC'"><a href="#!" style="padding: 2px 0px 2px 3px;" ng-click="showESG()" class="waves-effect waves-light grey-text text-darken-3"><small><i class="fa fa-edit"></i> Editar</small></a></li>
+              <li ng-hide="x.fields.status == 'AC'">
+                <a href="#group|edit" ng-click="showESG()" class="waves-effect waves-light grey-text text-darken-3">
+                  <i class="fa fa-edit green-text"></i>
+                  <span>Editar</span>
+                </a>
+              </li>
               <li class="divider"></li>
-              <li ng-hide="x.fields.status == 'AC'"><a href="#!" style="padding: 2px 0px 2px 3px;" class="waves-effect waves-light grey-text text-darken-3" ng-click="delsgroup($event)" data-sgroup="{{x.pk}}"><small><i class="fa fa-trash"></i> Eliminar</small></a></li>
+              <li ng-hide="x.fields.status == 'AC'">
+                <a href="#group|remove" class="waves-effect waves-light grey-text text-darken-3" ng-click="delsgroup($event)" data-sgroup="{{x.pk}}">
+                  <i class="fa fa-trash red-text"></i>
+                  <span>Eliminar</span>
+                </a>
+              </li>
             </ul>
           </td>
         </script>

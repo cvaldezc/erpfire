@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from audit_log.models.managers import AuditLog
+
 from django.db import models
 from django.contrib import admin
 
@@ -79,6 +81,8 @@ class Compra(models.Model):
     paid = models.CharField(max_length=1, blank=True, default='0')
     flag = models.BooleanField(default=True)
 
+    audit_log = AuditLog()
+
     class Meta:
         ordering = ['compra_id']
 
@@ -108,6 +112,8 @@ class DetCompra(models.Model):
     perception = models.FloatField(default=0, blank=True)
     convertto = models.DecimalField(max_digits=6, decimal_places=2, default=1)
     observation = models.TextField(blank=True, default='')
+
+    audit_log = AuditLog()
 
     class Meta:
         ordering = ['materiales']

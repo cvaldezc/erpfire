@@ -210,14 +210,18 @@ class Employee(models.Model):
     audit_log = AuditLog()
 
     class Meta:
+        """some options for view in admin"""
         ordering = ['lastname']
 
     def __unicode__(self):
-        return '%s' % (self.empdni_id)
+        name = u' '.join((self.firstname, self.lastname)).encode('utf-8').strip()
+        # last = self.lastname
+        return '{0} {1}'.format(self.empdni_id, name)
 
     @property
     def name_complete(self):
-        return '%s, %s' % (self.lastname, self.firstname)
+        name = u' '.join((self.firstname, self.lastname)).encode('utf-8').strip()
+        return name
 
     @property
     def name_charge(self):
