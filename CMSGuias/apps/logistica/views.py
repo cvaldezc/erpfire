@@ -1152,8 +1152,9 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
                         obuy.sigv = True if x['sigv'] == 'true' else False
                         obuy.discount = x['discount']
                         obuy.observation = x['observation']
+                        print request.FILES
                         if 'deposit' in request.FILES:
-                            obuy.desposito = request.FILES['deposit']
+                            obuy.deposito = request.FILES['deposit']
                         # compare if buy is complete
                         odet = DetCompra.objects.filter(compra_id=kwargs['purchaseid'])
                         if odet.count() == odet.filter(cantidad=0).count():

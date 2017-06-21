@@ -10,10 +10,18 @@
     <div class="row">
         <div class="col s12 m12 l12">
             <div class="chip yellow lighten-3" ng-model="cchip" ng-hide="cchip">
-                Recuerde que esta pagina debe de ser manipulada con google chrome Version 59.0 o superior, para su correcto funcionamiento.
+                Recuerde que esta pagina debe de ser manipulada con google chrome Version >= 59.0 o , para su correcto funcionamiento.
                 <i class="fa fa-times" ng-click="cchip=!cchip"></i>
             </div>
-            <h4>Editar Orden de Compra {{ purchaseid }}</h4>
+            <h4>
+                Editar Orden de Compra {{ purchaseid }}
+                <strong ng-show="vm.purchase.fields.status=='CO'">
+                    <br>
+                    <small>
+                    Está orden de compra no se puede modificar por que se ha ingresado su detalle por completo.</small>
+                </strong>
+            </h4>
+
             <input type="hidden" ng-init="vm.purchase['id']='{{purchaseid}}'">
             <div class="card">
                 <div class="card-content">
@@ -30,7 +38,7 @@
                     </button>
                     {% comment %}<button class="right btn"></button>{% endcomment %}
                     <label class="right">&nbsp;&nbsp;</label>
-                    <button type="button" class="right waves-effect waves-light btn blue pulse" ng-click="vm.saveHeadPurchase()">
+                    <button type="button" class="right waves-effect waves-light btn blue pulse" ng-click="vm.saveHeadPurchase()" ng-hide="vm.purchase.fields.status=='CO' || vm.purchase['fields'].status == null">
                         <i class="fa fa-floppy-o"></i>
                         <span class="hide-on-small-only">GUARDAR</span>
                     </button>
@@ -40,7 +48,7 @@
             <div class="light-blue lighten-4 progress" ng-hide="vm.purchase['fields'].status != null">
                 <div class="indeterminate light-blue"></div>
             </div>
-            <div id="bedside" class="card">
+            <div id="bedside" class="card" ng-show="vm.purchase['fields'].status != null">
                 <div class="row" ng-show="shead">
                     <div class="col l6 m6 s12 input-field">
                         <select id="supplier" class="browser-default browser-default suppliers" ng-model="vm.purchase['fields']['proveedor']">
@@ -103,7 +111,7 @@
                         <input type="text" id="contact" ng-model="vm.purchase['fields']['contacto']">
                         <label for="contact" ng-class="{'active': vm.purchase['fields']['contacto'] != null}">Contanto</label>
                     </div>
-                    <div class="file-field input-field col l4 m4 s12">
+                    <div class="file-field input-field col l3 m3 s12">
                         <div class="btn">
                             <span>Deposito</span>
                             <input type="file" id="deposit">
@@ -111,7 +119,12 @@
                         <div class="file-path-wrapper">
                             <input class="file-path validate" type="text">
                         </div>
-                        <a href="/media/storage{{vm.purchase['fields']['deposito']}}" ng-if="vm.purchase['fields']['deposito']"><i class="fa fa-file"></i></a>
+                    </div>
+                    <div class="col l1 m1 m12 input-field">
+                        <label for="deposit" class="active">Archivo Previo</label>
+                        <a id="deposit" href="/media/{{vm.purchase['fields']['deposito']}}" target="_blank" ng-if="vm.purchase['fields']['deposito']">
+                            <i class="fa fa-file"></i>
+                        </a>
                     </div>
                     <div class="input-field col l12 m12 s12">
                         <label class="active">Observaciones</label>
@@ -119,9 +132,9 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" ng-hide="vm.purchase.fields.status=='CO'">
                 <div class="col l12 m12 s12">
-                    <div class="card-panel block-details">
+                    <div class="card-panel block-details" ng-show="vm.purchase['fields'].status != null">
                         <button type="button" class="waves-effect waves-light btn" ng-model="vm.badd" ng-init="vm.badd=false" ng-click="vm.badd=!vm.badd">
                             <i class="fa fa-plus"></i>
                             <span class="hide-on-small-only">Agregar</span>

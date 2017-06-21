@@ -125,7 +125,7 @@ showActions = (event) ->
 showEditPurchasae = (event) ->
     #$(".mactions").modal "hide"
     $(".nrop").text @value
-    window.open "/logistics/purchase/edit/#{@value}/"
+    location.href = "/logistics/purchase/edit/#{@value}/"
     #getDataPurchase @value
     #$(".step-one").fadeOut 150
     #$(".step-two").fadeIn 800

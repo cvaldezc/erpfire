@@ -129,7 +129,7 @@ showActions = function(event) {
 
 showEditPurchasae = function(event) {
   $(".nrop").text(this.value);
-  window.open("/logistics/purchase/edit/" + this.value + "/");
+  location.href = "/logistics/purchase/edit/" + this.value + "/";
 };
 
 showStepOne = function(event) {
