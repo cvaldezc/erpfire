@@ -50,7 +50,7 @@ def get_description_materials(request):
             name = Materiale.objects.values('matnom').filter(
                 matnom__icontains=request.GET.get('nom')).distinct(
                     'matnom').order_by('matnom')
-            context['names'] = [{'matnom': x['matnom'], 'name': x['matnom']} for x in name]
+            context['name'] = [{'matnom': x['matnom'], 'name': x['matnom']} for x in name]
             context['status'] = True
         except ObjectDoesNotExist:
             context['status'] = False
