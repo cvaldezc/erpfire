@@ -1,7 +1,7 @@
 {
   "name": "erpfire",
-  "version": "4.4.3",
-  "homepage": "https://github.com/christian6/CMSGuias",
+  "version": "4.5.11",
+  "homepage": "https://github.com/cvaldezc/CMSGuias",
   "description": "Libraries",
   "main": "bower.js",
   "moduleType": [
@@ -34,8 +34,8 @@
     "chosen": "1.7.0",
     "materialize": ">=0.97.8",
     "showdown": "^1.6.4",
-    "angular": "~1.4.8",
-    "angular-cookies": "1.4.3",
-    "angular-sanitize": "~1.4.3"
+    "angular": "1.5.11",
+    "angular-cookies": "1.5.11",
+    "angular-sanitize": "1.5.11"
   }
 }
