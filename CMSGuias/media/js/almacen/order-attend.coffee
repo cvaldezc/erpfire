@@ -85,6 +85,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
   $scope.ngvalid = false
   $scope.idxobs = -1
   $scope.nroguide = ''
+  $scope.indexguide = new Array()
   angular.element(document).ready ->
     # console.log "angular load success!"
     angular.element(".modal").modal()
@@ -326,6 +327,20 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
             $scope.gnbrand = prm.nbrand
             $scope.gnmodel = prm.nmodel
             angular.element("#sd").text "#{prm.name} #{prm.nbrand} #{prm.nmodel}"
+            # @Christian 2017-06-23 16:55:37
+            # block add object in dguides
+            $scope.dguide.push({
+              'materials': $scope.gmaterials,
+              'brand': $scope.gbrand,
+              'model': $scope.gmodel,
+              'name': $scope.gname,
+              'nbrand': $scope.gnbrand,
+              'nmodel': $scope.gnmodel,
+              'amount': 0,
+              'details': new Array()
+            })
+            $scope.indexguide["#{prm.materials}#{prm.nbrand}#{prm.nmodel}"] = ($scope.dguide.length - 1)
+            # end block
             $scope.dstock =
               'materials': prm.materials
               'brand': prm.brand
@@ -424,70 +439,86 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
     # promise = deferred.promise
     # console.log $scope.stks
     tmp = new Array()
-    amount = 0
-    angular.forEach $scope.stks, (obj, index) ->
-      amount += parseFloat(parseFloat(obj['quantity']).toFixed(3))
-      return
-    # console.log amount
-    if amount > $scope.qmax
-      Materialize.toast "<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad mayor a la requerida.", 6000
-    else if amount <= 0
-      Materialize.toast "<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad menor que 0.", 6000
-    else
-      # stk = angular.element("#q#{$scope.gmaterials}#{$scope.gbrand}#{$scope.gmodel}")
-      $scope.dguide.push
-        'materials': $scope.gmaterials
-        'brand': $scope.gbrand
-        'model': $scope.gmodel
-        'name': $scope.gname
-        'nbrand': $scope.gnbrand
-        'nmodel': $scope.gnmodel
-        'amount': amount
-        'details': new Array()
-      angular.forEach $scope.dguide, (obj, index) ->
-        m = (obj.materials is $scope.gmaterials)
-        b = (obj.brand is $scope.gbrand)
-        o = (obj.model is $scope.gmodel)
-        if m and b and o
-          angular.forEach $scope.stks, (stk, i) ->
-            if stk.chk is true
-              obj.details.push
-                'materials': $scope.gmaterials
-                'brand': stk.brand
-                'model': stk.model
-                'nbrand': stk.nbrand
-                'nmodel': stk.nmodel
-                'quantity': parseFloat(parseFloat(stk.quantity).toFixed(3))
-              return
-          return
-      angular.forEach $scope.fchk, (obj, index) ->
-        m = (obj.materials is $scope.gmaterials)
-        b = (obj.brand is $scope.gbrand)
-        o = (obj.model is $scope.gmodel)
-        if m and b and o
-          $scope.fchk[index].quantity = amount
+    # $scope.dguide = new Array()
+    amountPromise = ->
+      defer = $q.defer()
+      amount = 0
+      angular.forEach $scope.stks, (obj, index) ->
+        amount += parseFloat(parseFloat(obj['quantity']).toFixed(3))
         return
-      # console.log stk
-      # stk[0].value = amount
-      console.info "Nothing generate guide"
-      # poner en cero la cantidad
-      # console.warn $scope.dguide
-      $scope.stock()
-      .then (result) ->
-        # console.warn result
-        if result
-          $scope.enableGuide()
-          angular.element("#mstock").modal('close')
-          Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Completo!", 3000
-          $timeout ->
-            angular.element('.lean-overlay').remove()
-            return
-          , 800
-          return
+      defer.resolve(amount)
+      return defer.promise
+    amountPromise().then (_amount) ->
+        console.log _amount
+        if _amount > $scope.qmax
+          Materialize.toast "<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad mayor a la requerida.", 6000
+        else if amount <= 0
+          Materialize.toast "<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad menor que 0.", 6000
         else
-          console.log "Falta"
-          return
-    return
+          # stk = angular.element("#q#{$scope.gmaterials}#{$scope.gbrand}#{$scope.gmodel}")
+          # # comprobar la existencia del object in scope dguide
+          # $scope.dguide.push
+          #   'materials': $scope.gmaterials
+          #   'brand': $scope.gbrand
+          #   'model': $scope.gmodel
+          #   'name': $scope.gname
+          #   'nbrand': $scope.gnbrand
+          #   'nmodel': $scope.gnmodel
+          #   'amount': _amount
+          #   'details': new Array()
+          # ?????????????
+          # angular.forEach $scope.dguide, (obj, index) ->
+          #   m = (obj.materials is $scope.gmaterials)
+          #   b = (obj.brand is $scope.gbrand)
+          #   o = (obj.model is $scope.gmodel)
+          #   if m and b and o
+          guidem = "#{$scope.gmaterials}#{$scope.gbrand}#{$scope.gmodel}"
+          index = $scope.indexguide[guidem]
+          $scope.dguide[index]['amount'] = _amount
+          getallStockGuides = ->
+            angular.forEach $scope.stks, (stk, i) ->
+              _quantity = parseFloat(stk.quantity)
+              if stk.chk is true and _quantity > 0
+                obj.details.push
+                  'materials': $scope.gmaterials
+                  'brand': stk.brand
+                  'model': stk.model
+                  'nbrand': stk.nbrand
+                  'nmodel': stk.nmodel
+                  'quantity': parseFloat(_quantity.toFixed(3))
+                return
+          # return
+          # block
+          # establece la cantidad total del item en la lista principal
+          angular.forEach $scope.fchk, (obj, index) ->
+            m = (obj.materials is $scope.gmaterials)
+            b = (obj.brand is $scope.gbrand)
+            o = (obj.model is $scope.gmodel)
+            if m and b and o
+              $scope.fchk[index].quantity = amount
+            return
+          # end block
+          # console.log stk
+          # stk[0].value = amount
+          console.info "Nothing generate guide"
+          # poner en cero la cantidad
+          # console.warn $scope.dguide
+          $scope.stock()
+          .then (result) ->
+            # console.warn result
+            if result
+              $scope.enableGuide()
+              angular.element("#mstock").modal('close')
+              Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Completo!", 3000
+              $timeout ->
+                angular.element('.lean-overlay').remove()
+                return
+              , 800
+              return
+            else
+              console.log "Falta"
+              return
+        return
 
   $scope.enableGuide = ->
     sd = ->
