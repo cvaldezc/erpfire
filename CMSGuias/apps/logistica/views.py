@@ -862,7 +862,8 @@ class ListPurchase(JSONResponseMixin, TemplateView):
                                 'status': x.status
                             }
                             for x in Compra.objects.filter(
-                                flag=True, status=request.GET.get('status'))
+                                flag=True,
+                                status=request.GET.get('status').order_by('-registrado'))
                         ]
                     if 'dates' in request.GET:
                         if 'start' in request.GET and 'end' not in request.GET:
@@ -870,7 +871,7 @@ class ListPurchase(JSONResponseMixin, TemplateView):
                                 flag=True,
                                 registrado__startswith=(
                                     globalVariable.format_str_date(
-                                        request.GET.get('start'))))
+                                        request.GET.get('start')))).order_by('-registrado')
                         elif 'start' in request.GET and 'end' in request.GET:
                             obj = Compra.objects.filter(
                                 flag=True,
@@ -878,7 +879,7 @@ class ListPurchase(JSONResponseMixin, TemplateView):
                                     globalVariable.format_str_date(
                                         request.GET.get('start')),
                                     globalVariable.format_str_date(
-                                        request.GET.get('end'))))
+                                        request.GET.get('end')))).order_by('-registrado')
                         context['list'] = [
                             {
                                 'purchase': x.compra_id,

@@ -3,6 +3,7 @@
     {% include "menus/storagemd.htm" %}
 {% endblock menu %}
 {% block content %}
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/trumbowyg/dist/ui/trumbowyg.min.css"/>
 <section ng-app="attendApp" ng-controller="attendCtrl">
     <header>
         <h3>
@@ -116,7 +117,7 @@
         <br>
         <div class="card-panel amber" ng-model="ntf" ng-init="ntf=true" ng-show="ntf">
             <i class="fa fa-times right" ng-click="ntf=!ntf"></i>
-            <strong>¡Ten en cuenta!</strong> que solo debes de seleccionar 12 items como maximo para generar una guia de remision.
+            <strong>¡Ten en cuenta!</strong> que solo debes de seleccionar 14 items como maximo para generar una guia de remision.
             <p>
                 Recuerda que solo se debe realizar una guia a la vez.
             </p>
@@ -343,7 +344,7 @@
                 <i class="fa fa-check"></i>
                 <span class="hide-on-only-small">GUARDAR</span>
             </button>
-            <h5>Stock para <small id="sd"></small></h5>
+            <h5 class="left">Stock para <small id="sd"></small></h5>
         </div>
         <div class="modal-content">
             {% verbatim %}
@@ -679,5 +680,4 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/trumbowyg/dist/trumbowyg.min.js" defer></script>
 <script defer type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/almacen/order-attend.js" defer></script>
-<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/trumbowyg/dist/ui/trumbowyg.min.css"/>
 {% endblock content %}
