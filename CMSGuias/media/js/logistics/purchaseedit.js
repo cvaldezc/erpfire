@@ -392,7 +392,6 @@ var Directivies;
 			<div class="col s12 m4 l4 input-field">
 				<label for="mmeasure">Medida</label>
 				<select id="mmeasure" class="browser-default chosen-select" ng-model="smeasure" data-placeholder="Seleccione un medida" ng-options="msr.pk as msr.measure for msr in measures" esmmeasure>
-
 				</select></div></div>`;
             this.replace = true;
         }
@@ -426,7 +425,7 @@ var Directivies;
             return new Promise((resolve) => {
                 angular.element.getJSON('/json/get/materials/name/', { 'nom': descany }, (response, textStatus, xhr) => {
                     if (response['status']) {
-                        resolve(response['names']);
+                        resolve(response['name']);
                     }
                     else {
                         resolve([]);
