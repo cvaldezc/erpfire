@@ -79,7 +79,7 @@ body {
 }
 #ui-datepicker-div {
   background: #fff;
-  z-index: 999 !important;
+  z-index: 1050 !important;
 }
 .ui-widget {
   font-size: 12px;

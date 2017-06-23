@@ -396,6 +396,11 @@ showBedside = function() {
   $tb = $("table.table-list > tbody > tr");
   if ($tb.length) {
     $(".mpurchase").modal("toggle");
+    $("input[name=traslado]").datepicker({
+      minDate: "0",
+      showAnim: "slide",
+      dateFormat: "yy-mm-dd"
+    });
     calcTotal();
   } else {
     $().toastmessage("showWarningToast", "Debe de ingresar por lo menos un material.");
