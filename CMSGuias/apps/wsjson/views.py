@@ -731,7 +731,7 @@ def post_approved_orders(request):
             obj.save()
             data['bedside'] = request.POST['oid']
             data['company'] = request.session['company']['name']
-            usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni)
+            usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni_id)
             data['cc'] = '%s,%s'% (usr.email, globalVariable.mailcc)
             mpl = [obj.proyecto.empdni.email, obj.empdni.email]
             data['to'] = ','.join(set(mpl))
@@ -829,7 +829,7 @@ def post_cancel_orders(request):
             obj.save()
             data['bedside'] = request.POST['oid']
             data['company'] = request.session['company']['name']
-            usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni)
+            usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni_id)
             data['cc'] = '%s,%s'% (usr.email, globalVariable.mailcc)
             mpl = [obj.proyecto.empdni.email, obj.empdni.email]
             data['to'] = ','.join(set(mpl))

@@ -87,18 +87,21 @@ getSearch = ->
                                         <td><button value="{{ purchase }}" class="btn btn-xs btn-link text-black btn-purchase"><span class="glyphicon glyphicon-list"></span></a>
                                         </td>
                                         <td>
-                                            {{!status}}
+                                            <button class="btn btn-xs btn-link text-black btn-actions" value="{{ purchase }}">
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            </button>
                                         </td>
                                     </tr>"""
                         $tb = $("table > tbody")
                         $tb.empty()
                         for x of response.list
-                            if response.list[x].status == 'PE'
-                                tmp = template.replace "{{!status}}", "<button class=\"btn btn-xs btn-link text-black btn-actions\" value=\"{{ purchase }}\">
-                                                <span class=\"glyphicon glyphicon-ok\"></span>
-                                            </button>"
-                            else
-                                tmp = template
+                            tmp = template
+                            # if response.list[x].status == 'PE'
+                            #     tmp = template.replace "{{!status}}", "<button class=\"btn btn-xs btn-link text-black btn-actions\" value=\"{{ purchase }}\">
+                            #                     <span class=\"glyphicon glyphicon-ok\"></span>
+                            #                 </button>"
+                            # else
+                            #     tmp = template
                             if response.list[x].status == 'CO'
                                 tmp = tmp.replace "{{!replace}}", "Recibido-Completo"
                             else if response.list[x].status == 'IN'
