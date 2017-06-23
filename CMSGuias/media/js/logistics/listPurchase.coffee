@@ -95,6 +95,7 @@ getSearch = ->
                         $tb = $("table > tbody")
                         $tb.empty()
                         for x of response.list
+                            tmp = template
                             # if response.list[x].status == 'PE'
                             #     tmp = template.replace "{{!status}}", "<button class=\"btn btn-xs btn-link text-black btn-actions\" value=\"{{ purchase }}\">
                             #                     <span class=\"glyphicon glyphicon-ok\"></span>

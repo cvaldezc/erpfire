@@ -90,15 +90,11 @@ getSearch = function() {
         $.getJSON("", data, function(response) {
           var $tb, template, tmp, x;
           if (response.status) {
-            template = "<tr>\n    <td>{{ item }}</td>\n    <td>{{ purchase }}</td>\n    <td>{{ document }}</td>\n    <td>{{ projects }}</td>\n    <td>{{ transfer }}</td>\n    <td>{{ currency }}</td>\n    <td>{{!replace}}</td>\n    <td><a class=\"text-black\" target=\"_blank\" href=\"/media/{{ deposito }}\"><span class=\"glyphicon glyphicon-file\"></span></a></td>\n    <td><button value=\"{{ purchase }}\" class=\"btn btn-xs btn-link text-black btn-purchase\"><span class=\"glyphicon glyphicon-list\"></span></a>\n    </td>\n    <td>\n        {{!status}}\n    </td>\n</tr>";
+            template = "<tr>\n    <td>{{ item }}</td>\n    <td>{{ purchase }}</td>\n    <td>{{ document }}</td>\n    <td>{{ projects }}</td>\n    <td>{{ transfer }}</td>\n    <td>{{ currency }}</td>\n    <td>{{!replace}}</td>\n    <td><a class=\"text-black\" target=\"_blank\" href=\"/media/{{ deposito }}\"><span class=\"glyphicon glyphicon-file\"></span></a></td>\n    <td><button value=\"{{ purchase }}\" class=\"btn btn-xs btn-link text-black btn-purchase\"><span class=\"glyphicon glyphicon-list\"></span></a>\n    </td>\n    <td>\n        <button class=\"btn btn-xs btn-link text-black btn-actions\" value=\"{{ purchase }}\">\n            <span class=\"glyphicon glyphicon-ok\"></span>\n        </button>\n    </td>\n</tr>";
             $tb = $("table > tbody");
             $tb.empty();
             for (x in response.list) {
-              if (response.list[x].status === 'PE') {
-                tmp = template.replace("{{!status}}", "<button class=\"btn btn-xs btn-link text-black btn-actions\" value=\"{{ purchase }}\"> <span class=\"glyphicon glyphicon-ok\"></span> </button>");
-              } else {
-                tmp = template;
-              }
+              tmp = template;
               if (response.list[x].status === 'CO') {
                 tmp = tmp.replace("{{!replace}}", "Recibido-Completo");
               } else if (response.list[x].status === 'IN') {
