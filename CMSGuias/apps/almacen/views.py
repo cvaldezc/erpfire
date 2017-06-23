@@ -1224,7 +1224,9 @@ def view_list_guide_referral_success(request):
                                     request.GET.get('feci'),
                                     FORMAT_DATE_STR).date()
                             lst = GuiaRemision.objects.filter(
-                                    traslado=star, status='GE', flag=True)
+                                    traslado=star,
+                                    status='GE',
+                                    flag=True).order_by('-registrado')
                         elif fecf != '' and feci != '':
                             star = datetime.datetime.strptime(
                                     request.GET.get('feci'),
@@ -1235,7 +1237,7 @@ def view_list_guide_referral_success(request):
                             lst = GuiaRemision.objects.filter(
                                     traslado__range=[star, end],
                                     status='GE',
-                                    flag=True)
+                                    flag=True).order_by('-registrado')
                         data['status'] = True
                     i = 1
                     for x in lst:
@@ -1255,7 +1257,7 @@ def view_list_guide_referral_success(request):
                     mimetype='application/json')
             lst = GuiaRemision.objects.filter(
                     status='GE',
-                    flag=True).order_by('-guia_id')[:10]
+                    flag=True).order_by('-registrado')[:10]
             ctx = {'guide': lst}
             return render_to_response(
                 'almacen/listguide.html',
@@ -1392,7 +1394,7 @@ def view_list_guide_referral_canceled(request):
                                 request.GET.get('feci'),
                                 FORMAT_DATE_STR).date()
                             lst = GuiaRemision.objects.filter(
-                                traslado=star, status='AN', flag=False)
+                                traslado=star, status='AN', flag=False).order_by('-registrado')
                         elif request.GET.get('fecf') != '' and request.GET.get('feci') != '':
                             star = datetime.datetime.strptime(
                                 request.GET.get('feci'),
@@ -1403,7 +1405,7 @@ def view_list_guide_referral_canceled(request):
                             lst = GuiaRemision.objects.filter(
                                 traslado__range=[star, end],
                                 status='AN',
-                                flag=False)
+                                flag=False).order_by('-registrado')
                         data['status'] = True
                     i = 1
                     for x in lst:
@@ -2947,7 +2949,7 @@ class AttendOrder(JSONResponseMixin, TemplateView):
                     emails = list()
                     emails.append(guide.pedido.proyecto.empdni.email)
                     emails.append(guide.pedido.empdni.email)
-                    usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni)
+                    usr = Employee.objects.get(empdni_id=request.user.get_profile().empdni_id)
                     context['company'] = request.session['company']['name']
                     context['order'] = guide.pedido_id
                     context['project'] = guide.pedido.proyecto_id

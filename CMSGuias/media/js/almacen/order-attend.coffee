@@ -12,8 +12,9 @@ app.directive 'cinmam', ($parse) ->
   scope: '@'
   link: (scope, element, attrs, ngModel) ->
     element.bind 'change, blur', (event) ->
-      if !isNaN(element.context.value) and element.context.value != ""
-        val = parseFloat(parseFloat(element.context.value).toFixed(3))
+      # console.log(element.val())
+      if !isNaN(element.val()) and element.val() != ""
+        val = parseFloat(parseFloat(element.val()).toFixed(3))
       else
         val = parseFloat(parseFloat(attrs.max).toFixed(3))
       max = parseFloat attrs.max

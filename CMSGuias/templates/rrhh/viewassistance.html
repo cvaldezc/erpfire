@@ -60,7 +60,7 @@
                 <td ng-repeat="n in vm.dnames" ng-class="{'red lighten-3 center-align': x['days'][n.nmo]['day'] == null}">
                     <small ng-if="(x['days'][n.nmo]['hour'] != null)">
                     <a href="#" ng-click="vm.showEdit(x, n)">
-                        <i class="fa fa-circle bordered-icon icon-round fa-2x right" ng-class="{'yellow-text text-lighten-1': x['days'][n.nmo]['hour'] < vm.settings.tth, 
+                        <i class="fa fa-circle bordered-icon icon-round fa-2x right" ng-class="{'yellow-text text-lighten-1': x['days'][n.nmo]['hour'] < vm.settings.tth,
                         'green-text text-lighten-1': x['days'][n.nmo]['hour'] >= vm.settings.tth}"></i>
                     </a>
                     <br>
@@ -202,7 +202,7 @@
     {% endverbatim %}
 </section>
 <!-- scripts -->
-<script defer src="{{ MEDIA_URL }}vendor/angularjs/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
 <script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
 <script defer src="{{ MEDIA_URL }}js/rrhh/viewassistance.js"></script>
 {% endblock content %}
