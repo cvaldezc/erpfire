@@ -153,6 +153,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
   $scope.ngvalid = false;
   $scope.idxobs = -1;
   $scope.nroguide = '';
+  $scope.indexguide = new Array();
   angular.element(document).ready(function() {
     angular.element(".modal").modal();
     if ($scope.init === true) {
@@ -367,6 +368,17 @@ controllers = function($scope, $timeout, $q, attendFactory) {
             $scope.gnbrand = prm.nbrand;
             $scope.gnmodel = prm.nmodel;
             angular.element("#sd").text(prm.name + " " + prm.nbrand + " " + prm.nmodel);
+            $scope.dguide.push({
+              'materials': $scope.gmaterials,
+              'brand': $scope.gbrand,
+              'model': $scope.gmodel,
+              'name': $scope.gname,
+              'nbrand': $scope.gnbrand,
+              'nmodel': $scope.gnmodel,
+              'amount': 0,
+              'details': new Array()
+            });
+            $scope.indexguide["" + prm.materials + prm.brand + prm.model] = $scope.dguide.length - 1;
             $scope.dstock = {
               'materials': prm.materials,
               'brand': prm.brand,
@@ -465,70 +477,77 @@ controllers = function($scope, $timeout, $q, attendFactory) {
     });
   };
   $scope.validSelectStock = function() {
-    var amount, tmp;
+    var amountPromise, tmp;
     tmp = new Array();
-    amount = 0;
-    angular.forEach($scope.stks, function(obj, index) {
-      amount += parseFloat(parseFloat(obj['quantity']).toFixed(3));
-    });
-    if (amount > $scope.qmax) {
-      Materialize.toast("<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad mayor a la requerida.", 6000);
-    } else if (amount <= 0) {
-      Materialize.toast("<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad menor que 0.", 6000);
-    } else {
-      $scope.dguide.push({
-        'materials': $scope.gmaterials,
-        'brand': $scope.gbrand,
-        'model': $scope.gmodel,
-        'name': $scope.gname,
-        'nbrand': $scope.gnbrand,
-        'nmodel': $scope.gnmodel,
-        'amount': amount,
-        'details': new Array()
+    amountPromise = function() {
+      var amount, defer;
+      defer = $q.defer();
+      amount = 0;
+      angular.forEach($scope.stks, function(obj, index) {
+        amount += parseFloat(parseFloat(obj['quantity']).toFixed(3));
       });
-      angular.forEach($scope.dguide, function(obj, index) {
-        var b, m, o;
-        m = obj.materials === $scope.gmaterials;
-        b = obj.brand === $scope.gbrand;
-        o = obj.model === $scope.gmodel;
-        if (m && b && o) {
+      defer.resolve(amount);
+      return defer.promise;
+    };
+    amountPromise().then(function(_amount) {
+      var getallStockGuides, guidem, index;
+      console.log(_amount);
+      if (_amount > $scope.qmax) {
+        Materialize.toast("<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad mayor a la requerida.", 6000);
+      } else if (_amount <= 0) {
+        Materialize.toast("<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad menor que 0.", 6000);
+      } else {
+        guidem = "" + $scope.gmaterials + $scope.gbrand + $scope.gmodel;
+        index = $scope.indexguide[guidem];
+        $scope.dguide[index]['amount'] = _amount;
+        getallStockGuides = function() {
+          var count, defer;
+          defer = $q.defer();
+          count = 0;
           angular.forEach($scope.stks, function(stk, i) {
-            if (stk.chk === true) {
-              obj.details.push({
+            var _quantity;
+            _quantity = parseFloat(stk.quantity);
+            if (stk.chk === true && _quantity > 0) {
+              count += 1;
+              $scope.dguide[index]['details'].push({
                 'materials': $scope.gmaterials,
                 'brand': stk.brand,
                 'model': stk.model,
                 'nbrand': stk.nbrand,
                 'nmodel': stk.nmodel,
-                'quantity': parseFloat(parseFloat(stk.quantity).toFixed(3))
+                'quantity': parseFloat(_quantity.toFixed(3))
               });
             }
           });
-        }
-      });
-      angular.forEach($scope.fchk, function(obj, index) {
-        var b, m, o;
-        m = obj.materials === $scope.gmaterials;
-        b = obj.brand === $scope.gbrand;
-        o = obj.model === $scope.gmodel;
-        if (m && b && o) {
-          $scope.fchk[index].quantity = amount;
-        }
-      });
-      console.info("Nothing generate guide");
-      $scope.stock().then(function(result) {
-        if (result) {
-          $scope.enableGuide();
-          angular.element("#mstock").modal('close');
-          Materialize.toast("<i class='fa fa-check fa-2x green-text'></i>&nbsp;Completo!", 3000);
-          $timeout(function() {
-            angular.element('.lean-overlay').remove();
-          }, 800);
-        } else {
-          console.log("Falta");
-        }
-      });
-    }
+          defer.resolve(count);
+          return defer.promise;
+        };
+        getallStockGuides().then(function(allreponse) {
+          angular.forEach($scope.fchk, function(obj, index) {
+            var b, m, o;
+            m = obj.materials === $scope.gmaterials;
+            b = obj.brand === $scope.gbrand;
+            o = obj.model === $scope.gmodel;
+            if (m && b && o) {
+              $scope.fchk[index].quantity = _amount;
+            }
+          });
+          console.info("Nothing generate guide");
+          $scope.stock().then(function(result) {
+            if (result) {
+              $scope.enableGuide();
+              angular.element("#mstock").modal('close');
+              Materialize.toast("<i class='fa fa-check fa-2x green-text'></i>&nbsp;Completo!", 3000);
+              $timeout(function() {
+                angular.element('.lean-overlay').remove();
+              }, 800);
+            } else {
+              console.log("Falta");
+            }
+          });
+        });
+      }
+    });
   };
   $scope.enableGuide = function() {
     var sd;
