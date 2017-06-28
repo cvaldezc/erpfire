@@ -339,7 +339,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
               'amount': 0,
               'details': new Array()
             })
-            $scope.indexguide["#{prm.materials}#{prm.nbrand}#{prm.nmodel}"] = ($scope.dguide.length - 1)
+            $scope.indexguide["#{prm.materials}#{prm.brand}#{prm.model}"] = ($scope.dguide.length - 1)
             # end block
             $scope.dstock =
               'materials': prm.materials
@@ -452,8 +452,10 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
         console.log _amount
         if _amount > $scope.qmax
           Materialize.toast "<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad mayor a la requerida.", 6000
-        else if amount <= 0
+          return
+        else if _amount <= 0
           Materialize.toast "<i class='fa fa-times fa-3x red-text'></i>&nbsp;Cantidad menor que 0.", 6000
+          return
         else
           # stk = angular.element("#q#{$scope.gmaterials}#{$scope.gbrand}#{$scope.gmodel}")
           # # comprobar la existencia del object in scope dguide
@@ -476,10 +478,13 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
           index = $scope.indexguide[guidem]
           $scope.dguide[index]['amount'] = _amount
           getallStockGuides = ->
+            defer = $q.defer()
+            count = 0
             angular.forEach $scope.stks, (stk, i) ->
               _quantity = parseFloat(stk.quantity)
               if stk.chk is true and _quantity > 0
-                obj.details.push
+                count += 1
+                $scope.dguide[index]['details'].push
                   'materials': $scope.gmaterials
                   'brand': stk.brand
                   'model': stk.model
@@ -487,38 +492,42 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
                   'nmodel': stk.nmodel
                   'quantity': parseFloat(_quantity.toFixed(3))
                 return
-          # return
-          # block
-          # establece la cantidad total del item en la lista principal
-          angular.forEach $scope.fchk, (obj, index) ->
-            m = (obj.materials is $scope.gmaterials)
-            b = (obj.brand is $scope.gbrand)
-            o = (obj.model is $scope.gmodel)
-            if m and b and o
-              $scope.fchk[index].quantity = amount
-            return
-          # end block
-          # console.log stk
-          # stk[0].value = amount
-          console.info "Nothing generate guide"
-          # poner en cero la cantidad
-          # console.warn $scope.dguide
-          $scope.stock()
-          .then (result) ->
-            # console.warn result
-            if result
-              $scope.enableGuide()
-              angular.element("#mstock").modal('close')
-              Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Completo!", 3000
-              $timeout ->
-                angular.element('.lean-overlay').remove()
+            defer.resolve(count)
+            return defer.promise
+          getallStockGuides().then (allreponse) ->
+            # block
+            # establece la cantidad total del item en la lista principal
+            angular.forEach $scope.fchk, (obj, index) ->
+              m = (obj.materials is $scope.gmaterials)
+              b = (obj.brand is $scope.gbrand)
+              o = (obj.model is $scope.gmodel)
+              if m and b and o
+                $scope.fchk[index].quantity = _amount
                 return
-              , 800
-              return
-            else
-              console.log "Falta"
-              return
-        return
+            # end block
+            # console.log stk
+            # stk[0].value = amount
+            console.info "Nothing generate guide"
+            # poner en cero la cantidad
+            # console.warn $scope.dguide
+            $scope.stock()
+            .then (result) ->
+              # console.warn result
+              if result
+                $scope.enableGuide()
+                angular.element("#mstock").modal('close')
+                Materialize.toast "<i class='fa fa-check fa-2x green-text'></i>&nbsp;Completo!", 3000
+                $timeout ->
+                  angular.element('.lean-overlay').remove()
+                  return
+                , 800
+                return
+              else
+                console.log "Falta"
+                return
+            return
+          return
+      return
 
   $scope.enableGuide = ->
     sd = ->
