@@ -2884,6 +2884,10 @@ class AttendOrder(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
+        # @Christian 2017-06-30 12:05:17
+        '''
+        Generate Guide Remision from storage in global
+        '''
         context = dict()
         try:
             if 'generateGuide' in request.POST:
@@ -2924,24 +2928,25 @@ class AttendOrder(JSONResponseMixin, TemplateView):
                             obrand_id=d['brand'],
                             omodel_id=d['model'])
                         dg.save()
-                nip = json.loads(request.POST['nipp'])
-                # print 'NIPPLES', nip
-                if len(nip) > 0:
-                    for n in nip:
-                        for x in n['details']:
-                            if float(x['guide']) > 0:
-                                ng = NipleGuiaRemision(
-                                    guia_id=code,
-                                    materiales_id=x['materials'],
-                                    metrado=x['meter'],
-                                    cantguide=x['guide'],
-                                    tipo=x['tipo'],
-                                    flag=True,
-                                    brand_id=x['brand'],
-                                    model_id=x['model'],
-                                    related=x['id'],
-                                    order_id=kwargs['order'])
-                                ng.save()
+                if len(det) > 0:
+                    nip = json.loads(request.POST['nipp'])
+                    # print 'NIPPLES', nip
+                    if len(nip) > 0:
+                        for n in nip:
+                            for x in n['details']:
+                                if float(x['guide']) > 0:
+                                    ng = NipleGuiaRemision(
+                                        guia_id=code,
+                                        materiales_id=x['materials'],
+                                        metrado=x['meter'],
+                                        cantguide=x['guide'],
+                                        tipo=x['tipo'],
+                                        flag=True,
+                                        brand_id=x['brand'],
+                                        model_id=x['model'],
+                                        related=x['id'],
+                                        order_id=kwargs['order'])
+                                    ng.save()
                 context['code'] = code
                 ## data for mail
                 #order = Pedido.objects.get(pedido_id=kwargs['order'])
@@ -3117,6 +3122,14 @@ class LoadInventoryBrand(JSONResponseMixin, TemplateView):
                                 purchase=1,
                                 sale=1)
                             ib.save()
+                    context['status'] = True
+                if 'adjustStk' in request.POST:
+                    oin = InventoryBrand.objects.get(
+                        materials_id=request.POST['materials'],
+                        brand_id=request.POST['brand'],
+                        model_id=request.POST['model'])
+                    oin.stock=request.POST['stk']
+                    oin.save()
                     context['status'] = True
             except (ObjectDoesNotExist, Exception) as e:
                 context['raise'] = str(e)

@@ -32,7 +32,7 @@
     "angular-filter": "^0.5.9",
     "trumbowyg": "~2.2.0",
     "chosen": "1.7.0",
-    "materialize": ">=0.97.8",
+    "materialize": "~0.97.8",
     "showdown": "^1.6.4",
     "angular": "1.5.11",
     "angular-cookies": "1.5.11",

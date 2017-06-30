@@ -920,8 +920,8 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       defer = $q.defer()
       for x in $scope.selectedniple.details
         if x.status
-          amount += $scope.toRound(x.fields.metrado * x.qorder)
-      defer.resolve $scope.toRound(amount/100)
+          amount += (x.fields.metrado * x.qorder)
+      defer.resolve parseFloat(parseFloat(amount/100).toFixed(3))
       return defer.promise
     getAmountMeter().then (response) ->
       $index = $scope.selectedniple['index']

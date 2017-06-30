@@ -371,8 +371,16 @@ ul.tabs.idenred > .indicator {
 .card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating) {
   margin: 0px;
 }
+.bwidth-40 {
+  width: 40%;
+}
 @media screen and (max-width: 992px) {
   tbody tr td {
     padding: 15px 5px 15px 5px !important;
+  }
+}
+@media screen and (max-width: 668px) {
+  .bwidth-40 {
+    width: 100%;
   }
 }

@@ -4,164 +4,201 @@
 {% endblock menu %}
 {% block content %}
 <section ng-app="inventoryApp" ng-controller="inventoryCtrl">
-  <input type="hidden" ng-model="parea" ng-init="parea='{{ request.user.get_profile.empdni.charge.area|lower }}'">
-  <input type="hidden" ng-model="pcargo" ng-init="pcargo='{{ request.user.get_profile.empdni.charge.cargos|lower }}'">
-  <div class="card-panel">
-    <h4>Inventario</h4>
-    <button type="button" class="waves-effect waves-light btn amber lighten-1 grey-text text-darken-3 " ng-show="parea=='administrator'" ng-model="bload" ng-init="bload=false" data-target="mupload">
-      <i class="fa fa-upload"></i>
-      <span class="hide-on-small-only">CARGAR INVENTARIO</span>
-    </button>
-    <button type="button" class="waves-effect waves-light btn red lighten-1" ng-show="parea=='administrator'" ng-model="bdel" ng-init="bdel=false" ng-disabled="bdel" ng-click="delInventory()">
-      <i class="fa fa-trash-o"></i>
-      <span class="hide-on-small-only">Eliminar INVENTARIO</span>
-    </button>
-    <button type="button" class="waves-effect waves-light btn blue lighten-1" ng-show="parea=='administrator' && '70492850' == {{request.user.get_profile.empdni_id}}" ng-click="loadOrderStk()">
-      <i class="fa fa-list"></i>
-      <span class="hide-on-small-only">CARGAR STOCK PEDIDO</span>
-    </button>
-    <blockquote>
-      <div class="input-field">
-        <i class="fa fa-filter prefix"></i>
-        <input type="text" ng-model="desc" ng-keyup="getMaterials($event)">
-        <label for="">Filtrar Materiales del Inventario</label>
-      </div>
-    </blockquote>
-    <blockquote ng-model="sload" ng-show="sload">
-      <h3>Cargar Inventario</h3>
-      <div class="file-field input-field">
-        <div class="btn">
-          <span>Archivo</span>
-          <input type="file">
+  <div class="row">
+    <div class="col s12 m12 l12">
+      <input type="hidden" ng-model="parea" ng-init="parea='{{ request.user.get_profile.empdni.charge.area|lower }}'">
+      <input type="hidden" ng-model="pcargo" ng-init="pcargo='{{ request.user.get_profile.empdni.charge.cargos|lower }}'">
+      <div class="card-panel">
+        <div class="row">
+          <div class="col s12 m3 l3">
+            <h4><i class="fa fa-archive"></i> Inventario</h4>
+          </div>
+          <div class="col s12 m9 l9 right-align">
+            <button type="button" class="waves-effect waves-light btn amber lighten-1 grey-text text-darken-3 " ng-show="parea=='administrator'" ng-model="bload" ng-init="bload=false" data-target="mupload">
+              <i class="fa fa-upload"></i>
+              <span class="hide-on-small-only">CARGAR INVENTARIO</span>
+            </button>
+            <button type="button" class="waves-effect waves-light btn red lighten-1" ng-show="parea=='administrator'" ng-model="bdel" ng-init="bdel=false" ng-disabled="bdel" ng-click="delInventory()">
+              <i class="fa fa-trash-o"></i>
+              <span class="hide-on-small-only">Eliminar INVENTARIO</span>
+            </button>
+            <button type="button" class="waves-effect waves-light btn blue lighten-1" ng-show="parea=='administrator' && '70492850' == {{request.user.get_profile.empdni_id}}" ng-click="loadOrderStk()">
+              <i class="fa fa-list"></i>
+              <span class="hide-on-small-only">CARGAR STOCK PEDIDO</span>
+            </button>
+          </div>
         </div>
-        <div class="file-path-wrapper">
-          <input class="file-path validate" type="text">
-        </div>
-      </div>
-    </blockquote>
-  </div>
-  <div class="card-panel">
-    <table class="table responsive-table highlight">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Código</th>
-          <th>Descripción</th>
-          <!--<th>Marca</th>
-          <th>Modelo</th>-->
-          <th>Unidad</th>
-          <th>Stock</th>
-          <th>Detalle</th>
-        </tr>
-        <tr ng-hide="ginit">
-          <td colspan="7" class="center-align">
-            <div class="preloader-wrapper big active">
-              <div class="spinner-layer spinner-blue-only">
-                <div class="circle-clipper left">
-                  <div class="circle"></div>
-                </div><div class="gap-patch">
-                  <div class="circle"></div>
-                </div><div class="circle-clipper right">
-                  <div class="circle"></div>
-                </div>
-              </div>
+        <blockquote>
+          <div class="input-field">
+            <i class="fa fa-filter prefix"></i>
+            <input type="text" ng-model="desc" ng-keyup="getMaterials($event)">
+            <label for="">Filtrar Materiales del Inventario</label>
+          </div>
+        </blockquote>
+        <blockquote ng-model="sload" ng-show="sload">
+          <h3>Cargar Inventario</h3>
+          <div class="file-field input-field">
+            <div class="btn">
+              <span>Archivo</span>
+              <input type="file">
             </div>
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        {% verbatim %}
-            <tr ng-repeat="x in lstinv">
-              <td class="center-align">{{$index+1}}</td>
-              <td class="left-align">{{x.fields.materiales.pk}}</td>
-              <td class="left-align">{{x.fields.materiales.fields.matnom}} {{x.fields.materiales.fields.matmed}}</td>
-              <!--<td>{{x.fields.brand.fields.brand}}</td>
-              <td>{{x.fields.model.fields.model}}</td>-->
-              <td class="center-align">{{x.fields.materiales.fields.unidad}}</td>
-              <td class="right-align">{{x.fields.stock | number:2}}</td>
-              <td class="center-align">
-                <a href="#!{{x.fields.materiales.pk}}" ng-click="getDetails(x.fields.materiales.pk)">
-                  <i class="fa fa-list-alt"></i>
-                </a>
-              </td>
-            </tr>
-        {% endverbatim %}
-      </tbody>
-    </table>
-  </div>
-  <!-- block modal -->
-  <div class="modal" id="mupload">
-    <div class="modal-content">
-      <div class="file-field input-field">
-        <div class="btn">
-          <span>Archivo *.xlsx</span>
-          <input type="file" file-model="fload" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-        </div>
-        <div class="file-path-wrapper">
-          <input class="file-path validate" type="text">
+            <div class="file-path-wrapper">
+              <input class="file-path validate" type="text">
+            </div>
+          </div>
+        </blockquote>
+      </div>
+      <div class="row">
+        <div class="col s12 m12 l12">
+          <table class="table responsive-table highlight">
+            <thead class="red white-text">
+              <tr>
+                <th class="col-1">#</th>
+                <th class="col-2">Código</th>
+                <th>Descripción</th>
+                <!--<th>Marca</th>
+                <th>Modelo</th>-->
+                <th class="col-2">Unidad</th>
+                <th class="col-2">Stock</th>
+                <th class="col-1">Detalle</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% verbatim %}
+                  <tr ng-repeat="x in lstinv">
+                    <td class="center-align">{{$index+1}}</td>
+                    <td class="left-align"><small>{{x.fields.materiales.pk}}</small></td>
+                    <td class="left-align"><small>{{x.fields.materiales.fields.matnom}} {{x.fields.materiales.fields.matmed}}</small></td>
+                    <!--<td>{{x.fields.brand.fields.brand}}</td>
+                    <td>{{x.fields.model.fields.model}}</td>-->
+                    <td class="center-align">{{x.fields.materiales.fields.unidad}}</td>
+                    <td class="right-align"><strong>{{x.fields.stock | number:2}}</strong></td>
+                    <td class="center-align">
+                      <a href="#!{{x.fields.materiales.pk}}" class="grey-text text-darken-2" ng-click="getDetails(x.fields.materiales.pk)">
+                        <i class="fa fa-list-alt"></i>
+                      </a>
+                    </td>
+                  </tr>
+              {% endverbatim %}
+            </tbody>
+            <tfoot>
+              <tr ng-hide="ginit">
+                <td colspan="7" class="center-align">
+                    <div class="progress red lighten-4">
+                      <div class="indeterminate red"></div>
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="modal-action modal-close waves-effect btn left grey lighten-5 grey-text text-darken-3">
-        <i class="fa fa-times"></i>
-        <span class="hide-on-small-only">Salir</span>
-      </button>
-      <button type="button" class="btn blue" ng-disabled="bload" ng-click="loadInventory()">
-        <i class="fa" ng-class="{'fa-cog fa-spinner fa-pulse fa-fw':bload, 'fa-upload': !bload}"></i>
-        <span class="hide-on-small-only">Cargar</span>
-      </button>
-    </div>
-  </div>
-  <!-- block modals -->
-  <div id="mdetails" class="modal bottom-sheet" style="max-height:80%;">
-    <div class="modal-content">
-      {% verbatim %}
-        <h4>
-          {{details[0].fields.materials.fields.matnom}} {{details[0].fields.materials.fields.matmed}}
-          <br>
-          <small><strong>STOCK TOTAL {{amount}}</strong></small>
-        </h4>
-      {% endverbatim %}
-      <table class="table responsive-table highlight">
-        <caption class="input-field" ng-hide="sf">
-          <i class="prefix fa fa-filter"></i>
-          <input type="text" id="sb" ng-model="sbrand" placeholder="Filtar">
-        </caption>
-        <thead>
-          <tr>
-            <th>
-              <a href="#!" ng-model="sf" ng-init="sf=true" ng-click="sf=!sf"><i class="fa fa-search"></i></a>
-            </th>
-            <th>Código</th>
-            <th>Descripción</th>
-            <th>Marca</th>
-            <th>Modelo</th>
-            <th>Unidad</th>
-            <th>Stock</th> 
-          </tr>
-        </thead>
-        <tbody>
+      <!-- block modal -->
+      <div class="modal" id="mupload">
+        <div class="modal-content">
+          <div class="file-field input-field">
+            <div class="btn">
+              <span>Archivo *.xlsx</span>
+              <input type="file" file-model="fload" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            </div>
+            <div class="file-path-wrapper">
+              <input class="file-path validate" type="text">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-action modal-close waves-effect btn left grey lighten-5 grey-text text-darken-3">
+            <i class="fa fa-times"></i>
+            <span class="hide-on-small-only">Salir</span>
+          </button>
+          <button type="button" class="btn blue" ng-disabled="bload" ng-click="loadInventory()">
+            <i class="fa" ng-class="{'fa-cog fa-spinner fa-pulse fa-fw':bload, 'fa-upload': !bload}"></i>
+            <span class="hide-on-small-only">Cargar</span>
+          </button>
+        </div>
+      </div>
+      <!-- block modals -->
+      <div id="mdetails" class="modal bottom-sheet" style="max-height:80%;">
+        <div class="modal-content">
           {% verbatim %}
-            <tr ng-repeat="x in details | filter : sbrand">
-              <td>{{$index+1}}</td>
-              <td class="center-align">{{x.fields.materials.pk}}</td>
-              <td class="left-align">{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-              <td class="center-align">{{x.fields.brand.fields.brand}}</td>
-              <td class="center-align">{{x.fields.model.fields.model}}</td>
-              <td class="center-align">{{x.fields.materials.fields.unidad}}</td>
-              <td class="right-align">{{x.fields.stock | number : 2}}</td>
-              <td>
-            </tr>
+            <h5>
+              <small>{{details[0].fields.materials.pk}}</small> - {{details[0].fields.materials.fields.matnom}} {{details[0].fields.materials.fields.matmed}}
+              <br>
+              <small><strong>STOCK TOTAL {{amount}} {{details[0].fields.materials.fields.unidad}}</strong></small>
+            </h5>
           {% endverbatim %}
-        </tbody>
-      </table>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3 left">
-        <i class="fa fa-times"></i>
-        <small class="hide-on-small-only">SALIR</small>
-      </button>
+          <div class="row">
+            <div class="col s12 m12 l12">
+              <table class="table responsive-table highlight">
+                <caption class="input-field" ng-hide="sf">
+                  <i class="prefix fa fa-filter"></i>
+                  <input type="text" id="sb" ng-model="sbrand" placeholder="Filtar">
+                </caption>
+                <thead class="light-blue">
+                  <tr>
+                    <th class="col-1 center-align">
+                      <a href="#!search" class="white-text" ng-model="sf" ng-init="sf=true" ng-click="sf=!sf"><i class="fa fa-search"></i></a>
+                    </th>
+                    <!--<th class="col-2">Código</th>-->
+                    <th>Descripción</th>
+                    <th class="col-2 center-align">Marca</th>
+                    <th class="col-2 center-align">Modelo</th>
+                    <th class="col-2 center-align">Unidad</th>
+                    <th class="col-2 center-align">Stock</th>
+                    <th class="center-align col-1"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% verbatim %}
+                    <tr ng-repeat="x in details | filter : sbrand">
+                      <td class="center-align">{{ $index + 1 }}</td>
+                      <!--<td class="center-align"><small>{{x.fields.materials.pk}}</small></td>-->
+                      <td class="left-align"><small>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</small></td>
+                      <td class="center-align">{{ x.fields.brand.fields.brand }}</td>
+                      <td class="center-align">{{ x.fields.model.fields.model }}</td>
+                      <td class="center-align">{{ x.fields.materials.fields.unidad}}</td>
+                      <td class="right-align"><strong>{{ x.fields.stock | number : 2 }}</strong></td>
+                      <td class="center-align">
+                        <a href="#!adjust" class="center-align red-text" ng-click="openAdjustQuantity(x)">
+                          <i class="fa fa-wrench"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% endverbatim %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3 left">
+            <i class="fa fa-times"></i>
+            <small class="hide-on-small-only">SALIR</small>
+          </button>
+        </div>
+      </div>
+      <!-- block adjust stock for each material -->
+      <div class="modal bwidth-40" id="madjust">
+        <div class="modal-content">
+          {% verbatim %}
+            <h6><strong>{{adjust.fields.brand.fields.brand}} - {{adjust.fields.model.fields.model}} | {{adjust.fields.materials.fields.unidad}}</strong></h6>
+          {% endverbatim %}
+          <div class="input-field">
+            <input type="number" id="qadjust" class="right-align" step="0.10" ng-model="adjust.fields.stock">
+            <label for="qadjust" ng-class="{'active': adjust.fields.stock}">Ajustar Stock</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="waves-effect waves-light btn red" ng-click="adjustStock()">
+            <i class="fa fa-wrench"></i>
+            <span class="hide-on-small-only">AJUSTAR</span>
+          </button>
+          <button type="button" class="modal-action modal-close left waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+            <i class="fa fa-times"></i>
+            <span class="hide-on-small-only">SALIR</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </section>
