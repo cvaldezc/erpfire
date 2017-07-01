@@ -648,6 +648,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   };
   $scope.modifyList = function() {
     var data;
+    $scope.listTemps('N');
     data = {
       modifyList: true
     };
@@ -1674,6 +1675,14 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   };
   $scope.removeToastStatic = function() {
     angular.element(".toast-remove").remove();
+  };
+  $scope.refreshListsModified = function() {
+    var i, len, ref, x;
+    ref = new Array('n', 'm', 'd');
+    for (i = 0, len = ref.length; i < len; i++) {
+      x = ref[i];
+      $scope.listTemps(x.toUpperCase());
+    }
   };
   calcSumTemp = function(arr, type) {
     if (arr !== void 0) {

@@ -415,7 +415,9 @@ class Nipple(models.Model):
 
 
 class DSMetradoTemp(models.Model):
-    """Class for temporal add dsector add, edit, del """
+    '''
+        Class for temporal add dsector add, edit, del
+    '''
     STATUS = (('N', 'NEW'), ('M', 'MODIFY'), ('D', 'DELETE'), )
     register = models.DateTimeField(auto_now_add=True)
     dsector = models.ForeignKey(DSector, to_field='dsector_id')
@@ -423,6 +425,7 @@ class DSMetradoTemp(models.Model):
     brand = models.ForeignKey(Brand, related_name='brand_DSMtemp')
     model = models.ForeignKey(Model, related_name='model_DSMtemp')
     missingsend = models.DecimalField(max_digits=12, decimal_places=3, default=0)
+    qsold = models.DecimalField(max_digits=12, decimal_places=3, default=0)
     quantity = models.DecimalField(max_digits=12, decimal_places=3, default=0)
     ppurchase = models.DecimalField(max_digits=12, decimal_places=3, default=0)
     psales = models.DecimalField(max_digits=12, decimal_places=3, default=0)

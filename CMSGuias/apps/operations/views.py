@@ -121,56 +121,53 @@ class ProgramingProject(JSONResponseMixin, View):
             try:
                 if 'listg' in request.GET:
                     sg = SGroup.objects.filter(
-                            project_id=kwargs['pro'],
-                            subproject_id=kwargs[
-                                'sub'] if unicode(kwargs[
-                                    'sub']) != 'None' and unicode(kwargs[
-                                        'sub']) != '' else None,
-                            sector_id=kwargs['sec']).order_by('name')
-                    context['sg'] = json.loads(serializers.serialize(
-                                                                'json', sg))
+                        project_id=kwargs['pro'],
+                        subproject_id=kwargs[
+                            'sub'] if unicode(kwargs[
+                                'sub']) != 'None' and unicode(kwargs[
+                                    'sub']) != '' else None,
+                        sector_id=kwargs['sec']).order_by('name')
+                    context['sg'] = json.loads(serializers.serialize('json', sg))
                     context['status'] = True
                 if 'listds' in request.GET:
                     ds = DSector.objects.filter(
-                            project_id=kwargs['pro'],
-                            sgroup__subproject_id=kwargs[
-                                'sub'] if unicode(kwargs[
-                                    'sub']) != 'None' and unicode(kwargs[
-                                        'sub']) != '' else None,
-                            sgroup__sector_id=kwargs['sec']).order_by(
-                            'sgroup')
+                        project_id=kwargs['pro'],
+                        sgroup__subproject_id=kwargs[
+                            'sub'] if unicode(kwargs[
+                                'sub']) != 'None' and unicode(kwargs[
+                                    'sub']) != '' else None,
+                        sgroup__sector_id=kwargs['sec']).order_by('sgroup')
                     context['ds'] = json.loads(serializers.serialize(
-                                        'json',
-                                        ds,
-                                        relations=('sgroup',)))
+                        'json',
+                        ds,
+                        relations=('sgroup',)))
                     context['status'] = True
                 if 'getAreasByGroup' in request.GET:
                     ds = DSector.objects.filter(
-                            project_id=kwargs['pro'],
-                            sgroup_id=request.GET['sgroup'],
-                            sgroup__sector_id=kwargs['sec']).order_by(
-                            'sgroup')
+                        project_id=kwargs['pro'],
+                        sgroup_id=request.GET['sgroup'],
+                        sgroup__sector_id=kwargs['sec']).order_by('sgroup')
                     context['areas'] = json.loads(serializers.serialize(
-                                        'json',
-                                        ds,
-                                        relations=('sgroup',)))
+                        'json',
+                        ds,
+                        relations=('sgroup',)))
                     context['status'] = True
                 if 'valPrices' in request.GET:
                     # get sgroup
                     sg = [x[0] for x in SGroup.objects.filter(
-                            project_id=kwargs['pro'],
-                            subproject_id=kwargs[
-                                'sub'] if unicode(kwargs[
-                                    'sub']) != 'None' and unicode(kwargs[
-                                        'sub']) != '' else None,
-                            sector_id=kwargs['sec']).values_list('sgroup_id',)]
+                        project_id=kwargs['pro'],
+                        subproject_id=kwargs[
+                            'sub'] if unicode(kwargs[
+                                'sub']) != 'None' and unicode(kwargs[
+                                    'sub']) != '' else None,
+                        sector_id=kwargs['sec']).values_list('sgroup_id',)]
                     sec = [x[0] for x in DSector.objects.filter(
-                            sgroup_id__in=sg).values_list('dsector_id')]
+                        sgroup_id__in=sg).values_list('dsector_id')]
                     without = DSMetrado.objects.filter(
                         Q(dsector_id__in=sec),
                         Q(ppurchase=0) | Q(psales=0) | Q(quantity=0)
                         ).order_by('materials__matnom').distinct(
-                        'materials__matnom')
+                            'materials__matnom')
                     if without:
                         context['list'] = json.loads(
                             serializers.serialize(
@@ -194,9 +191,7 @@ class ProgramingProject(JSONResponseMixin, View):
                     subproyecto_id=kwargs['sub'] if kwargs[
                         'sub'] is None else None,
                     sector_id=kwargs['sec'])
-                ds = DSector.objects.filter(
-                        project_id=kwargs['pro'],
-                        sector_id=kwargs['sec'])
+                ds = DSector.objects.filter(project_id=kwargs['pro'], sector_id=kwargs['sec'])
                 t = ds.count()
                 if t == 0:
                     context['status'] = 'PE'
@@ -211,13 +206,10 @@ class ProgramingProject(JSONResponseMixin, View):
                 if ds:
                     context['operations'] = DSMetrado.objects.filter(
                         dsector_id__in=[x.dsector_id for x in ds]).aggregate(
-                        amount=Sum(
-                            'quantity',
-                            field='quantity*ppurchase'))['amount']
+                            amount=Sum('quantity', field='quantity*ppurchase'))['amount']
                     if context['operations'] <= 0 or context['operations'] == None:
                         context['operations'] = 0
-                    context['diff'] = (context[
-                                        'sector'].amount-context['operations'])
+                    context['diff'] = (context['sector'].amount-context['operations'])
                 return render(
                     request,
                     'operations/programinggroup.html',
@@ -233,8 +225,7 @@ class ProgramingProject(JSONResponseMixin, View):
                 if 'saveg' in request.POST:
                     try:
                         if 'sgroup_id' in request.POST:
-                            sg = SGroup.objects.get(
-                                    sgroup_id=request.POST['sgroup_id'])
+                            sg = SGroup.objects.get(sgroup_id=request.POST['sgroup_id'])
                             form = SGroupForm(request.POST, instance=sg)
                         else:
                             form = SGroupForm(request.POST)
@@ -244,8 +235,7 @@ class ProgramingProject(JSONResponseMixin, View):
                     if form.is_valid():
                         if 'sgroup_id' not in request.POST:
                             add = form.save(commit=False)
-                            key = genkeys.genSGroup(
-                                    kwargs['pro'], kwargs['sec'])
+                            key = genkeys.genSGroup(kwargs['pro'], kwargs['sec'])
                             add.sgroup_id = key.strip()
                             add.project_id = kwargs['pro']
                             if unicode(kwargs['sub']) != 'None':
@@ -263,10 +253,8 @@ class ProgramingProject(JSONResponseMixin, View):
                 if 'saveds' in request.POST:
                     try:
                         if 'dsector_id' in request.POST:
-                            ds = DSector.objects.get(
-                                    dsector_id=request.POST['dsector_id'])
-                            form = DSectorForm(
-                                    request.POST, request.FILES, instance=ds)
+                            ds = DSector.objects.get(dsector_id=request.POST['dsector_id'])
+                            form = DSectorForm(request.POST, request.FILES, instance=ds)
                         else:
                             form = DSectorForm(request.POST, request.FILES)
                     except ObjectDoesNotExist as e:
@@ -274,9 +262,7 @@ class ProgramingProject(JSONResponseMixin, View):
                     if form.is_valid():
                         if 'dsector_id' not in request.POST:
                             add = form.save(commit=False)
-                            key = genkeys.genDSector(
-                                    kwargs['pro'],
-                                    request.POST['sgroup'])
+                            key = genkeys.genDSector(kwargs['pro'], request.POST['sgroup'])
                             add.dsector_id = key.strip()
                             add.project_id = kwargs['pro']
                             add.sector_id = kwargs['sec']
@@ -284,20 +270,17 @@ class ProgramingProject(JSONResponseMixin, View):
                         else:
                             form.save()
                         try:
-                            sg = SGroup.objects.get(
-                                    sgroup_id=request.POST['sgroup'])
+                            sg = SGroup.objects.get(sgroup_id=request.POST['sgroup'])
                             if sg.datestart is None:
                                 sg.datestart = request.POST['datestart']
                             else:
-                                st = globalVariable.format_str_date(
-                                        request.POST['datestart'])
+                                st = globalVariable.format_str_date(request.POST['datestart'])
                                 if st < sg.datestart:
                                     sg.datestart = st
                             if sg.dateend is None:
                                 sg.dateend = request.POST['dateend']
                             else:
-                                ed = globalVariable.format_str_date(
-                                        request.POST['dateend'])
+                                ed = globalVariable.format_str_date(request.POST['dateend'])
                                 if ed > sg.dateend:
                                     sg.dateend = ed
                             sg.save()
@@ -309,14 +292,14 @@ class ProgramingProject(JSONResponseMixin, View):
                         context['raise'] = 'Fields empty'
                 if 'savePricewithout' in request.POST:
                     sg = [x[0] for x in SGroup.objects.filter(
-                            project_id=kwargs['pro'],
-                            subproject_id=kwargs[
-                                'sub'] if unicode(kwargs[
-                                    'sub']) != 'None' and unicode(kwargs[
-                                        'sub']) != '' else None,
-                            sector_id=kwargs['sec']).values_list('sgroup_id',)]
+                        project_id=kwargs['pro'],
+                        subproject_id=kwargs[
+                            'sub'] if unicode(kwargs[
+                                'sub']) != 'None' and unicode(kwargs[
+                                    'sub']) != '' else None,
+                        sector_id=kwargs['sec']).values_list('sgroup_id',)]
                     sec = [x[0] for x in DSector.objects.filter(
-                            sgroup_id__in=sg).values_list('dsector_id')]
+                        sgroup_id__in=sg).values_list('dsector_id')]
                     dsm = DSMetrado.objects.filter(
                         dsector_id__in=sec,
                         materials_id=request.POST['materials'])
@@ -327,29 +310,21 @@ class ProgramingProject(JSONResponseMixin, View):
                     context['status'] = True
                 if 'approvedAreas' in request.POST:
                     # print kwargs['pro'], kwargs['sec']
-                    sg = SGroup.objects.filter(
-                            project_id=kwargs['pro'],
-                            sector_id=kwargs['sec'])
+                    sg = SGroup.objects.filter(project_id=kwargs['pro'], sector_id=kwargs['sec'])
                     for x in sg:
                         x.status = 'AC'
                         x.save()
-                    ds = DSector.objects.filter(
-                            project_id=kwargs['pro'],
-                            sector_id=kwargs['sec'])
+                    ds = DSector.objects.filter(project_id=kwargs['pro'], sector_id=kwargs['sec'])
                     for x in ds:
                         x.status = 'AC'
                         x.save()
                     context['status'] = True
                 if 'DiscapprovedAreas' in request.POST:
-                    sg = SGroup.objects.filter(
-                            project_id=kwargs['pro'],
-                            sector_id=kwargs['sec'])
+                    sg = SGroup.objects.filter(project_id=kwargs['pro'], sector_id=kwargs['sec'])
                     for x in sg:
                         x.status = 'PE'
                         x.save()
-                    ds = DSector.objects.filter(
-                            project_id=kwargs['pro'],
-                            sector_id=kwargs['sec'])
+                    ds = DSector.objects.filter(project_id=kwargs['pro'], sector_id=kwargs['sec'])
                     for x in ds:
                         x.status = 'PE'
                         x.save()
@@ -389,16 +364,18 @@ class ProgramingProject(JSONResponseMixin, View):
                                     print name
                                     try:
                                         sg = SGroup.objects.filter(
-                                                project_id=kwargs['pro'],
-                                                sector_id=kwargs['sec'],
-                                                name__exact=name)
+                                            project_id=kwargs['pro'],
+                                            sector_id=kwargs['sec'],
+                                            name__exact=name)
                                         print 'COUNTER SGROUP', sg.count()
                                         if sg.count() > 0:
                                             sgroup[name] = {'id': sg[0].sgroup_id}
                                         else:
                                             print "CREA NUEVO GROUP DEFECT"
                                             nw = SGroup()
-                                            sgroup[name] = {'id': genkeys.genSGroup(kwargs['pro'], sec)}
+                                            sgroup[name] = {
+                                                'id': genkeys.genSGroup(kwargs['pro'], sec)
+                                            }
                                             # time.sleep(1)
                                             nw.sgroup_id = sgroup[name]['id']
                                             nw.project_id = kwargs['pro']
@@ -491,7 +468,7 @@ class ProgramingProject(JSONResponseMixin, View):
                                             try:
                                                 dsm = MetProject.objects.filter(
                                                     materiales_id=str(cm)).order_by(
-                                                    '-proyecto__registrado')
+                                                        '-proyecto__registrado')
                                                 if len(dsm):
                                                     dsm = dsm[0]
                                                     purchase = float(dsm.precio)
@@ -500,7 +477,8 @@ class ProgramingProject(JSONResponseMixin, View):
                                                 raise e
 
                                         try:
-                                            odsm = DSMetrado.objects.filter(dsector_id=sgroup[tgn][ns]['id'],
+                                            odsm = DSMetrado.objects.filter(
+                                                dsector_id=sgroup[tgn][ns]['id'],
                                                 sector_id=kwargs['sec'],
                                                 materials_id=cm, brand_id='BR000',
                                                 model_id='MO000')
@@ -552,8 +530,8 @@ class ProgramingProject(JSONResponseMixin, View):
                 if 'delsgroup' in request.POST:
                     try:
                         ds = DSector.objects.filter(
-                                project_id=kwargs['pro'],
-                                sgroup_id=request.POST['sgroup'])
+                            project_id=kwargs['pro'],
+                            sgroup_id=request.POST['sgroup'])
                         ds = [x.dsector_id for x in ds]
                         DSMetrado.objects.filter(
                             dsector_id__in=ds).delete()
@@ -561,13 +539,13 @@ class ProgramingProject(JSONResponseMixin, View):
                     except DSector.DoesNotExist as e:
                         context['raise'] = str(e)
                     SGroup.objects.get(
-                            project_id=kwargs['pro'],
-                            subproject_id=kwargs[
-                                'sub'] if unicode(kwargs[
-                                    'sub']) != 'None' and unicode(kwargs[
-                                        'sub']) != '' else None,
-                            sector_id=kwargs['sec'],
-                            sgroup_id=request.POST['sgroup']).delete()
+                        project_id=kwargs['pro'],
+                        subproject_id=kwargs[
+                            'sub'] if unicode(kwargs[
+                                'sub']) != 'None' and unicode(kwargs[
+                                    'sub']) != '' else None,
+                        sector_id=kwargs['sec'],
+                        sgroup_id=request.POST['sgroup']).delete()
                     context['status'] = True
             except ObjectDoesNotExist as e:
                 context['raise'] = str(e)
@@ -592,8 +570,8 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         'json',
                         DSMetrado.objects.filter(
                             dsector_id=kwargs['area']).order_by(
-                            'materials__matnom'), relations=(
-                            'materials', 'brand', 'model', 'dsector')))
+                                'materials__matnom'), relations=(
+                                'materials', 'brand', 'model', 'dsector')))
                     context['status'] = True
                 if 'lstnipp' in request.GET:
                     context['nip'] = json.loads(
@@ -614,7 +592,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             'json',
                             MMetrado.objects.filter(
                                 dsector_id=kwargs['area']).order_by(
-                                'materials__matnom'),
+                                    'materials__matnom'),
                             relations=('materials', 'brand', 'model')))
                     context['status'] = True
                 if 'samountp' in request.GET:
@@ -622,30 +600,29 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         'json',
                         [Sectore.objects.get(sector_id=kwargs['sec'])]))
                     sg = [x[0] for x in SGroup.objects.filter(
-                            project_id=kwargs['pro'],
-                            sector_id=kwargs['sec']).values_list('sgroup_id',)]
+                        project_id=kwargs['pro'],
+                        sector_id=kwargs['sec']).values_list('sgroup_id',)]
                     sec = [x[0] for x in DSector.objects.filter(
-                            sgroup_id__in=sg).values_list('dsector_id')]
+                        sgroup_id__in=sg).values_list('dsector_id')]
                     dsal = DSMetrado.objects.filter(
-                            dsector_id__in=sec).aggregate(
-                            tpurchase=Sum(
-                                'quantity', field='quantity * ppurchase'),
-                            tsales=Sum('quantity', field='quantity * psales'))
+                        dsector_id__in=sec).aggregate(
+                        tpurchase=Sum(
+                            'quantity', field='quantity * ppurchase'),
+                        tsales=Sum('quantity', field='quantity * psales'))
                     rds = DSMetrado.objects.filter(dsector_id=kwargs[
-                        'area']).aggregate(tpurchase=Sum(
-                            'quantity',
-                            field='quantity * ppurchase'),
+                        'area']).aggregate(
+                            tpurchase=Sum('quantity', field='quantity * ppurchase'),
                             tsales=Sum('quantity', field='quantity * psales'))
                     # print rds
                     context['msector'] = dsal
                     context['maarea'] = rds
                     mm = MMetrado.objects.filter(
                         dsector_id=kwargs['area']).order_by(
-                        'materials__matnom').aggregate(
-                        apurchase=Sum(
-                            'quantity', field='quantity * ppurchase'),
-                        asale=Sum(
-                            'quantity', field='quantity * psales'))
+                            'materials__matnom').aggregate(
+                                apurchase=Sum(
+                                    'quantity', field='quantity * ppurchase'),
+                                asale=Sum(
+                                    'quantity', field='quantity * psales'))
                     context['mmodify'] = mm
                     context['status'] = True
                 if 'nippleOrders' in request.GET:
@@ -662,7 +639,8 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     context['status'] = True
                 if 'lsttemp' in request.GET:
                     def lists(tp):
-                        lst = DSMetradoTemp.objects.filter(dsector_id=kwargs['area'],
+                        lst = DSMetradoTemp.objects.filter(
+                            dsector_id=kwargs['area'],
                             type=tp).order_by('materials__matnom')
                         return json.loads(serializers.serialize(
                             'json', lst, relations=('materials', 'brand', 'model')))
@@ -683,14 +661,13 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
         else:
             try:
                 context['dsector'] = DSector.objects.get(
-                                        dsector_id=kwargs['area'])
+                    dsector_id=kwargs['area'])
                 context['modify'] = MMetrado.objects.filter(
-                                        dsector_id=kwargs['area']).order_by(
-                                            '-register')[:5]
+                    dsector_id=kwargs['area']).order_by('-register')[:5]
                 if request.user.get_profile().empdni.charge.area.lower() == 'ventas' or request.user.get_profile().empdni.charge.area .lower() == 'administrator':
                     context['amount'] = DSMetrado.objects.filter(
-                        dsector_id=kwargs['area']).aggregate(apurchase=Sum(
-                            'quantity', field='quantity*ppurchase'),
+                        dsector_id=kwargs['area']).aggregate(
+                            apurchase=Sum('quantity', field='quantity*ppurchase'),
                             asales=Sum('quantity', field='quantity*psales'))
                 context['storage'] = Almacene.objects.filter(flag=True)
                 return render(request, 'operations/dsector.html', context)
@@ -741,7 +718,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                             'sub']) != '' else None,
                                 sector_id=kwargs['sec']).values_list('sgroup_id',)]
                             sec = [x[0] for x in DSector.objects.filter(
-                                    sgroup_id__in=sg).values_list('dsector_id')]
+                                sgroup_id__in=sg).values_list('dsector_id')]
                             dsmup = DSMetrado.objects.filter(
                                 dsector_id__in=sec,
                                 materials_id=request.POST['code'])
@@ -787,8 +764,8 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                         for x in sec:
                             try:
                                 ds = DSMetrado.objects.get(
-                                        dsector_id=kwargs['area'],
-                                        materials_id=x.materiales_id)
+                                    dsector_id=kwargs['area'],
+                                    materials_id=x.materiales_id)
                             except DSMetrado.DoesNotExist:
                                 ds = DSMetrado()
                             ds.dsector_id = kwargs['area']
@@ -824,8 +801,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     context['status'] = True
                 if 'nipplesav' in request.POST:
                     try:
-                        area = DSector.objects.get(
-                                dsector_id=kwargs['area'])
+                        area = DSector.objects.get(dsector_id=kwargs['area'])
                     except DSector.DoesNotExist as ex:
                         kwargs['raise'] = str(ex)
                         area = {'sector_id': ''}
@@ -835,14 +811,14 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     request.POST['proyecto'] = kwargs['area'][:7]
                     request.POST['area'] = kwargs['area']
                     request.POST['sector'] = area.sgroup.sector_id
-                    request.POST['brand'] = 'BR000';
-                    request.POST['model'] = 'MO000';
+                    request.POST['brand'] = 'BR000'
+                    request.POST['model'] = 'MO000'
                     request.POST._mutable = False
                     if 'edit' in request.POST:
                         Np = Nipple.objects.get(
-                                id=request.POST['id'],
-                                area_id=kwargs['area'],
-                                materiales_id=request.POST['materiales'])
+                            id=request.POST['id'],
+                            area_id=kwargs['area'],
+                            materiales_id=request.POST['materiales'])
                         nip = NippleForm(request.POST, instance=Np)
                     else:
                         nip = NippleForm(request.POST)
@@ -861,8 +837,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     # 2016-24-11 633 ok available by modify dsmetrado
                     valid = MMetrado.objects.filter(dsector_id=kwargs['area'])
                     if not valid:
-                        clipboard = DSMetrado.objects.filter(
-                                        dsector_id=kwargs['area'])
+                        clipboard = DSMetrado.objects.filter(dsector_id=kwargs['area'])
                         if clipboard:
                             for x in clipboard:
                                 add = MMetrado()
@@ -901,22 +876,25 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                 materials_id=request.POST['code'],
                                 brand_id=request.POST['brand'],
                                 model_id=request.POST['model'])
-                            dsmt.quantity += Decimal(request.POST['quantity']).quantize(Decimal('0.001'))
-                            dsmt.missingsend += Decimal(request.POST['quantity']).quantize(Decimal('0.001'))
+                            dsmt.quantity += Decimal(
+                                request.POST['quantity']).quantize(Decimal('0.001'))
+                            dsmt.missingsend += Decimal(
+                                request.POST['quantity']).quantize(Decimal('0.001'))
                             dsmt.type = regt
                             dsmt.symbol = '+'
                             dsmt.save()
                         except DSMetradoTemp.DoesNotExist as ex:
                             print ex
-                            DSMetradoTemp.objects.create(dsector_id=kwargs['area'],
-                            materials_id=request.POST['code'],
-                            brand_id=request.POST['brand'],
-                            model_id=request.POST['model'],
-                            missingsend=request.POST['quantity'],
-                            quantity=request.POST['quantity'],
-                            ppurchase=request.POST['ppurchase'],
-                            psales=request.POST['psales'],
-                            type=regt)
+                            DSMetradoTemp.objects.create(
+                                dsector_id=kwargs['area'],
+                                materials_id=request.POST['code'],
+                                brand_id=request.POST['brand'],
+                                model_id=request.POST['model'],
+                                missingsend=request.POST['quantity'],
+                                quantity=request.POST['quantity'],
+                                ppurchase=request.POST['ppurchase'],
+                                psales=request.POST['psales'],
+                                type=regt)
                     try:
                         # if exists in table principal se debe de almacen como una modificacion
                         MMetrado.objects.get(

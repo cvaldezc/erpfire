@@ -145,7 +145,7 @@
                     <th class="col-2 center-align">Modelo</th>
                     <th class="col-2 center-align">Unidad</th>
                     <th class="col-2 center-align">Stock</th>
-                    <th class="center-align col-1"></th>
+                    <th class="center-align col-1" ng-show="parea=='administrator'"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -158,7 +158,7 @@
                       <td class="center-align">{{ x.fields.model.fields.model }}</td>
                       <td class="center-align">{{ x.fields.materials.fields.unidad}}</td>
                       <td class="right-align"><strong>{{ x.fields.stock | number : 2 }}</strong></td>
-                      <td class="center-align">
+                      <td class="center-align" ng-show="parea=='administrator'">
                         <a href="#!adjust" class="center-align red-text" ng-click="openAdjustQuantity(x)">
                           <i class="fa fa-wrench"></i>
                         </a>

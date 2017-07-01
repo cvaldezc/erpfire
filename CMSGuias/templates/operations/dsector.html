@@ -433,7 +433,7 @@
                 <div class="row">
                     <div class="col l12 m12 s12">
                         <ul class="tabs idenred">
-                            <li class="tab col s3"><a class="grey-text text-darken-3" href="#vmodify"><i class="fa fa-pencil"></i> <strong>MODIFICACION</strong></a></li>
+                            <li class="tab col s3"><a class="grey-text text-darken-3" href="#vmodify" ng-click="refreshListsModified()"><i class="fa fa-pencil"></i> <strong>MODIFICACION</strong></a></li>
                             <li class="tab col s3"><a class="grey-text text-darken-3 active" href="#vlist"><i class="fa fa-list-alt"></i> <strong>LISTA ACTUAL</strong></a></li>
                             <li class="tab col s3"><a class="grey-text text-darken-3" href="#vprices"><i class="fa fa-dollar"></i> <strong>PRECIOS</strong></a></li>
                         </ul>
@@ -468,15 +468,15 @@
                                             <a href="#!" class="grey-text text-darken-3">
                                                 <i class="fa fa-filter"></i></a>
                                         </th>
-                                        <th class="col-3">Código</th>
+                                        <th class="col-1">Código</th>
                                         <th>
                                             Descripción
                                         </th>
                                         <th class="col-2">Marca</th>
                                         <th class="col-2">Modelo</th>
                                         <th class="col-1">Unidad</th>
-                                        <th class="col-2">P. Compra</th>
-                                        <th class="col-2">P. Venta</th>
+                                        <th class="col-2">P.Compra</th>
+                                        <th class="col-2">P.Venta</th>
                                         <th class="col-2">Cantidad</th>
                                         <th class="col-1">
                                             <a href="#!lnew" class="blue-text" ng-click="listTemps('N')">
@@ -493,11 +493,11 @@
                                 <tbody>
                                     <tr ng-repeat="x in lstN">
                                         <td>{{$index+1}}</td>
-                                        <td>{{x.fields.materials.pk}}</td>
-                                        <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-                                        <td class="center-align">{{x.fields.brand.fields.brand}}</td>
-                                        <td class="center-align">{{x.fields.model.fields.model}}</td>
-                                        <td>{{x.fields.materials.fields.unidad}}</td>
+                                        <td><small>{{x.fields.materials.pk}}</small></td>
+                                        <td><small>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.brand.fields.brand}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.model.fields.model}}</small></td>
+                                        <td><small>{{x.fields.materials.fields.unidad}}</small></td>
                                         <td class="right-align">{{x.fields.ppurchase}}</td>
                                         <td class="right-align">{{x.fields.psales}}</td>
                                         <td class="right-align">{{x.fields.quantity}}</td>
@@ -524,15 +524,15 @@
                                 <thead>
                                     <tr class="blue lighten-5">
                                         <th class="col-1 center-align"><a href="#!" class="grey-text text-darken-3"><i class="fa fa-filter"></i></a></th>
-                                        <th>Código</th>
+                                        <th class="col-1">Código</th>
                                         <th>Descripción</th>
-                                        <th>Marca</th>
-                                        <th>Modelo</th>
-                                        <th class="col-2">Unidad</th>
-                                        <th class="right-align col-2">P.Compra</th>
-                                        <th class="right-align col-2">P.Ventas</th>
-                                        <th class="right-align col-2">Pendiente</th>
-                                        <th class="right-align col-2">Cantidad</th>
+                                        <th class="col-2">Marca</th>
+                                        <th class="col-2">Modelo</th>
+                                        <th class="col-1">Unidad</th>
+                                        <th class="col-2 right-align">P.Compra</th>
+                                        <th class="col-2 right-align">P.Ventas</th>
+                                        <th class="col-2 right-align">Pendiente</th>
+                                        <th class="col-2 right-align">Cantidad</th>
                                         <th class="col-1">
                                             <a href="#!reload" class="col-1 blue-text" ng-click="listTemps('M')">
                                                 <i class="fa fa-refresh"></i>
@@ -548,15 +548,15 @@
                                 <tbody>
                                     <tr ng-repeat="x in lstM">
                                         <td>{{$index+1}}</td>
-                                        <td>{{x.fields.materials.pk}}</td>
-                                        <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-                                        <td>{{x.fields.brand.fields.brand}}</td>
-                                        <td>{{x.fields.model.fields.model}}</td>
-                                        <td>{{x.fields.materials.fields.unidad}}</td>
-                                        <td>{{x.fields.ppurchase}}</td>
-                                        <td>{{x.fields.psales}}</td>
-                                        <td>{{x.fields.missingsend}}</td>
-                                        <td>{{x.fields.quantity}}</td>
+                                        <td><small>{{x.fields.materials.pk}}</small></td>
+                                        <td><small>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.brand.fields.brand}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.model.fields.model}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.materials.fields.unidad}}</small></td>
+                                        <td class="right-align">{{x.fields.ppurchase}}</td>
+                                        <td class="right-align">{{x.fields.psales}}</td>
+                                        <td class="right-align">{{x.fields.missingsend}}</td>
+                                        <td class="right-align">{{x.fields.quantity}}</td>
                                         <td>
                                             <i class="fa" ng-class="{'fa-long-arrow-up': x.fields.symbol == '+','fa-long-arrow-down': x.fields.symbol == '-'}"></i>
                                         </td>
@@ -582,15 +582,15 @@
                                 <thead>
                                     <tr class="red lighten-5">
                                         <th><a href="#!" class="grey-text text-darken-3"><i class="fa fa-filter"></i></a></th>
-                                        <th>Código</th>
+                                        <th class="col-1">Código</th>
                                         <th>Descripción</th>
-                                        <th>Marca</th>
-                                        <th>Modelo</th>
-                                        <th>Unidad</th>
-                                        <th class="right-align">P. Compra</th>
-                                        <th class="right-align">P. Ventas</th>
-                                        <th class="right-align">En Pedidos</th>
-                                        <th class="right-align">C. Eliminar</th>
+                                        <th class="col-1">Marca</th>
+                                        <th class="col-1">Modelo</th>
+                                        <th class="col-1">Unidad</th>
+                                         <th class="col-2 right-align">P.Compra</th>
+                                        <th class="col-2 right-align">P.Ventas</th>
+                                        <th class="col-2 right-align">Pedidos</th>
+                                        <th class="col-1 right-align">C.Eliminar</th>
                                         <th>
                                             <a href="#!lnew" class="blue-text" ng-click="listTemps('D')">
                                                 <i class="fa fa-refresh"></i>
@@ -606,11 +606,11 @@
                                 <tbody>
                                     <tr ng-repeat="x in lstD">
                                         <td>{{$index+1}}</td>
-                                        <td class="center-align">{{x.fields.materials.pk}}</td>
-                                        <td class="left-align">{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-                                        <td class="center-align">{{x.fields.brand.fields.brand}}</td>
-                                        <td class="center-align">{{x.fields.model.fields.model}}</td>
-                                        <td class="center-align">{{x.fields.materials.fields.unidad}}</td>
+                                        <td class="center-align"><small>{{x.fields.materials.pk}}</small></td>
+                                        <td class="left-align"><small>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.brand.fields.brand}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.model.fields.model}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.materials.fields.unidad}}</small></td>
                                         <td class="right-align">{{x.fields.ppurchase}}</td>
                                         <td class="right-align">{{x.fields.psales}}</td>
                                         <td class="right-align">{{x.fields.missingsend}}</td>

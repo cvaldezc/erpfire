@@ -549,6 +549,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         return
     return
   $scope.modifyList = ->
+    $scope.listTemps('N')
     data =
       modifyList: true
     $http.get '', params: data
@@ -1389,7 +1390,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
               angular.element('.toast-kill').remove()
               if response.status
                 $scope.disableModify()
-                $scope.listTemps type
+                $scope.listTemps(type)
                 $scope.calcApproved()
                 Materialize.toast """<i class='fa fa-trash fa-lg red-text'></i>
                   \ items eliminados!""", 4000
@@ -1471,6 +1472,15 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       .remove()
     return
   # end block
+
+  # @cvaldezch 2017-07-01 11:53:44
+  # improvement modified materials
+  $scope.refreshListsModified = ->
+    for x in new Array('n', 'm', 'd')
+        $scope.listTemps(x.toUpperCase())
+    return
+  #end block
+
   calcSumTemp = (arr, type) ->
     if arr isnt undefined
       $scope["tmlst#{type}"] = [0, 0]
