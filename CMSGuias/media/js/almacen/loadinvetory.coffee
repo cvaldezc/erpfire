@@ -32,10 +32,12 @@ factories = ($http, $cookies) ->
   obj.getDetails = (options = {}) ->
     $http.get "", params: options
   obj.loadInventory = (options = {}) ->
-    $http.post "", formd(options), transformRequest: angular.identity, headers: 'Content-Type': undefined
+    obj.post(options)
   obj.delInventory = (options = {}) ->
-    $http.post "", formd(options), transformRequest: angular.identity, headers: 'Content-Type': undefined
+    obj.post(options)
   obj.sendOrder = (options = {}) ->
+    obj.post(options)
+  obj.post = (options = {}) ->
     $http.post "", formd(options), transformRequest: angular.identity, headers: 'content-Type': undefined
 
   obj
@@ -48,18 +50,19 @@ controller = ($scope, $timeout, $q, inventoryFactory) ->
   $scope.parea = ''
   $scope.pcargo = ''
   $scope.ginit = false
+  $scope.adjust = {}
 
   angular.element(document).ready ->
-    prms = 
+    prms =
       getmat: true
       desc: ''
     inventoryFactory.getMaterials prms
-        .success (response) ->
-          if response.status
-            console.log response
-            $scope.lstinv = response.materials
-            $scope.ginit = true
-            return
+    .success (response) ->
+      if response.status
+        console.log response
+        $scope.lstinv = response.materials
+        $scope.ginit = true
+        return
     angular.element('.modal').modal()
     #, 'open'
     #   dismissible: false
@@ -67,7 +70,11 @@ controller = ($scope, $timeout, $q, inventoryFactory) ->
 
   $scope.getMaterials = ($event) ->
     if $event.keyCode == 13
-      prms =
+      $scope.getdescription()
+      return
+
+  $scope.getdescription = ->
+    prms =
         'getmat': true
         'desc': $scope.desc
       $scope.ginit = false
@@ -78,10 +85,10 @@ controller = ($scope, $timeout, $q, inventoryFactory) ->
           $scope.lstinv = response.materials
           console.info $scope.lstinv
           $scope.ginit = true
-          return
+
         else
           console.error "Error #{response.raise}"
-          return
+        return
       return
 
   $scope.getDetails = (matid) ->
@@ -204,6 +211,43 @@ controller = ($scope, $timeout, $q, inventoryFactory) ->
           Materialize.toast "Error! #{response.raise}", 3600
           return
     return
+  #
+  # @Christian 2017-06-30 17:55:04
+  # add function for adjust stock in inventoryBrand
+  $scope.openAdjustQuantity = (obj) ->
+    angular.element("#madjust").modal('open')
+    $scope.adjust = obj
+    return
+
+  $scope.adjustStock = ->
+    Materialize.toast 'Procesando...!', undefined, 'toast-remove'
+    param =
+      adjustStk: true
+      stk: $scope.adjust.fields.stock
+      materials: $scope.adjust.fields.materials.pk
+      brand: $scope.adjust.fields.brand.pk
+      model: $scope.adjust.fields.model.pk
+    inventoryFactory.post(param).then (
+      (response) ->
+        angular.element('.toast-remove').remove()
+        if response['data']['status'] and response.status == 200
+          Materialize.toast 'Transacción Correcta!', 2600
+          $scope.desc = $scope.adjust.fields.materials.fields.matnom
+          angular.element("#madjust").modal('close')
+          $scope.adjust = {}
+          $scope.getdescription()
+          # console.info(response)
+          return
+    )
+    .catch(
+      (err) ->
+        console.error("ERROR post ", err)
+        return
+    )
+    return
+  # 2017-06-30 17:55:38
+  #end block
+
   return
 
 app.controller 'inventoryCtrl', controller

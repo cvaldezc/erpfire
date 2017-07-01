@@ -610,7 +610,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
           if x.guide == 0
             continue
           else
-            promises.push ((x.meter * x.guide) / 100)
+            promises.push parseFloat(parseFloat((x.meter * x.guide) / 100).toFixed(3))
         $q.all(promises).then (result) ->
           am = 0
           for x in promises
