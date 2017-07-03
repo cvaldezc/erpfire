@@ -1380,6 +1380,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     $scope.editm['missingsend'] = $scope.objedit.fields.qorder;
     $scope.editm['ppurchase'] = $scope.objedit.fields.ppurchase;
     $scope.editm['psales'] = $scope.objedit.fields.psales;
+    $scope.editm['qsold'] = $scope.objedit.fields.quantity;
   };
   $scope.showEdit = function() {
     if (Object.keys($scope.objedit).length > 0) {
@@ -1470,7 +1471,8 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
             'omodel': obj.materials.fields.model.pk,
             'quantity': obj.materials.fields.quantity,
             'psales': obj.materials.fields.psales,
-            'ppurchase': obj.materials.fields.ppurchase
+            'ppurchase': obj.materials.fields.ppurchase,
+            'qsold': obj.materials.fields.quantity
           });
         }
       }
@@ -1683,6 +1685,10 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
       x = ref[i];
       $scope.listTemps(x.toUpperCase());
     }
+  };
+  $scope.openChangeQuantityModified = function(obj) {
+    $scope.mmp.details = obj;
+    angular.element("#mupdatemodied").modal('open');
   };
   calcSumTemp = function(arr, type) {
     if (arr !== void 0) {

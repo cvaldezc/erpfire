@@ -880,6 +880,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                 request.POST['quantity']).quantize(Decimal('0.001'))
                             dsmt.missingsend += Decimal(
                                 request.POST['quantity']).quantize(Decimal('0.001'))
+                            dsmt.qsold = request.POST['qsold'] if 'qsold' in request.POST else 0
                             dsmt.type = regt
                             dsmt.symbol = '+'
                             dsmt.save()
@@ -894,6 +895,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                 quantity=request.POST['quantity'],
                                 ppurchase=request.POST['ppurchase'],
                                 psales=request.POST['psales'],
+                                qsold=request.POST['qsold'] if 'qsold' in request.POST else 0,
                                 type=regt)
                     try:
                         # if exists in table principal se debe de almacen como una modificacion
@@ -978,7 +980,8 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             model_id=request.POST['omodel'],
                             type='D')
                         valid = False
-                        context['raise'] = 'No se puede modificar el material por que ya esta registrado en "ELIMINADOS"'
+                        context['raise'] = 'No se puede modificar el material '\
+                            'por que ya esta registrado en "ELIMINADOS"'
                         context['status'] = False
                     except DSMetradoTemp.DoesNotExist as ex:
                         pass
@@ -1016,22 +1019,26 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                 type='M')
                             dsmt.missingsend = dsm.qorder
                             dsmt.quantity = qtt
+                            dsmt.qsold = Decimal(request.POST['qsold']).quantize(Decimal('0.01'))
                             dsmt.type = 'M'
                             dsmt.symbol = symb
                             dsmt.save()
                         except DSMetradoTemp.DoesNotExist as ex:
-                            DSMetradoTemp.objects.create(dsector_id=kwargs['area'],
+                            DSMetradoTemp.objects.create(
+                                dsector_id=kwargs['area'],
                                 materials_id=request.POST['materials'],
                                 brand_id=request.POST['brand'],
                                 model_id=request.POST['model'],
                                 missingsend=dsm.qorder,
                                 quantity=qtt,
+                                qsold=Decimal(request.POST['qsold']).quantize(Decimal('0.01')),
                                 ppurchase=request.POST['ppurchase'],
                                 psales=Decimal(request.POST['psales']).quantize(Decimal('0.001')),
                                 type='M',
                                 symbol=symb)
                         context['status'] = True
                 if 'deleteModify' in request.POST:
+                    ''' Delete material from modified table temporary for area '''
                     DSMetradoTemp.objects.get(
                         dsector_id=kwargs['area'],
                         materials_id=request.POST['materials'],
@@ -1051,41 +1058,47 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             model_id=request.POST['omodel'],
                             type='M')
                         valid = False
-                        context['raise'] = 'No se puede modificar el material por que ya esta registrado en "MODIFICADOS"'
+                        context['raise'] = 'No se puede modificar el material '\
+                            'por que ya esta registrado en "MODIFICADOS"'
                         context['status'] = False
                     except DSMetradoTemp.DoesNotExist as ex:
                         pass
                     if valid:
+                        ''' get all data in order storage '''
                         dp = Detpedido.objects.filter(
                             pedido__dsector_id=kwargs['area'],
                             materiales_id=request.POST['materials'],
                             brand_id=request.POST['obrand'],
                             model_id=request.POST['omodel'],
-                            pedido__status__in=['PE','AP','IN', 'CO'])
+                            pedido__status__in=['PE', 'AP', 'IN', 'CO'])
                         sq = sum(s.cantidad for s in dp)
                         # print Decimal(request.POST['psales']).quantize(Decimal('0.01'))
                         try:
                             dsmt = DSMetradoTemp.objects.get(
                                 dsector_id=kwargs['area'],
-                                type='D',materials_id=request.POST['materials'],
+                                type='D', materials_id=request.POST['materials'],
                                 brand_id=request.POST['obrand'],
                                 model_id=request.POST['omodel'])
                             dsmt.missingsend = sq
                             dsmt.quantity = (
                                 float(request.POST['quantity']) - float(sq))
+                            dsmt.qsold = Decimal(request.POST['qsold']).quantize(Decimal('0.01'))
                             dsmt.save()
                         except DSMetradoTemp.DoesNotExist as ex:
                             ob = DSMetradoTemp()
-                            ob.dsector_id=kwargs['area']
-                            ob.materials_id=request.POST['materials']
-                            ob.brand_id=request.POST['obrand']
-                            ob.model_id=request.POST['omodel']
-                            ob.missingsend=Decimal(sq).quantize(Decimal('0.01'))
-                            ob.quantity=Decimal(abs(float(request.POST['quantity'])-sq)).quantize(Decimal('0.01'))
-                            ob.type='D'
-                            ob.symbol='-'
-                            ob.ppurchase=Decimal(request.POST['ppurchase']).quantize(Decimal('0.01'))
-                            ob.psales=Decimal(request.POST['psales']).quantize(Decimal('0.01'))
+                            ob.dsector_id = kwargs['area']
+                            ob.materials_id = request.POST['materials']
+                            ob.brand_id = request.POST['obrand']
+                            ob.model_id = request.POST['omodel']
+                            ob.missingsend = Decimal(sq).quantize(Decimal('0.01'))
+                            ob.quantity = Decimal(
+                                abs(float(request.POST['quantity'])-sq)).quantize(Decimal('0.01'))
+                            ob.qsold = Decimal(request.POST['qsold']).quantize(Decimal('0.01'))
+                            ob.type = 'D'
+                            ob.symbol = '-'
+                            ob.ppurchase = Decimal(
+                                request.POST['ppurchase']).quantize(Decimal('0.01'))
+                            ob.psales = Decimal(request.POST['psales']).quantize(Decimal('0.01'))
                             ob.save()
                         context['status'] = True
                 if 'delregdel' in request.POST:

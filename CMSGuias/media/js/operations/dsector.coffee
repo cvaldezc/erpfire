@@ -1192,6 +1192,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     $scope.editm['missingsend'] = $scope.objedit.fields.qorder
     $scope.editm['ppurchase'] = $scope.objedit.fields.ppurchase
     $scope.editm['psales'] = $scope.objedit.fields.psales
+    $scope.editm['qsold'] = $scope.objedit.fields.quantity
     return
 
   $scope.showEdit = () ->
@@ -1294,6 +1295,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
             'quantity': obj.materials.fields.quantity
             'psales': obj.materials.fields.psales
             'ppurchase': obj.materials.fields.ppurchase
+            'qsold': obj.materials.fields.quantity
 
       param['status'] = if param['param'].length > 0 then true else false
       defer.resolve param
@@ -1480,6 +1482,13 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         $scope.listTemps(x.toUpperCase())
     return
   #end block
+  # @cvaldezch 2017-07-03 15:26:35
+  # modified show modal
+  $scope.openChangeQuantityModified = (obj) ->
+    $scope.mmp.details = obj
+    angular.element("#mupdatemodied").modal('open')
+    return
+  # end block
 
   calcSumTemp = (arr, type) ->
     if arr isnt undefined

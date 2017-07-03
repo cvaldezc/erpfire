@@ -338,7 +338,7 @@ class MMetrado(models.Model):
 
     @property
     def apurchase(self):
-        return (self.quantity * float(self.ppurchase))
+        return self.quantity * float(self.ppurchase)
 
 
 class HistoryDSMetrado(models.Model):
@@ -370,7 +370,7 @@ class HistoryDSMetrado(models.Model):
 
 
 class Nipple(models.Model):
-    """Class manager Niples in Dsector"""
+    '''Class manager Niples in Dsector'''
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id', blank=True)
     subproyecto = models.ForeignKey(
         Subproyecto,
