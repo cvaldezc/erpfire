@@ -1470,6 +1470,20 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                             ppurchase=request.POST['pp'],
                             psales=request.POST['pv'])
                     context['status'] = True
+                if 'savemmp' in request.POST:
+                    print request.POST
+                    dsmt = DSMetradoTemp.objects.get(
+                        dsector_id=kwargs['area'],
+                        type=request.POST['type'],
+                        materials_id=request.POST['materials'],
+                        brand_id=request.POST['obrand'],
+                        model_id=request.POST['omodel'])
+                    dsmt.brand_id = request.POST['brand']
+                    dsmt.model_id = request.POST['model']
+                    dsmt.quantity = request.POST['quantity']
+
+                    dsmt.save()
+                    context['status'] = True
             except ObjectDoesNotExist as e:
                 context['raise'] = str(e)
                 context['status'] = False

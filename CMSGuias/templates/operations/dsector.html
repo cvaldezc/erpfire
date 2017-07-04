@@ -18,6 +18,7 @@
 {% endblock menu %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/getMaterials.css">
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/vendor/chosen/chosen.css">
 <link rel="stylesheet" href="{{ MEDIA_URL }}vendor/trumbowyg/dist/ui/trumbowyg.min.css">
 <div ng-app="dsApp" ng-controller="DSCtrl">
     <input type="hidden" id="perarea" ng-model="perarea" ng-init="{{ request.user.get_profile.empdni.charge.area|lower }}" value="{{ request.user.get_profile.empdni.charge.area|lower }}">
@@ -146,7 +147,7 @@
                     <span class="hide-on-med-and-down">Agregar</span>
                 </button>
                 <button type="button" class="btn red lighten-1 grey-text text-darken-3 waves-effect" ng-click="delAllModifyArea($event)" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
-                    <i class="fa fa-fire"></i>
+                    <!--<i class="fa fa-fire"></i>-->
                     <i class="fa fa-trash"></i>
                     <span class="hide-on-med-and-down"> Eliminar Modificación</span>
                 </button>
@@ -546,6 +547,9 @@
                                             </a>
                                         </th>
                                         <th class="col-1">
+                                            <i class="fa fa-pencil"></i>
+                                        </th>
+                                        <th class="col-1">
                                             <a href="#!del" class="red-text col-1" ng-click="delModifiedNMD('M')">
                                                 <i class="fa fa-trash"></i>
                                             </a>
@@ -554,7 +558,7 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="x in lstM">
-                                        <td>{{$index+1}}</td>
+                                        <td class="center-align">{{$index+1}}</td>
                                         <td><small>{{x.fields.materials.pk}}</small></td>
                                         <td><small>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</small></td>
                                         <td class="center-align"><small>{{x.fields.brand.fields.brand}}</small></td>
@@ -566,7 +570,10 @@
                                         <td class="right-align">{{x.fields.missingsend}}</td>
                                         <td class="right-align">{{x.fields.quantity}}</td>
                                         <td class="center-align">
-                                            <i class="fa" ng-class="{'fa-level-up': x.fields.symbol == '+','fa-level-down': x.fields.symbol == '-'}"></i>
+                                            <i class="fa" ng-class="{'fa-level-up': x.fields.symbol == '+', 'fa-level-down': x.fields.symbol == '-'}"></i>
+                                        </td>
+                                        <td class="center-align">
+                                            <a href="#editm" class="light-blue-text" ng-click="openChangeQuantityModified(x)"><i class="fa fa-edit"></i></a>
                                         </td>
                                         <td class="center-align">
                                             <input type="checkbox" class="filled-in red" id="filled-in-boxlstm{{$index}}" ng-model="lstM[$index].selected" ng-init="lstM[$index].selected=false" />
@@ -606,6 +613,9 @@
                                             </a>
                                         </th>
                                         <th class="col-1">
+                                            <i class="fa fa-pencil"></i>
+                                        </th>
+                                        <th class="col-1">
                                             <a href="#!del" class="red-text" ng-click="delModifiedNMD('D')">
                                                 <i class="fa fa-trash"></i>
                                             </a>
@@ -614,7 +624,7 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="x in lstD">
-                                        <td>{{$index+1}}</td>
+                                        <td class="center-align">{{$index+1}}</td>
                                         <td class="center-align"><small>{{x.fields.materials.pk}}</small></td>
                                         <td class="left-align"><small>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</small></td>
                                         <td class="center-align"><small>{{x.fields.brand.fields.brand}}</small></td>
@@ -626,6 +636,9 @@
                                         <td class="right-align">{{x.fields.missingsend}}</td>
                                         <td class="right-align">{{x.fields.quantity}}</td>
                                         <td class="center-align"><i class="fa fa-level-down"></i></td>
+                                        <td class="center-align">
+                                            <a href="#editm" class="light-blue-text" ng-click="openChangeQuantityModified(x)"><i class="fa fa-edit"></i></a>
+                                        </td>
                                         <td class="center-align">
                                             <input type="checkbox" class="filled-in red" id="filled-in-boxlstd{{$index}}" ng-model="lstD[$index].selected" ng-init="lstD[$index].selected=false" />
                                             <label for="filled-in-boxlstd{{$index}}"></label>
@@ -1362,31 +1375,31 @@
             <div class="row">
                 <div class="col s12 m12 l12">
                     <h5>
-                        <small></small>
+                        <small>{{ mmp.details.fields.materials.fields.matnom }} {{ mmp.details.fields.materials.fields.matmed }} | {{ mmp.details.fields.materials.fields.unidad }}</small>
                     </h5>
                 </div>
                 <div class="col s12 m12 l12 input-field">
                     <label for="ssbrand" class="active">Marca</label>
-                    <select name="" id="ssbrand" class="browser-default" ng-model="mmp.brand" ng-options="x.pk as x.fields.brand for x in lbrand"></select>
+                    <select name="" id="ssbrand" class="browser-default chosen-select" ng-model="mmp.brand" ng-options="x.pk as x.fields.brand for x in lbrand"></select>
                 </div>
                 <div class="col s12 m12 l12 input-field">
                     <label for="ssmodel" class="active">Modelo</label>
-                    <select name="" id="ssmodel" class="browser-default" ng-model="mmp.model" ng-options="x.pk as x.fields.model for x in lmodel"></select>
+                    <select name="" id="ssmodel" class="browser-default chosen-select" ng-model="mmp.model" ng-options="x.pk as x.fields.model for x in lmodel"></select>
                 </div>
                 <div class="col s12 m12 l12 input-field">
-                    <input type="number" id="mmpquantity" value="0" class="right-align" min="0" max="{{mmp.details.fields.qsold}}">
-                    <label for="mmpquantity"></label>
+                    <input type="number" id="mmpquantity"class="right-align" ng-model="mmp.quantity" step="0.100" min="0" max="{{(mmp.details.fields.symbol == '-') ? ((mmp.details.fields.type == 'D')? mmp.details.fields.quantity: mmp.details.fields.missingsend) : 1000 }}" minandmax>
+                    <label for="mmpquantity">Cantidad</label>
                 </div>
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
-                <i class="fa fa-times"></i>
-                <span class="hide-on-small-only">Cancelar</span>
-            </button>
-            <button type="button" class="waves-effect waves-light btn light-blue">
+            <button type="button" class="waves-effect waves-light btn light-blue" ng-click="saveChangeItemModified()">
                 <i class="fa fa-check"></i>
                 <span class="hide-on-small-only">GUARDAR</span>
+            </button>
+            <button type="button" class="left modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3" ng-click="$scope.mmp = {}">
+                <i class="fa fa-times"></i>
+                <span class="hide-on-small-only">Cancelar</span>
             </button>
         </div>
     </div>
@@ -1402,6 +1415,7 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}js/getMaterials.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/directives.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/trumbowyg/dist/trumbowyg.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/operations/dsector.js"></script>
 {% endblock %}
