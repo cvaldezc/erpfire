@@ -1,6 +1,10 @@
 #-*- coding: utf-8 -*-
 # Django settings for CMSGuias project.
 import os
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

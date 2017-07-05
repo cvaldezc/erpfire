@@ -1,11 +1,12 @@
 <div class="navbar-fixed">
-  
+
   <ul id="user-setting" class="dropdown-content">
-    <li><a class="black-text">Cargo: {{ user.get_profile.empdni.charge.cargos }}</a></li>
+    <li><a class="black-text"><small>{{ user.get_profile.empdni.charge.cargos }}</small></a></li>
+    <li><a class="black-text"><small>{{ user.get_profile.empdni.name_complete }}</small></a></li>
     <li class="divider"></li>
     <li>
       <a class="black-text" href="{% url 'vista_logout' %}">
-        <span class="fa fa-sign-out"></span> Cerrar Session
+        <span class="fa fa-sign-out"></span> <small>Cerrar Sesion</small>
       </a>
     </li>
   </ul>
@@ -78,7 +79,7 @@
 
         <li>
           <a class="dropdown-button" href="#!" data-hover="true" data-activates="user-setting" data-gutter="0" data-beloworigin="true">
-            {{ user.get_profile.empdni.firstname }}, {{ user.get_profile.empdni.lastname }} <b class="fa fa-caret-down"></b>
+            {{ user.username }} <b class="fa fa-caret-down"></b>
           </a>
         </li>
       </ul>

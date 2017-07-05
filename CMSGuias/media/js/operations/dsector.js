@@ -111,6 +111,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   $scope.preorders = [];
   $scope.selectedniple = [];
   $scope.mchks = [];
+  $scope.mmp = {};
   angular.element(document).ready(function() {
     var $table, i, len, ref, x;
     $scope.mdstatus = false;
@@ -158,18 +159,21 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     }
     $('textarea#textarea1').characterCounter();
     $('.datepicker').pickadate({
-      container: "body",
+      container: 'body',
       closeOnSelect: true,
       min: new Date(),
       selectMonths: true,
       selectYears: 15,
-      format: "yyyy-mm-dd"
+      format: 'yyyy-mm-dd'
     });
-    $scope.perarea = angular.element("#perarea")[0].value;
-    $scope.percharge = angular.element("#percharge")[0].value;
-    $scope.perdni = angular.element("#perdni")[0].value;
+    $scope.perarea = angular.element('#perarea')[0].value;
+    $scope.percharge = angular.element('#percharge')[0].value;
+    $scope.perdni = angular.element('#perdni')[0].value;
     $scope.listPlanes();
     angular.element('.materialboxed').materialbox();
+    angular.element('.chosen-select').chosen({
+      width: '100%'
+    });
   });
   $scope.run = function() {
     mailing.Mailing();
@@ -648,6 +652,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   };
   $scope.modifyList = function() {
     var data;
+    $scope.listTemps('N');
     data = {
       modifyList: true
     };
@@ -1379,6 +1384,7 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
     $scope.editm['missingsend'] = $scope.objedit.fields.qorder;
     $scope.editm['ppurchase'] = $scope.objedit.fields.ppurchase;
     $scope.editm['psales'] = $scope.objedit.fields.psales;
+    $scope.editm['qsold'] = $scope.objedit.fields.quantity;
   };
   $scope.showEdit = function() {
     if (Object.keys($scope.objedit).length > 0) {
@@ -1469,7 +1475,8 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
             'omodel': obj.materials.fields.model.pk,
             'quantity': obj.materials.fields.quantity,
             'psales': obj.materials.fields.psales,
-            'ppurchase': obj.materials.fields.ppurchase
+            'ppurchase': obj.materials.fields.ppurchase,
+            'qsold': obj.materials.fields.quantity
           });
         }
       }
@@ -1675,6 +1682,57 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   $scope.removeToastStatic = function() {
     angular.element(".toast-remove").remove();
   };
+  $scope.refreshListsModified = function() {
+    var i, len, ref, x;
+    ref = new Array('n', 'm', 'd');
+    for (i = 0, len = ref.length; i < len; i++) {
+      x = ref[i];
+      $scope.listTemps(x.toUpperCase());
+    }
+  };
+  $scope.openChangeQuantityModified = function(obj) {
+    $scope.mmp['details'] = obj;
+    $scope.mmp['brand'] = obj['fields']['brand']['pk'];
+    $scope.mmp['model'] = obj['fields']['model']['pk'];
+    $scope.mmp['quantity'] = parseFloat(obj['fields']['quantity']);
+    setTimeout((function() {
+      angular.element('.chosen-select').trigger('chosen:updated');
+    }), 800);
+    angular.element('#mupdatemodied').modal('open');
+  };
+  $scope.saveChangeItemModified = function() {
+    var params;
+    Materialize.toast('<i class="fa fa-cog fa-fw fa-spin"></i>&nbsp; Procesando!', void 0, 'remove-toast');
+    params = {
+      'brand': $scope.mmp['brand'],
+      'model': $scope.mmp['model'],
+      'quantity': $scope.mmp['quantity'],
+      'obrand': $scope.mmp['details']['fields']['brand']['pk'],
+      'omodel': $scope.mmp['details']['fields']['model']['pk'],
+      'materials': $scope.mmp['details']['fields']['materials']['pk'],
+      'type': $scope.mmp['details']['fields']['type'],
+      'symbol': $scope.mmp['details']['fields']['symbol'],
+      'savemmp': true
+    };
+    Factory.post(params).then(function(response) {
+      if (response['data']['status']) {
+        Materialize.toast('Guardado!', 2600);
+        angular.element('.remove-toast').remove();
+        $scope.listTemps($scope.mmp['details']['fields']['type']);
+        if ($scope.mmp['details']['fields']['type'] !== 'N') {
+          if ($scope.mmp['details']['fields']['type'] === 'M') {
+            $scope.listTemps('D');
+          } else if ($scope.mmp['details']['fields']['type'] === 'D') {
+            $scope.listTemps('M');
+          }
+        }
+        $scope.mmp = {};
+        angular.element('#mupdatemodied').modal('close');
+      } else {
+        Materialize.toast("Error " + response['data']['raise'], 6000);
+      }
+    });
+  };
   calcSumTemp = function(arr, type) {
     if (arr !== void 0) {
       $scope["tmlst" + type] = [0, 0];
@@ -1754,5 +1812,14 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
   });
   $scope.$watch('gui.smat', function() {
     $(".floatThead").floatThead('reflow');
+  });
+  $scope.$watch('lbrand', function(nw, old) {
+    if (typeof nw === 'object') {
+      if (nw.length > 0) {
+        setTimeout((function() {
+          angular.element('.chosen-select').trigger('chosen:updated');
+        }), 800);
+      }
+    }
   });
 });

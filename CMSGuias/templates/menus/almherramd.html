@@ -1,7 +1,12 @@
 <div class="navbar-fixed">
-  
+
   <ul id="user-setting" class="dropdown-content">
-    <li><a class="black-text">Cargo: {{ user.get_profile.empdni.charge.cargos }}</a></li>
+    <li><a class="black-text">
+      <span>{{ user.get_profile.empdni.charge.cargos }}</span>
+      </a></li>
+      <li><a class="black-text">
+      <span>{{ user.get_profile.empdni.name_complete }}</span>
+      </a></li>
   </ul>
 
   <ul id="listaguia" class="dropdown-content">
@@ -9,7 +14,7 @@
     <li class="divider"></li>
     <li><a href="{% url 'viewguiaherra' %}">Guia Herramienta</a></li>
     <li class="divider"></li>
-    <li><a href="{% url 'viewinventario' %}">Inventario</a></li> 
+    <li><a href="{% url 'viewinventario' %}">Inventario</a></li>
     <li class="divider"></li>
     <li><a href="{% url 'viewdevolucion' %}">Doc Devolucion</a></li>
     <li class="divider"></li>
@@ -46,7 +51,9 @@
 
         <li style="width:300px;">
           <a class="dropdown-button" href="#!" data-hover="true" data-activates="user-setting" data-gutter="0" data-beloworigin="true">
-            {{ user.get_profile.empdni.firstname }}, {{ user.get_profile.empdni.lastname }} <b class="fa fa-caret-down"></b>
+            <i class="fa fa-user-circle-o fa lg"></i>
+            {{ user.username }}
+            <b class="fa fa-caret-down"></b>
           </a>
         </li>
       </ul>

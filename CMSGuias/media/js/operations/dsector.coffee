@@ -73,6 +73,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
   $scope.selectedniple = []
   ## modify
   $scope.mchks = []
+  $scope.mmp = {}
   angular.element(document).ready ->
     $scope.mdstatus = false
     angular.element('.modal').modal dismissible: false
@@ -104,17 +105,18 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       $scope.listTypeNip()
     $('textarea#textarea1').characterCounter()
     $('.datepicker').pickadate
-      container: "body"
+      container: 'body'
       closeOnSelect: true
       min: new Date()
       selectMonths: true
       selectYears: 15
-      format: "yyyy-mm-dd"
-    $scope.perarea = angular.element("#perarea")[0].value
-    $scope.percharge = angular.element("#percharge")[0].value
-    $scope.perdni = angular.element("#perdni")[0].value
+      format: 'yyyy-mm-dd'
+    $scope.perarea = angular.element('#perarea')[0].value
+    $scope.percharge = angular.element('#percharge')[0].value
+    $scope.perdni = angular.element('#perdni')[0].value
     $scope.listPlanes()
     angular.element('.materialboxed').materialbox()
+    angular.element('.chosen-select').chosen({width: '100%'})
     # setTimeout ->
     #   console.log $scope.modify
     #   return
@@ -549,6 +551,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         return
     return
   $scope.modifyList = ->
+    $scope.listTemps('N')
     data =
       modifyList: true
     $http.get '', params: data
@@ -1191,6 +1194,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     $scope.editm['missingsend'] = $scope.objedit.fields.qorder
     $scope.editm['ppurchase'] = $scope.objedit.fields.ppurchase
     $scope.editm['psales'] = $scope.objedit.fields.psales
+    $scope.editm['qsold'] = $scope.objedit.fields.quantity
     return
 
   $scope.showEdit = () ->
@@ -1293,6 +1297,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
             'quantity': obj.materials.fields.quantity
             'psales': obj.materials.fields.psales
             'ppurchase': obj.materials.fields.ppurchase
+            'qsold': obj.materials.fields.quantity
 
       param['status'] = if param['param'].length > 0 then true else false
       defer.resolve param
@@ -1389,7 +1394,7 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
               angular.element('.toast-kill').remove()
               if response.status
                 $scope.disableModify()
-                $scope.listTemps type
+                $scope.listTemps(type)
                 $scope.calcApproved()
                 Materialize.toast """<i class='fa fa-trash fa-lg red-text'></i>
                   \ items eliminados!""", 4000
@@ -1471,6 +1476,61 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       .remove()
     return
   # end block
+
+  # @cvaldezch 2017-07-01 11:53:44
+  # improvement modified materials
+  $scope.refreshListsModified = ->
+    for x in new Array('n', 'm', 'd')
+        $scope.listTemps(x.toUpperCase())
+    return
+  #end block
+  # @cvaldezch 2017-07-03 15:26:35
+  # modified show modal
+  $scope.openChangeQuantityModified = (obj) ->
+    $scope.mmp['details'] = obj
+    $scope.mmp['brand'] = obj['fields']['brand']['pk']
+    $scope.mmp['model'] = obj['fields']['model']['pk']
+    $scope.mmp['quantity'] = parseFloat(obj['fields']['quantity'])
+    setTimeout (->
+      angular.element('.chosen-select').trigger('chosen:updated')
+      return
+    ), 800
+    angular.element('#mupdatemodied').modal('open')
+    return
+
+  # function for update the item for inside modified
+  $scope.saveChangeItemModified = ->
+    Materialize.toast('<i class="fa fa-cog fa-fw fa-spin"></i>&nbsp; Procesando!', undefined, 'remove-toast')
+    params = {
+      'brand': $scope.mmp['brand']
+      'model': $scope.mmp['model']
+      'quantity': $scope.mmp['quantity']
+      'obrand': $scope.mmp['details']['fields']['brand']['pk']
+      'omodel': $scope.mmp['details']['fields']['model']['pk']
+      'materials': $scope.mmp['details']['fields']['materials']['pk']
+      'type': $scope.mmp['details']['fields']['type']
+      'symbol': $scope.mmp['details']['fields']['symbol']
+      'savemmp': true
+    }
+    Factory.post(params).then( (response) ->
+      if response['data']['status']
+        Materialize.toast('Guardado!', 2600)
+        angular.element('.remove-toast').remove()
+        $scope.listTemps($scope.mmp['details']['fields']['type'])
+        if $scope.mmp['details']['fields']['type'] isnt 'N'
+          if $scope.mmp['details']['fields']['type'] is 'M'
+            $scope.listTemps('D')
+          else if $scope.mmp['details']['fields']['type'] is 'D'
+            $scope.listTemps('M')
+        $scope.mmp = {}
+        angular.element('#mupdatemodied').modal('close')
+      else
+        Materialize.toast("Error #{response['data']['raise']}", 6000)
+      return
+    )
+    return
+  # end block
+
   calcSumTemp = (arr, type) ->
     if arr isnt undefined
       $scope["tmlst#{type}"] = [0, 0]
@@ -1511,15 +1571,15 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
         return
         ), 1200
     return
-  $scope.$watch 'lstN', (nw, old)->
+  $scope.$watch 'lstN', (nw, old) ->
     if nw isnt undefined
       calcSumTemp nw, 'N'
     return
-  $scope.$watch 'lstM', (nw, old)->
+  $scope.$watch 'lstM', (nw, old) ->
     if nw isnt undefined
       calcSumTemp nw, 'M'
     return
-  $scope.$watch 'lstD', (nw, old)->
+  $scope.$watch 'lstD', (nw, old) ->
     if nw isnt undefined
       calcSumTemp nw, 'D'
     return
@@ -1538,5 +1598,13 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
     return
   $scope.$watch 'gui.smat', ->
     $(".floatThead").floatThead 'reflow'
+    return
+  $scope.$watch 'lbrand', (nw, old) ->
+    if typeof nw == 'object'
+      if nw.length > 0
+        setTimeout (->
+          angular.element('.chosen-select').trigger('chosen:updated')
+          return
+          ), 800
     return
   return

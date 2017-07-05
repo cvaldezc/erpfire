@@ -18,6 +18,7 @@
 {% endblock menu %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/getMaterials.css">
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/vendor/chosen/chosen.css">
 <link rel="stylesheet" href="{{ MEDIA_URL }}vendor/trumbowyg/dist/ui/trumbowyg.min.css">
 <div ng-app="dsApp" ng-controller="DSCtrl">
     <input type="hidden" id="perarea" ng-model="perarea" ng-init="{{ request.user.get_profile.empdni.charge.area|lower }}" value="{{ request.user.get_profile.empdni.charge.area|lower }}">
@@ -126,7 +127,7 @@
                 {% endif %}
             {% endif %}
             {% if dsector.status == 'AC' %}
-                <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect" ng-model="btnmodify" ng-init="btnmodify={% if modify|length > 0 %} true {% else %} false {% endif %}" ng-click="showModify()" ng-disabled="btnmodify" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
+                <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect" ng-model="btnmodify" ng-init="btnmodify={% if modify|length > 0 %} true {% else %} false {% endif %}" ng-click="showModify()" ng-show="(perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones') && !btnmodify">
                     <i class="fa fa-pencil"></i>
                     <span class="hide-on-med-and-down"> Modificar Área</span>
                 </button>
@@ -146,13 +147,13 @@
                     <span class="hide-on-med-and-down">Agregar</span>
                 </button>
                 <button type="button" class="btn red lighten-1 grey-text text-darken-3 waves-effect" ng-click="delAllModifyArea($event)" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
-                    <i class="fa fa-fire"></i>
+                    <!--<i class="fa fa-fire"></i>-->
                     <i class="fa fa-trash"></i>
                     <span class="hide-on-med-and-down"> Eliminar Modificación</span>
                 </button>
-                <button type="button" class="btn green lighten-1 grey-text text-darken-3 waves-effect" ng-click="approvedModify($event)" ng-disabled="!mdstatus && perarea != 'administrator'" ng-show="perarea == 'administrator' || perarea == 'ventas'">
+                <button type="button" class="btn green lighten-1 grey-text text-darken-3 waves-effect" ng-click="approvedModify($event)" ng-disabled="!mdstatus && (perarea != 'administrator') || (pnp <= 0)" ng-show="perarea == 'administrator' || perarea == 'ventas'">
                     <i class="fa fa-pencil"></i>
-                    <i class="fa fa-check-square-o"></i>
+                    <i class="fa fa-check"></i>
                     <span class="hide-on-med-and-down"> Aprobar Modificación</span>
                 </button>
                 <input type="hidden" id="modify" value="true">
@@ -433,7 +434,7 @@
                 <div class="row">
                     <div class="col l12 m12 s12">
                         <ul class="tabs idenred">
-                            <li class="tab col s3"><a class="grey-text text-darken-3" href="#vmodify"><i class="fa fa-pencil"></i> <strong>MODIFICACION</strong></a></li>
+                            <li class="tab col s3"><a class="grey-text text-darken-3" href="#vmodify" ng-click="refreshListsModified()"><i class="fa fa-pencil"></i> <strong>MODIFICACION</strong></a></li>
                             <li class="tab col s3"><a class="grey-text text-darken-3 active" href="#vlist"><i class="fa fa-list-alt"></i> <strong>LISTA ACTUAL</strong></a></li>
                             <li class="tab col s3"><a class="grey-text text-darken-3" href="#vprices"><i class="fa fa-dollar"></i> <strong>PRECIOS</strong></a></li>
                         </ul>
@@ -451,13 +452,13 @@
                     </div>
                 </div>
                 {% verbatim %}
-                <ul class="collapsible popout" data-collapsible="expandable">
+                <ul class="collapsible popout" data-collapsible="expandable" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
                     <li ng-class="{'active': mmview}">
-                        <div ng-class="{'active': mmview}" class="collapsible-header green-text text-lighten-1">
+                        <div ng-class="{'active': mmview}" class="collapsible-header light-green-text">
                             <i class="fa fa-plus"></i> Nuevos
-                            <div style="margin-top: 5px;" class="chip right green lighten-2">
+                            <div style="margin-top: 5px;" class="chip right light-green">
                                 <strong>Venta: {{tmlstN[1] | number:"2"}}</strong></div>
-                            <div style="margin-top: 5px;" class="chip right green lighten-2">
+                            <div style="margin-top: 5px;" class="chip right light-green lighten-2">
                                 <strong>Compra: {{tmlstN[0] | number:"2"}}</strong></div>
                         </div>
                         <div class="collapsible-body" ng-style="mmview ? {display: 'block'} : {display: 'none'}">
@@ -468,20 +469,23 @@
                                             <a href="#!" class="grey-text text-darken-3">
                                                 <i class="fa fa-filter"></i></a>
                                         </th>
-                                        <th class="col-3">Código</th>
+                                        <th class="col-1 center-align">Código</th>
                                         <th>
                                             Descripción
                                         </th>
-                                        <th class="col-2">Marca</th>
-                                        <th class="col-2">Modelo</th>
-                                        <th class="col-1">Unidad</th>
-                                        <th class="col-2">P. Compra</th>
-                                        <th class="col-2">P. Venta</th>
-                                        <th class="col-2">Cantidad</th>
-                                        <th class="col-1">
+                                        <th class="col-2 center-align">Marca</th>
+                                        <th class="col-2 center-align">Modelo</th>
+                                        <th class="col-1 center-align">Unidad</th>
+                                        <th class="col-2 center-align">P.Compra</th>
+                                        <th class="col-2 center-align">P.Venta</th>
+                                        <th class="col-2 center-align">Cantidad</th>
+                                        <th class="col-1 center-align">
                                             <a href="#!lnew" class="blue-text" ng-click="listTemps('N')">
                                                 <i class="fa fa-refresh"></i>
                                             </a>
+                                        </th>
+                                        <th class="col-1 center-align">
+                                            <i class="fa fa-pencil"></i>
                                         </th>
                                         <th class="col-1">
                                             <a href="#!del" class="red-text" ng-click="delModifiedNMD('N')">
@@ -492,16 +496,19 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="x in lstN">
-                                        <td>{{$index+1}}</td>
-                                        <td>{{x.fields.materials.pk}}</td>
-                                        <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-                                        <td class="center-align">{{x.fields.brand.fields.brand}}</td>
-                                        <td class="center-align">{{x.fields.model.fields.model}}</td>
-                                        <td>{{x.fields.materials.fields.unidad}}</td>
+                                        <td class="center-align">{{$index+1}}</td>
+                                        <td class="center-align"><small>{{x.fields.materials.pk}}</small></td>
+                                        <td><small>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.brand.fields.brand}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.model.fields.model}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.materials.fields.unidad}}</small></td>
                                         <td class="right-align">{{x.fields.ppurchase}}</td>
                                         <td class="right-align">{{x.fields.psales}}</td>
                                         <td class="right-align">{{x.fields.quantity}}</td>
-                                        <td class="center-align"><i class="fa fa-long-arrow-up"></i></td>
+                                        <td class="center-align"><i class="fa fa-level-up"></i></td>
+                                        <td class="center-align">
+                                            <a href="#editm" class="light-blue-text" ng-click="openChangeQuantityModified(x)"><i class="fa fa-edit"></i></a>
+                                        </td>
                                         <td class="center-align">
                                             <input type="checkbox" class="filled-in red" id="filled-in-boxlstn{{$index}}" ng-model="lstN[$index].selected" ng-init="lstN[$index].selected=false" />
                                             <label for="filled-in-boxlstn{{$index}}"></label>
@@ -513,7 +520,7 @@
                     </li>
                     <li ng-class="{'active': mmview}">
                         <div ng-class="{'active': mmview}" class="collapsible-header blue-text text-darken-1">
-                            <i class="fa fa-edit"></i> Modificados
+                            <i class="fa fa-pencil"></i> Modificados
                             <div style="margin-top: 5px;" class="chip right blue lighten-2">
                                 <strong>Venta: {{tmlstM[1] | number:"2"}}</strong></div>
                             <div style="margin-top: 5px;" class="chip right blue lighten-2">
@@ -524,19 +531,23 @@
                                 <thead>
                                     <tr class="blue lighten-5">
                                         <th class="col-1 center-align"><a href="#!" class="grey-text text-darken-3"><i class="fa fa-filter"></i></a></th>
-                                        <th>Código</th>
+                                        <th class="col-1">Código</th>
                                         <th>Descripción</th>
-                                        <th>Marca</th>
-                                        <th>Modelo</th>
-                                        <th class="col-2">Unidad</th>
-                                        <th class="right-align col-2">P.Compra</th>
-                                        <th class="right-align col-2">P.Ventas</th>
-                                        <th class="right-align col-2">Pendiente</th>
-                                        <th class="right-align col-2">Cantidad</th>
+                                        <th class="col-2">Marca</th>
+                                        <th class="col-2">Modelo</th>
+                                        <th class="col-1">Unidad</th>
+                                        <th class="col-2 canter-align">P.Compra</th>
+                                        <th class="col-2 canter-align">P.Ventas</th>
+                                        <th class="col-2 canter-align">T.Vendido</th>
+                                        <th class="col-2 canter-align">Pendiente</th>
+                                        <th class="col-2 canter-align">Cantidad</th>
                                         <th class="col-1">
                                             <a href="#!reload" class="col-1 blue-text" ng-click="listTemps('M')">
                                                 <i class="fa fa-refresh"></i>
                                             </a>
+                                        </th>
+                                        <th class="col-1">
+                                            <i class="fa fa-pencil"></i>
                                         </th>
                                         <th class="col-1">
                                             <a href="#!del" class="red-text col-1" ng-click="delModifiedNMD('M')">
@@ -547,20 +558,24 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="x in lstM">
-                                        <td>{{$index+1}}</td>
-                                        <td>{{x.fields.materials.pk}}</td>
-                                        <td>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-                                        <td>{{x.fields.brand.fields.brand}}</td>
-                                        <td>{{x.fields.model.fields.model}}</td>
-                                        <td>{{x.fields.materials.fields.unidad}}</td>
-                                        <td>{{x.fields.ppurchase}}</td>
-                                        <td>{{x.fields.psales}}</td>
-                                        <td>{{x.fields.missingsend}}</td>
-                                        <td>{{x.fields.quantity}}</td>
-                                        <td>
-                                            <i class="fa" ng-class="{'fa-long-arrow-up': x.fields.symbol == '+','fa-long-arrow-down': x.fields.symbol == '-'}"></i>
+                                        <td class="center-align">{{$index+1}}</td>
+                                        <td><small>{{x.fields.materials.pk}}</small></td>
+                                        <td><small>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.brand.fields.brand}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.model.fields.model}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.materials.fields.unidad}}</small></td>
+                                        <td class="right-align">{{x.fields.ppurchase}}</td>
+                                        <td class="right-align">{{x.fields.psales}}</td>
+                                        <td class="right-align">{{x.fields.qsold}}</td>
+                                        <td class="right-align">{{x.fields.missingsend}}</td>
+                                        <td class="right-align">{{x.fields.quantity}}</td>
+                                        <td class="center-align">
+                                            <i class="fa" ng-class="{'fa-level-up': x.fields.symbol == '+', 'fa-level-down': x.fields.symbol == '-'}"></i>
                                         </td>
-                                        <td>
+                                        <td class="center-align">
+                                            <a href="#editm" class="light-blue-text" ng-click="openChangeQuantityModified(x)"><i class="fa fa-edit"></i></a>
+                                        </td>
+                                        <td class="center-align">
                                             <input type="checkbox" class="filled-in red" id="filled-in-boxlstm{{$index}}" ng-model="lstM[$index].selected" ng-init="lstM[$index].selected=false" />
                                             <label for="filled-in-boxlstm{{$index}}"></label>
                                         </td>
@@ -571,7 +586,7 @@
                     </li>
                     <li ng-class="{'active': mmview}">
                         <div ng-class="{'active': mmview}" class="collapsible-header red-text">
-                            <i class="fa fa-trash"></i> Eliminados
+                            <i class="fa fa-free-code-camp"></i> Eliminados
                             <div style="margin-top: 5px;" class="chip right red lighten-2">
                                 <strong>Venta: {{tmlstD[1] | number:"2"}}</strong></div>
                             <div style="margin-top: 5px;" class="chip right red lighten-2">
@@ -581,22 +596,26 @@
                             <table class="table responsive-table highlight hovered">
                                 <thead>
                                     <tr class="red lighten-5">
-                                        <th><a href="#!" class="grey-text text-darken-3"><i class="fa fa-filter"></i></a></th>
-                                        <th>Código</th>
+                                        <th class="col-1"><a href="#!" class="grey-text text-darken-3"><i class="fa fa-filter"></i></a></th>
+                                        <th class="col-1">Código</th>
                                         <th>Descripción</th>
-                                        <th>Marca</th>
-                                        <th>Modelo</th>
-                                        <th>Unidad</th>
-                                        <th class="right-align">P. Compra</th>
-                                        <th class="right-align">P. Ventas</th>
-                                        <th class="right-align">En Pedidos</th>
-                                        <th class="right-align">C. Eliminar</th>
-                                        <th>
+                                        <th class="col-1">Marca</th>
+                                        <th class="col-1">Modelo</th>
+                                        <th class="col-1">Unidad</th>
+                                         <th class="col-2 right-align">P.Compra</th>
+                                        <th class="col-2 right-align">P.Ventas</th>
+                                        <th class="col-2 right-align">T.Vendido</th>
+                                        <th class="col-2 right-align"><small>en Pedidos</small></th>
+                                        <th class="col-1 right-align">C.Eliminar</th>
+                                        <th class="col-1">
                                             <a href="#!lnew" class="blue-text" ng-click="listTemps('D')">
                                                 <i class="fa fa-refresh"></i>
                                             </a>
                                         </th>
-                                        <th>
+                                        <th class="col-1">
+                                            <i class="fa fa-pencil"></i>
+                                        </th>
+                                        <th class="col-1">
                                             <a href="#!del" class="red-text" ng-click="delModifiedNMD('D')">
                                                 <i class="fa fa-trash"></i>
                                             </a>
@@ -605,17 +624,21 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="x in lstD">
-                                        <td>{{$index+1}}</td>
-                                        <td class="center-align">{{x.fields.materials.pk}}</td>
-                                        <td class="left-align">{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</td>
-                                        <td class="center-align">{{x.fields.brand.fields.brand}}</td>
-                                        <td class="center-align">{{x.fields.model.fields.model}}</td>
-                                        <td class="center-align">{{x.fields.materials.fields.unidad}}</td>
+                                        <td class="center-align">{{$index+1}}</td>
+                                        <td class="center-align"><small>{{x.fields.materials.pk}}</small></td>
+                                        <td class="left-align"><small>{{x.fields.materials.fields.matnom}} {{x.fields.materials.fields.matmed}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.brand.fields.brand}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.model.fields.model}}</small></td>
+                                        <td class="center-align"><small>{{x.fields.materials.fields.unidad}}</small></td>
                                         <td class="right-align">{{x.fields.ppurchase}}</td>
                                         <td class="right-align">{{x.fields.psales}}</td>
+                                        <td class="right-align">{{x.fields.qsold}}</td>
                                         <td class="right-align">{{x.fields.missingsend}}</td>
                                         <td class="right-align">{{x.fields.quantity}}</td>
-                                        <td class="center-align"><i class="fa fa-long-arrow-down"></i></td>
+                                        <td class="center-align"><i class="fa fa-level-down"></i></td>
+                                        <td class="center-align">
+                                            <a href="#editm" class="light-blue-text" ng-click="openChangeQuantityModified(x)"><i class="fa fa-edit"></i></a>
+                                        </td>
                                         <td class="center-align">
                                             <input type="checkbox" class="filled-in red" id="filled-in-boxlstd{{$index}}" ng-model="lstD[$index].selected" ng-init="lstD[$index].selected=false" />
                                             <label for="filled-in-boxlstd{{$index}}"></label>
@@ -631,15 +654,16 @@
             <!-- list current materials -->
             <div id="vlist" class="col l12 m12 s12">
                 <table class="bordered responsive-table" ng-show="perarea == 'administrator' || perarea == 'ventas'">
+                    <!--
                     <thead>
                         <tr>
                             <th style="max-width: 50px;">{{ dsector.sgroup.project.currency.moneda }}</th>
                             <th class="center-align" colspan="3">SECTOR</th>
                             <th class="center-align" colspan="3">AREA</th>
                         </tr>
-                    </thead>
+                    </thead>-->
                     {% verbatim %}
-                        <tbody>
+                        <!--<tbody>
                             <tr>
                                 <th></th>
                                 <th class="center-align">VENTA</th>
@@ -666,7 +690,7 @@
                                 <td class="center-align">{{amns|number:"2"}}</td>
                                 <td class="center-align">{{amms|number:"2"}}</td>
                                 <td class="center-align">{{amns-amms|number:"2"}}</td>
-                            </tr>
+                            </tr>-->
                             <!--<tr>
                                 <th>COMPRA</th>
                                 <th>
@@ -691,7 +715,7 @@
                                 <td class="center-align">{{amms|number:"2"}}</td>
                                 <td></td>
                             </tr>-->
-                        </tbody>
+                        <!--</tbody>-->
                     {% endverbatim %}
                 </table>
                 <input type="hidden" ng-model="modify" ng-init="modify={{ modify|length }}">
@@ -712,7 +736,7 @@
                     </caption>
                     <thead class="amber lighten-4">
                         <tr>
-                            <th class="center-align col-1">
+                            <th class="col-1 center-align">
                                 <i class="fa fa-angle-double-up cursor-hand" onClick="$('html, body').animate({scrollTop: 500}, 400);"></i>
                             </th>
                             <th class="col-1">
@@ -735,7 +759,7 @@
                             <th class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">Compra</th>
                             <th class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">Venta</th>
                             <th class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">Importe</th>
-                            <th class="center-align">
+                            <th class="col-1 center-align">
                                 <i class="fa fa-search cursor-hand" ng-model="fme" ng-click="fme=!fme"></i>
                             </th>
                         </tr>
@@ -754,11 +778,11 @@
                             <td class="center-align">{{x.fields.brand.fields.brand}}</td>
                             <td class="center-align">{{x.fields.model.fields.model}}</td>
                             <td class="center-align">{{x.fields.materials.fields.unidad}}</td>
-                            <td class="right-align col-2">{{x.fields.qorder}}</td>
-                            <td class="right-align col-2">{{x.fields.quantity}}</td>
-                            <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.ppurchase}}</td>
-                            <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.psales}}</td>
-                            <td class="right-align col-2" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.quantity * x.fields.ppurchase | number:2}}</td>
+                            <td class="right-align">{{x.fields.qorder}}</td>
+                            <td class="right-align">{{x.fields.quantity}}</td>
+                            <td class="right-align" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.ppurchase}}</td>
+                            <td class="right-align" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.psales}}</td>
+                            <td class="right-align" ng-show="perarea == 'administrator' || perarea == 'ventas'">{{x.fields.quantity * x.fields.ppurchase | number:2}}</td>
                             <td class="center-align">
                                 <input type="radio" name="wrench" class="with-gap" id="rb{{$index}}" ng-click="enableModify($index, x)">
                                 <label for="rb{{$index}}"></label>
@@ -769,7 +793,7 @@
                 </table>
                 <br>
                 <br>
-                <div class="fixed-action-btn horizontal">
+                <div class="fixed-action-btn horizontal" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
                     <a class="btn-floating btn-large red">
                         <i class="fa fa-wrench"></i>
                     </a>
@@ -785,9 +809,14 @@
             </div>
             <!-- view prices -->
             <div id="vprices" class="col l12 m12 s12">
-                <h4>Precios</h4>
+                <h5>
+                    Precios
+                    <br>
+                    <small>Todos los precios están expresados en {{ dsector.sgroup.project.currency.moneda }}</small>
+                </h5>
                 <button type="button" ng-show="perarea == 'administrator' || perarea == 'ventas'" class="waves-effect waves-light btn amber grey-text text-darken-3" ng-click="calcApproved()">
-                    <i class="fa fa-cog"></i>
+                    <i class="fa fa-usd"></i>
+                    <i class="fa fa-check"></i>
                     <span class="hide-on-small-only">Validar Aprobación</span>
                 </button>
                 {% verbatim %}
@@ -796,34 +825,46 @@
                         <table class="highlight hover table bordered">
                             <thead>
                                 <tr>
-                                    <th></th>
-                                    <th width="200px">COMPRAS</th>
-                                    <th width="200px">VENTAS</th>
+                                    <th class="col-4"></th>
+                                    <th class="col-3">COMPRAS</th>
+                                    <th >VENTAS</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <th width="150px">VENTA</th>
-                                    <th width="200px">{{amsecp|number:"2"}}</th>
-                                    <th width="200px">{{amsecs|number:"2"}}</th>
+                                    <th>VENTA</th>
+                                    <th>{{amsecp|number:"2"}}</th>
+                                    <th>{{amsecs|number:"2"}}</th>
                                 </tr>
                                 <tr>
-                                    <th width="150px">SECTOR</th>
+                                    <th>SECTOR</th>
                                     <th>{{amstp|number:"2"}}</th>
-                                    <th>{{amsts|number:"2"}}</th>
+                                    <th>
+                                        {{amsts|number:"2"}}
+                                        <input type="hidden" ng-model="adgp">
+                                        <input type="hidden" ng-model="adgs">
+                                    </th>
                                 </tr>
-                                <tr class="amber lighten-5">
-                                    <th width="150px">PRECIO AREA</th>
+                                <tr class="lighten-2" ng-class="{'lime':agdp>0, 'red accent-1': agdp<=0}">
+                                    <th>
+                                        DIFERENCIA GLOBAL
+                                        <small>(VENTA - SECTOR)</small>
+                                    </th>
+                                    <th>{{agdp=(amsecp - amstp)|number:"2"}}</th>
+                                    <th>{{agds=(amsecs - amsts)|number:"2"}}</th>
+                                </tr>
+                                <tr class="light-blue accent-2">
+                                    <th>PRECIO AREA</th>
                                     <th>{{amnp|number:"2"}}</th>
                                     <th>{{amns|number:"2"}}</th>
                                 </tr>
                                 <tr class="green lighten-5">
-                                    <th width="150px">AGREGAR (+)</th>
+                                    <th>AGREGAR (+)</th>
                                     <th>{{tmlstN[0]|number:"2"}}</th>
                                     <th>{{tmlstN[1]|number:"2"}}</th>
                                 </tr>
                                 <tr class="green lighten-5">
-                                    <th width="150px" rowspan="2">MODIFICAR (±)</th>
+                                    <th rowspan="2">MODIFICAR (±)</th>
                                     <th>+ {{sldm[0][0]|number:"2"}}</th>
                                     <th>+ {{sldm[1][0]|number:"2"}}</th>
                                 </tr>
@@ -832,19 +873,32 @@
                                     <th>- {{sldm[1][1]|number:"2"}}</th>
                                 </tr>
                                 <tr class="red lighten-5">
-                                    <th width="150px">ELIMINAR (-)</th>
+                                    <th>ELIMINAR (-)</th>
                                     <th>{{tmlstD[0]|number:"2"}}</th>
                                     <th>{{tmlstD[1]|number:"2"}}</th>
                                 </tr>
-                                <tr class="red lighten-5">
-                                    <th width="150px">PRECIO FINAL</th>
+                                <tr class="yellow accent-1">
+                                    <th>
+                                        PRECIO FINAL DE AREA
+                                        <small>(+) + (±) - (-)</small>
+                                    </th>
                                     <th>{{pnp|number:"2"}}</th>
                                     <th>{{pns|number:"2"}}</th>
                                 </tr>
-                                <tr class="red lighten-5">
-                                    <th width="150px">DIFERENCIA</th>
-                                    <th>{{pgpa|number:"2"}}</th>
-                                    <th>{{pgsa|number:"2"}}</th>
+                                <tr class="lighten-5">
+                                    <th>
+                                        DIFERENCIA TOTAL DE AREA
+                                        ( <i class="fa fa-square light-blue-text text-accent-2"></i>
+                                        -
+                                        <i class="fa fa-square yellow-text text-accent-1"></i> )
+                                    </th>
+                                    <th>{{(amnp - pnp)|number:"2"}}</th>
+                                    <th>{{(amns - pns)|number:"2"}}</th>
+                                </tr>
+                                <tr class="lighten-3" ng-class="{'lime':pgpa>0, 'red accent-1': pgsa<=0}">
+                                    <th>DIFERENCIA GLOBAL RESULTANTE</th>
+                                    <th><i class="fa" ng-class="{'fa-thumbs-o-up': pgpa > 0, 'fa-thumbs-o-down': pgpa <= 0}"></i> {{pgpa|number:"2"}}</th>
+                                    <th><i class="fa" ng-class="{'fa-thumbs-o-up': pgsa > 0, 'fa-thumbs-o-down': pspa <= 0}"></i> {{pgsa|number:"2"}}</th>
                                 </tr>
                             </tbody>
                         </table>
@@ -1314,6 +1368,42 @@
             </button>
         </div>
     </div>
+    <!-- @cvaldezch 2017-07-03 14:59:42 -->
+    <!-- modal edit quantity in modified part -->
+    <div class="modal bwidth-40" id="mupdatemodied">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5>
+                        <small>{{ mmp.details.fields.materials.fields.matnom }} {{ mmp.details.fields.materials.fields.matmed }} | {{ mmp.details.fields.materials.fields.unidad }}</small>
+                    </h5>
+                </div>
+                <div class="col s12 m12 l12 input-field">
+                    <label for="ssbrand" class="active">Marca</label>
+                    <select name="" id="ssbrand" class="browser-default chosen-select" ng-model="mmp.brand" ng-options="x.pk as x.fields.brand for x in lbrand"></select>
+                </div>
+                <div class="col s12 m12 l12 input-field">
+                    <label for="ssmodel" class="active">Modelo</label>
+                    <select name="" id="ssmodel" class="browser-default chosen-select" ng-model="mmp.model" ng-options="x.pk as x.fields.model for x in lmodel"></select>
+                </div>
+                <div class="col s12 m12 l12 input-field">
+                    <input type="number" id="mmpquantity"class="right-align" ng-model="mmp.quantity" step="0.100" min="0" max="{{(mmp.details.fields.symbol == '-') ? ((mmp.details.fields.type == 'D')? mmp.details.fields.quantity: mmp.details.fields.missingsend) : 1000 }}" minandmax>
+                    <label for="mmpquantity">Cantidad</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="waves-effect waves-light btn light-blue" ng-click="saveChangeItemModified()">
+                <i class="fa fa-check"></i>
+                <span class="hide-on-small-only">GUARDAR</span>
+            </button>
+            <button type="button" class="left modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3" ng-click="$scope.mmp = {}">
+                <i class="fa fa-times"></i>
+                <span class="hide-on-small-only">Cancelar</span>
+            </button>
+        </div>
+    </div>
+    <!--end block-->
     {% endverbatim %}
 </div>
 {% csrf_token %}
@@ -1325,6 +1415,7 @@
 <script type="text/javascript" src="{{ MEDIA_URL }}js/getMaterials.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/directives.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}vendor/trumbowyg/dist/trumbowyg.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/mailing.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/operations/dsector.js"></script>
 {% endblock %}

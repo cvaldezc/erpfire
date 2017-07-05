@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 # -*- coding: utf-8 -*-
 #
 # import datetime
@@ -75,8 +76,7 @@ class Unidade(models.Model):
 
 class Materiale(models.Model):
     materiales_id = models.CharField(
-                                        u'Mnemocode', unique=True,
-                                        primary_key=True, max_length=15)
+        u'Mnemocode', unique=True, primary_key=True, max_length=15)
     matnom = models.CharField(max_length=200, null=False)
     matmed = models.CharField(max_length=200, null=False)
     unidad = models.ForeignKey(Unidade, to_field='unidad_id')
@@ -93,12 +93,11 @@ class Materiale(models.Model):
 
     @property
     def complete_name(self):
-        return '%s %s' % (self.matnom, self.matmed)
+        return u'' .join((self.matnom, self.matmed)).encode('utf-8').strip()
 
     def __unicode__(self):
-        return '%s %s %s %s' % (
-                                self.materiales_id, self.matnom,
-                                self.matmed, self.unidad.uninom)
+        name = self.complete_name()
+        return '{0} {1} {2}'.format(self.materiales_id, name, self.unidad.uninom)
 
 class MNiple(models.Model):
     ktype = models.CharField(max_length=1, primary_key=True)
@@ -210,11 +209,11 @@ class Employee(models.Model):
     audit_log = AuditLog()
 
     class Meta:
-        """some options for view in admin"""
+        '''some options for view in admin'''
         ordering = ['lastname']
 
     def __unicode__(self):
-        name = u' '.join((self.firstname, self.lastname)).encode('utf-8').strip()
+        name = u' '.join((unicode(self.firstname), unicode(self.lastname))).decode('utf-8').strip()
         # last = self.lastname
         return '{0} {1}'.format(self.empdni_id, name)
 
@@ -225,7 +224,7 @@ class Employee(models.Model):
 
     @property
     def name_charge(self):
-        return '%s - %s' % (self.charge.cargos, self.charge.area)
+        return u' '.join((self.firstname, self.lastname)).encode('utf-8').strip()
 
 
 class userProfile(models.Model):
