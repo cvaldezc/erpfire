@@ -1509,13 +1509,19 @@ app.controller 'DSCtrl', ($scope, $http, $cookies, $compile, $timeout, $sce, $q,
       'omodel': $scope.mmp['details']['fields']['model']['pk']
       'materials': $scope.mmp['details']['fields']['materials']['pk']
       'type': $scope.mmp['details']['fields']['type']
+      'symbol': $scope.mmp['details']['fields']['symbol']
       'savemmp': true
     }
     Factory.post(params).then( (response) ->
       if response['data']['status']
-        angular.element('.remove-toast').remove()
         Materialize.toast('Guardado!', 2600)
+        angular.element('.remove-toast').remove()
         $scope.listTemps($scope.mmp['details']['fields']['type'])
+        if $scope.mmp['details']['fields']['type'] isnt 'N'
+          if $scope.mmp['details']['fields']['type'] is 'M'
+            $scope.listTemps('D')
+          else if $scope.mmp['details']['fields']['type'] is 'D'
+            $scope.listTemps('M')
         $scope.mmp = {}
         angular.element('#mupdatemodied').modal('close')
       else

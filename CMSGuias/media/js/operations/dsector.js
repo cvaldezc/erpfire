@@ -1711,13 +1711,21 @@ app.controller('DSCtrl', function($scope, $http, $cookies, $compile, $timeout, $
       'omodel': $scope.mmp['details']['fields']['model']['pk'],
       'materials': $scope.mmp['details']['fields']['materials']['pk'],
       'type': $scope.mmp['details']['fields']['type'],
+      'symbol': $scope.mmp['details']['fields']['symbol'],
       'savemmp': true
     };
     Factory.post(params).then(function(response) {
       if (response['data']['status']) {
-        angular.element('.remove-toast').remove();
         Materialize.toast('Guardado!', 2600);
+        angular.element('.remove-toast').remove();
         $scope.listTemps($scope.mmp['details']['fields']['type']);
+        if ($scope.mmp['details']['fields']['type'] !== 'N') {
+          if ($scope.mmp['details']['fields']['type'] === 'M') {
+            $scope.listTemps('D');
+          } else if ($scope.mmp['details']['fields']['type'] === 'D') {
+            $scope.listTemps('M');
+          }
+        }
         $scope.mmp = {};
         angular.element('#mupdatemodied').modal('close');
       } else {

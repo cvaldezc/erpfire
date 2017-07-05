@@ -1481,7 +1481,21 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                     dsmt.brand_id = request.POST['brand']
                     dsmt.model_id = request.POST['model']
                     dsmt.quantity = request.POST['quantity']
-
+                    print request.POST['symbol'], request.POST['symbol'] == '-'
+                    if request.POST['symbol'] == '-':
+                        print request.POST['type'], request.POST['type'] == 'D'
+                        if request.POST['type'] == 'D':
+                            qres = (dsmt.qsold - dsmt.missingsend)
+                            if float(request.POST['quantity']) < qres:
+                                dsmt.type = 'M'
+                                dsmt.missingsend = qres
+                        print request.POST['type'], request.POST['type'] == 'M'
+                        if request.POST['type'] == 'M':
+                            print dsmt.missingsend, dsmt.quantity
+                            if float(dsmt.missingsend) == float(dsmt.quantity):
+                                dsmt.type = 'D'
+                                dsmt.missingsend = float(dsmt.qsold) - float(dsmt.quantity)
+                    print dsmt.type, dsmt.symbol
                     dsmt.save()
                     context['status'] = True
             except ObjectDoesNotExist as e:
