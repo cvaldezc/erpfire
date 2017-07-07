@@ -2724,11 +2724,10 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        context = dict()
         try:
-            context['pro'] = Proyecto.objects.get(
+            kwargs['pro'] = Proyecto.objects.get(
                             proyecto_id=kwargs['pro'])
-            if context['pro'].status != 'AC' and context['project'].status != 'PE':
+            if kwargs['pro'].status != 'AC' and kwargs['project'].status != 'PE':
                 return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
             svc = ServiceOrder.objects.filter(project_id=kwargs['pro'])
             dsvc = DetailsServiceOrder.objects.filter(
@@ -2736,18 +2735,16 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
             lst = list()
             for x in svc.order_by('-register'):
                 am = dsvc.filter(
-                        serviceorder_id=x.serviceorder_id
-                        ).aggregate(amount=Sum(
-                            'quantity', field='quantity*price'))['amount']
+                    serviceorder_id=x.serviceorder_id).aggregate(amount=Sum(
+                        'quantity', field='quantity*price'))['amount']
                 cs = ''
                 if x.currency_id == 'CU02':
-                    am = (am/x.project.exchange)
+                    am = (am / x.project.exchange)
                     cs = ' - USD'
-                conf = Configuracion.objects.get(
-                        periodo=x.register.strftime('%Y'))
-                dst = (((x.dsct*am)/100)+am)
+                conf = Configuracion.objects.get(periodo=x.register.strftime('%Y'))
+                dst = (((x.dsct * am) / 100) + am)
                 if x.sigv:
-                    am = (((conf.igv*dst)/100)+dst)
+                    am = (((conf.igv * dst) / 100) + dst)
                 else:
                     am = dst
                 lst.append({
@@ -2757,13 +2754,13 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                     'symbol': '%s%s' % (x.currency.simbolo, cs),
                     'amount': am})
                 am = None
-            context['services'] = lst
-            context['total'] = sum([x['amount'] for x in lst])
-            if context['total'] is None:
-                context['total'] = 0
-            context['diff'] = (
-                float(context['pro'].aservices) - context['total'])
-            return render(request, 'sales/servicesproject.html', context)
+            kwargs['services'] = lst
+            kwargs['total'] = sum([x['amount'] for x in lst])
+            if kwargs['total'] is None:
+                kwargs['total'] = 0
+            kwargs['diff'] = (
+                float(kwargs['pro'].aservices) - kwargs['total'])
+            return render(request, 'sales/servicesproject.html', kwargs)
         except TemplateDoesNotExist, e:
             print e
             raise Http404(e)

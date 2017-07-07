@@ -17,18 +17,20 @@
     {% endif %}
 {% endblock menu %}
 {% block content %}
-<div>
-  <div class="card card-panel">
-    <div class="card-content">
-      <h4>
-        Servicios de Proyecto: {{ pro.nompro }}
-        <br>
-        <small>{{ pro.currency.moneda }}</small>
-      </h4>
-    </div>
+<section>
+  <div class="card-panel">
+    <h5>
+      Servicios de Proyecto: {{ pro.nompro }}
+      <br>
+      <small>Moneda {{ pro.currency.moneda }}</small>
+    </h5>
     {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
       <div class="card-action">
-        <button type="button" class="btn" data-target="mservices">
+        <a href="{% url 'oservicenew_view' %}" class="btn light-blue grey-text text-darken-3">
+            <i class="fa fa-plus"></i>
+            <span class="hide-on-small-only">Nueva Orden</span>
+        </a>
+        <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
           <i class="fa fa-usd"></i>
           <span>Monto Servicios</span>
         </button>
@@ -36,32 +38,42 @@
     {% endif %}
   </div>
   <div class="row">
-    <div class="col l6">
-      <div class="card card-panel">
-        <div class="card-content">
-          <a href="{% url 'oservicenew_view' %}" class="btn grey lighten-5 grey-text text-darken-3">
-            <i class="fa fa-plus"></i>
-            Nueva Orden
-          </a>
+    <div class="col s12 m6 l6">
+          <ul class="collapsible" data-collapsible="accordion">
+            <li>
+              <div class="collapsible-header"><i class="fa fa-filter"></i>First</div>
+              <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+            </li>
+            <li>
+              <div class="collapsible-header"><i class="fa fa-podcast"></i>Second</div>
+              <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+            </li>
+            <li>
+              <div class="collapsible-header"><i class="fa fa-grav"></i>Third</div>
+              <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+            </li>
+          </ul>
           <ul class="collection">
             {% for x in services %}
               <li class="collection-item avatar">
                 {# <img src="images/yuna.jpg" alt="" class="circle"> #}
                 <i class="fa fa-file-text circle"></i>
-                <span class="title"><a href="{% url 'rpt_serviceorder' x.id %}" target="_blank">{{ x.id }}</a></span>
-                <p>{{ x.supplier }} <br>
+                <span class="title">
+                  <a href="{% url 'rpt_serviceorder' x.id %}" target="_blank">{{ x.id }}</a>
+                </span>
+                <p>
+                  {{ x.supplier }} <br>
                    {{ x.register }}
                 </p>
-                <span href="#!" class="secondary-content"><h5>{{ x.symbol }} {{ x.amount|floatformat:"2" }}</h5></span>
+                <span href="#!" class="secondary-content">
+                  <h5>{{ x.symbol }} {{ x.amount|floatformat:"2" }}</h5>
+                </span>
               </li>
             {% endfor %}
           </ul>
-        </div>
-      </div>
     </div>
-    <div class="col l6">
-      <div class="card card-panel">
-        <div class="card-content">
+    <div class="col s12 m6 l6">
+      <div class="card-panel">
           <table>
             <tbody>
               <tr>
@@ -81,7 +93,6 @@
               </tr>
             </tbody>
           </table>
-        </div>
       </div>
     </div>
   </div>
@@ -109,8 +120,13 @@
       </form>
     </div>
   </div>
-</div>
-<script type="text/javascript">
-  $('.modal').modal();
+</section>
+<script>
+  var exports = {};
 </script>
+<script defer src="{{ MEDIA_URL }}js/moduleServices.js"></script>
+<script defer src="{{ MEDIA_URL }}js/sales/costproject.js"></script>
+<!--<script type="text/javascript">
+  $('.modal').modal();
+</script>-->
 {% endblock content %}

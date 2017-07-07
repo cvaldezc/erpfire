@@ -2,22 +2,27 @@
     "sourceMap": false,
     "compileOnSave": true,
     "compilerOptions": {
+        "skipLibCheck": true,
         "target": "es5",
+        "lib": ["es5", "dom"],
         "module": "commonjs",
+        "removeComments": true,
+        "preserveConstEnums": true,
         "noImplicitAny": false,
         "sourceMap": true,
         "watch": true,
         "types": [
             "angular",
+            "angular-cookies",
             "jquery",
-            "node",
             "core-js",
+            "node",
             "materialize-css",
             "sweetalert"
         ],
         "typeRoots": [
             // add path to @types
-            "node_modules/@types"
+            "./node_modules/@types/"
          ]
     },
     "include": [ "CMSGuias/media/js/*" ],

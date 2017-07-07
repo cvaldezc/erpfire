@@ -93,10 +93,10 @@ class Materiale(models.Model):
 
     @property
     def complete_name(self):
-        return u'' .join((self.matnom, self.matmed)).encode('utf-8').strip()
+        return u''.join((self.matnom, self.matmed)).encode('utf-8').strip()
 
     def __unicode__(self):
-        name = self.complete_name()
+        name = u''.join((self.matnom, self.matmed)).encode('utf-8').strip()
         return '{0} {1} {2}'.format(self.materiales_id, name, self.unidad.uninom)
 
 class MNiple(models.Model):
