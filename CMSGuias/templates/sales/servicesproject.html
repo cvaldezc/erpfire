@@ -17,7 +17,7 @@
     {% endif %}
 {% endblock menu %}
 {% block content %}
-<section>
+<section ng-app="app" ng-controller="controller as vm">
   <div class="card-panel">
     <h5>
       Servicios de Proyecto: {{ pro.nompro }}
@@ -26,10 +26,14 @@
     </h5>
     {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
       <div class="card-action">
-        <a href="{% url 'oservicenew_view' %}" class="btn light-blue grey-text text-darken-3">
+        <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
             <i class="fa fa-plus"></i>
             <span class="hide-on-small-only">Nueva Orden</span>
         </a>
+        <button type="button" data-target="mitemizer" class="waves-effect waves-light btn gray lighten-5 grat-text text-darken-3">
+          <i class="fa fa-plus-circle"></i>
+          <span class="hide-on-small-only">Agregar Partida</span>
+        </button>
         <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
           <i class="fa fa-usd"></i>
           <span>Monto Servicios</span>
@@ -97,34 +101,61 @@
     </div>
   </div>
   <div class="row">
+    <div class="modal col l4 m12 s12 offset-l4" id="mitemizer">
+      <div class="modal-content">
+        <h5>Partida de Servicio</h5>
+        <div class="input-field">
+          <input type="text" id="itemname" ng-model="vm.itemizer.name">
+          <label for="itemname">Nombre</label>
+        </div>
+        <div class="input-field">
+          <input type="number" class="right-align" name="itempurchase" step="0.10" min="0" ng-model="vm.itemizer.purchase" ng-init="vm.itemizer.purchase=0">
+          <label for="itempurchase">Valor de Compra</label>
+        </div>
+        <div class="input-field">
+          <input type="number" class="right-align" name="itemsales" step="0.10" min="0" ng-model="vm.itemizer.sales" >
+          <label for="itemsales">Valor de Venta</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="waves-effect waves-light btn light-blue">
+          <i class="fa fa-floppy-o"></i>
+          <span class="hide-on-small-only"><small>Guardar</small></span>
+        </button>
+        <button type="button" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+          <i class="fa fa-times"></i>
+          <span class="hide-on-small-only"><small>Salir</small></span>
+        </button>
+      </div>
+    </div>
+    <!-- block modal assign amount total for project -->
     <div class="modal col l4 offset-l4" id="mservices">
       <form method="post" action="">
-      {% csrf_token %}
       <div class="modal-content">
-        <h4>Monto de Servicios</h4>
+        {% csrf_token %}
+        <h5>Monto de Servicios</h5>
         <div class="input-field">
           <input type="number" id="aservices" name="aservices" step="0.01" class="validate">
           <label for="aservices">Monto</label>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" name="saservices" value="true" class="btn grey lighten-5 grey-text text-darken-3">
+        <button type="submit" name="saservices" value="true" class="btn light-blue grey-text text-darken-3">
           <i class="fa fa-check"></i>
-          Guardar
+          <small>Guardar</small>
         </button>
-        <button type="reset" class="btn grey lighten-5 grey-text text-darken-3 waves-effect modal-action modal-close">
+        <button type="reset" class="modal-action modal-close btn grey lighten-5 grey-text text-darken-3 waves-effect">
           <i class="fa fa-times"></i>
-          Cancelar
+          <small>Cancelar</small>
         </button>
       </div>
       </form>
     </div>
+    <!-- endblock-->
   </div>
 </section>
-<script>
-  var exports = {};
-</script>
-<script defer src="{{ MEDIA_URL }}js/moduleServices.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
 <script defer src="{{ MEDIA_URL }}js/sales/costproject.js"></script>
 <!--<script type="text/javascript">
   $('.modal').modal();
