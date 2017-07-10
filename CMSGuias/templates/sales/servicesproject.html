@@ -109,11 +109,11 @@
           <label for="itemname">Nombre</label>
         </div>
         <div class="input-field">
-          <input type="number" class="right-align" name="itempurchase" step="0.10" min="0" ng-model="vm.itemizer.purchase" ng-init="vm.itemizer.purchase=0">
+          <input type="number" class="right-align" name="itempurchase" step="0.10" min="0" ng-model="vm.itemizer.purchase" ng-init="vm.itemizer.purchase=0" ng-change="vm.setItemizerSalesAmount()">
           <label for="itempurchase">Valor de Compra</label>
         </div>
         <div class="input-field">
-          <input type="number" class="right-align" name="itemsales" step="0.10" min="0" ng-model="vm.itemizer.sales" >
+          <input type="number" class="right-align" name="itemsales" step="0.10" min="0" ng-model="vm.itemizer.sales" ng-value="vm.itemizer.sales">
           <label for="itemsales">Valor de Venta</label>
         </div>
       </div>

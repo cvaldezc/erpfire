@@ -35,6 +35,11 @@ var ControllerServiceProject = (function () {
     ControllerServiceProject.prototype.getItemizer = function () {
         console.log('get itemizer');
     };
+    ControllerServiceProject.prototype.setItemizerSalesAmount = function () {
+        // console.log(this.itemizer['purchase'] * 1.10);
+        this.itemizer['sales'] = (Math.round(this.itemizer['purchase'] * 1.10) * 100) / 100;
+        // console.log(this.itemizer);
+    };
     return ControllerServiceProject;
 }());
 ControllerServiceProject.$inject = ['sproxy'];

@@ -54,6 +54,12 @@ class ControllerServiceProject implements IController {
 	getItemizer(): void {
 		console.log('get itemizer')
 	}
+
+	setItemizerSalesAmount(): void {
+		// console.log(this.itemizer['purchase'] * 1.10);
+		this.itemizer['sales'] = (Math.round(this.itemizer['purchase'] * 1.10) * 100) / 100;
+		// console.log(this.itemizer);
+	}
 }
 
 let apps = angular.module('app', ['ngCookies']);
