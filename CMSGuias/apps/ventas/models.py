@@ -470,7 +470,7 @@ class ProjectItemizer(models.Model):
     '''
     model for storage items from the services
     '''
-    itemizer = models.CharField(max_length=12, default='PRAA000IT000', primary_key=True)
+    itemizer_id = models.CharField(max_length=12, default='PRAA000IT000', primary_key=True)
     project = models.ForeignKey(Proyecto, related_name='projectasitemizer')
     name = models.CharField(max_length=255)
     register = models.DateTimeField(auto_now_add=True)
@@ -485,5 +485,5 @@ class ProjectItemizer(models.Model):
 
     def __unicode__(self):
         return '{0} {1} {2} {3} {4}'.format(
-            self.itemizer, self.project, self.name, self.register, self.purchase)
+            self.itemizer_id, self.project, self.name, self.register, self.purchase)
 #endblock

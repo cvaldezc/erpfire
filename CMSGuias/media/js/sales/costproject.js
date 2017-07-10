@@ -33,12 +33,41 @@ var ControllerServiceProject = (function () {
         this.getItemizer();
     }
     ControllerServiceProject.prototype.getItemizer = function () {
-        console.log('get itemizer');
+        var _this = this;
+        Materialize.toast('<i class="fa fa-cog"></i> Procesando...!', parseInt(undefined), 'toast-remove');
+        this.proxy.get('', { itemizer: true }).then(function (response) {
+            if (response['data']['status']) {
+                _this.itemizers = response['data']['itemizers'];
+                angular.element('.toast-remove').remove();
+            }
+        });
     };
     ControllerServiceProject.prototype.setItemizerSalesAmount = function () {
         // console.log(this.itemizer['purchase'] * 1.10);
         this.itemizer['sales'] = (Math.round(this.itemizer['purchase'] * 1.10) * 100) / 100;
         // console.log(this.itemizer);
+    };
+    ControllerServiceProject.prototype.saveItemizer = function () {
+        var _this = this;
+        Materialize.toast('<i class="fa fa-cog"></i> Procesando...!', parseInt(undefined), 'toast-remove');
+        var params = this.itemizer;
+        params['saveitemizer'] = true;
+        this.proxy.post('', params).then(function (response) {
+            if (response['data']['status']) {
+                angular.element('.toast-remove').remove();
+                _this.getItemizer();
+                Materialize.toast('Guardado!', 2600);
+                _this.itemizer = {
+                    name: '',
+                    purchase: 0,
+                    sales: 0
+                };
+                angular.element('#mitemizer').modal('close');
+            }
+            else {
+                Materialize.toast('${response["raise"]}', 6600);
+            }
+        });
     };
     return ControllerServiceProject;
 }());

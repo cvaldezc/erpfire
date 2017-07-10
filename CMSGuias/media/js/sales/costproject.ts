@@ -37,12 +37,14 @@ class SProxy implements IProxy {
 
 interface IController {
 	itemizer: object;
+	itemizers: object;
 	getItemizer(): void;
-
+	saveItemizer(): void;
 }
 
 class ControllerServiceProject implements IController {
 	itemizer: object;
+	itemizers: object;
 	static $inject = ['sproxy']
 
 	constructor(private proxy: SProxy) {
@@ -52,13 +54,44 @@ class ControllerServiceProject implements IController {
 	}
 
 	getItemizer(): void {
-		console.log('get itemizer')
+		Materialize.toast('<i class="fa fa-cog"></i> Procesando...!', parseInt(undefined), 'toast-remove');
+		this.proxy.get('', {itemizer: true}).then(
+			(response: object) => {
+				if (response['data']['status']) {
+					this.itemizers = response['data']['itemizers']
+					angular.element('.toast-remove').remove()
+				}
+			}
+		)
 	}
 
 	setItemizerSalesAmount(): void {
 		// console.log(this.itemizer['purchase'] * 1.10);
 		this.itemizer['sales'] = (Math.round(this.itemizer['purchase'] * 1.10) * 100) / 100;
 		// console.log(this.itemizer);
+	}
+
+	saveItemizer(): void {
+		Materialize.toast('<i class="fa fa-cog"></i> Procesando...!', parseInt(undefined), 'toast-remove');
+		let params: object = this.itemizer;
+		params['saveitemizer'] = true;
+		this.proxy.post('', params).then(
+			(response) => {
+				if (response['data']['status']) {
+					angular.element('.toast-remove').remove();
+					this.getItemizer();
+					Materialize.toast('Guardado!', 2600);
+					this.itemizer = {
+						name: '',
+						purchase: 0,
+						sales: 0
+					}
+					angular.element('#mitemizer').modal('close');
+				}else{
+					Materialize.toast('${response["raise"]}', 6600);
+				}
+			}
+		)
 	}
 }
 

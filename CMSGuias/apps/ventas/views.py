@@ -2725,6 +2725,18 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         try:
+            if request.is_ajax():
+                try:
+                    if 'itemizer' in request.GET:
+                        kwargs['itemizers'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                ProjectItemizer.objects.filter(project_id=kwargs['pro']).order_by('name')))
+                        kwargs['status'] = True
+                except Exception as oex:
+                    kwargs['raise'] = str(oex)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
             kwargs['pro'] = Proyecto.objects.get(
                             proyecto_id=kwargs['pro'])
             if kwargs['pro'].status != 'AC' and kwargs['project'].status != 'PE':
@@ -2767,15 +2779,41 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
-        # context = dict()
         try:
+            if 'saveitemizer' in request.POST:
+                def saveItemizer(obj, params={}):
+                    try:
+                        if obj is None:
+                            oit = ProjectItemizer()
+                            oit.itemizer_id = genkeys.GenerateIDItemizerProject(kwargs['pro'])
+                        else:
+                            oit = obj
+                        oit.project_id = kwargs['pro']
+                        oit.name = str(params['name']).upper()
+                        oit.purchase = params['purchase']
+                        oit.sales = params['sales']
+                        oit.save()
+                        return True
+                    except ObjectDoesNotExist as oex:
+                        kwargs['raise'] = str(oex)
+                        return False
+                # save itemizer
+                status = False
+                if 'itemizer' in request.POST:
+                    obj = ProjectItemizer.objects.get(itemizer_id=request.POST['itemizer'])
+                    status = saveItemizer(obj, request.POST)
+                else:
+                    status = saveItemizer(None, request.POST)
+                kwargs['status'] = status
             if 'saservices' in request.POST:
                 p = Proyecto.objects.get(proyecto_id=kwargs['pro'])
                 p.aservices = request.POST['aservices']
                 p.save()
                 return redirect('servicesp_view', pro=kwargs['pro'])
-        except ObjectDoesNotExist, e:
-            raise e
+        except Exception as e:
+            kwargs['raise'] = str(e)
+            kwargs['status'] = False
+        return self.render_to_json_response(kwargs)
 
 
 # Configuration Painting for Project

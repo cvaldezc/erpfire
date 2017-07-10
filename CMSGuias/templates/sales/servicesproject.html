@@ -18,82 +18,78 @@
 {% endblock menu %}
 {% block content %}
 <section ng-app="app" ng-controller="controller as vm">
-  <div class="card-panel">
-    <h5>
-      Servicios de Proyecto: {{ pro.nompro }}
-      <br>
-      <small>Moneda {{ pro.currency.moneda }}</small>
-    </h5>
-    {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-      <div class="card-action">
-        <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
-            <i class="fa fa-plus"></i>
-            <span class="hide-on-small-only">Nueva Orden</span>
-        </a>
-        <button type="button" data-target="mitemizer" class="waves-effect waves-light btn gray lighten-5 grat-text text-darken-3">
-          <i class="fa fa-plus-circle"></i>
-          <span class="hide-on-small-only">Agregar Partida</span>
-        </button>
-        <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
-          <i class="fa fa-usd"></i>
-          <span>Monto Servicios</span>
-        </button>
-      </div>
-    {% endif %}
-  </div>
   <div class="row">
-    <div class="col s12 m6 l6">
-          <ul class="collapsible" data-collapsible="accordion">
-            <li>
-              <div class="collapsible-header"><i class="fa fa-filter"></i>First</div>
-              <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
-            </li>
-            <li>
-              <div class="collapsible-header"><i class="fa fa-podcast"></i>Second</div>
-              <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
-            </li>
-            <li>
-              <div class="collapsible-header"><i class="fa fa-grav"></i>Third</div>
-              <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
-            </li>
-          </ul>
-          <ul class="collection">
-            {% for x in services %}
-              <li class="collection-item avatar">
-                {# <img src="images/yuna.jpg" alt="" class="circle"> #}
-                <i class="fa fa-file-text circle"></i>
-                <span class="title">
-                  <a href="{% url 'rpt_serviceorder' x.id %}" target="_blank">{{ x.id }}</a>
-                </span>
-                <p>
-                  {{ x.supplier }} <br>
-                   {{ x.register }}
-                </p>
-                <span href="#!" class="secondary-content">
-                  <h5>{{ x.symbol }} {{ x.amount|floatformat:"2" }}</h5>
-                </span>
-              </li>
-            {% endfor %}
-          </ul>
+    <div class="col s12 m12 l12">
+      <div class="card">
+        <div class="card-content">
+          <h5>
+            Servicios de Proyecto: {{ pro.nompro }}
+            <br>
+            <small>Moneda {{ pro.currency.moneda }}</small>
+          </h5>
+          {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+            <div class="card-action">
+              <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
+                  <i class="fa fa-plus"></i>
+                  <span class="hide-on-small-only">Nueva Orden</span>
+              </a>
+              <button type="button" data-target="mitemizer" class="waves-effect waves-light btn gray lighten-5 grat-text text-darken-3">
+                <i class="fa fa-plus-circle"></i>
+                <span class="hide-on-small-only">Agregar Partida</span>
+              </button>
+              <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
+                <i class="fa fa-usd"></i>
+                <span class="hide-on-small-only">Monto Servicios</span>
+              </button> -->
+            </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
+    {% verbatim %}
+    <div class="col s12 m6 l6">
+      <ul class="collapsible" data-collapsible="accordion">
+        <li ng-repeat="x in vm.itemizers">
+          <div class="collapsible-header">
+            <i class="fa fa-files-o"></i>
+            <span>{{x.fields.name}}</span>
+            <span class="badge">
+              <a href="#edit" class="light-green-text text-16">
+                <span class="fa fa-edit"></span>
+                &nbsp;
+              </a>
+              <a href="#del" class="red-text text-16">
+                <span class="fa fa-trash"></span>
+              </a>
+            </span>
+          </div>
+          <div class="collapsible-body">
+            <p>
+              <strong>Compra:</strong> {{ x.fields.purchase }} <strong>Venta:</strong> {{ x.fields.sales }}
+            </p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    {% endverbatim %}
     <div class="col s12 m6 l6">
       <div class="card-panel">
-          <table>
+          <table class="table responsive-table">
             <tbody>
               <tr>
-                <th><h4>Asignado</h4></th>
-                <td class="right-align"><h4>{{ pro.aservices|floatformat:"2" }}</h4></td>
+                <th><h5>Asignado</h5></th>
+                <td class="right-align"><h5>{{ pro.aservices|floatformat:"2" }}</h5></td>
               </tr>
               <tr>
-                <th><h4>Gastado</h4></th>
-                <th class="right-align"><h4>{{ total|floatformat:"2" }}</h4></th>
+                <th><h5>Gastado</h5></th>
+                <th class="right-align"><h5>{{ total|floatformat:"2" }}</h5></th>
               </tr>
               <tr>
                 <td colspan="2"><div class="divider"></div></td>
               </tr>
               <tr>
-                <th><h4>Total</h4></th>
-                <td class="right-align"><h4>{{ diff|floatformat:"2" }}</h4></td>
+                <th><h5>Total</h5></th>
+                <td class="right-align"><h5>{{ diff|floatformat:"2" }}</h5></td>
               </tr>
             </tbody>
           </table>
@@ -103,7 +99,10 @@
   <div class="row">
     <div class="modal col l4 m12 s12 offset-l4" id="mitemizer">
       <div class="modal-content">
-        <h5>Partida de Servicio</h5>
+        <h5>
+          Partida de Servicio <br>
+          <small>Moneda {{ pro.currency.moneda }}</small>
+        </h5>
         <div class="input-field">
           <input type="text" id="itemname" ng-model="vm.itemizer.name">
           <label for="itemname">Nombre</label>
@@ -118,7 +117,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="waves-effect waves-light btn light-blue">
+        <button type="button" class="waves-effect waves-light btn light-blue" ng-click="vm.saveItemizer()">
           <i class="fa fa-floppy-o"></i>
           <span class="hide-on-small-only"><small>Guardar</small></span>
         </button>
