@@ -40,6 +40,10 @@ var ControllerServiceProject = (function () {
                 _this.itemizers = response['data']['itemizers'];
                 angular.element('.toast-remove').remove();
             }
+            else {
+                angular.element('.toast-remove').remove();
+                Materialize.toast("Error: " + response['data']['raise'], 2600);
+            }
         });
     };
     ControllerServiceProject.prototype.setItemizerSalesAmount = function () {

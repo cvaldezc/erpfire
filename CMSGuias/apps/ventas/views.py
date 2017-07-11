@@ -2731,47 +2731,55 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                         kwargs['itemizers'] = json.loads(
                             serializers.serialize(
                                 'json',
-                                ProjectItemizer.objects.filter(project_id=kwargs['pro']).order_by('name')))
+                                ProjectItemizer.objects.filter(
+                                    project_id=kwargs['pro']).order_by('name')))
+                        for x in kwargs['itemizers']:
+                            documents = ServiceOrder.objects.filter(
+                                project_id=kwargs['pro'],
+                                itemizer_id=x['pk'])
+                            x['services'] = json.loads(serializers.serialize(
+                                'json', documents))
+                            for dx in x['services']:
+
+                                dx['amounts']
                         kwargs['status'] = True
                 except Exception as oex:
                     kwargs['raise'] = str(oex)
                     kwargs['status'] = False
                 return self.render_to_json_response(kwargs)
-            kwargs['pro'] = Proyecto.objects.get(
-                            proyecto_id=kwargs['pro'])
+            kwargs['pro'] = Proyecto.objects.get(proyecto_id=kwargs['pro'])
             if kwargs['pro'].status != 'AC' and kwargs['project'].status != 'PE':
                 return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
-            svc = ServiceOrder.objects.filter(project_id=kwargs['pro'])
-            dsvc = DetailsServiceOrder.objects.filter(
-                serviceorder_id__in=[x.serviceorder_id for x in svc])
-            lst = list()
-            for x in svc.order_by('-register'):
-                am = dsvc.filter(
-                    serviceorder_id=x.serviceorder_id).aggregate(amount=Sum(
-                        'quantity', field='quantity*price'))['amount']
-                cs = ''
-                if x.currency_id == 'CU02':
-                    am = (am / x.project.exchange)
-                    cs = ' - USD'
-                conf = Configuracion.objects.get(periodo=x.register.strftime('%Y'))
-                dst = (((x.dsct * am) / 100) + am)
-                if x.sigv:
-                    am = (((conf.igv * dst) / 100) + dst)
-                else:
-                    am = dst
-                lst.append({
-                    'id': x.serviceorder_id,
-                    'supplier': x.supplier.razonsocial,
-                    'register': x.register.strftime('%d-%m-%Y'),
-                    'symbol': '%s%s' % (x.currency.simbolo, cs),
-                    'amount': am})
-                am = None
-            kwargs['services'] = lst
-            kwargs['total'] = sum([x['amount'] for x in lst])
-            if kwargs['total'] is None:
-                kwargs['total'] = 0
-            kwargs['diff'] = (
-                float(kwargs['pro'].aservices) - kwargs['total'])
+            # svc = ServiceOrder.objects.filter(project_id=kwargs['pro'])
+            # dsvc = DetailsServiceOrder.objects.filter(
+            #     serviceorder_id__in=[x.serviceorder_id for x in svc])
+            # lst = list()
+            # for x in svc.order_by('-register'):
+            #     am = dsvc.filter(
+            #         serviceorder_id=x.serviceorder_id).aggregate(amount=Sum(
+            #             'quantity', field='quantity*price'))['amount']
+            #     cs = ''
+            #     if x.currency_id == 'CU02':
+            #         am = (am / x.project.exchange)
+            #         cs = ' - USD'
+            #     conf = Configuracion.objects.get(periodo=x.register.strftime('%Y'))
+            #     dst = (((x.dsct * am) / 100) + am)
+            #     if x.sigv:
+            #         am = (((conf.igv * dst) / 100) + dst)
+            #     else:
+            #         am = dst
+            #     lst.append({
+            #         'id': x.serviceorder_id,
+            #         'supplier': x.supplier.razonsocial,
+            #         'register': x.register.strftime('%d-%m-%Y'),
+            #         'symbol': '%s%s' % (x.currency.simbolo, cs),
+            #         'amount': am})
+            #     am = None
+            # kwargs['services'] = lst
+            # kwargs['total'] = sum([x['amount'] for x in lst])
+            # if kwargs['total'] is None:
+            #     kwargs['total'] = 0
+            # kwargs['diff'] = (float(kwargs['pro'].aservices) - kwargs['total'])
             return render(request, 'sales/servicesproject.html', kwargs)
         except TemplateDoesNotExist, e:
             print e

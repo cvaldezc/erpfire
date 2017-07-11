@@ -38,6 +38,7 @@ do ->
         $scope.dtotal= 0
         $scope.edit = {}
         $scope.dels = []
+        $scope.itemizers = []
 
         angular.element(document).ready ->
             angular.element('.datepicker').pickadate
@@ -61,8 +62,9 @@ do ->
                     $scope.loadDetails()
                     $scope.so = response.data
                     $scope.projects = response.projects
+                    $scope.itemizers = response['itemizers']
                     $scope.suppliers = response.supplier
-                    $scope.documents = response.document
+                    $scope.documents = response['document']
                     $scope.methods = response.method
                     $scope.currencys = response.currencys
                     $scope.authorizeds = response.authorized
@@ -75,6 +77,25 @@ do ->
                     Materialize.toast "<i class='fa fa-warning fa-2x amber-text'></i>&nbsp; No se ha cargado los datos!", 4000
                 return
             return
+
+        # @cvaldezch 2017-07-11 16:03:20
+        $scope.loadItemizers = ->
+            params = {
+                'project': $scope.so['project']
+                'itemizer': true
+            }
+            soFactory.getData(params)
+            .success(
+                (response) ->
+                    if response['status']
+                        $scope.itemizers = response['itemizers']
+                        return
+                    else
+                        Materialize.toast("#{response['raise']}", 2600)
+                        return
+            )
+            return
+        # endblock
 
         $scope.loadDetails = ->
             prm = details: true
@@ -95,7 +116,7 @@ do ->
         $scope.calc = ->
             getsubtotal = ->
                 defer = $q.defer()
-                promises = 0 
+                promises = 0
                 angular.forEach $scope.details, (obj) ->
                     #  console.info obj
                     promises += (obj.fields.price * obj.fields.quantity)
@@ -187,7 +208,7 @@ do ->
                         if obj.pk is pk
                             $scope.dels.push
                                 'pk': obj.pk
-                                'model': obj.model 
+                                'model': obj.model
                             $scope.details.splice index, 1
                             # $scope.$apply()
                             Materialize.toast "<i class='fa fa-fire fa-lg red-text'></i>&nbsp;Item eliminado!", 2600
@@ -210,17 +231,17 @@ do ->
                 closeOnCancel: true
             , (isConfirm) ->
                 if isConfirm
-                    tg = $scope.so.tag
-                    if tg.search(/\#/) isnt -1
-                        tg = tg.split(/\#/).pop()
-                        if tg is ""
-                            Materialize.toast "Error en la categoria", 3000
-                            return false
-                        else
-                            $scope.so.tag = "##{tg}".toUpperCase()
-                    else
-                        Materialize.toast "Formato de Categoria!", 3000
-                        return false
+                    # tg = $scope.so.tag
+                    # if tg.search(/\#/) isnt -1
+                    #     tg = tg.split(/\#/).pop()
+                    #     if tg is ""
+                    #         Materialize.toast "Error en la categoria", 3000
+                    #         return false
+                    #     else
+                    #         $scope.so.tag = "##{tg}".toUpperCase()
+                    # else
+                    #     Materialize.toast "Formato de Categoria!", 3000
+                    #     return false
                     prm =
                         saveOrder: true
                         so: JSON.stringify($scope.so)
@@ -243,7 +264,7 @@ do ->
                     return
             return
 
-        
+
 
         $scope.$watch 'so.dsct', (nw, old) ->
             if nw isnt old
@@ -259,11 +280,11 @@ do ->
                     $scope.dsigv = 0
                 $scope.calc()
             return
-        
+
         $scope.$watch 'so.currency', (nw, old) ->
             if nw isnt undefined
                 $scope.lcur = angular.element("#currency option:selected").text()
-        
+
         $scope.$watch 'dtotal', (nw, old) ->
             if nw isnt old
                 $scope.dtotal = parseFloat($scope.dtotal).toFixed(2)

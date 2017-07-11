@@ -7,7 +7,7 @@ $(document).ready ->
         dateFormat: "yy-mm-dd"
         showAnim: "slide"
         showButtonPanel: true
-    $("select[name=project]").on "click", selectProject
+    $("select[name=project]").on "change", selectProject
     $("button.btn-add-item").on "click", addItem
     $("button.btn-refresh").on "click", getListTmp
     $("input[name=dsct]").on "change keyup", changeDsct
@@ -50,6 +50,7 @@ showList = (event) ->
 selectProject = (event) ->
     $pro = $(@)
     if $pro.val()
+        getItemizerByProject()
         data = new Object
         data.pro = $pro.val()
         data.changeProject = true
@@ -114,8 +115,7 @@ listDetails = (response) ->
         $tb = $("table.table-details > tbody")
         $tb.empty()
         for x of response.list
-            
-            response.list[x].description =  
+            response.list[x].description =
             $tb.append Mustache.to_html temp, response.list[x]
         calcamount()
     return
@@ -210,8 +210,9 @@ loadEdit = (event) ->
 
 saveServiceOrder = (event) ->
     data = new Object
-    data.project = $("select[name=project]").val()
-    data.subproject = $("select[name=subproject]").val()
+    data.project = $("select[name=project]").val() or ''
+    # data.project = if data.project is '' then '' else data.project
+    data.subproject = $("select[name=subproject]").val() or ''
     data.supplier = $("select[name=supplier]").val()
     data.quotation = $("input[name=quotation]").val() or ''
     data.arrival = $("input[name=arrival]").val()
@@ -223,9 +224,10 @@ saveServiceOrder = (event) ->
     data.dsct = $("input[name=dsct]").val()
     data.authorized = $("select[name=authorized]").val()
     data.sigv = $("#sigv").is(":checked")
-    data.tag = $("#category").val()
+    data.itemizer = $("#itemizer").val() or ''
+    # data.itemizer = if data.itemizer is '' then '' else data.itemizer
     for x in Object.keys(data)
-        if data[x] is "" and x isnt "quotation"
+        if data[x] is "" and (x isnt 'quotation' and x isnt 'project' and x isnt 'itemizer' and x isnt 'subproject')
             valid = false
             break
         else
@@ -261,3 +263,34 @@ saveServiceOrder = (event) ->
     else
         $().toastmessage "showWarningToast", "Se a encontrado un campo vacio."
     return
+
+# @cvaldezch 2017-07-11 10:34:38
+# add function for get itemizer for each project
+getItemizerByProject = ->
+    project = $("select[name=project]").val()
+    if project isnt ''
+        params = {
+            itemizer: true
+            project: project
+        }
+        $.getJSON('', params, (response) ->
+            if response['status']
+                temporal = """
+                {{#itemizer}}
+                <option value="{{pk}}">{{fields.name}}</option>
+                {{/itemizer}}
+                """
+                $select = $("#itemizer")
+                $select.empty()
+                $select.html Mustache.render temporal, response
+                setTimeout (->
+                    $("#itemizer").trigger("chosen:updated")
+                    return
+                    ), 800
+                return
+            else
+                $().toastmessage "showErrorToast", "#{response['raise']}"
+                return
+        )
+    return
+# endblock

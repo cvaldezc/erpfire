@@ -415,7 +415,7 @@ class PurchaseOrder(models.Model):
     dsct = models.FloatField(default=0, blank=True)
     igv = models.FloatField(default=0, blank=True)
     order = models.FileField(
-            upload_to=url, null=True, blank=True, max_length=200)
+        upload_to=url, null=True, blank=True, max_length=200)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -465,7 +465,7 @@ class Painting(models.Model):
 
 
 # 2017-07-10 12:24:48
-# @cvaldezch - add model class
+# @cvaldezch - add model class Project Itemizer
 class ProjectItemizer(models.Model):
     '''
     model for storage items from the services

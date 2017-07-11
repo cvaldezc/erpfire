@@ -60,6 +60,9 @@ class ControllerServiceProject implements IController {
 				if (response['data']['status']) {
 					this.itemizers = response['data']['itemizers']
 					angular.element('.toast-remove').remove()
+				}else{
+					angular.element('.toast-remove').remove()
+					Materialize.toast(`Error: ${response['data']['raise']}`, 2600)
 				}
 			}
 		)
