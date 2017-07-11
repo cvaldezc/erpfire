@@ -2740,8 +2740,8 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                             x['services'] = json.loads(serializers.serialize(
                                 'json', documents))
                             for dx in x['services']:
-
-                                dx['amounts']
+                                order = DetailsServiceOrder.objects.filter(serviceorder_id=dx['pk'])
+                                dx['amounts'] = sum([(od.quantity * float(od.price)) for od in order])
                         kwargs['status'] = True
                 except Exception as oex:
                     kwargs['raise'] = str(oex)
