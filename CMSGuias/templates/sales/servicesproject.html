@@ -27,14 +27,19 @@
             <br>
             <small>Moneda {{ pro.currency.moneda }}</small>
           </h5>
+          <input type="hidden" ng-model="vm.area" ng-init="vm.area='{{ request.user.get_profile.empdni.charge.area|lower }}'">
+          <a href="/sales/projects/manger/{{pro.proyecto_id}}/" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+            <i class="fa fa-chevron-left"></i>
+            <span class="hide-on-small-only">REGRESAR</span>
+          </a>
           {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
             <div class="card-action">
               <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
-                  <i class="fa fa-plus"></i>
+                  <i class="fa fa-file-text-o"></i>
                   <span class="hide-on-small-only">Nueva Orden</span>
               </a>
               <button type="button" data-target="mitemizer" class="waves-effect waves-light btn gray lighten-5 grat-text text-darken-3">
-                <i class="fa fa-plus-circle"></i>
+                <i class="fa fa-tags"></i>
                 <span class="hide-on-small-only">Agregar Partida</span>
               </button>
               <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
@@ -50,11 +55,11 @@
     <div class="col s12 m6 l6">
       <ul class="collapsible" data-collapsible="accordion">
         <li ng-repeat="x in vm.itemizers">
-          <div class="collapsible-header">
-            <i class="fa fa-files-o"></i>
+          <div class="collapsible-header light-green lighten-4">
+            <i class="fa fa-tag"></i>
             <span><strong>{{x.fields.name}}</strong></span>
-            <span class="badge">
-              <a href="#edit" class="light-green-text text-16">
+            <span class="badge" ng-show="(vm.area == 'ventas' || vm.area == 'administrator')">
+              <a href="#edit" class="light-blue-text text-16">
                 <span class="fa fa-edit"></span>
                 &nbsp;
               </a>
@@ -64,37 +69,64 @@
             </span>
           </div>
           <div class="collapsible-body">
-            <p>
-              <strong>Compra:</strong> {{ x.fields.purchase }} <strong>Venta:</strong> {{ x.fields.sales }}
-            </p>
+            <div class="card-panel">
+              <strong>Asignado</strong>
+              <strong>Compra:</strong> {{x.fields.purchase}} <strong>Venta:</strong> {{x.fields.sales}}
+              <input type="hidden" ng-init="vm.assignament=(vm.assignament + (x.fields.purchase - 0))">
+              <input type="hidden" value="{{x['sum']=(0-0)}}">
+              <!-- details by item-->
+              <table class="table responsive-table highlight">
+                <tbody>
+                  <tr ng-repeat="d in x.services">
+                    <td><a href="/reports/services/orders/{{d.pk}}/" target="_blank"><i class="fa fa-file-text-o"></i></a></td>
+                    <td class="col-1">
+                      <small><strong>{{d.pk}}</strong></small></td>
+                    <td><small>{{d.fields.supplier.fields.razonsocial}}</small></td>
+                    <td class="right-align">
+                      <small><strong>
+                        {{
+                          total = ((d.amounts - ((d.fields.dsct/100) * d.amounts)) * (((d.fields.sigv?d.configure.fields.igv:0)/100)+1));
+                          (d['total'] = (d.fields.currency.pk == d.configure.fields.moneda.pk) ? total : (total / d['exchange']));
+                          (x['sum'] = (d['total'] + (x['sum'] - 0)));
+                          (d['total']) | number:2
+                        }}
+                      </strong></small>
+                    </td>
+                    <td class="right-align">
+                      <small>{{(d.fields.currency.pk == d.configure.fields.moneda.pk) ? d.fields.currency.fields.simbolo : d.fields.currency.fields.simbolo +' - ' + d.configure.fields.moneda.fields.simbolo }}</small></td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- endblock -->
+            </div>
           </div>
         </li>
       </ul>
     </div>
-    {% endverbatim %}
     <div class="col s12 m6 l6">
       <div class="card-panel">
           <table class="table responsive-table">
             <tbody>
               <tr>
                 <th><h5>Asignado</h5></th>
-                <td class="right-align"><h5>{{ pro.aservices|floatformat:"2" }}</h5></td>
+                <td class="right-align"><h5>{{vm.assignament | number:2}}</h5></td>
               </tr>
               <tr>
                 <th><h5>Gastado</h5></th>
-                <th class="right-align"><h5>{{ total|floatformat:"2" }}</h5></th>
+                <th class="right-align"><h5></h5></th>
               </tr>
               <tr>
                 <td colspan="2"><div class="divider"></div></td>
               </tr>
               <tr>
                 <th><h5>Total</h5></th>
-                <td class="right-align"><h5>{{ diff|floatformat:"2" }}</h5></td>
+                <td class="right-align"><h5></h5></td>
               </tr>
             </tbody>
           </table>
       </div>
     </div>
+    {% endverbatim %}
   </div>
   <div class="row">
     <div class="modal col l4 m12 s12 offset-l4" id="mitemizer">

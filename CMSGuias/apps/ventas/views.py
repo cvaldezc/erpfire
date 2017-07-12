@@ -2738,9 +2738,14 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                                 project_id=kwargs['pro'],
                                 itemizer_id=x['pk'])
                             x['services'] = json.loads(serializers.serialize(
-                                'json', documents))
+                                'json', documents, relations=('supplier', 'currency')))
                             for dx in x['services']:
                                 order = DetailsServiceOrder.objects.filter(serviceorder_id=dx['pk'])
+                                dx['configure'] = json.loads(serializers.serialize(
+                                    'json',
+                                    [Configuracion.objects.get(
+                                        periodo=order[0].serviceorder.register.strftime('%Y'))], relations=('moneda')))[0]
+                                dx['exchange'] = order[0].serviceorder.project.exchange
                                 dx['amounts'] = sum([(od.quantity * float(od.price)) for od in order])
                         kwargs['status'] = True
                 except Exception as oex:

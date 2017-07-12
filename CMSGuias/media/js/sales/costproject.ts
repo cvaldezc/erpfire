@@ -38,6 +38,7 @@ class SProxy implements IProxy {
 interface IController {
 	itemizer: object;
 	itemizers: object;
+	assignament: number;
 	getItemizer(): void;
 	saveItemizer(): void;
 }
@@ -45,6 +46,8 @@ interface IController {
 class ControllerServiceProject implements IController {
 	itemizer: object;
 	itemizers: object;
+	assignament: number = 0;
+
 	static $inject = ['sproxy']
 
 	constructor(private proxy: SProxy) {

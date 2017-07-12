@@ -22,12 +22,13 @@ var SProxy = (function () {
         }
         return form;
     };
+    SProxy.$inject = ['$http', '$cookies'];
     return SProxy;
 }());
-SProxy.$inject = ['$http', '$cookies'];
 var ControllerServiceProject = (function () {
     function ControllerServiceProject(proxy) {
         this.proxy = proxy;
+        this.assignament = 0;
         console.log("hi! hello world!!!");
         angular.element('.modal').modal();
         this.getItemizer();
@@ -73,9 +74,9 @@ var ControllerServiceProject = (function () {
             }
         });
     };
+    ControllerServiceProject.$inject = ['sproxy'];
     return ControllerServiceProject;
 }());
-ControllerServiceProject.$inject = ['sproxy'];
 var apps = angular.module('app', ['ngCookies']);
 apps.service('sproxy', SProxy);
 apps.controller('controller', ControllerServiceProject);
