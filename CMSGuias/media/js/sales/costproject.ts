@@ -102,7 +102,7 @@ class ControllerServiceProject implements IController {
 					}
 					angular.element('#mitemizer').modal('close');
 				}else{
-					Materialize.toast('${response["raise"]}', 6600);
+					Materialize.toast(`${response['data']['raise']}`, 6600);
 				}
 			}
 		)
@@ -155,7 +155,18 @@ class ControllerServiceProject implements IController {
 			closeOnCancel: true
 		}, (isConfirm) => {
 			if (isConfirm) {
-
+				let params = {
+					delitemizer: true,
+					itemizer: item['pk']
+				}
+				this.proxy.post('', params).then( (response:object) => {
+					if (response['data']['status']) {
+						this.getItemizer();
+						Materialize.toast('Eliminado!', 2600);
+					}else{
+						Materialize.toast(`Error: ${response['data']['raise']}`, 10600);
+					}
+				});
 			}
 		});
 	}

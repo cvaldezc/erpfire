@@ -74,7 +74,7 @@ var ControllerServiceProject = (function () {
                 angular.element('#mitemizer').modal('close');
             }
             else {
-                Materialize.toast('${response["raise"]}', 6600);
+                Materialize.toast("" + response['data']['raise'], 6600);
             }
         });
     };
@@ -112,6 +112,7 @@ var ControllerServiceProject = (function () {
         angular.element('#mitemizer').modal('open');
     };
     ControllerServiceProject.prototype.delItem = function (item) {
+        var _this = this;
         swal({
             title: "Realmente desea eliminar el item " + item['fields']['name'] + "?",
             text: 'Nota: El item no se eliminara si tiene ordenes asociadas.',
@@ -123,6 +124,19 @@ var ControllerServiceProject = (function () {
             closeOnCancel: true
         }, function (isConfirm) {
             if (isConfirm) {
+                var params = {
+                    delitemizer: true,
+                    itemizer: item['pk']
+                };
+                _this.proxy.post('', params).then(function (response) {
+                    if (response['data']['status']) {
+                        _this.getItemizer();
+                        Materialize.toast('Eliminado!', 2600);
+                    }
+                    else {
+                        Materialize.toast("Error: " + response['data']['raise'], 10600);
+                    }
+                });
             }
         });
     };

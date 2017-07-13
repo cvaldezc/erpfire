@@ -2823,6 +2823,16 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                 p.aservices = request.POST['aservices']
                 p.save()
                 return redirect('servicesp_view', pro=kwargs['pro'])
+            if 'delitemizer' in request.POST:
+                serv = ServiceOrder.objects.filter(itemizer_id=request.POST['itemizer'])
+                if serv.count() == 0:
+                    obj = ProjectItemizer.objects.get(itemizer_id=request.POST['itemizer'])
+                    obj.delete()
+                    kwargs['status'] = True
+                else:
+                    kwargs['status'] = False
+                    kwargs['raise'] = 'Existén documentos enlazados a esté item,'\
+                        ' cambielos o anule las ordenes, STATUS = 1 | {0}'.format(serv.count())
         except Exception as e:
             kwargs['raise'] = str(e)
             kwargs['status'] = False
