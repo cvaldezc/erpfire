@@ -99,11 +99,11 @@
     <div class="card" id="card">
         <div class="card-action">
             {% if dsector.status == 'PE' %}
-                <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect" ng-click="gui.smat=!gui.smat" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134'">
+                <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect" ng-click="gui.smat=!gui.smat" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '71744452'">
                     <i class="fa fa-plus"></i>
                     <span class="hide-on-med-and-down">Agregar</span>
                 </button>
-                <button type="button" class="btn waves waves-effect amber accent-2 grey-text text-darken-3 modal" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134'" data-target="mdplane">
+                <button type="button" class="btn waves waves-effect amber accent-2 grey-text text-darken-3 modal" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '71744452'" data-target="mdplane">
                     <i class="fa fa-file-pdf-o"></i>
                     <span class="hide-on-med-and-down">Plano Detalle</span>
                 </button>
@@ -127,7 +127,7 @@
                 {% endif %}
             {% endif %}
             {% if dsector.status == 'AC' %}
-                <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect" ng-model="btnmodify" ng-init="btnmodify={% if modify|length > 0 %} true {% else %} false {% endif %}" ng-click="showModify()" ng-show="(perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones') && !btnmodify">
+                <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect" ng-model="btnmodify" ng-init="btnmodify={% if modify|length > 0 %} true {% else %} false {% endif %}" ng-click="showModify()" ng-show="(perarea == 'administrator' || perarea == 'ventas' || perdni == '71744452' || percharge == 'jefe de almacen' || perarea == 'operaciones') && !btnmodify">
                     <i class="fa fa-pencil"></i>
                     <span class="hide-on-med-and-down"> Modificar Área</span>
                 </button>
@@ -142,11 +142,11 @@
                 {% endif %}
             {% endif %}
             {% if modify|length > 0 %}
-                <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect" ng-click="gui.smat=!gui.smat" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
+                <button type="button" class="btn amber accent-2 grey-text text-darken-3 waves-effect" ng-click="gui.smat=!gui.smat" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '71744452' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
                     <i class="fa fa-plus"></i>
                     <span class="hide-on-med-and-down">Agregar</span>
                 </button>
-                <button type="button" class="btn red lighten-1 grey-text text-darken-3 waves-effect" ng-click="delAllModifyArea($event)" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
+                <button type="button" class="btn red lighten-1 grey-text text-darken-3 waves-effect" ng-click="delAllModifyArea($event)" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '71744452' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
                     <!--<i class="fa fa-fire"></i>-->
                     <i class="fa fa-trash"></i>
                     <span class="hide-on-med-and-down"> Eliminar Modificación</span>
@@ -452,7 +452,7 @@
                     </div>
                 </div>
                 {% verbatim %}
-                <ul class="collapsible popout" data-collapsible="expandable" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
+                <ul class="collapsible popout" data-collapsible="expandable" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '71744452' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
                     <li ng-class="{'active': mmview}">
                         <div ng-class="{'active': mmview}" class="collapsible-header light-green-text">
                             <i class="fa fa-plus"></i> Nuevos
@@ -793,7 +793,7 @@
                 </table>
                 <br>
                 <br>
-                <div class="fixed-action-btn horizontal" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '46377134' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
+                <div class="fixed-action-btn horizontal" ng-show="perarea == 'administrator' || perarea == 'ventas' || perdni == '71744452' || percharge == 'jefe de almacen' || perarea == 'operaciones'">
                     <a class="btn-floating btn-large red">
                         <i class="fa fa-wrench"></i>
                     </a>

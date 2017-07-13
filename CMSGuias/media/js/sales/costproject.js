@@ -29,6 +29,7 @@ var ControllerServiceProject = (function () {
     function ControllerServiceProject(proxy) {
         this.proxy = proxy;
         this.assignament = 0;
+        this.spent = 0;
         console.log("hi! hello world!!!");
         angular.element('.modal').modal();
         this.getItemizer();
@@ -40,6 +41,9 @@ var ControllerServiceProject = (function () {
             if (response['data']['status']) {
                 _this.itemizers = response['data']['itemizers'];
                 angular.element('.toast-remove').remove();
+                _this.assignament = 0;
+                _this.spent = 0;
+                _this.calcAmounts();
             }
             else {
                 angular.element('.toast-remove').remove();
@@ -71,6 +75,54 @@ var ControllerServiceProject = (function () {
             }
             else {
                 Materialize.toast('${response["raise"]}', 6600);
+            }
+        });
+    };
+    ControllerServiceProject.prototype.calcAmounts = function () {
+        // import itemizers
+        for (var key in this.itemizers) {
+            if (this.itemizers.hasOwnProperty(key)) {
+                var element = this.itemizers[key];
+                var sum = 0;
+                for (var dt in element['services']) {
+                    if (element['services'].hasOwnProperty(dt)) {
+                        var services = element['services'][dt];
+                        var dsct = (this.itemizers[key]['services'][dt].amounts * (this.itemizers[key]['services'][dt].fields.dsct / 100));
+                        dsct = (this.itemizers[key]['services'][dt].amounts - dsct);
+                        var igv = ((this.itemizers[key]['services'][dt].fields.sigv ? this.itemizers[key]['services'][dt].configure.fields.igv : 0) / 100);
+                        igv = (igv > 0) ? (dsct * (igv)) : 0;
+                        var total = ((dsct) + (igv));
+                        total = ((this.itemizers[key]['services'][dt].fields.currency.pk == this.itemizers[key]['services'][dt].configure.fields.moneda.pk) ? total : (total / this.itemizers[key]['services'][dt]['exchange']));
+                        this.itemizers[key]['services'][dt]['total'] = total;
+                        sum += (total);
+                    }
+                }
+                this.itemizers[key]['sum'] = sum;
+                this.spent += sum;
+            }
+        }
+    };
+    ControllerServiceProject.prototype.showEdit = function (item) {
+        this.itemizer = {
+            name: item['fields']['name'],
+            purchase: parseFloat(item['fields']['purchase']),
+            sales: parseFloat(item['fields']['sales']),
+            itemizer: item['pk']
+        };
+        angular.element('#mitemizer').modal('open');
+    };
+    ControllerServiceProject.prototype.delItem = function (item) {
+        swal({
+            title: "Realmente desea eliminar el item " + item['fields']['name'] + "?",
+            text: 'Nota: El item no se eliminara si tiene ordenes asociadas.',
+            showCancelButton: true,
+            confirmButtonText: 'Si! eliminar',
+            cancelButtonText: 'No',
+            confirmButtonColor: '#fe6969',
+            closeOnConfirm: true,
+            closeOnCancel: true
+        }, function (isConfirm) {
+            if (isConfirm) {
             }
         });
     };

@@ -55,15 +55,18 @@
     <div class="col s12 m6 l6">
       <ul class="collapsible" data-collapsible="accordion">
         <li ng-repeat="x in vm.itemizers">
-          <div class="collapsible-header light-green lighten-4">
-            <i class="fa fa-tag"></i>
-            <span><strong>{{x.fields.name}}</strong></span>
+          <div class="collapsible-header lighten-4" ng-class="{'red': x.sum > x.fields.purchase, 'light-green': x.sum <= x.fields.purchase}">
+            <i class="fa" ng-class="{'fa-frown-o': x.sum > x.fields.purchase, 'fa-smile-o': x.sum <= x.fields.purchase}"></i>
+            <span><strong>
+              {{x.fields.name}}
+              <!-- <span class="fa" ng-class="{'fa-frown-o': x.sum > x.fields.purchase, 'fa-smile-o': x.sum <= x.fields.purchase}"></span> -->
+            </strong></span>
             <span class="badge" ng-show="(vm.area == 'ventas' || vm.area == 'administrator')">
-              <a href="#edit" class="light-blue-text text-16">
+              <a href="#edit" class="light-blue-text text-16" ng-click="vm.showEdit(x)">
                 <span class="fa fa-edit"></span>
                 &nbsp;
               </a>
-              <a href="#del" class="red-text text-16">
+              <a href="#del" class="red-text text-16" ng-click="vm.delItem(x)">
                 <span class="fa fa-trash"></span>
               </a>
             </span>
@@ -71,9 +74,12 @@
           <div class="collapsible-body">
             <div class="card-panel">
               <strong>Asignado</strong>
-              <strong>Compra:</strong> {{x.fields.purchase}} <strong>Venta:</strong> {{x.fields.sales}}
+              <strong>Compra:</strong> {{x.fields.purchase}}
+              <strong>Venta:</strong> {{x.fields.sales}}
+              <strong>Disponible:</strong> {{x.fields.purchase - x.sum | number:2}}
+              <i class="fa" ng-class="{'fa-level-down': x.sum > x.fields.purchase, 'fa-level-up': x.sum <= x.fields.purchase}"></i>
               <input type="hidden" ng-init="vm.assignament=(vm.assignament + (x.fields.purchase - 0))">
-              <input type="hidden" value="{{x['sum']=(0-0)}}">
+              <!-- <input type="hidden" value="{{x['sum']=(0-0)}}"> -->
               <!-- details by item-->
               <table class="table responsive-table highlight">
                 <tbody>
@@ -83,14 +89,18 @@
                       <small><strong>{{d.pk}}</strong></small></td>
                     <td><small>{{d.fields.supplier.fields.razonsocial}}</small></td>
                     <td class="right-align">
-                      <small><strong>
-                        {{
-                          total = ((d.amounts - ((d.fields.dsct/100) * d.amounts)) * (((d.fields.sigv?d.configure.fields.igv:0)/100)+1));
+                      <small>
+                        <strong>
+                          <!--
+                            total = ((d.amounts - ((d.fields.dsct/100) * d.amounts)) * (((d.fields.sigv?d.configure.fields.igv:0)/100)+1));
                           (d['total'] = (d.fields.currency.pk == d.configure.fields.moneda.pk) ? total : (total / d['exchange']));
                           (x['sum'] = (d['total'] + (x['sum'] - 0)));
-                          (d['total']) | number:2
+                          -->
+                        {{
+                          d['total'] | number:2
                         }}
-                      </strong></small>
+                        </strong>
+                      </small>
                     </td>
                     <td class="right-align">
                       <small>{{(d.fields.currency.pk == d.configure.fields.moneda.pk) ? d.fields.currency.fields.simbolo : d.fields.currency.fields.simbolo +' - ' + d.configure.fields.moneda.fields.simbolo }}</small></td>
@@ -105,22 +115,27 @@
     </div>
     <div class="col s12 m6 l6">
       <div class="card-panel">
-          <table class="table responsive-table">
+          <table class="table responsive-table highlight">
             <tbody>
               <tr>
                 <th><h5>Asignado</h5></th>
-                <td class="right-align"><h5>{{vm.assignament | number:2}}</h5></td>
+                <td class="right-align"><h5>{{ vm.assignament | number:2 }}</h5></td>
               </tr>
               <tr>
                 <th><h5>Gastado</h5></th>
-                <th class="right-align"><h5></h5></th>
+                <th class="right-align"><h5>{{ vm.spent | number:2 }}</h5></th>
               </tr>
               <tr>
                 <td colspan="2"><div class="divider"></div></td>
               </tr>
-              <tr>
-                <th><h5>Total</h5></th>
-                <td class="right-align"><h5></h5></td>
+              <tr ng-class="{'light-green lighten-4': vm.amount > 0, 'red': vm.amount <= 0 }">
+                <th><h5><strong>TOTAL</strong></h5></th>
+                <td class="right-align">
+                  <h5>
+                    <i class="fa" ng-class="{'fa-thumbs-up': vm.amount > 0, 'fa-thumbs-down': vm.amount <= 0 }"></i>
+                    &nbsp; {{vm.amount = (vm.assignament - vm.spent) | number: 2 }}
+                  </h5>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -140,7 +155,7 @@
           <label for="itemname">Nombre</label>
         </div>
         <div class="input-field">
-          <input type="number" class="right-align" name="itempurchase" step="0.10" min="0" ng-model="vm.itemizer.purchase" ng-init="vm.itemizer.purchase=0" ng-change="vm.setItemizerSalesAmount()">
+          <input type="number" class="right-align" name="itempurchase" step="0.10" min="0" ng-model="vm.itemizer.purchase" ng-change="vm.setItemizerSalesAmount()" ng-value="vm.itemizer.purchase">
           <label for="itempurchase">Valor de Compra</label>
         </div>
         <div class="input-field">
@@ -153,7 +168,7 @@
           <i class="fa fa-floppy-o"></i>
           <span class="hide-on-small-only"><small>Guardar</small></span>
         </button>
-        <button type="button" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+        <button type="button" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3" ng-click="vm.itemizer={}">
           <i class="fa fa-times"></i>
           <span class="hide-on-small-only"><small>Salir</small></span>
         </button>
