@@ -116,7 +116,7 @@
                         <td class="text-center item">{{ x.item|floatformat:"2" }}</td>
                         <td class="text-center cod">{{ x.materials }}</td>
                         <td>
-                            {{ x.name }} {% if x.comment|length %} - {{ x.comment }} {% endif %}
+                            {{ x.name }} {% if x.comment|length %} - {{ x.comment | safe }} {% endif %}
                         </td>
                         <td class="text-center">{{ x.unit }}</td>
                         <td class="text-center">{{ x.brand }}</td>
