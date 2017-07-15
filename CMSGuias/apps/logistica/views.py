@@ -863,7 +863,7 @@ class ListPurchase(JSONResponseMixin, TemplateView):
                             }
                             for x in Compra.objects.filter(
                                 flag=True,
-                                status=request.GET.get('status').order_by('-registrado'))
+                                status=request.GET.get('status')).order_by('-registrado')
                         ]
                     if 'dates' in request.GET:
                         if 'start' in request.GET and 'end' not in request.GET:

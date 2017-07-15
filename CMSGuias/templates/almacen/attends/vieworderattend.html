@@ -10,6 +10,8 @@
             Atender Pedido Nro {{ order.pedido_id }}
         </h3>
     </header>
+    <input type="hidden" id="ruc" value="{{ruc}}">
+    <input type="hidden" id="hreport" value="{{hreport}}">
     {% if order.status == 'IN' or order.status == 'AP' %}
     <input type="hidden" ng-model="init" ng-init="init=true">
     <div class="card-panel">
