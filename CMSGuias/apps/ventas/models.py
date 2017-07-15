@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 # encoding: utf-8
 from __future__ import unicode_literals
 import datetime
@@ -129,7 +129,7 @@ class CloseProject(models.Model):
     keyreopens = models.CharField(max_length=6, null=True)
     performedre = models.ForeignKey(Employee, related_name='reopen', null=True)
     datereopen = models.DateTimeField(null=True)
-    
+
     audit_log = AuditLog()
 
 
@@ -160,7 +160,7 @@ class Sectore(models.Model):
         primary_key=True, max_length=20, null=False, unique=True)
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproyecto = models.ForeignKey(
-                Subproyecto, to_field='subproyecto_id', null=True, blank=True)
+        Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     planoid = models.CharField(max_length=16, null=True, default='')
     nomsec = models.CharField(max_length=200)
     registrado = models.DateTimeField(auto_now_add=True)
@@ -195,7 +195,7 @@ class Sectore(models.Model):
     def stadistics(self):
         context = dict()
         obj = operations.models.MetProject.objects.filter(
-                proyecto_id=self.proyecto_id, sector_id=self.sector_id)
+            proyecto_id=self.proyecto_id, sector_id=self.sector_id)
         context['total'] = obj.count()
         context['attend'] = obj.filter(tag='2').count()
         context['semi'] = obj.filter(tag='1').count()
@@ -204,30 +204,32 @@ class Sectore(models.Model):
 
 
 class SectorFiles(models.Model):
+
     def url(self, filename):
         ext = filename.split('.')[-1]
         date = datetime.datetime.today().strftime('%Y%m%d-%H%M%S')
         if self.dsector is None:
             if self.subproyecto is None:
                 ruta = 'storage/projects/%s/%s/%s/%s.%s' % (
-                        self.proyecto.registrado.strftime('%Y'),
-                        self.proyecto_id,
-                        self.sector_id,
-                        date, ext)
+                    self.proyecto.registrado.strftime('%Y'),
+                    self.proyecto_id,
+                    self.sector_id,
+                    date, ext)
             else:
                 ruta = 'storage/projects/%s/%s/%s/%s/%s.%s' % (
-                        self.proyecto.registrado.strftime('%Y'),
-                        self.proyecto_id,
-                        self.subproyecto_id,
-                        self.sector_id,
-                        date, ext)
+                    self.proyecto.registrado.strftime('%Y'),
+                    self.proyecto_id,
+                    self.subproyecto_id,
+                    self.sector_id,
+                    date, ext)
         else:
             ruta = 'storage/projects/%s/%s/%s/%s/%s.%s' % (
-                        self.proyecto.registrado.strftime('%Y'),
-                        self.proyecto_id,
-                        self.sector_id,
-                        self.dsector_id,
-                        date, ext)
+                self.proyecto.registrado.strftime('%Y'),
+                self.proyecto_id,
+                self.sector_id,
+                self.dsector_id,
+                date,
+                ext)
         return ruta
 
     sector = models.ForeignKey(Sectore, to_field='sector_id')
@@ -249,7 +251,7 @@ class SectorFiles(models.Model):
 class Metradoventa(models.Model):
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproyecto = models.ForeignKey(
-                Subproyecto, to_field='subproyecto_id', null=True, blank=True)
+        Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     sector = models.ForeignKey(Sectore, to_field='sector_id')
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     brand = models.ForeignKey(Brand, to_field='brand_id', default='BR000')
@@ -271,9 +273,9 @@ class Metradoventa(models.Model):
 class Alertasproyecto(models.Model):
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproyecto = models.ForeignKey(
-                Subproyecto, to_field='subproyecto_id', null=True, blank=True)
+        Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     sector = models.ForeignKey(
-                Sectore, to_field='sector_id', null=True, blank=True)
+        Sectore, to_field='sector_id', null=True, blank=True)
     registrado = models.DateTimeField(auto_now_add=True)
     empdni = models.ForeignKey(Employee, to_field='empdni_id')
     charge = models.ForeignKey(Cargo, to_field='cargo_id')
@@ -286,11 +288,11 @@ class Alertasproyecto(models.Model):
 
     def __unicode__(self):
         return '%s %s %s %s %s' % (
-                                    self.proyecto,
-                                    self.sector,
-                                    self.charge,
-                                    self.message,
-                                    self.registrado)
+            self.proyecto,
+            self.sector,
+            self.charge,
+            self.message,
+            self.registrado)
 
 
 class HistoryMetProject(models.Model):
@@ -298,17 +300,17 @@ class HistoryMetProject(models.Model):
     token = models.CharField(max_length=6, default=globalVariable.get_Token())
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id', default='')
     subproyecto = models.ForeignKey(
-                Subproyecto, to_field='subproyecto_id', null=True, blank=True)
+        Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     sector = models.ForeignKey(Sectore, to_field='sector_id')
     materials = models.ForeignKey(
-                    Materiale, to_field='materiales_id', default='')
+        Materiale, to_field='materiales_id', default='')
     brand = models.ForeignKey(Brand, to_field='brand_id', default='BR000')
     model = models.ForeignKey(Model, to_field='model_id', default='MO000')
     quantity = models.FloatField()
     price = models.FloatField()
     sales = models.DecimalField(max_digits=9, decimal_places=3, default=0)
     comment = models.CharField(
-                max_length=250, default='', null=True, blank=True)
+        max_length=250, default='', null=True, blank=True)
     quantityorders = models.FloatField(default=0)
     tag = models.CharField(max_length=1, default='0')
     flag = models.BooleanField(default=True)
@@ -318,11 +320,11 @@ class HistoryMetProject(models.Model):
 
     def __unicode__(self):
         return '%s %s %s %f %f' % (
-                                    self.proyecto,
-                                    self.sector,
-                                    self.materials_id,
-                                    self.quantity,
-                                    self.price)
+            self.proyecto,
+            self.sector,
+            self.materials_id,
+            self.quantity,
+            self.price)
 
 
 class RestoreStorage(models.Model):
@@ -330,16 +332,16 @@ class RestoreStorage(models.Model):
     token = models.CharField(max_length=6, default=globalVariable.get_Token())
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id', default='')
     subproyecto = models.ForeignKey(
-                Subproyecto, to_field='subproyecto_id', null=True, blank=True)
+        Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     sector = models.ForeignKey(Sectore, to_field='sector_id')
     materials = models.ForeignKey(
-                    Materiale, to_field='materiales_id', default='')
+        Materiale, to_field='materiales_id', default='')
     brand = models.ForeignKey(Brand, to_field='brand_id', default='BR000')
     model = models.ForeignKey(Model, to_field='model_id', default='MO000')
     quantity = models.FloatField()
     price = models.FloatField()
     sales = models.DecimalField(
-            max_digits=9, decimal_places=3, default=0, null=True, blank=True)
+        max_digits=9, decimal_places=3, default=0, null=True, blank=True)
     tag = models.CharField(max_length=1, default='0')
     flag = models.BooleanField(default=True)
 
@@ -348,28 +350,28 @@ class RestoreStorage(models.Model):
 
     def __unicode__(self):
         return '%s %s %s %f %f' % (
-                    self.proyecto,
-                    self.sector,
-                    self.materials_id,
-                    self.quantity,
-                    self.price)
+            self.proyecto,
+            self.sector,
+            self.materials_id,
+            self.quantity,
+            self.price)
 
 
 class UpdateMetProject(models.Model):
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id', default='')
     subproyecto = models.ForeignKey(
-                Subproyecto, to_field='subproyecto_id', null=True, blank=True)
+        Subproyecto, to_field='subproyecto_id', null=True, blank=True)
     sector = models.ForeignKey(Sectore, to_field='sector_id')
     materials = models.ForeignKey(
-                    Materiale, to_field='materiales_id', default='')
+        Materiale, to_field='materiales_id', default='')
     brand = models.ForeignKey(Brand, to_field='brand_id', default='BR000')
     model = models.ForeignKey(Model, to_field='model_id', default='MO000')
     quantity = models.FloatField()
     price = models.FloatField()
     sales = models.DecimalField(
-                max_digits=9, decimal_places=3, default=0, blank=True)
+        max_digits=9, decimal_places=3, default=0, blank=True)
     comment = models.CharField(
-                max_length=250, default='', null=True, blank=True)
+        max_length=250, default='', null=True, blank=True)
     quantityorders = models.FloatField(default=0, blank=True)
     tag = models.CharField(max_length=1, default='0')
     flag = models.BooleanField(default=True)
@@ -385,11 +387,11 @@ class UpdateMetProject(models.Model):
 
     def __unicode__(self):
         return '%s %s %s %f %f' % (
-                                    self.proyecto,
-                                    self.sector,
-                                    self.materials_id,
-                                    self.quantity,
-                                    self.price)
+            self.proyecto,
+            self.sector,
+            self.materials_id,
+            self.quantity,
+            self.price)
 
 
 class PurchaseOrder(models.Model):
@@ -413,7 +415,7 @@ class PurchaseOrder(models.Model):
     dsct = models.FloatField(default=0, blank=True)
     igv = models.FloatField(default=0, blank=True)
     order = models.FileField(
-            upload_to=url, null=True, blank=True, max_length=200)
+        upload_to=url, null=True, blank=True, max_length=200)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -455,7 +457,33 @@ class Painting(models.Model):
         ordering = ['-project']
 
     def __unicode__(self):
-        return 'unicode(%s) %s %d %d' % (self.project,
-                                self.register,
-                                self.nfilmb,
-                                self.nfilmc)
+        return 'unicode(%s) %s %d %d' % (
+            self.project,
+            self.register,
+            self.nfilmb,
+            self.nfilmc)
+
+
+# 2017-07-10 12:24:48
+# @cvaldezch - add model class Project Itemizer
+class ProjectItemizer(models.Model):
+    '''
+    model for storage items from the services
+    '''
+    itemizer_id = models.CharField(max_length=12, default='PRAA000IT000', primary_key=True)
+    project = models.ForeignKey(Proyecto, related_name='projectasitemizer')
+    name = models.CharField(max_length=255)
+    register = models.DateTimeField(auto_now_add=True)
+    purchase = models.DecimalField(max_digits=12, decimal_places=3, default=0)
+    sales = models.DecimalField(max_digits=12, decimal_places=3, default=0)
+    tag = models.BooleanField(default=True)
+
+    audit_log = AuditLog()
+
+    class Meta:
+        ordering = ['-register']
+
+    def __unicode__(self):
+        return '{0} {1} {2} {3} {4}'.format(
+            self.itemizer_id, self.project, self.name, self.register, self.purchase)
+#endblock

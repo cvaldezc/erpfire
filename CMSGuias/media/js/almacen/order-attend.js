@@ -155,7 +155,9 @@ controllers = function($scope, $timeout, $q, attendFactory) {
   $scope.nroguide = '';
   $scope.indexguide = new Array();
   angular.element(document).ready(function() {
-    angular.element(".modal").modal();
+    angular.element(".modal").modal()({
+      dismissible: false
+    });
     if ($scope.init === true) {
       angular.element(".datepicker").pickadate({
         container: 'body',
@@ -628,7 +630,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
           if (x.guide === 0) {
             continue;
           } else {
-            promises.push((x.meter * x.guide) / 100);
+            promises.push(parseFloat(parseFloat((x.meter * x.guide) / 100).toFixed(3)));
           }
         }
         $q.all(promises).then(function(result) {
@@ -868,8 +870,10 @@ controllers = function($scope, $timeout, $q, attendFactory) {
     });
   };
   $scope.showPrint = function(type) {
-    var url, win;
-    url = "/reports/guidereferral/" + $scope.nroguide + "/" + type + "/";
+    var hreport, ruc, url, win;
+    hreport = angular.element("#hreport").val();
+    ruc = angular.element("#ruc").val();
+    url = hreport + "guide/remission/materials?idguide=" + $scope.nroguide + "&ruc=" + ruc;
     win = window.open(url, '_blank');
     win.focus();
   };

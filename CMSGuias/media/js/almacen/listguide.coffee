@@ -9,7 +9,9 @@ $(document).ready ->
     return
   $('.btn-gv').click (event) ->
     event.preventDefault()
-    url = "/reports/guidereferral/#{this.value}/#{this.name}/"
+    host = $("#hreport").val()
+    ruc = $("#ruc").val()
+    url = "#{host}guide/remission/materials?idguide=#{this.value}&ruc#{ruc}"
     window.open url, '_blank'
     return
   $('input[name=search]').change ->
@@ -41,7 +43,25 @@ $(document).ready ->
       $.getJSON '', data, (response) ->
         if response.status
           $tb = $('tbody')
-          temp = """<tr class='success tr{{guia_id}}'><td class='text-center'>{{item}}</td><td class='text-center'>{{guia_id}}</td><td>{{nompro}}</td><td>{{traslado}}</td><td>{{connom}}</td><td class='text-center'><button class='btn btn-link btn-sm text-black btn-show-gv' onClick='view(this);' value='{{guia_id}}'><span class='glyphicon glyphicon-paperclip'></span></button></td><td class="text-center"><a class="btn btn-link btn-sm text-black" href="/almacen/guide/edit/{{guia_id}}/"><i class="fa fa-pencil"></i></a></td><td class='text-center'><button class='btn btn-link btn-sm text-black'  onclick='show_annular(this);' value='{{guia_id}}'><span class='glyphicon glyphicon-fire'></span></button></td></tr>"""
+          temp = """<tr class='success tr{{guia_id}}'>
+          <td class='text-center'>{{item}}</td>
+          <td class='text-center'>{{guia_id}}</td>
+          <td>{{nompro}}</td>
+          <td>{{traslado}}</td>
+          <td>{{connom}}</td>
+          <td class='text-center'>
+            <button class='btn btn-link btn-sm text-black btn-show-gv' onClick='view(this);' value='{{guia_id}}'>
+              <span class='glyphicon glyphicon-paperclip'></span>
+            </button></td><td class="text-center">
+            <a class="btn btn-link btn-sm text-black" href="/almacen/guide/edit/{{guia_id}}/">
+              <i class="fa fa-pencil"></i>
+            </a>
+          </td>
+          <td class='text-center'>
+            <button class='btn btn-link btn-sm text-black'  onclick='show_annular(this);' value='{{guia_id}}'>
+              <span class='glyphicon glyphicon-fire'></span>
+            </button>
+          </td></tr>"""
           $tb.empty()
           for i of response.list
             $tb.append Mustache.render(temp, response.list[i])

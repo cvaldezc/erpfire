@@ -2724,61 +2724,119 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        context = dict()
         try:
-            context['pro'] = Proyecto.objects.get(
-                            proyecto_id=kwargs['pro'])
-            if context['pro'].status != 'AC' and context['project'].status != 'PE':
+            if request.is_ajax():
+                try:
+                    if 'itemizer' in request.GET:
+                        kwargs['itemizers'] = json.loads(
+                            serializers.serialize(
+                                'json',
+                                ProjectItemizer.objects.filter(
+                                    project_id=kwargs['pro']).order_by('name')))
+                        for x in kwargs['itemizers']:
+                            documents = ServiceOrder.objects.filter(
+                                project_id=kwargs['pro'],
+                                itemizer_id=x['pk'])
+                            x['services'] = json.loads(serializers.serialize(
+                                'json', documents, relations=('supplier', 'currency')))
+                            for dx in x['services']:
+                                order = DetailsServiceOrder.objects.filter(serviceorder_id=dx['pk'])
+                                dx['configure'] = json.loads(serializers.serialize(
+                                    'json',
+                                    [Configuracion.objects.get(
+                                        periodo=order[0].serviceorder.register.strftime('%Y'))], relations=('moneda')))[0]
+                                dx['exchange'] = order[0].serviceorder.project.exchange
+                                dx['amounts'] = sum([(od.quantity * float(od.price)) for od in order])
+                        kwargs['status'] = True
+                except Exception as oex:
+                    kwargs['raise'] = str(oex)
+                    kwargs['status'] = False
+                return self.render_to_json_response(kwargs)
+            kwargs['pro'] = Proyecto.objects.get(proyecto_id=kwargs['pro'])
+            if kwargs['pro'].status != 'AC' and kwargs['project'].status != 'PE':
                 return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
-            svc = ServiceOrder.objects.filter(project_id=kwargs['pro'])
-            dsvc = DetailsServiceOrder.objects.filter(
-                serviceorder_id__in=[x.serviceorder_id for x in svc])
-            lst = list()
-            for x in svc.order_by('-register'):
-                am = dsvc.filter(
-                        serviceorder_id=x.serviceorder_id
-                        ).aggregate(amount=Sum(
-                            'quantity', field='quantity*price'))['amount']
-                cs = ''
-                if x.currency_id == 'CU02':
-                    am = (am/x.project.exchange)
-                    cs = ' - USD'
-                conf = Configuracion.objects.get(
-                        periodo=x.register.strftime('%Y'))
-                dst = (((x.dsct*am)/100)+am)
-                if x.sigv:
-                    am = (((conf.igv*dst)/100)+dst)
-                else:
-                    am = dst
-                lst.append({
-                    'id': x.serviceorder_id,
-                    'supplier': x.supplier.razonsocial,
-                    'register': x.register.strftime('%d-%m-%Y'),
-                    'symbol': '%s%s' % (x.currency.simbolo, cs),
-                    'amount': am})
-                am = None
-            context['services'] = lst
-            context['total'] = sum([x['amount'] for x in lst])
-            if context['total'] is None:
-                context['total'] = 0
-            context['diff'] = (
-                float(context['pro'].aservices) - context['total'])
-            return render(request, 'sales/servicesproject.html', context)
+            # svc = ServiceOrder.objects.filter(project_id=kwargs['pro'])
+            # dsvc = DetailsServiceOrder.objects.filter(
+            #     serviceorder_id__in=[x.serviceorder_id for x in svc])
+            # lst = list()
+            # for x in svc.order_by('-register'):
+            #     am = dsvc.filter(
+            #         serviceorder_id=x.serviceorder_id).aggregate(amount=Sum(
+            #             'quantity', field='quantity*price'))['amount']
+            #     cs = ''
+            #     if x.currency_id == 'CU02':
+            #         am = (am / x.project.exchange)
+            #         cs = ' - USD'
+            #     conf = Configuracion.objects.get(periodo=x.register.strftime('%Y'))
+            #     dst = (((x.dsct * am) / 100) + am)
+            #     if x.sigv:
+            #         am = (((conf.igv * dst) / 100) + dst)
+            #     else:
+            #         am = dst
+            #     lst.append({
+            #         'id': x.serviceorder_id,
+            #         'supplier': x.supplier.razonsocial,
+            #         'register': x.register.strftime('%d-%m-%Y'),
+            #         'symbol': '%s%s' % (x.currency.simbolo, cs),
+            #         'amount': am})
+            #     am = None
+            # kwargs['services'] = lst
+            # kwargs['total'] = sum([x['amount'] for x in lst])
+            # if kwargs['total'] is None:
+            #     kwargs['total'] = 0
+            # kwargs['diff'] = (float(kwargs['pro'].aservices) - kwargs['total'])
+            return render(request, 'sales/servicesproject.html', kwargs)
         except TemplateDoesNotExist, e:
             print e
             raise Http404(e)
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
-        # context = dict()
         try:
+            if 'saveitemizer' in request.POST:
+                def saveItemizer(obj, params={}):
+                    try:
+                        if obj is None:
+                            oit = ProjectItemizer()
+                            oit.itemizer_id = genkeys.GenerateIDItemizerProject(kwargs['pro'])
+                        else:
+                            oit = obj
+                        oit.project_id = kwargs['pro']
+                        oit.name = str(params['name']).upper()
+                        oit.purchase = params['purchase']
+                        oit.sales = params['sales']
+                        oit.save()
+                        return True
+                    except ObjectDoesNotExist as oex:
+                        kwargs['raise'] = str(oex)
+                        return False
+                # save itemizer
+                status = False
+                if 'itemizer' in request.POST:
+                    obj = ProjectItemizer.objects.get(itemizer_id=request.POST['itemizer'])
+                    status = saveItemizer(obj, request.POST)
+                else:
+                    status = saveItemizer(None, request.POST)
+                kwargs['status'] = status
             if 'saservices' in request.POST:
                 p = Proyecto.objects.get(proyecto_id=kwargs['pro'])
                 p.aservices = request.POST['aservices']
                 p.save()
                 return redirect('servicesp_view', pro=kwargs['pro'])
-        except ObjectDoesNotExist, e:
-            raise e
+            if 'delitemizer' in request.POST:
+                serv = ServiceOrder.objects.filter(itemizer_id=request.POST['itemizer'])
+                if serv.count() == 0:
+                    obj = ProjectItemizer.objects.get(itemizer_id=request.POST['itemizer'])
+                    obj.delete()
+                    kwargs['status'] = True
+                else:
+                    kwargs['status'] = False
+                    kwargs['raise'] = 'Existén documentos enlazados a esté item,'\
+                        ' cambielos o anule las ordenes, STATUS = 1 | {0}'.format(serv.count())
+        except Exception as e:
+            kwargs['raise'] = str(e)
+            kwargs['status'] = False
+        return self.render_to_json_response(kwargs)
 
 
 # Configuration Painting for Project

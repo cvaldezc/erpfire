@@ -10,7 +10,7 @@ from CMSGuias.apps.almacen.models import (
     Pedido, GuiaRemision, Suministro, NoteIngress, Restoration, devolucionHerra,
     GrupoPedido)
 from CMSGuias.apps.logistica.models import Cotizacion, Compra, ServiceOrder
-from CMSGuias.apps.ventas.models import Proyecto
+from CMSGuias.apps.ventas.models import Proyecto, ProjectItemizer
 from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado, Rubro
 from CMSGuias.apps.operations.models import (
     Deductive, Letter, PreOrders, SGroup, DSector)
@@ -723,3 +723,22 @@ def GenerateIdGrupoPedido():
     except ObjectDoesNotExist, e:
         raise e
     return id
+
+# 2017-07-10 12:24:48
+# @cvaldezch - add generate for itemizer
+def GenerateIDItemizerProject(pro):
+    '''
+    generate max item for each project
+    '''
+    number = ''
+    counter = 1
+    try:
+        code = ProjectItemizer.objects.filter(project_id=pro).latest('register')
+        print code
+        if code is not None:
+            counter = (int(code.itemizer_id[9:]) + 1)
+    except ObjectDoesNotExist as oex:
+        counter = 1
+    number = u'{0}{1:0>3d}'.format(pro, counter)
+    return number
+# endblock

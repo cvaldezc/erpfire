@@ -1,7 +1,7 @@
 {
   "name": "erpfire",
-  "version": "4.5.11",
-  "homepage": "https://github.com/cvaldezc/CMSGuias",
+  "version": "4.5.15",
+  "homepage": "https://github.com/cvaldezc/erpfire",
   "description": "Libraries",
   "main": "bower.js",
   "moduleType": [

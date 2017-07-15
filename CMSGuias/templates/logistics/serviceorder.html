@@ -41,6 +41,7 @@
                                 <div class="form-group">
                                     <label class="control-label">Proyecto</label>
                                     <select name="project" id="" class="chosen-select form-control input-sm">
+                                        <option value="">--ninguno--</option>
                                         {% for x in project %}
                                             <option value="{{ x.proyecto_id }}">{{ x.nompro }}</option>
                                         {% endfor %}
@@ -142,12 +143,17 @@
                                     <input type="file" name="deposit" class="form-control" accept="application/pdf">
                                 </div>
                             </div>
+                            <!-- @cvaldezch 2017-07-11 10:18:44 - change -->
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="category" class="control-label">Categoria</label>
-                                    <input type="text" id="category" class="form-control" placeholder="e.g #TODO #TRANSPORTE #ALQUILER">
+                                    <label for="category" class="control-label">Servicio de Proyecto</label>
+                                    <select name="itemizer" id="itemizer" class="chosen-select form-control input-sm">
+                                        <opiton value="">--ninguno--</opiton>
+                                    </select>
+                                    <!--<input type="text" id="category" class="form-control" placeholder="e.g #TODO #TRANSPORTE #ALQUILER">-->
                                 </div>
                             </div>
+                            <!-- endblock -->
                             <div class="col-md-1">
                                 <div class="form-group">
                                     <label for="sigv" class="control-label">Incluir IGV</label>

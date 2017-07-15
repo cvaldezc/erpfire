@@ -1097,6 +1097,7 @@ def view_generate_document_out(request, oid):
             orders = get_object_or_404(Pedido, flag=True, pedido_id__exact=oid)
             trans = get_list_or_404(Transportista.objects.values(
                 'traruc_id', 'tranom'), flag=True)
+            print request.session['company']
             ctx = {'oid': oid, 'trans': trans, 'orders': orders}
             return render_to_response(
                 'almacen/documentout.html',
@@ -1258,7 +1259,13 @@ def view_list_guide_referral_success(request):
             lst = GuiaRemision.objects.filter(
                     status='GE',
                     flag=True).order_by('-registrado')[:10]
-            ctx = {'guide': lst}
+            # print request.session['company']
+            ctx = {
+                'guide': lst,
+                'ruc': request.session['company']['ruc'],
+                'hreport': SettingsApp.objects.get(id=1).serverreport
+                }
+            # print ctx
             return render_to_response(
                 'almacen/listguide.html',
                 ctx,
@@ -1426,7 +1433,11 @@ def view_list_guide_referral_canceled(request):
                     mimetype='application/json')
             lst = GuiaRemision.objects.filter(
                 status='AN', flag=False).order_by('-guia_id')[:10]
-            ctx = {'guide': lst}
+            ctx = {
+                'guide': lst,
+                'ruc': request.session['company']['ruc'],
+                'hreport': SettingsApp.objects.get(flag=True).serverreport
+                }
             return render_to_response(
                 'almacen/listguidecanceled.html',
                 ctx,
@@ -2875,6 +2886,8 @@ class AttendOrder(JSONResponseMixin, TemplateView):
                 return self.render_to_json_response(context)
             else:
                 context['order'] = Pedido.objects.get(pedido_id=kwargs['order'])
+                context['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+                context['ruc'] = request.session['company']['ruc']
                 # guide = GuiaRemision.objects.get(guia_id='001-10019104')
                 # print guide.pedido.proyecto.empdni.email
                 # print guide.pedido.empdni.email

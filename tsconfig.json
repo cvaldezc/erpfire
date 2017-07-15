@@ -2,23 +2,32 @@
     "sourceMap": false,
     "compileOnSave": true,
     "compilerOptions": {
-        "target": "es5",
+        // "skipLibCheck": true,
+        "moduleResolution": "node",
+        "target": "es2015",
+        "lib": ["es5", "dom"],
         "module": "commonjs",
-        "noImplicitAny": false,
+        "removeComments": false,
+        "preserveConstEnums": false,
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noLib": true,
         "sourceMap": true,
         "watch": true,
         "types": [
             "angular",
-            "jquery",
-            "node",
+            "angular-cookies",
             "core-js",
+            "node",
+            "jquery",
             "materialize-css",
             "sweetalert"
-        ],
-        "typeRoots": [
-            // add path to @types
-            "node_modules/@types"
-         ]
+        ]
+        // "typeRoots": [
+        //     // add path to @types
+        //     "node_modules/@types/"
+        //  ]
     },
     "include": [ "CMSGuias/media/js/*" ],
     "exclude": [

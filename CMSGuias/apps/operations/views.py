@@ -1187,7 +1187,7 @@ class AreaProjectView(JSONResponseMixin, TemplateView):
                                     materials_id=obj.materials_id,
                                     brand_id=obj.brand_id,
                                     model_id=obj.model_id,
-                                    ppurchase=obj.purchase,
+                                    ppurchase=obj.ppurchase,
                                     psales=obj.psales,
                                     quantity=obj.quantity,
                                     qorder=obj.quantity,

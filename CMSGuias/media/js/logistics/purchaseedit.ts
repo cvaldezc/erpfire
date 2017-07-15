@@ -1,7 +1,7 @@
 'use strict'
-
 module Service {
-	export interface IProxy {
+
+	interface IProxy {
 		get: (uri: string, options: object) => ng.IHttpPromise<any>;
 
 		post: (url: string, options: object) => ng.IHttpPromise<any>;
@@ -10,7 +10,8 @@ module Service {
 	export class Proxy implements IProxy {
 
 		static $inject = ['$http', '$cookies'];
-		constructor(private $http: ng.IHttpService, private $cookies: ng.cookies.ICookiesService) {
+
+		constructor(private $http: ng.IHttpService, private $cookies: ng.cookies.ICookieStoreService) {
 			this.$http.defaults.headers.post['X-CSRFToken'] = $cookies['csrftoken'];
 			this.$http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 		}
@@ -33,7 +34,6 @@ module Service {
 			}
 			return form;
 		}
-
 	}
 }
 

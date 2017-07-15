@@ -32,7 +32,7 @@ from .models import (
     Compra, Cotizacion, CotCliente, CotKeys, DetCotizacion,
     DetCompra, tmpcotizacion, tmpcompra, ServiceOrder,
     DetailsServiceOrder)
-from CMSGuias.apps.ventas.models import Proyecto, Subproyecto
+from CMSGuias.apps.ventas.models import Proyecto, Subproyecto, ProjectItemizer
 from CMSGuias.apps.operations.models import MetProject
 from CMSGuias.apps.tools import genkeys, globalVariable, uploadFiles, search, number_to_char
 from .forms import (
@@ -863,7 +863,7 @@ class ListPurchase(JSONResponseMixin, TemplateView):
                             }
                             for x in Compra.objects.filter(
                                 flag=True,
-                                status=request.GET.get('status').order_by('-registrado'))
+                                status=request.GET.get('status')).order_by('-registrado')
                         ]
                     if 'dates' in request.GET:
                         if 'start' in request.GET and 'end' not in request.GET:
@@ -1872,30 +1872,34 @@ class ServiceOrders(JSONResponseMixin, TemplateView):
                     sub = Subproyecto.objects.filter(
                         proyecto_id=request.GET.get('pro'))
                     context['address'] = address.direccion
-                    context['subprojects'] = [{
-                        'id': x.subproyecto_id,
-                        'subproject': x.subproyecto}
+                    context['subprojects'] = [
+                        {
+                            'id': x.subproyecto_id,
+                            'subproject': x.subproyecto
+                        }
                         for x in sub]
                     context['status'] = True
-            except ObjectDoesNotExist, e:
-                context['raise'] = e.__str__()
+                if 'itemizer' in request.GET:
+                    context['itemizer'] = json.loads(serializers.serialize(
+                        'json',
+                        ProjectItemizer.objects.filter(project_id=request.GET['project']).order_by(
+                            'name')))
+                    context['status'] = True
+            except ObjectDoesNotExist as e:
+                context['raise'] = str(e)
                 context['status'] = False
             return self.render_to_json_response(context)
         else:
             try:
-                context['project'] = Proyecto.objects.filter(
-                    flag=True,
-                    status='AC')
+                context['project'] = Proyecto.objects.filter(flag=True, status='AC')
                 context['supplier'] = Proveedor.objects.filter(flag=True)
-                context['document'] = Documentos.objects.filter(
-                                        flag=True).order_by('documento')
-                context['method'] = FormaPago.objects.filter(
-                                        flag=True).order_by('pagos')
+                context['document'] = Documentos.objects.filter(flag=True).order_by('documento')
+                context['method'] = FormaPago.objects.filter(flag=True).order_by('pagos')
                 context['authorized'] = Employee.objects.filter(flag=True)
                 context['unit'] = Unidade.objects.filter(flag=True)
                 context['vigv'] = search.getIGVCurrent()
                 context['service'] = ServiceOrder.objects.filter(
-                                        flag=True).order_by('-serviceorder_id')
+                    flag=True).order_by('-serviceorder_id')
                 context['currency'] = Moneda.objects.filter(flag=True)
                 return render_to_response(
                     'logistics/serviceorder.html',
@@ -1921,8 +1925,7 @@ class ServiceOrders(JSONResponseMixin, TemplateView):
                                 x['quantity'] = request.POST.get('quantity')
                                 x['price'] = request.POST.get('price')
                                 x['amount'] = (float(request.POST.get(
-                                    'quantity')) * float(
-                                    request.POST.get('price')))
+                                    'quantity')) * float(request.POST.get('price')))
                                 break
                     else:
                         tmp.append({
@@ -1931,8 +1934,7 @@ class ServiceOrders(JSONResponseMixin, TemplateView):
                             'unit': request.POST.get('unit'),
                             'quantity': request.POST.get('quantity'),
                             'price': request.POST.get('price'),
-                            'amount': (float(request.POST.get(
-                                    'quantity')) * float(
+                            'amount': (float(request.POST.get('quantity')) * float(
                                 request.POST.get('price')))})
                     request.session['serorddet'] = tmp
                     context['list'] = request.session.get('serorddet')
@@ -1949,8 +1951,7 @@ class ServiceOrders(JSONResponseMixin, TemplateView):
                             x['quantity'] = request.POST.get('quantity')
                             x['price'] = request.POST.get('quantity')
                             x['amount'] = (float(request.POST.get(
-                                    'quantity')) * float(
-                                request.POST.get('price')))
+                                'quantity')) * float(request.POST.get('price')))
                 if 'del' in request.POST:
                     item = 1
                     tmp = request.session['serorddet']
@@ -1973,8 +1974,7 @@ class ServiceOrders(JSONResponseMixin, TemplateView):
                         add = form.save(commit=False)
                         service = genkeys.GenerateIdServiceOrder()
                         add.serviceorder_id = service
-                        add.elaborated_id = request.user.get_profile(
-                            ).empdni_id
+                        add.elaborated_id = request.user.get_profile().empdni_id
                         add.save()
                         # save details
                         for x in request.session['serorddet']:
@@ -2026,6 +2026,10 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                                 'json',
                                 Proyecto.objects.filter(
                                     flag=True).exclude(status='AN').order_by('-registrado')))
+                        kwargs['itemizers'] = json.loads(serializers.serialize(
+                            'json',
+                            ProjectItemizer.objects.filter(project_id=os.project_id)
+                        ))
                         kwargs['supplier'] = json.loads(
                             serializers.serialize(
                                 'json',
@@ -2050,6 +2054,12 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                                 'json', Unidade.objects.filter(flag=True)))
                         y = globalVariable.format_date_str(_date=os.register, format='%Y')
                         kwargs['vigv'] = search.getIGVCurrent(year=y)
+                        kwargs['status'] = True
+                    if 'itemizer' in request.GET:
+                        kwargs['itemizers'] = json.loads(serializers.serialize(
+                            'json',
+                            ProjectItemizer.objects.filter(
+                                project_id=request.GET['project']).order_by('name')))
                         kwargs['status'] = True
                 except ObjectDoesNotExist as e:
                     kwargs['raise'] = str(e)
@@ -2084,14 +2094,16 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                         # save updade and create new details
                         for x in details:
                             if x['model'] == 'add':
-                                DetailsServiceOrder.objects.create( serviceorder_id=kwargs['oservice'],
-                                                                    description=x['fields']['description'],
-                                                                    unit_id=x['fields']['unit'],
-                                                                    quantity=x['fields']['quantity'],
-                                                                    price=x['fields']['price'])
+                                DetailsServiceOrder.objects.create(
+                                    serviceorder_id=kwargs['oservice'],
+                                    description=x['fields']['description'],
+                                    unit_id=x['fields']['unit'],
+                                    quantity=x['fields']['quantity'],
+                                    price=x['fields']['price'])
                             else:
                                 try:
-                                    ds = DetailsServiceOrder.objects.get(serviceorder_id=kwargs['oservice'], pk=x['pk'])
+                                    ds = DetailsServiceOrder.objects.get(
+                                        serviceorder_id=kwargs['oservice'], pk=x['pk'])
                                     ds.description = x['fields']['description']
                                     ds.unit_id = x['fields']['unit']
                                     ds.quantity = x['fields']['quantity']
@@ -2105,7 +2117,8 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                         for x in dels:
                             if x['model'] != 'add':
                                 try:
-                                    dl = DetailsServiceOrder.objects.get(serviceorder_id=kwargs['oservice'], pk=x['pk'])
+                                    dl = DetailsServiceOrder.objects.get(
+                                        serviceorder_id=kwargs['oservice'], pk=x['pk'])
                                     dl.delete()
                                 except DetailsServiceOrder as ex:
                                     print ex
@@ -2126,7 +2139,7 @@ class EditServiceOrder(JSONResponseMixin, TemplateView):
                     so.authorized_id = s['authorized']
                     so.currency_id = s['currency']
                     so.sigv = s['sigv']
-                    so.tag = s['tag']
+                    so.itemizer_id = s['itemizer']
                     so.save()
                     kwargs['status'] = True
             except ObjectDoesNotExist as e:

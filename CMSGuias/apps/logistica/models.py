@@ -17,7 +17,7 @@ from CMSGuias.apps.home.models import (
     Brand,
     Model,
     Unidade)
-from CMSGuias.apps.ventas.models import Proyecto, Subproyecto
+from CMSGuias.apps.ventas.models import Proyecto, Subproyecto, ProjectItemizer
 from CMSGuias.apps.tools import globalVariable
 # from CMSGuias.apps.almacen.models import Suministro
 
@@ -260,7 +260,7 @@ class DetDevProveedor(models.Model):
 
 
 class ServiceOrder(models.Model):
-    def url(self, filename):
+    def url(self, filename=''):
         return 'storage/services/%s/%s-%s.pdf' % (
             globalVariable.get_year, self.serviceorder_id, self.supplier_id)
 
@@ -286,7 +286,8 @@ class ServiceOrder(models.Model):
     sigv = models.BooleanField(default=True, blank=True)
     status = models.CharField(max_length=2, default='PE')
     flag = models.BooleanField(default=True)
-    tag = models.CharField(max_length=80, default='#TODO')
+    itemizer = models.ForeignKey(
+        ProjectItemizer, related_name='itemizerasproject', null=True, blank=True)
 
     def __unicode__(self):
         return u'%s %s %s %s' % (
@@ -294,6 +295,9 @@ class ServiceOrder(models.Model):
 
 
 class DetailsServiceOrder(models.Model):
+    '''
+    model details service order
+    '''
     serviceorder = models.ForeignKey(ServiceOrder, to_field='serviceorder_id')
     description = models.TextField(null=False)
     unit = models.ForeignKey(Unidade, to_field='unidad_id')
@@ -302,7 +306,10 @@ class DetailsServiceOrder(models.Model):
 
     @property
     def amount(self):
-        return '%.3f' % (self.quantity * float(self.price))
+        '''
+        property for amount like quantity * price
+        '''
+        return '{0:.3f}'.format(self.quantity * float(self.price))
 
     def __unicode__(self):
         return u'%s %s %f' % (
@@ -310,7 +317,11 @@ class DetailsServiceOrder(models.Model):
             self.description,
             self.quantity)
 
+
 class DetailsServiceOrderAdmin(admin.ModelAdmin):
+    '''
+    Details Service Order Admin
+    '''
     list_display = ('serviceorder', 'description', 'unit', 'quantity', 'price', 'amount')
     search_fields = ['serviceorder__serviceorder_id', 'description',]
     actions_on_top = True

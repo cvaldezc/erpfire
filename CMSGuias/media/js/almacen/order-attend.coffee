@@ -89,7 +89,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
   angular.element(document).ready ->
     # console.log "angular load success!"
     angular.element(".modal").modal()
-    # 	dismissible: false
+      dismissible: false
     if $scope.init is true
       angular.element(".datepicker").pickadate
         container: 'body'
@@ -840,7 +840,9 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
     return
 
   $scope.showPrint = (type) ->
-    url = "/reports/guidereferral/#{$scope.nroguide}/#{type}/"
+    hreport = angular.element("#hreport").val()
+    ruc = angular.element("#ruc").val()
+    url = "#{hreport}guide/remission/materials?idguide=#{$scope.nroguide}&ruc=#{ruc}"
     win = window.open url, '_blank'
     win.focus()
     return

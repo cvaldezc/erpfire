@@ -17,100 +17,193 @@
     {% endif %}
 {% endblock menu %}
 {% block content %}
-<div>
-  <div class="card card-panel">
-    <div class="card-content">
-      <h4>
-        Servicios de Proyecto: {{ pro.nompro }}
-        <br>
-        <small>{{ pro.currency.moneda }}</small>
-      </h4>
-    </div>
-    {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-      <div class="card-action">
-        <button type="button" class="btn" data-target="mservices">
-          <i class="fa fa-usd"></i>
-          <span>Monto Servicios</span>
-        </button>
-      </div>
-    {% endif %}
-  </div>
+<section ng-app="app" ng-controller="controller as vm">
   <div class="row">
-    <div class="col l6">
-      <div class="card card-panel">
+    <div class="col s12 m12 l12">
+      <div class="card">
         <div class="card-content">
-          <a href="{% url 'oservicenew_view' %}" class="btn grey lighten-5 grey-text text-darken-3">
-            <i class="fa fa-plus"></i>
-            Nueva Orden
+          <h5>
+            Servicios de Proyecto: {{ pro.nompro }}
+            <br>
+            <small>Moneda {{ pro.currency.moneda }}</small>
+          </h5>
+          <input type="hidden" ng-model="vm.area" ng-init="vm.area='{{ request.user.get_profile.empdni.charge.area|lower }}'">
+          <a href="/sales/projects/manger/{{pro.proyecto_id}}/" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+            <i class="fa fa-chevron-left"></i>
+            <span class="hide-on-small-only">REGRESAR</span>
           </a>
-          <ul class="collection">
-            {% for x in services %}
-              <li class="collection-item avatar">
-                {# <img src="images/yuna.jpg" alt="" class="circle"> #}
-                <i class="fa fa-file-text circle"></i>
-                <span class="title"><a href="{% url 'rpt_serviceorder' x.id %}" target="_blank">{{ x.id }}</a></span>
-                <p>{{ x.supplier }} <br>
-                   {{ x.register }}
-                </p>
-                <span href="#!" class="secondary-content"><h5>{{ x.symbol }} {{ x.amount|floatformat:"2" }}</h5></span>
-              </li>
-            {% endfor %}
-          </ul>
+          {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+            <div class="card-action">
+              <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
+                  <i class="fa fa-file-text-o"></i>
+                  <span class="hide-on-small-only">Nueva Orden</span>
+              </a>
+              <button type="button" data-target="mitemizer" class="waves-effect waves-light btn gray lighten-5 grat-text text-darken-3">
+                <i class="fa fa-tags"></i>
+                <span class="hide-on-small-only">Agregar Partida</span>
+              </button>
+              <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
+                <i class="fa fa-usd"></i>
+                <span class="hide-on-small-only">Monto Servicios</span>
+              </button> -->
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
-    <div class="col l6">
-      <div class="card card-panel">
-        <div class="card-content">
-          <table>
+    {% verbatim %}
+    <div class="col s12 m6 l6">
+      <ul class="collapsible" data-collapsible="accordion">
+        <li ng-repeat="x in vm.itemizers">
+          <div class="collapsible-header lighten-4" ng-class="{'red': x.sum > x.fields.purchase, 'light-green': x.sum <= x.fields.purchase}">
+            <i class="fa" ng-class="{'fa-frown-o': x.sum > x.fields.purchase, 'fa-smile-o': x.sum <= x.fields.purchase}"></i>
+            <span><strong>
+              {{x.fields.name}}
+              <!-- <span class="fa" ng-class="{'fa-frown-o': x.sum > x.fields.purchase, 'fa-smile-o': x.sum <= x.fields.purchase}"></span> -->
+            </strong></span>
+            <span class="badge" ng-show="(vm.area == 'ventas' || vm.area == 'administrator')">
+              <a href="#edit" class="light-blue-text text-16" ng-click="vm.showEdit(x)">
+                <span class="fa fa-edit"></span>
+                &nbsp;
+              </a>
+              <a href="#del" class="red-text text-16" ng-click="vm.delItem(x)">
+                <span class="fa fa-trash"></span>
+              </a>
+            </span>
+          </div>
+          <div class="collapsible-body">
+            <div class="card-panel">
+              <strong>Asignado</strong>
+              <strong>Compra:</strong> {{x.fields.purchase}}
+              <strong>Venta:</strong> {{x.fields.sales}}
+              <strong>Disponible:</strong> {{x.fields.purchase - x.sum | number:2}}
+              <i class="fa" ng-class="{'fa-level-down': x.sum > x.fields.purchase, 'fa-level-up': x.sum <= x.fields.purchase}"></i>
+              <input type="hidden" ng-init="vm.assignament=(vm.assignament + (x.fields.purchase - 0))">
+              <!-- <input type="hidden" value="{{x['sum']=(0-0)}}"> -->
+              <!-- details by item-->
+              <table class="table responsive-table highlight">
+                <tbody>
+                  <tr ng-repeat="d in x.services">
+                    <td><a href="/reports/services/orders/{{d.pk}}/" target="_blank"><i class="fa fa-file-text-o"></i></a></td>
+                    <td class="col-1">
+                      <small><strong>{{d.pk}}</strong></small></td>
+                    <td><small>{{d.fields.supplier.fields.razonsocial}}</small></td>
+                    <td class="right-align">
+                      <small>
+                        <strong>
+                          <!--
+                            total = ((d.amounts - ((d.fields.dsct/100) * d.amounts)) * (((d.fields.sigv?d.configure.fields.igv:0)/100)+1));
+                          (d['total'] = (d.fields.currency.pk == d.configure.fields.moneda.pk) ? total : (total / d['exchange']));
+                          (x['sum'] = (d['total'] + (x['sum'] - 0)));
+                          -->
+                        {{
+                          d['total'] | number:2
+                        }}
+                        </strong>
+                      </small>
+                    </td>
+                    <td class="right-align">
+                      <small>{{(d.fields.currency.pk == d.configure.fields.moneda.pk) ? d.fields.currency.fields.simbolo : d.fields.currency.fields.simbolo +' - ' + d.configure.fields.moneda.fields.simbolo }}</small></td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- endblock -->
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="col s12 m6 l6">
+      <div class="card-panel">
+          <table class="table responsive-table highlight">
             <tbody>
               <tr>
-                <th><h4>Asignado</h4></th>
-                <td class="right-align"><h4>{{ pro.aservices|floatformat:"2" }}</h4></td>
+                <th><h5>Asignado</h5></th>
+                <td class="right-align"><h5>{{ vm.assignament | number:2 }}</h5></td>
               </tr>
               <tr>
-                <th><h4>Gastado</h4></th>
-                <th class="right-align"><h4>{{ total|floatformat:"2" }}</h4></th>
+                <th><h5>Gastado</h5></th>
+                <th class="right-align"><h5>{{ vm.spent | number:2 }}</h5></th>
               </tr>
               <tr>
                 <td colspan="2"><div class="divider"></div></td>
               </tr>
-              <tr>
-                <th><h4>Total</h4></th>
-                <td class="right-align"><h4>{{ diff|floatformat:"2" }}</h4></td>
+              <tr ng-class="{'light-green lighten-4': vm.amount > 0, 'red': vm.amount <= 0 }">
+                <th><h5><strong>TOTAL</strong></h5></th>
+                <td class="right-align">
+                  <h5>
+                    <i class="fa" ng-class="{'fa-thumbs-up': vm.amount > 0, 'fa-thumbs-down': vm.amount <= 0 }"></i>
+                    &nbsp; {{vm.amount = (vm.assignament - vm.spent) | number: 2 }}
+                  </h5>
+                </td>
               </tr>
             </tbody>
           </table>
-        </div>
       </div>
     </div>
+    {% endverbatim %}
   </div>
   <div class="row">
+    <div class="modal col l4 m12 s12 offset-l4" id="mitemizer">
+      <div class="modal-content">
+        <h5>
+          Partida de Servicio <br>
+          <small>Moneda {{ pro.currency.moneda }}</small>
+        </h5>
+        <div class="input-field">
+          <input type="text" id="itemname" ng-model="vm.itemizer.name">
+          <label for="itemname">Nombre</label>
+        </div>
+        <div class="input-field">
+          <input type="number" class="right-align" name="itempurchase" step="0.10" min="0" ng-model="vm.itemizer.purchase" ng-change="vm.setItemizerSalesAmount()" ng-value="vm.itemizer.purchase">
+          <label for="itempurchase">Valor de Compra</label>
+        </div>
+        <div class="input-field">
+          <input type="number" class="right-align" name="itemsales" step="0.10" min="0" ng-model="vm.itemizer.sales" ng-value="vm.itemizer.sales">
+          <label for="itemsales">Valor de Venta</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="waves-effect waves-light btn light-blue" ng-click="vm.saveItemizer()">
+          <i class="fa fa-floppy-o"></i>
+          <span class="hide-on-small-only"><small>Guardar</small></span>
+        </button>
+        <button type="button" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3" ng-click="vm.itemizer={}">
+          <i class="fa fa-times"></i>
+          <span class="hide-on-small-only"><small>Salir</small></span>
+        </button>
+      </div>
+    </div>
+    <!-- block modal assign amount total for project -->
     <div class="modal col l4 offset-l4" id="mservices">
       <form method="post" action="">
-      {% csrf_token %}
       <div class="modal-content">
-        <h4>Monto de Servicios</h4>
+        {% csrf_token %}
+        <h5>Monto de Servicios</h5>
         <div class="input-field">
           <input type="number" id="aservices" name="aservices" step="0.01" class="validate">
           <label for="aservices">Monto</label>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" name="saservices" value="true" class="btn grey lighten-5 grey-text text-darken-3">
+        <button type="submit" name="saservices" value="true" class="btn light-blue grey-text text-darken-3">
           <i class="fa fa-check"></i>
-          Guardar
+          <small>Guardar</small>
         </button>
-        <button type="reset" class="btn grey lighten-5 grey-text text-darken-3 waves-effect modal-action modal-close">
+        <button type="reset" class="modal-action modal-close btn grey lighten-5 grey-text text-darken-3 waves-effect">
           <i class="fa fa-times"></i>
-          Cancelar
+          <small>Cancelar</small>
         </button>
       </div>
       </form>
     </div>
+    <!-- endblock-->
   </div>
-</div>
-<script type="text/javascript">
+</section>
+<script defer src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/sales/costproject.js"></script>
+<!--<script type="text/javascript">
   $('.modal').modal();
-</script>
+</script>-->
 {% endblock content %}
