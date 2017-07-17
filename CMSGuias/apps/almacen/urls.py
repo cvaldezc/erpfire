@@ -133,7 +133,7 @@ urlpatterns = patterns(
     url(r'^herramienta/cargar$', Cargar.as_view(), name='viewcarga'),
     url(r'^herramienta/estados$', EstadoHerramienta.as_view(), name='viewestherramienta'),
     # # devolucion material
-    url(r'^devolucionmaterial/$', DevMaterial.as_view(), name='viewdevolucionmat'),
+    # url(r'^devolucionmaterial/$', DevMaterial.as_view(), name='viewdevolucionmat'),
     # 2017-05-19 09:16:53
     # Juan Julcapari
     # for return item from guide

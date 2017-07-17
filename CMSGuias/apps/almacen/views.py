@@ -5,6 +5,7 @@ import datetime
 import json
 import os
 from decimal import Decimal
+
 from django.shortcuts import (
     render_to_response,
     get_object_or_404,
@@ -26,7 +27,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from openpyxl import load_workbook
 
-from CMSGuias.apps.almacen.models import *
+from ..almacen.models import *
 from CMSGuias.apps.home.models import *
 from CMSGuias.apps.ventas.models import Proyecto, Sectore, Subproyecto
 from CMSGuias.apps.almacen import forms
@@ -1726,6 +1727,7 @@ class InventoryView(ListView, JSONResponseMixin):
         # data = json.dumps(data)
         return self.render_to_json_response(data)
 
+
 class SupplyView(ListView):
     template_name = 'almacen/supply.html'
 
@@ -1858,6 +1860,7 @@ class SupplyView(ListView):
                 mimetype='application/json',
                 content_type='application/json')
 
+
 class ListOrdersSummary(TemplateView):
     template_name = 'almacen/listorderssupply.html'
     context_object_name = 'Orders'
@@ -1899,6 +1902,7 @@ class ListOrdersSummary(TemplateView):
             return HttpResponse(
                 json.dumps(data),
                 mimetype='application/json')
+
 
 class ListDetOrders(JSONResponseMixin, TemplateView):
     template_name = 'almacen/listdetailsOrders.html'
@@ -2157,6 +2161,7 @@ class InputOrderPurchase(JSONResponseMixin, TemplateView):
                 context['status'] = False
             return self.render_to_json_response(context)
 
+
 class NoteIngressView(JSONResponseMixin, TemplateView):
     template_name = 'almacen/listnoteingress.html'
 
@@ -2289,6 +2294,7 @@ class NoteIngressView(JSONResponseMixin, TemplateView):
                 context['raise'] = str(e)
                 context['status'] = True
             return self.render_to_json_response(context)
+
 
 class GuideSingle(JSONResponseMixin, TemplateView):
 
@@ -2495,6 +2501,7 @@ class GuideSingle(JSONResponseMixin, TemplateView):
                 context['status'] = False
             return self.render_to_json_response(context)
 
+
 class MaterialBrand(JSONResponseMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
@@ -2513,6 +2520,7 @@ class MaterialBrand(JSONResponseMixin, TemplateView):
             return render(request, 'almacen/materialbrand.html', context)
         except TemplateDoesNotExist, e:
             raise Http404(e)
+
 
 class EditBedsideGuide(JSONResponseMixin, View):
 
@@ -2552,8 +2560,9 @@ class EditBedsideGuide(JSONResponseMixin, View):
                 context['status'] = False
             return self.render_to_json_response(context)
 
+
 class ReturnItemOrders(JSONResponseMixin, TemplateView):
-    """docstring for ReturnItemOrders"""
+    '''docstring for ReturnItemOrders'''
     def get(self, request, *args, **kwargs):
         try:
             context = dict()
@@ -2991,6 +3000,7 @@ class AttendOrder(JSONResponseMixin, TemplateView):
             context['status'] = False
         return self.render_to_json_response(context)
 
+
 class LoadInventoryBrand(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
@@ -3009,11 +3019,11 @@ class LoadInventoryBrand(JSONResponseMixin, TemplateView):
                                 materiales__matnom__icontains=request.GET[
                                     'desc']) | Q(
                                     materiales__matmed__icontains=request.GET[
-                                    'desc'])).order_by('materiales__matnom','materiales__matmed'),
+                                    'desc']), stock__gt=0).order_by('materiales__matnom','materiales__matmed'),
                                 relations=('materiales')))
                         context['status'] = True
                     if 'details' in request.GET:
-                        ib = InventoryBrand.objects.filter(materials_id=request.GET['materials'])
+                        ib = InventoryBrand.objects.filter(materials_id=request.GET['materials'], stock__gt=0)
                         context['materials'] = json.loads(
                             serializers.serialize(
                                 'json',
@@ -3149,6 +3159,7 @@ class LoadInventoryBrand(JSONResponseMixin, TemplateView):
                 context['status'] = False
             return self.render_to_json_response(context)
 
+
 class DevolutionStorage(JSONResponseMixin, TemplateView):
     template_name = "almacen/devolutions/devolution.html"
 
@@ -3159,6 +3170,7 @@ class DevolutionStorage(JSONResponseMixin, TemplateView):
             return render(request, self.template_name, context)
         except TemplateDoesNotExist as e:
             raise Http404(e)
+
 
 class ReturnWith(JSONResponseMixin, TemplateView):
     template_name = "almacen/devolutions/withguide.html"
@@ -3189,6 +3201,7 @@ class ReturnWith(JSONResponseMixin, TemplateView):
             return render(request, self.template_name, context)
         except TemplateDoesNotExist as e:
             raise Http404(e)
+
 
 class ReturnWithout(JSONResponseMixin, TemplateView):
     template_name = "almacen/devolutions/withoutguide.html"
@@ -3818,22 +3831,18 @@ class DevConGuia(JSONResponseMixin, TemplateView):
             'lconduct':lconduct
             })
 
-# ///////////////////////////
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         try:
             context = dict()
             if request.is_ajax():
                 try:
-
                     if 'updestguiadevmat' in request.POST:
                         updest = GuiaDevMat.objects.get(
-                            guiadevmat_id=request.POST.get('codguidevmat')
-                            )
+                            guiadevmat_id=request.POST.get('codguidevmat'))
                         updest.estado = request.POST.get('estado')
                         updest.save()
                         context['status'] = True
-
                     if 'saveeditmat' in request.POST:
                         edmat = detGuiaDevMat.objects.get(
                             id = request.POST.get('idt'))
@@ -3842,14 +3851,10 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                         edmat.motivo = request.POST.get('motivo')
                         edmat.save()
                         context['status'] = True
-
-
                     if 'delmatdet' in request.POST:
                         detGuiaDevMat.objects.get(
                             id=request.POST.get('idtable')).delete()
                         context['status'] = True
-
-
                     if 'savecabgdev' in request.POST:
                         cabgdev = GuiaDevMat.objects.get(
                             guiadevmat_id = request.POST.get('codgdev'))
@@ -3858,32 +3863,36 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                         cabgdev.comentario = request.POST.get('coment')
                         cabgdev.save()
                         context['status'] = True
-
-
                     if 'savedevmat' in request.POST:
                         guiadevmat = genkeys.GenerateIdGuiaMatDev();
                         lniplefinal2=json.loads(request.POST.get('lniplefinal2'))
                         ldetdev = json.loads(request.POST.get('ldetdev'))
-
-                        print 'lniplefinal2 ',len(lniplefinal2)
-
-                        GuiaDevMat.objects.create(
-                            guiadevmat_id = guiadevmat,
-                            fechadevolucion = request.POST.get('fdev'),
-                            emple_aut_id = request.POST.get('empdniaut'),
-                            empdni_id = request.user.get_profile().empdni_id,
-                            condni_id=request.POST.get('cond'),
-                            nropla_id=request.POST.get('placa'),
-                            proyecto_id=request.POST.get('codproy'),
-                            traruc_id=request.POST.get('transport'),
-                            estado = request.POST.get('est'),
-                            comentario = request.POST.get('comen')
-                            )
-
-
+                        print 'lniplefinal2 ', len(lniplefinal2)
+                        gdm = GuiaDevMat()
+                        gdm.guiadevmat_id=guiadevmat
+                        gdm.fechadevolucion=request.POST.get('fdev')
+                        gdm.emple_aut_id=request.POST.get('empdniaut')
+                        gdm.empdni_id=request.user.get_profile().empdni_id
+                        gdm.condni_id=request.POST.get('cond')
+                        gdm.nropla_id=request.POST.get('placa')
+                        gdm.proyecto_id=request.POST.get('codproy')
+                        gdm.traruc_id=request.POST.get('transport')
+                        gdm.estado=request.POST.get('est')
+                        gdm.comentario=request.POST.get('comen')
+                        gdm.save()
+                        # GuiaDevMat.objects.create(
+                        #     guiadevmat_id=guiadevmat,
+                        #     fechadevolucion=request.POST.get('fdev'),
+                        #     emple_aut_id=request.POST.get('empdniaut'),
+                        #     empdni_id=request.user.get_profile().empdni_id,
+                        #     condni_id=request.POST.get('cond'),
+                        #     nropla_id=request.POST.get('placa'),
+                        #     proyecto_id=request.POST.get('codproy'),
+                        #     traruc_id=request.POST.get('transport'),
+                        #     estado=request.POST.get('est'),
+                        #     comentario=request.POST.get('comen'))
                         # ldetnip = json.loads(request.POST.get('ldetnip'))
                         # ldetni = json.loads(request.POST.get('ldetni'))
-
                         if len(ldetdev) > 0:
                             for x in ldetdev:
                                 detGuiaDevMat.objects.create(
@@ -3896,7 +3905,6 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                                     comentario = x['comment'],
                                     motivo = x['motivo']
                                     )
-
                         if len(lniplefinal2) > 0:
                             for y in lniplefinal2:
                                 GuiaDevMatNiple.objects.create(
@@ -3912,7 +3920,6 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                                     motivo='' if y['motinip']==None else y['motinip'],
                                     comentario='' if y['comnip']==None else y['comnip']
                                     )
-
                         # if len(ldetni) > 0:
                         #     for z in ldetni:
                         #         GuiaDevMatNiple.objects.create(
@@ -3929,13 +3936,11 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                         #             comentario='')
 
                         context['status'] = True
-
                     if 'upddevmatniple' in request.POST:
                         nip=GuiaDevMatNiple.objects.get(
                             id=request.POST.get('codtab'))
                         nip.cantidad=request.POST.get('cantupdnip')
                         nip.save()
-
                         detgdev=detGuiaDevMat.objects.get(
                             guiadevmat_id=request.POST.get('codguiadevmat'),
                             material_id=request.POST.get('codmat'),
@@ -3943,14 +3948,10 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             model_id=request.POST.get('codmod'))
                         detgdev.cantidad=request.POST.get('canttot')
                         detgdev.save()
-
                         context['status']=True
-
                     if 'delnipdevmat' in request.POST:
-
                         GuiaDevMatNiple.objects.get(
                             id=request.POST.get('idtable')).delete()
-
                         upd=detGuiaDevMat.objects.get(
                             guiadevmat_id=request.POST.get('codgdevmat'),
                             material_id=request.POST.get('codmat'),
@@ -3958,9 +3959,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             model_id=request.POST.get('codmod'))
                         upd.cantidad=request.POST.get('canttotal')
                         upd.save()
-
                         context['status']=True
-
                     if 'updsavedevmat' in request.POST:
                         ldetgrem = json.loads(request.POST.get('ldetgrem'))
                         ldetinven = json.loads(request.POST.get('ldetinven'))
@@ -4051,11 +4050,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                                 idref_id=x['idtabniple'],
                                 motivo=request.POST.get('motivo'),
                                 comentario='')
-
-
                         context['status']=True
-
-
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False

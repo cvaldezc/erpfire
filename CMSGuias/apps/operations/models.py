@@ -279,6 +279,9 @@ class DSector(models.Model):
 
 
 class DSMetrado(models.Model):
+    '''
+    models dsmetrado for operations principal
+    '''
     dsector = models.ForeignKey(DSector, to_field='dsector_id')
     sector = models.ForeignKey(Sectore, to_field='sector_id', null=True)
     materials = models.ForeignKey(Materiale, to_field='materiales_id')
@@ -294,8 +297,8 @@ class DSMetrado(models.Model):
     nipple = models.BooleanField(default=False, blank=True)
     flag = models.BooleanField(default=True)
     # @Juan Julcapari 2017-07-17 10:40:02 - return materials from guide remission
-    cantdev = models.FloatField()
-    stcantdev = models.BooleanField()
+    cantdev = models.FloatField(default=0, blank=True, null=True)
+    stcantdev = models.BooleanField(default=True)
     # endblock
 
     audit_log = AuditLog()
@@ -305,10 +308,7 @@ class DSMetrado(models.Model):
     #     verbose_name_plural = 'DSMetrados'
 
     def __unicode__(self):
-        return '%s %s %f %f' % (self.dsector_id,
-                                self.materials,
-                                self.quantity,
-                                self.ppurchase)
+        return '%s %s %f %f' % (self.dsector_id, self.materials, self.quantity, self.ppurchase)
 
     # @property
     # def squantity(self):
@@ -393,8 +393,8 @@ class Nipple(models.Model):
     tag = models.CharField(max_length=1, default='0')
     flag = models.BooleanField(default=True)
     # @Juan Julcapari 2017-07-17 10:42:25 - return materials from guide remission
-    cantenvnip = models.FloatField(default=0)
-    stcantenvnip = models.FloatField(default=0)
+    cantenvnip = models.FloatField(default=0, blank=True, null=True)
+    stcantenvnip = models.FloatField(default=0, blank=True, null=True)
     # endblock
 
     class Meta:

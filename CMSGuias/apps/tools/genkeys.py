@@ -8,7 +8,7 @@ from django.db.models import Max
 
 from CMSGuias.apps.almacen.models import (
     Pedido, GuiaRemision, Suministro, NoteIngress, Restoration, devolucionHerra,
-    GrupoPedido)
+    GrupoPedido, GuiaDevMat)
 from CMSGuias.apps.logistica.models import Cotizacion, Compra, ServiceOrder
 from CMSGuias.apps.ventas.models import Proyecto, ProjectItemizer
 from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado, Rubro

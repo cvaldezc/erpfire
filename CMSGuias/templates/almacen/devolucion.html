@@ -1,24 +1,23 @@
 {% extends "basemd.html" %}
-
 {% block title %}
   Devolucion
 {% endblock %}
 {% block menu %}
-  {% include "menus/storagemd.htm" %}
+  {% include "menus/almherramd.htm" %}
 {% endblock %}
 {% block content %}
 <script src="/media/js/almacen/guiaherramienta.js"></script>
 <link rel="stylesheet" href="/media/css/almacen/guia.css">
 <div>
-      <h4 align="center">Documentos de Devolucion</h4>
-      <div class="card" style="width:95%;margin-left:20px;">
-        <div class="card-action">
-          <div class="input-field col s12">
-            <i class="prefix fa fa-search"></i>
-            <input class="txtbuscardoc" style="width:90%;" type="search" placeholder="Buscar Documento" name="txtbuscardoc" id="txtbuscardoc" >
-          </div>
+    <h4 align="center">Documentos de Devolucion</h4>
+    <div class="card" style="width:95%;margin-left:20px;">
+      <div class="card-action">
+        <div class="input-field col s12">
+          <i class="prefix fa fa-search"></i>
+          <input class="txtbuscardoc" style="width:90%;" type="search" placeholder="Buscar Documento" name="txtbuscardoc" id="txtbuscardoc" >
         </div>
       </div>
+    </div>
     <table class="tabla-listdev" id="tabla-listdev">
         <thead class="cab">
           <tr>

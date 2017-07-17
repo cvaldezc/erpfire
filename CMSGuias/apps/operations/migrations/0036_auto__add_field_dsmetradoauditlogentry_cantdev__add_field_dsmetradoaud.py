@@ -10,32 +10,32 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'DSMetradoAuditLogEntry.cantdev'
         db.add_column(u'operations_dsmetradoauditlogentry', 'cantdev',
-                      self.gf('django.db.models.fields.FloatField')(default=None),
+                      self.gf('django.db.models.fields.FloatField')(default=0, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'DSMetradoAuditLogEntry.stcantdev'
         db.add_column(u'operations_dsmetradoauditlogentry', 'stcantdev',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      self.gf('django.db.models.fields.BooleanField')(default=True),
                       keep_default=False)
 
         # Adding field 'Nipple.cantenvnip'
         db.add_column(u'operations_nipple', 'cantenvnip',
-                      self.gf('django.db.models.fields.FloatField')(default=0),
+                      self.gf('django.db.models.fields.FloatField')(default=0, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'Nipple.stcantenvnip'
         db.add_column(u'operations_nipple', 'stcantenvnip',
-                      self.gf('django.db.models.fields.FloatField')(default=0),
+                      self.gf('django.db.models.fields.FloatField')(default=0, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'DSMetrado.cantdev'
         db.add_column(u'operations_dsmetrado', 'cantdev',
-                      self.gf('django.db.models.fields.FloatField')(default=None),
+                      self.gf('django.db.models.fields.FloatField')(default=0, null=True, blank=True),
                       keep_default=False)
 
         # Adding field 'DSMetrado.stcantdev'
         db.add_column(u'operations_dsmetrado', 'stcantdev',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      self.gf('django.db.models.fields.BooleanField')(default=True),
                       keep_default=False)
 
 
@@ -299,7 +299,7 @@ class Migration(SchemaMigration):
         u'operations.dsmetrado': {
             'Meta': {'object_name': 'DSMetrado'},
             'brand': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Brand']"}),
-            'cantdev': ('django.db.models.fields.FloatField', [], {}),
+            'cantdev': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'dsector': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['operations.DSector']"}),
             'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
@@ -313,7 +313,7 @@ class Migration(SchemaMigration):
             'qorder': ('django.db.models.fields.FloatField', [], {}),
             'quantity': ('django.db.models.fields.FloatField', [], {}),
             'sector': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['ventas.Sectore']", 'null': 'True'}),
-            'stcantdev': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'stcantdev': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'tag': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '1'})
         },
         u'operations.dsmetradoauditlogentry': {
@@ -323,7 +323,7 @@ class Migration(SchemaMigration):
             u'action_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             u'action_user': ('audit_log.models.fields.LastUserField', [], {'related_name': "u'_dsmetrado_audit_log_entry'", 'to': u"orm['auth.User']"}),
             'brand': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['home.Brand']"}),
-            'cantdev': ('django.db.models.fields.FloatField', [], {}),
+            'cantdev': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'dsector': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['operations.DSector']"}),
             'flag': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
@@ -337,7 +337,7 @@ class Migration(SchemaMigration):
             'qorder': ('django.db.models.fields.FloatField', [], {}),
             'quantity': ('django.db.models.fields.FloatField', [], {}),
             'sector': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['ventas.Sectore']", 'null': 'True'}),
-            'stcantdev': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'stcantdev': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'tag': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '1'})
         },
         u'operations.dsmetradotemp': {
@@ -464,7 +464,7 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "['proyecto']", 'object_name': 'Nipple'},
             'area': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['operations.DSector']", 'null': 'True', 'blank': 'True'}),
             'brand': ('django.db.models.fields.related.ForeignKey', [], {'default': "'BR000'", 'related_name': "'brandtonipple'", 'to': u"orm['home.Brand']"}),
-            'cantenvnip': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'cantenvnip': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'cantidad': ('django.db.models.fields.FloatField', [], {'default': '1', 'null': 'True'}),
             'cantshop': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True'}),
             'comment': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '250', 'null': 'True', 'blank': 'True'}),
@@ -475,7 +475,7 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.related.ForeignKey', [], {'default': "'MO000'", 'related_name': "'modeltonipple'", 'to': u"orm['home.Model']"}),
             'proyecto': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['ventas.Proyecto']", 'blank': 'True'}),
             'sector': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['ventas.Sectore']", 'null': 'True', 'blank': 'True'}),
-            'stcantenvnip': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'stcantenvnip': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'subproyecto': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['ventas.Subproyecto']", 'null': 'True', 'blank': 'True'}),
             'tag': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '1'}),
             'tipo': ('django.db.models.fields.CharField', [], {'max_length': '1'})
