@@ -139,4 +139,8 @@ urlpatterns = patterns(
     # for return item from guide
     url(r'^pedidoap/$', Pedidoap.as_view(), name='viewpedidopap'),
     url(r'^grupopedido/$', GrupPedido.as_view(), name='viewgrupoped'),
+    # @Juan Julcapari 2017-07-17 11:39:52
+    # devolucion material
+    url(r'^devolucionmaterial/$', DevConMaterial.as_view(), name='viewdevolucionmat'),
+    url(r'^devolucionguia/$', DevConGuia.as_view(), name='viewdevolucionguia'),
 )

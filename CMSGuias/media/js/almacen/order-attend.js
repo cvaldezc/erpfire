@@ -155,7 +155,7 @@ controllers = function($scope, $timeout, $q, attendFactory) {
   $scope.nroguide = '';
   $scope.indexguide = new Array();
   angular.element(document).ready(function() {
-    angular.element(".modal").modal()({
+    angular.element(".modal").modal({
       dismissible: false
     });
     if ($scope.init === true) {

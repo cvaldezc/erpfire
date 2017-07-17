@@ -1,0 +1,83 @@
+{% extends "basemd.html" %}
+{% extends "div.html %"}
+{% block title %}
+  Devolucion de Material
+{% endblock %}
+{% block menu %}
+  {% include "menus/almherramd.html" %}
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<script src="/media/js/almacen/devmaterial.js"></script>
+<link rel="stylesheet" href="/media/css/almacen/devmaterial.css">
+
+<script src="{{ MEDIA_URL }}js/floatThead.js"></script>
+
+<div>
+	<h4 align="center">Devolucion de Material con Guia</h4>
+	<div class="card" id="divsearchguia" style="width:95%;margin-left:50px;">
+		<div class="card-action">
+		  <div class="input-field col s12">
+		    <input class="txtbuscarguia" style="width:90%;" type="search" placeholder="Ingresar Numero de Guia" name="txtbuscarguia" id="txtbuscarguia" >
+		  </div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="input-field col s3" style="width:25%;margin-left:40px;">
+		    <input checked="true" onclick="javascript:viewestguiamatdev();" name="estguiamatdev" type="radio" id="radiope" value="PE" />
+		    <label for="radiope" style="font-size:15px;font-weight:bold;color:black;">Pendiente</label>
+		    <input onclick="javascript:viewestguiamatdev();" name="estguiamatdev" type="radio" id="radioge" value="PE"/>
+		    <label for="radioge" style="font-size:15px;font-weight:bold;color:black;">Generada</label>
+		</div>
+		<div class="input-field col s6" style="margin-left:300px;">
+			<i class="prefix fa fa-search"></i>
+		    <input class="txtbuscguiatable" style="width:90%;" type="search" placeholder="Buscar Documento" name="txtbuscguiatable" id="txtbuscguiatable" >
+		</div>
+	</div>
+	<hr>
+
+	<div id="divtabledevpe" style="margin-left:50px;width:95%;">
+		<table id="table-guiadevpe" class="table responsive-table table-condensed highlight table-guiadevpe">
+			<h5 align="center"><strong>PENDIENTE</strong></h5>
+			<thead class="cab">
+				<tr>
+					<th class="colst40">#</th>
+					<th class="colst100">Doc</th>
+					<th>Proyecto</th>
+					<th >Autorizado por:</th>
+					<th class="colst150">F.Registro</th>
+					<th class="colst150">F.Devolucion</th>
+					<th class="colst150">Acciones</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+
+	<div id="divtabledevge" style="display:none;margin-left:50px;width:95%;">
+		<table id="table-guiadevge" class="table responsive-table table-condensed highlight table-guiadevge">
+			<h5 align="center"><strong>GENERADA</strong></h5>
+			<thead class="cab">
+				<tr>
+					<th class="colst40">#</th>
+					<th class="colst100">Doc</th>
+					<th >Proyecto</th>
+					<th >Autorizado por:</th>
+					<th class="colst150">F.Registro</th>
+					<th class="colst150">F.Devolucion</th>
+					<th class="colst150">Acciones</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+</div>
+
+
+{% csrf_token %}
+{% include "almacen/formguiadevmat/listmaterial.html" %}
+{% include "almacen/formguiadevmat/editguiadevmat.html" %}
+{% include "almacen/formguiadevmat/formeditmat.html" %}
+{% endblock %}

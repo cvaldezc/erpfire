@@ -1,0 +1,60 @@
+<div class="modal formeditmat">
+	<div class="modal-content">
+		<div class="row">
+			<label style="display:none;" class="lblcodguiadev"></label>
+			<label style="display:none;" class="lblid"></label>
+
+			<div class="input-field col">
+				<h6 class="lblcodigo" style="font-weight:bold"></h6>
+			</div>
+			<div class="input-field col">
+				<h6 class="lbldescripcion" style="font-weight:bold"></h6>
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="input-field col s0">
+				<h6><strong>Devuelto: </strong></h6>
+			</div>
+			<div class="input-field col s3">
+				<h6 class="lblcantdev"></h6>
+			</div>
+			<div class="input-field col s0">
+				<h6><strong>Disponible para devolver: </strong></h6>
+			</div>
+			<div class="input-field col s3">
+				<h6 class="cantdisponible"></h6>
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="input-field col s3">
+				<input class="cantidadeditmat" placeholder="" type="text">
+				<label for="cantidadeditmat">CANTIDAD</label>
+			</div>
+		</div>
+		<div class="row">
+			<div class="input-field col s12">
+				<input maxlength="55" class="comboeditmotivo" placeholder="" type="text">
+				<label for="comboeditmotivo">MOTIVO</label>
+			</div>
+		</div>
+		<div class="row">
+			<div class="input-field col s12">
+				<input class="comenteditmat" row="2" placeholder="" type="text">
+				<label for="comenteditmat">COMENTARIO</label>
+			</div>
+		</div>
+
+		<div align="center" style="margin-top:10px;">
+            <button type="button" class="btn waves-effect teal lighten-1 btnsaveeditmat">
+            <i class="fa fa-file"></i>
+            <span><strong>GUARDAR</strong></span>
+            </button>
+            <button type="button" class="btn modal-action modal-close red lighten-1 btn-flat btncancelar">
+            <i class="fa fa-times"></i>
+            <span>CANCELAR</span>
+            </button>
+        </div>
+	</div>
+</div>

@@ -742,3 +742,22 @@ def GenerateIDItemizerProject(pro):
     number = u'{0}{1:0>3d}'.format(pro, counter)
     return number
 # endblock
+
+# @Juan Julcapari 2017-07-17 10:44:40
+# generate number id for guide return materials
+def GenerateIdGuiaMatDev():
+    id = None
+    try:
+        code = GuiaDevMat.objects.aggregate(max=Max('guiadevmat_id'))
+        id = code['max']
+        if id is not None:
+            counter = int(id[2:7])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('DM', '{:0>5d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+# endblock

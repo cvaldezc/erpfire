@@ -88,7 +88,7 @@ controllers = ($scope, $timeout, $q, attendFactory) ->
   $scope.indexguide = new Array()
   angular.element(document).ready ->
     # console.log "angular load success!"
-    angular.element(".modal").modal()
+    angular.element(".modal").modal
       dismissible: false
     if $scope.init is true
       angular.element(".datepicker").pickadate
