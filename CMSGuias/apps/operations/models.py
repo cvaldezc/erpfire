@@ -279,6 +279,9 @@ class DSector(models.Model):
 
 
 class DSMetrado(models.Model):
+    '''
+    models dsmetrado for operations principal
+    '''
     dsector = models.ForeignKey(DSector, to_field='dsector_id')
     sector = models.ForeignKey(Sectore, to_field='sector_id', null=True)
     materials = models.ForeignKey(Materiale, to_field='materiales_id')
@@ -293,6 +296,10 @@ class DSMetrado(models.Model):
     tag = models.CharField(max_length=1, default='0')
     nipple = models.BooleanField(default=False, blank=True)
     flag = models.BooleanField(default=True)
+    # @Juan Julcapari 2017-07-17 10:40:02 - return materials from guide remission
+    cantdev = models.FloatField(default=0, blank=True, null=True)
+    stcantdev = models.BooleanField(default=True)
+    # endblock
 
     audit_log = AuditLog()
 
@@ -301,10 +308,7 @@ class DSMetrado(models.Model):
     #     verbose_name_plural = 'DSMetrados'
 
     def __unicode__(self):
-        return '%s %s %f %f' % (self.dsector_id,
-                                self.materials,
-                                self.quantity,
-                                self.ppurchase)
+        return '%s %s %f %f' % (self.dsector_id, self.materials, self.quantity, self.ppurchase)
 
     # @property
     # def squantity(self):
@@ -373,20 +377,11 @@ class Nipple(models.Model):
     '''Class manager Niples in Dsector'''
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id', blank=True)
     subproyecto = models.ForeignKey(
-        Subproyecto,
-        to_field='subproyecto_id',
-        blank=True,
-        null=True)
+        Subproyecto, to_field='subproyecto_id', blank=True, null=True)
     sector = models.ForeignKey(
-        Sectore,
-        to_field='sector_id',
-        blank=True,
-        null=True)
+        Sectore, to_field='sector_id', blank=True, null=True)
     area = models.ForeignKey(
-        DSector,
-        to_field='dsector_id',
-        null=True,
-        blank=True)
+        DSector, to_field='dsector_id', null=True, blank=True)
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     brand = models.ForeignKey(Brand, related_name='brandtonipple', default='BR000')
     model = models.ForeignKey(Model, related_name='modeltonipple', default='MO000')
@@ -394,13 +389,13 @@ class Nipple(models.Model):
     metrado = models.FloatField(null=False, default=0)
     cantshop = models.FloatField(null=True, default=0)
     tipo = models.CharField(max_length=1)
-    comment = models.CharField(
-        max_length=250,
-        default='',
-        null=True,
-        blank=True)
+    comment = models.CharField(max_length=250, default='', null=True, blank=True)
     tag = models.CharField(max_length=1, default='0')
     flag = models.BooleanField(default=True)
+    # @Juan Julcapari 2017-07-17 10:42:25 - return materials from guide remission
+    cantenvnip = models.FloatField(default=0, blank=True, null=True)
+    stcantenvnip = models.FloatField(default=0, blank=True, null=True)
+    # endblock
 
     class Meta:
         ordering = ['proyecto']

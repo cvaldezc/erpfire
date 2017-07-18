@@ -1504,15 +1504,15 @@ class RESTFulSettings(JSONResponseMixin, TemplateView):
 # add 2017-05-18 15:55:33
 # @cvaldezch - Christian Valdez
 class RestInventoryTools(JSONResponseMixin, View):
-    """
+    '''
     Class that provide support rest for inventory tools
-    """
+    '''
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        """
+        '''
         this fucntion export data from table inventory tools
-        """
+        '''
         if kwargs['export'] == 'export':
             response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename="lista_herramienta.csv"'
@@ -1523,3 +1523,17 @@ class RestInventoryTools(JSONResponseMixin, View):
             for x in data:
                 writer.writerow([x[y],x[y+1],x[y+2].encode("utf-8"),x[y+3]])
             return response
+
+
+# @cvaldezch 2017-07-18 10:54:42 - add get settings and info for the reports
+class Reports(JSONResponseMixin, View):
+    '''
+    show get information for show reports
+    '''
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+        kwargs['ruc'] = request.session['company']['ruc']
+        kwargs['status'] = True
+        return self.render_to_json_response(kwargs)
+#endblock

@@ -94,9 +94,9 @@ class tmppedido(models.Model):
 
 
 class Niple(models.Model):
-    """
+    '''
     class for define struct for niples
-    """
+    '''
     pedido = models.ForeignKey(Pedido, to_field='pedido_id')
     proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
     subproyecto = models.ForeignKey(
@@ -121,8 +121,14 @@ class Niple(models.Model):
     comment = models.CharField(
         max_length=250, default='', null=True, blank=True)
     related = models.IntegerField(null=True, blank=True, default=0)
+    # @Juan Julcapari 2017-06-17 10:37:12
     cantenv = models.FloatField(blank=True, default=0)
     flagcantenv = models.BooleanField(blank=True, default=False)
+    # endblock
+    # Juan Julcapari 2017-07-17 10:37:28 - Return materials guide
+    cenvdevmat = models.FloatField(default=0)
+    flagcenvdevmat = models.BooleanField(default=False)
+    # endblock
 
     audit_log = AuditLog()
 
@@ -187,6 +193,9 @@ class GuiaRemision(models.Model):
 
 
 class DetGuiaRemision(models.Model):
+    '''
+    model for storage details guide remision
+    '''
     guia = models.ForeignKey(GuiaRemision, to_field='guia_id')
     materiales = models.ForeignKey(Materiale, to_field='materiales_id')
     cantguide = models.FloatField(default=0, null=True, blank=True)
@@ -200,6 +209,10 @@ class DetGuiaRemision(models.Model):
         Model, related_name='omodelAsDetGuide', blank=True, default='MO000')
     observation = models.CharField(max_length=250, null=True, blank=True)
     order = models.ForeignKey(Pedido, to_field='pedido_id', null=True, blank=True)
+    # @Juan Julcapari 2017-07-17 10:31:10
+    cantdev = models.FloatField(default=0)
+    stcantdev = models.BooleanField(default=0)
+    # endblock
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -645,3 +658,57 @@ class GrupoPedNiple(models.Model):
         return '{} {} {} {} {} {}'.format(
             self.codgrupo, self.pedido, self.material, self.tipo, self.cantidad, self.metrado)
 
+
+'''
+@Juan Julcapari 2017-07-17 10:17:58
+model return materials from guide remission
+'''
+class GuiaDevMat(models.Model):
+    guiadevmat_id = models.CharField(max_length=8, primary_key=True)
+    fechadevolucion = models.DateField()
+    emple_aut = models.ForeignKey(
+        Employee, related_name='AuthAsEmployee', null=True, blank=True)
+    empdni = models.ForeignKey(Employee, to_field='empdni_id', null=True, blank=True)
+    proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
+    condni = models.ForeignKey(Conductore, to_field='condni_id')
+    nropla = models.ForeignKey(Transporte, to_field='nropla_id')
+    traruc = models.ForeignKey(Transportista, to_field='traruc_id')
+    estado = models.CharField(max_length=4, null=True, blank=True)
+    registro = models.DateTimeField(auto_now_add=True)
+    comentario = models.CharField(max_length=200, null=True, blank=True)
+
+    audit_log = AuditLog()
+
+
+class detGuiaDevMat(models.Model):
+    guiadevmat = models.ForeignKey(GuiaDevMat, to_field='guiadevmat_id')
+    guia = models.ForeignKey(
+        GuiaRemision, to_field='guia_id', null=True, blank=True) #quitar null y blank
+    material = models.ForeignKey(Materiale, to_field='materiales_id')
+    marca = models.ForeignKey(Brand, to_field='brand_id')
+    model = models.ForeignKey(Model, to_field='model_id')
+    cantidad = models.FloatField()
+    motivo = models.CharField(max_length=60, null=True, blank=True)
+    comentario = models.CharField(max_length=200, null=True, blank=True)
+
+    audit_log = AuditLog()
+
+
+class GuiaDevMatNiple(models.Model):
+    guiadevmat = models.ForeignKey(GuiaDevMat, to_field='guiadevmat_id')
+    guia = models.ForeignKey(
+        GuiaRemision, to_field='guia_id', null=True, blank=True) #quitar null y blank
+    material = models.ForeignKey(Materiale, to_field='materiales_id')
+    marca = models.ForeignKey(Brand, to_field='brand_id')
+    model = models.ForeignKey(Model, to_field='model_id')
+    cantidad = models.FloatField()
+    metrado = models.FloatField()
+    tipo = models.CharField(max_length=1)
+    idref = models.ForeignKey(Niple, to_field='id')
+    motivo = models.CharField(max_length=60)
+    comentario = models.CharField(max_length=200, null=True, blank=True)
+
+    audit_log = AuditLog()
+'''
+endblock
+'''

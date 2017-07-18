@@ -8,7 +8,7 @@ from django.db.models import Max
 
 from CMSGuias.apps.almacen.models import (
     Pedido, GuiaRemision, Suministro, NoteIngress, Restoration, devolucionHerra,
-    GrupoPedido)
+    GrupoPedido, GuiaDevMat)
 from CMSGuias.apps.logistica.models import Cotizacion, Compra, ServiceOrder
 from CMSGuias.apps.ventas.models import Proyecto, ProjectItemizer
 from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado, Rubro
@@ -741,4 +741,23 @@ def GenerateIDItemizerProject(pro):
         counter = 1
     number = u'{0}{1:0>3d}'.format(pro, counter)
     return number
+# endblock
+
+# @Juan Julcapari 2017-07-17 10:44:40
+# generate number id for guide return materials
+def GenerateIdGuiaMatDev():
+    id = None
+    try:
+        code = GuiaDevMat.objects.aggregate(max=Max('guiadevmat_id'))
+        id = code['max']
+        if id is not None:
+            counter = int(id[2:7])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('DM', '{:0>5d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
 # endblock

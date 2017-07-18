@@ -1,0 +1,243 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+<div class="modal lmaterials">
+    <div class="modal-content">
+        <div class="row">
+            <label class="lblcodproyguia" style="display:none"></label>
+            <div class="input-field col s2">
+                <input readonly placeholder="" type="text" class="nguiadev">
+                <label for="nguiadev" >NUMERO DE GUIA</label>
+            </div>
+            <div class="input-field col s3" style="margin-top:30px;">
+                <select id="cboguiatransp" class="browser-default cboguiatransp">
+                <option value="" disabled selected>Transportista</option>
+                {% for x in ltransportist %}
+                    <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
+                {% endfor %}
+                </select>
+            </div>
+            <div class="input-field col s0">
+                <p>Conductor:</p>
+            </div>
+            <div class="input-field col s2" style="margin-top:30px;">
+                <select id="cboguiaconductor" class="browser-default cboguiaconductor">
+                </select>
+            </div>
+            <div class="input-field col s0">
+                <p>Placa:</p>
+            </div>
+            <div class="input-field col s2" style="margin-top:30px;">
+                <select id="cboguiaplaca" class="browser-default cboguiaplaca">
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s2">
+                <input placeholder="" type="date" class="datepicker fdevguiadev">
+                <label for="fdevguiadev">FECHA DE DEVOLUCION</label>
+            </div>
+            <div class="input-field col s3" style="margin-top:35px;">
+                <select id="comboempleado" class="browser-default comboempleado">
+                    <option value="" disabled selected>Autorizado por</option>
+                    {% for x in lemple %}
+                    <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="input-field col s3">
+                <input placeholder="" length="200" name="comentguiadev" type="text" class="comentguiadev">
+                <label for="comentguiadev">COMENTARIO</label>
+            </div>
+            <div class="input-field col s3" style="border:1px solid;border-color:#EF5350;border-radius:15px;margin-left:50px;background-color:#EF5350">
+                <div class="panel-group" style="width:310px;">
+                    <div class="panel" style="margin-left:10px;margin-right:10px;">
+                        <div class="panel-heading" style="">
+                            <h6 style="font-weight:bold;color:white">NOTA:</h6>
+                        </div>
+                        <div class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <h6 style="font-weight:bold;color:white">Solo puede ingresar hasta 10 materiales</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s8">
+                <i class="prefix fa fa-search"></i>
+                <input class="txtbuscmaterial" style="width:90%;height:30px;" type="search" placeholder="Codigo o Material" name="txtbuscmaterial" id="txtbuscmaterial">
+            </div>
+            <div class="input-field col" style="margin-top:25px;">
+                <h6>Seleccionar:</h6>
+            </div>
+            <div class="input-field col s3">
+                <input onclick="javascript:selcheckbox();" name="checkmat" type="radio" id="radioall" value="viewallnone"/>
+                <label for="radioall" style="font-size:15px;font-weight:bold;color:black;">Todo</label>
+                <input onclick="javascript:selcheckbox();" name="checkmat" type="radio" id="radionone" value="viewallnone"/>
+                <label for="radionone" style="font-size:15px;font-weight:bold;color:black;">Ninguno</label>
+            </div>
+        </div>
+        <!--
+        <div class="row">
+            <div class="input-field col s8">
+                <i class="prefix fa fa-search"></i>
+                <input class="txtbuscmaterial" style="width:90%;height:30px;" type="search" placeholder="Codigo o Material" name="txtbuscmaterial" id="txtbuscmaterial">
+            </div>
+            <div class="input-field col s3">
+                <button type="button" class="btn waves-effect teal lighten-1 btnsaveallmat">
+                <i class="fa fa-file"></i>
+                <span><strong>Devolver Todo</strong></span>
+                </button>
+            </div>
+        </div>
+        -->
+        <hr>
+        <div style="overflow-y: scroll;height:400px;">
+            <table class="table table-condensed responsive-table highlight table-lmaterials" id="table-lmaterials" >
+                <thead class="cab">
+                    <tr class="brand-primary">
+                        <th class="colst40">#</th>
+                        <th class="colst150">Codigo</th>
+                        <th>Material</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th class="colst100">Cant.Env.</th>
+                        <th class="colst100">Devolvio</th>
+                        <th class="colst100">Devolver</th>
+                        <th class="colst40"></th>
+                        <th class="colst150">Motivo</th>
+                        <th class="colst40"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!--Niples-->
+        <!--
+        <div id="divtablniple" style="display:none">
+            <table class="table table-condensed highlight tab-sellniple" id="tab-sellniple">
+                <h5>Lista de Niples</h5>
+                <thead class="cab">
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Material</th>
+                        <th>Metrado</th>
+                        <th>Tipo</th>
+                        <th>Cantidad</th>
+                        <th>Motivo</th>
+                        <th>Comentario</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="tbody"></tbody>
+            </table>
+        </div>
+        -->
+
+        <div align="center" style="margin-top:10px;">
+            <button type="button" id="btnsave" class="btn waves-effect teal lighten-1 btnsavedevmat">
+            <i class="fa fa-file"></i>
+            <span><strong>GUARDAR</strong></span>
+            </button>
+            <button style="color:white;font-weight:bold;" type="button" class="btn modal-action modal-close red lighten-1 btncloseguiadev">
+            <i class="fa fa-times"></i>
+            <span>CANCELAR</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!--LISTA DE NIPLES-->
+<div class="modal bottom-sheet modlniple" style="height:65%">
+    <div class="modal-content">
+        <div class="row" >
+            <div class="input-field col">
+                <h5 class="lblcodmat"></h5>
+            </div>
+            <div class="input-field col">
+                <h5 class="lblnamemat"></h5>
+            </div>
+            <div class="input-field col">
+                <h5 class="lblmedmat"></h5>
+            </div>
+            <div class="input-field col" style="display:none">
+                <h5 class="lblcodbr"></h5>
+            </div>
+            <div class="input-field col" style="display:none">
+                <h5 class="lblcodmod"></h5>
+            </div>
+            <div class="input-field col" style="display:none">
+                <h5 class="lblcountcod"></h5>
+            </div>
+            <div class="input-field col">
+                <button type="button" class="btn waves-effect teal lighten-1 btnsavedetniple">
+                <i class="fa fa-floppy-o"></i>
+                <span><strong>GUARDAR</strong></span>
+                </button>
+                <button style="color:white;font-weight:bold;" type="button" class="btn modal-action modal-close red lighten-1 btn-flat ">
+                <i class="fa fa-times"></i>
+                <span>SALIR</span>
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <input checked onclick="javascript:selboxnipguia();" name="checkgnip" type="radio" id="radnipall"/>
+            <label for="radnipall" style="font-size:15px;font-weight:bold;color:black;">Todo</label>
+            <input onclick="javascript:selboxnipguia();" name="checkgnip" type="radio" id="radnipnone"/>
+            <label for="radnipnone" style="font-size:15px;font-weight:bold;color:black;">Ninguno</label>
+        </div>
+        <hr>
+        <div style="overflow-y: scroll;height:300px;">
+            <table class="table table-condensed highlight responsive-table tab-lniple" id="tab-lniple">
+                <thead class="cab">
+                    <tr>
+                        <th class="colst40">#</th>
+                        <th class="colst100">Cantidad</th>
+                        <th class="colst100">Metrado</th>
+                        <th class="colst40">Tipo</th>
+                        <th class="colst100">Enviado</th>
+                        <th class="colst100">Enviar</th>
+                        <th class="colst40"></th>
+                        <th class="colst150">Motivo</th>
+                        <th class="colst40"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal modinfoniple">
+    <div class="modal-content">
+        <div class="row">
+            <div class="input-field col">
+                <h6 class="lblinfocodmat" style="font-weight:bold"></h6>
+            </div>
+            <div class="input-field col">
+                <h6 class="lblinfodescmat" style="font-weight:bold"></h6>
+            </div>
+        </div>
+        <hr>
+        <div style="overflow-y: scroll;height:350px;">
+            <table class="table table-condensed highlight tab-linfoniple">
+                <thead class="cab">
+                    <th>#</th>
+                    <th>Cantidad</th>
+                    <th>Metrado</th>
+                    <th>Tipo</th>
+                </thead>
+            <tbody></tbody>
+            </table>
+        </div>
+        <div align="right">
+            <button style="color:white;font-weight:bold;" type="button" class="btn modal-action modal-close red lighten-1 btn-flat ">
+            <i class="fa fa-times"></i>
+            <span>SALIR</span>
+            </button>
+        </div>
+    </div>
+</div>
