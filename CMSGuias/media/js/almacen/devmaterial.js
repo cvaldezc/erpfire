@@ -1288,8 +1288,20 @@ genguiadev = function(){
 }
 
 
-genpdf = function(codguiadev){
-	window.open('http://'+ location.hostname +':6000/guiasherramienta/reportguiadevmaterial?nguiadevmat='+codguiadev,'_blank');
+genpdf = function(codguiadev, format){
+	$.getJSON('/json/reports/', function (response) {
+		if (response['status']){
+			if (typeof format == 'undefined' || format === false) {
+				window.open(response['hreport'] + 'guide/return/materials?nguide='+codguiadev+'&ruc='+response['ruc'],'_blank');
+			}
+			else
+			{
+				window.open(response['hreport'] + 'guide/return/materials?nguide='+codguiadev+'&ruc='+response['ruc']+'&format=true','_blank');
+			}
+		}else{
+			swal('Error al mostrar reporte', ''+response['raise'], 'error');
+		}
+	});
 }
 
 savecabgdev = function(){
@@ -2508,17 +2520,19 @@ viewpdf = function(){
 		confirmButtonText:'Con Formato',
 		cancelButtonText:'Sin Formato',
 		showConfirmButton:true,
-		closeOnConfirm:true,
 		showCancelButton:true,
+		closeOnConfirm:true,
 		closeOnCancel:true,
 		animation:'slide-from-top'
 	},function(isConfirm){
-		if (isConfirm) {
-			console.log('con Formato')
-			genpdf(cod)
-		}else{
-			console.log('Sin Formato')
-		}
+		genpdf(cod, isConfirm);
+		// if (isConfirm) {
+		// 	console.log('con Formato');
+		// 	genpdf(cod, isConfirm);
+		// }else{
+		// 	console.log('Sin Formato');
+		// 	genpdf(cod, isConfirm);
+		// }
 	})
 }
 

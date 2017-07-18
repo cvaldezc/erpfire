@@ -90,4 +90,5 @@ urlpatterns = patterns(
     # url(r'restful/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^settings/$', RESTFulSettings.as_view()),
     url(r'^inventory/tools/(?P<export>\w{6})/$', RestInventoryTools.as_view()),
+    url(r'reports/', Reports.as_view()),
 )
