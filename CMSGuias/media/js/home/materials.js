@@ -24,18 +24,181 @@ var MProxy = (function () {
     MProxy.$inject = ['$http', '$cookies'];
     return MProxy;
 }());
-var ControllerMaterials = (function () {
-    function ControllerMaterials(proxy) {
+var ControllerMasterItem = (function () {
+    function ControllerMasterItem(proxy) {
         this.proxy = proxy;
-        this.blockmaterials = false;
+        this.categories = [];
+        this.masters = [];
+        this.master = {};
+        this.delselected = {};
+        this.search = {};
+        this.blocknew = false;
+        this.permissionarea = '';
+        this.selected = false;
         console.log("ready!!!");
+        this.initialize();
     }
-    ControllerMaterials.$inject = ['sproxy'];
-    return ControllerMaterials;
+    ControllerMasterItem.prototype.initialize = function () {
+        setTimeout(function () {
+            angular.element('.select-chosen').chosen({ width: '100%' });
+        }, 800);
+        this.listCategories();
+        this.listMaster({ 'startlist': true });
+    };
+    ControllerMasterItem.prototype.listMaster = function (params) {
+        var _this = this;
+        if (params === void 0) { params = {}; }
+        Materialize.toast('Procesando, espere!', parseInt('undefined'), 'toast-remove');
+        this.masters = [];
+        this.delselected = {};
+        this.proxy.get('', params).then(function (response) {
+            angular.element('.toast-remove').remove();
+            if (response['data']['status']) {
+                _this.masters = response['data']['masters'];
+            }
+            else {
+                Materialize.toast("Error: " + response['data']['raise'], 4000);
+            }
+        });
+    };
+    ControllerMasterItem.prototype.listCategories = function () {
+        var _this = this;
+        this.proxy.get('', { 'catergories': true }).then(function (response) {
+            if (response['data']['status']) {
+                _this.categories = response['data']['mastertypes'];
+                setTimeout(function () {
+                    angular.element('#tipo').chosen({ width: '100%' });
+                }, 800);
+            }
+            else {
+                Materialize.toast("Error: " + response['data']['raise'], 4000);
+            }
+        });
+    };
+    ControllerMasterItem.prototype.changeSelected = function () {
+        for (var x in this.delselected) {
+            this.delselected[x]['status'] = this.selected;
+        }
+    };
+    ControllerMasterItem.prototype.searchMaster = function (event, value) {
+        if (event.keyCode == 13) {
+            var params = {};
+            params[value] = this.search[value];
+            this.listMaster(params);
+        }
+    };
+    ControllerMasterItem.prototype.showEditing = function (obj) {
+        this.master['materiales_id'] = obj['pk'];
+        this.master['matnom'] = obj['fields']['matnom'];
+        this.master['matmed'] = obj['fields']['matmed'];
+        this.master['matacb'] = obj['fields']['matacb'];
+        this.master['matare'] = obj['fields']['matare'];
+        this.master['unidad'] = obj['fields']['unidad'];
+        this.master['weight'] = obj['fields']['weight'];
+        this.master['tipo'] = obj['fields']['tipo'];
+        this.master['edit'] = true;
+        setTimeout(function () {
+            angular.element('.select-chosen').trigger('chosen:updated');
+        }, 400);
+        this.blocknew = true;
+    };
+    ControllerMasterItem.prototype.saveMaster = function () {
+        var _this = this;
+        Materialize.toast('Procesando, espere!', parseInt('undefined'), 'toast-remove');
+        var params = this.master;
+        params['saveMaterial'] = true;
+        this.proxy.post('', params).then(function (response) {
+            angular.element('.toast-remove').remove();
+            if (response['data']['status']) {
+                _this.listMaster({ 'desc': params['matnom'] });
+                _this.master['materiales_id'] = '';
+                _this.master['matnom'] = '';
+                _this.master['matmed'] = '';
+                _this.master['matacb'] = '';
+                _this.master['matare'] = '';
+                _this.master['unidad'] = '';
+                _this.master['weight'] = '';
+                _this.master['tipo'] = '';
+                _this.master['edit'] = false;
+                _this.blocknew = false;
+            }
+            else {
+                Materialize.toast("Error: " + response['data']['raise'], 4000);
+            }
+        });
+    };
+    ControllerMasterItem.prototype.singleDelete = function (obj) {
+        var _this = this;
+        swal({
+            title: 'Desea eliminar el item?',
+            text: obj['fields']['matnom'] + " " + obj['fields']['matmed'] + " " + obj['fields']['unidad'] + " " + obj['fields']['tipo'],
+            type: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'No',
+            confirmButtonText: 'Si!, eliminar',
+            confirmButtonColor: '#d64848',
+            closeOnCancel: true,
+            closeOnConfirm: true
+        }, function (isConfirm) {
+            if (isConfirm) {
+                Materialize.toast('Procesando, espere!', parseInt('undefined'), 'toast-remove');
+                var params = {
+                    delsignle: true,
+                    materials: obj['pk']
+                };
+                _this.proxy.post('', params).then(function (response) {
+                    angular.element('.toast-remove').remove();
+                    if (response['data']['status']) {
+                        Materialize.toast('Se ha eliminado correctamente', 3000);
+                        _this.listMaster({ 'desc': obj['fields']['matnom'] });
+                    }
+                    else {
+                        Materialize.toast("Error: " + response['data']['raise'], 8000);
+                    }
+                });
+            }
+        });
+    };
+    ControllerMasterItem.prototype.selectedDelete = function () {
+        var _this = this;
+        swal({
+            title: 'Desea eliminar los items seleccionados?',
+            text: '',
+            type: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'No',
+            confirmButtonText: 'Si!, eliminar',
+            confirmButtonColor: '#d64848',
+            closeOnCancel: true,
+            closeOnConfirm: true
+        }, function (isConfirm) {
+            if (isConfirm) {
+                if (isConfirm) {
+                    Materialize.toast('Procesando, espere!', parseInt('undefined'), 'toast-remove');
+                    var params = {
+                        delselected: true,
+                        materials: JSON.stringify(_this.delselected)
+                    };
+                    _this.proxy.post('', params).then(function (response) {
+                        angular.element('.toast-remove').remove();
+                        if (response['data']['status']) {
+                            Materialize.toast('Se han eliminado correctamente', 3000);
+                            _this.initialize();
+                        }
+                        else {
+                            Materialize.toast("Error: " + response['data']['raise'], 8000);
+                        }
+                    });
+                }
+            }
+        });
+    };
+    ControllerMasterItem.$inject = ['sproxy'];
+    return ControllerMasterItem;
 }());
 var app = angular.module('app', ['ngCookies']);
 app.service('sproxy', MProxy);
-app.controller('ControllerMaterials', ControllerMaterials);
+app.controller('ControllerMasterItem', ControllerMasterItem);
 // app.directive('smaterials', Directivies.ComponentSearchMaterials.instance);
 // app.directive('esdesc', Directivies.EventDescription.instance);
 // app.directive('esmc', Directivies.EventKeyCode.instance);

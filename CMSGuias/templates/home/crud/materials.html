@@ -17,83 +17,94 @@
     {% endif %}
 {% endblock menu %}
 {% block content %}
-<section ng-app="app" ng-controller="ControllerMaterials as vm">
+<!--block css -->
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}/vendor/chosen/chosen.css">
+<!--endblock  -->
+<section ng-app="app" ng-controller="ControllerMasterItem as vm">
+    <input type="hidden"  ng-init="vm.permissionarea='{{ user.get_profile.empdni.charge.area|lower }}'">
     <header>
         <aside class="card-panel">
             <h5><i class="fa fa-bars"></i> Materiales</h5>
-            <strong><i class="fa fa-search"></i> Busqueda de Materiales</strong>
+            <strong><i class="fa fa-search"></i> Busqueda</strong>
             <div class="row">
                 <div class="col s12 m3 l2">
                     <div class="input-field">
-                        <input type="text" maxlength="15" name="searchCode" class="form-control">
+                        <input type="text" maxlength="15" name="searchCode" class="form-control" ng-model="vm.search['code']" ng-keyup="vm.searchMaster($event, 'code')">
                         <label class="control-label">Código</label>
                     </div>
                 </div>
                 <div class="col s12 m9 l10">
                     <div class="input-field">
-                        <input type="text" name="searchDesc" class="form-control">
+                        <input type="text" name="searchDesc" class="form-control" ng-model="vm.search['desc']" ng-keyup="vm.searchMaster($event, 'desc')">
                         <label class="control-label">Descripción</label>
                     </div>
                 </div>
             </div>
-            {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-                <button class="waves-effect waves-light btn light-green grey-text text-darken-3" ng-click="vm.blockmaterials=!vm.blockmaterials">
-                    <i class="fa fa-plus"></i>
-                    <span class="hide-on-small-only">Nuevo Material</span>
-                </button>
-            {% endif %}
-            <div class="card" ng-show="vm.blockmaterials">
+            <button class="waves-effect waves-light btn light-green grey-text text-darken-3" ng-click="vm.blocknew=!vm.blocknew" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                <i class="fa fa-plus"></i>
+                <span class="hide-on-small-only">Nuevo</span>
+            </button>
+
+            <button class="waves-effect waves-light btn red" ng-click="vm.selectedDelete()" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                <i class="fa fa-free-code-camp"></i>
+                <span class="hide-on-small-only">Eliminar Seleccionados</span>
+            </button>
+            <div class="card" ng-show="vm.blocknew">
                 <div class="card-content">
                     <div class="row">
                         <div class="col s12 m2 l2">
                             <div class="input-field">
-                                <input type="text" maxlength="15" name="materials" placeholder="Codigo">
+                                <input type="text" maxlength="15" name="materials" ng-model="vm.master['materiales_id']" placeholder="Codigo">
                                 <label class="control-label">Código</label>
                             </div>
                         </div>
                         <div class="col s12 m5 l5">
                             <div class="input-field">
-                                <input type="text" name="matnom" placeholder="Descripción">
+                                <input type="text" name="matnom" placeholder="Descripción" ng-model="vm.master['matnom']">
                                 <label class="control-label">Descripción</label>
                             </div>
                         </div>
                         <div class="col s12 m5 l5">
                             <div class="input-field">
-                                <input type="text" name="matmed" placeholder="Diametro">
+                                <input type="text" name="matmed" placeholder="Diametro" ng-model="vm.master['matmed']">
                                 <label class="control-label">Diametro</label>
                             </div>
                         </div>
                         <div class="col s12 m2 l2">
                             <div class="input-field">
-                                <input type="text" name="matacb" placeholder="Acabado">
+                                <input type="text" name="matacb" placeholder="Acabado" ng-model="vm.master['matacb']">
                                 <label class="control-label">Acabado</label>
                             </div>
                         </div>
                         <div class="col s12 m2 l2">
                             <div class="input-field">
-                                <input type="number" step="0.10" name="matare" class="right-align" placeholder="Area">
+                                <input type="number" step="0.10" name="matare" class="right-align" placeholder="Area" ng-model="vm.master['matare']">
                                 <label class="control-label">Area</label>
                             </div>
                         </div>
                         <div class="col s12 m2 l2">
                             <div class="input-field">
-                                <input type="number" step="0.10" name="metweight" class="right-align" placeholder="Peso">
+                                <input type="number" step="0.10" name="metweight" class="right-align" placeholder="Peso" ng-model="vm.master['weight']">
                                 <label class="control-label">Peso</label>
                             </div>
                         </div>
                         <div class="col s12 m2 l2 input-field">
                             <label class="active">Unidad</label>
-                            <select class="browser-default" name="unidad" placeholder="Unidad">
+                            <select class="browser-default select-chosen" name="unidad" placeholder="Unidad" ng-model="vm.master['unidad']">
                                 {% for x in unidad %}
                                     <option value="{{ x.unidad_id }}">{{ x.uninom }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col s12 m3 l3">
+                        <div class="col s12 m2 l2 input-field">
+                            <label class="active">Categoria</label>
+                            <select class="browser-default select-chosen" id="tipo" ng-model="vm.master.tipo" ng-options="x.id as x.name for x in vm.categories"></select>
+                        </div>
+                        <div class="col s12 m2 l2">
                             <div class="input-field">
                                 <!-- <label class="active">Guardar Materiales</label>
                                 <br> -->
-                                <button type="button" class="waves-effect waves-light btn btn-save-material light-blue pulse">
+                                <button type="button" class="waves-effect waves-light btn btn-save-material light-blue pulse" ng-click="vm.saveMaster()" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
                                     <i class="fa fa-save fa-2x"></i>
                                     <span class="hide-on-small-only">Guardar</span>
                                 </button>
@@ -104,9 +115,19 @@
             </div>
         </aside>
     </header>
+    {% verbatim %}
     <section>
         <div class="row">
             <div class="col s12 m12 l12">
+                <!-- Switch -->
+                <div class="switch">
+                    <label>
+                    Ninguno
+                    <input type="checkbox" ng-model="vm['selected']" ng-change="vm.changeSelected()">
+                    <span class="lever red"></span>
+                    Todos
+                    </label>
+                </div>
                 <table class="table highlight responsive-table">
                     <thead>
                         <tr class="light-blue accent-4">
@@ -115,48 +136,60 @@
                                     <i class="fa fa-angle-double-up"></i>
                                 </a>
                             </th>
+                            <th></th>
                             <th class="center-align col-2">Código</th>
                             <th class="left-align">Descripción</th>
                             <!-- <th class="center-align">Diametro</th> -->
                             <th class="col-2 center-align">Unidad</th>
                             <th class="col-3 center-align">Acabado</th>
-                            {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
                             <th class="col-2 center-align">Area</th>
                             <th class="col-2 center-align">Peso</th>
-                            <th class="col-1 center-align"></th>
-                            <th class="col-1 center-align"></th>
-                            {% endif %}
+                            <th class="col-2 center-align">Categoria</th>
+                            <th class="col-1 center-align" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')"></th>
+                            <th class="col-1 center-align" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')"></th>
                         </tr>
                     </thead>
                     <tbody>
-                    {% for x in materials %}
-                        <tr>
-                            <td class="center-align">{{ forloop.counter }}</td>
-                            <td class="center-align"><small>{{ x.materiales_id }}</small></td>
-                            <td><small>{{ x.matnom }} - {{ x.matmed }}</small></td>
-                            <td class="center-align">{{ x.unidad.uninom }}</td>
-                            <td class="center-align">{{ x.matacb }}</td>
-                            {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-                            <td class="right-align">{{ x.matare }}</td>
-                            <td class="right-align">0</td>
+                        <tr ng-repeat="x in vm.masters">
+                            <td class="center-align">{{$index+1}}</td>
                             <td class="center-align">
-                                <a href="#!pencil" value="{{ x.materiales_id }}" class="blue-text" data-des="{{ x.matnom }}" data-met="{{ x.matmed }}" data-unit="{{ x.unidad_id }}" data-acb="{{ x.matacb }}" data-area="{{ x.matare }}" name="btnedit">
+                                <input type="checkbox" id="{{x.pk}}" class="filled-in red" ng-model="vm.delselected[x.pk]['status']" ng-init="vm.delselected[x.pk]['status']=false">
+                                <label for="{{x.pk}}"></label>
+                                <input type="hidden" ng-model="vm.delselected[x.pk]['pk']" ng-init="vm.delselected[x.pk]['pk']=x.pk">
+                            </td>
+                            <td class="center-align"><small>{{x.pk}}</small></td>
+                            <td><small>{{x.fields.matnom}} - {{x.fields.matmed}}</small></td>
+                            <td class="center-align">{{x.fields.unidad}}</td>
+                            <td class="center-align">{{x.fields.matacb}}</td>
+                            <td class="right-align">{{x.fields.matare}}</td>
+                            <td class="right-align">{{x.fields.weight}}</td>
+                            <td class="center-align">{{x.fields.tipo}}</td>
+                            <td class="center-align" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                                <a href="#!pencil" value="{{ x.materiales_id }}" class="blue-text" name="btnedit" ng-click="vm.showEditing(x)">
                                     <span class="fa fa-pencil"></span>
                                 </a>
                             </td>
-                            <td class="center-align">
-                                <a href="#!trash" class="red-text" data-name="{{ x.matnom }}" data-measure="{{ x.matmed }}" value="{{ x.materiales_id }}" name="btndel">
+                            <td class="center-align" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                                <a href="#!trash" class="red-text" data-name="{{ x.matnom }}" data-measure="{{ x.matmed }}" value="{{ x.materiales_id }}" name="btndel" ng-click="vm.singleDelete(x)">
                                     <span class="fa fa-trash"></span>
                                 </a>
                             </td>
-                            {% endif %}
                         </tr>
-                    {% endfor %}
                     </tbody>
+                    <tfoot ng-hide="vm.masters.length > 0">
+                        <tr>
+                            <td colspan="9">
+                                <div class="progress light-green lighten-4">
+                                    <div class="indeterminate light-green"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
     </section>
+    {% endverbatim %}
 </section>
 <!-- block modal -->
 <div class="modal fade meditmat">

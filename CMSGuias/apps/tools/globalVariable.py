@@ -123,9 +123,14 @@ typeProject = {
     'AYD': 'Alarma y Detección'
 }
 
+# Types Items master system
+MASTER_TYPES = [
+    {'id': 'MT', 'name': 'MATERIALES'},
+    {'id': 'TL', 'name': 'HERRAMIENTAS'},
+    {'id': 'EP', 'name': 'EPPS'},
+]
+
 # date now format str
-
-
 def date_now(type='date', format='%Y-%m-%d'):
     date = datetime.datetime.today()
     if type == 'str':

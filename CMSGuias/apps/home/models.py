@@ -73,8 +73,17 @@ class Unidade(models.Model):
     def __unicode__(self):
         return '%s %s' % (self.unidad_id, self.uninom)
 
+# class Category(models.Model):
+#     '''
+#     Model class category for master items
+#     '''
+#     category_id
+
 
 class Materiale(models.Model):
+    '''
+    model class master for items for the project
+    '''
     materiales_id = models.CharField(
         u'Mnemocode', unique=True, primary_key=True, max_length=15)
     matnom = models.CharField(max_length=200, null=False)
@@ -85,6 +94,13 @@ class Materiale(models.Model):
     # matmod = models.CharField(max_length=40,null=True)
     matacb = models.CharField(max_length=255, null=True)
     matare = models.FloatField(null=True)
+    # @Juan Julcapari 2017-07-12 14:57:30
+    tipo = models.CharField(max_length=2, default='MT', blank=False, null=False)
+    #endblock
+    # @cvaldezch 2017-07-19 14:55:23 - add columns
+    weight = models.FloatField(default=0, blank=False, null=False)
+    register = models.DateTimeField(auto_now_add=True, blank=True, null=False)
+    #endblock
 
     audit_log = AuditLog()
 
@@ -99,6 +115,7 @@ class Materiale(models.Model):
         name = u''.join((self.matnom, self.matmed)).encode('utf-8').strip()
         return '{0} {1} {2}'.format(self.materiales_id, name, self.unidad.uninom)
 
+
 class MNiple(models.Model):
     ktype = models.CharField(max_length=1, primary_key=True)
     ntype = models.CharField(max_length=80)
@@ -110,6 +127,7 @@ class MNiple(models.Model):
 
     def __unicode__(self):
         return '%s %s %s' % (self.ktype, self.ntype, self.ncount)
+
 
 class TypeGroup(models.Model):
     tgroup_id = models.CharField(max_length=7, primary_key=True)
