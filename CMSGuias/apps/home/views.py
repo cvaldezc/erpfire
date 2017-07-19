@@ -847,104 +847,107 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        context = dict()
+        kwargs = dict()
         if request.is_ajax():
             try:
                 if 'code' in request.GET:
-                    context['list'] = [{
-                        'materials': x.materiales_id,
-                        'name': x.matnom,
-                        'measure': x.matmed,
-                        'unit': x.unidad.uninom,
-                        'finished': x.matacb,
-                        'area': x.matare}
+                    kwargs['list'] = [
+                        {
+                            'materials': x.materiales_id,
+                            'name': x.matnom,
+                            'measure': x.matmed,
+                            'unit': x.unidad.uninom,
+                            'finished': x.matacb,
+                            'area': x.matare
+                        }
                         for x in Materiale.objects.filter(
                             materiales_id__startswith=request.GET.get('code'))]
-                    a = (request.user.get_profile(
-                            ).empdni.charge.area.lower() == 'administrator')
-                    v = (request.user.get_profile(
-                            ).empdni.charge.area.lower() == 'ventas')
+                    a = (request.user.get_profile().empdni.charge.area.lower() == 'administrator')
+                    v = (request.user.get_profile().empdni.charge.area.lower() == 'ventas')
                     if a or v:
-                        context['user'] = True
+                        kwargs['user'] = True
                     else:
-                        context['user'] = False
-                    context['status'] = True
+                        kwargs['user'] = False
+                    kwargs['status'] = True
                 if 'desc' in request.GET:
-                    context['list'] = [{
-                        'materials': x.materiales_id,
-                        'name': x.matnom,
-                        'measure': x.matmed,
-                        'unit': x.unidad.uninom,
-                        'finished': x.matacb,
-                        'area': x.matare}
+                    kwargs['list'] = [
+                        {
+                            'materials': x.materiales_id,
+                            'name': x.matnom,
+                            'measure': x.matmed,
+                            'unit': x.unidad.uninom,
+                            'finished': x.matacb,
+                            'area': x.matare
+                        }
                         for x in Materiale.objects.filter(
-                        matnom__icontains=request.GET.get('desc'))]
-                    a = (request.user.get_profile(
-                            ).empdni.charge.area.lower() == 'administrator')
-                    v = (request.user.get_profile(
-                            ).empdni.charge.area.lower() == 'ventas')
+                            matnom__icontains=request.GET.get('desc'))]
+                    a = (request.user.get_profile().empdni.charge.area.lower() == 'administrator')
+                    v = (request.user.get_profile().empdni.charge.area.lower() == 'ventas')
                     if a or v:
-                        context['user'] = True
+                        kwargs['user'] = True
                     else:
-                        context['user'] = False
-                    context['status'] = True
+                        kwargs['user'] = False
+                    kwargs['status'] = True
                 # Ajax method for json
                 if 'searchName' in request.GET:
                     name = Materiale.objects.filter(
                         matnom__icontains=request.GET['name']).distinct(
-                        'matnom').order_by('matnom')
-                    context['names'] = [{
-                            'name': x.matnom}
-                            for x in name]
-                    context['status'] = True
+                            'matnom').order_by('matnom')
+                    kwargs['names'] = [
+                        {
+                            'name': x.matnom
+                        }
+                        for x in name]
+                    kwargs['status'] = True
                 if 'searchNamebyCode' in request.GET:
-                    name = Materiale.objects.filter(
-                            materiales_id=request.GET['scode'])
-                    context['names'] = [{
-                            'name': x.matnom}
-                            for x in name]
-                    context['status'] = True
+                    name = Materiale.objects.filter(materiales_id=request.GET['scode'])
+                    kwargs['names'] = [
+                        {
+                            'name': x.matnom
+                        }
+                        for x in name]
+                    kwargs['status'] = True
                 if 'searchMeter' in request.GET:
                     meter = Materiale.objects.filter(
                         matnom__icontains=request.GET['name']).distinct(
-                        'matmed').order_by('matmed')
-                    context['meter'] = [{
+                            'matmed').order_by('matmed')
+                    kwargs['meter'] = [
+                        {
                             'measure': x.matmed,
-                            'code': x.materiales_id}
-                            for x in meter]
-                    context['status'] = True
+                            'code': x.materiales_id
+                        }
+                        for x in meter]
+                    kwargs['status'] = True
                 if 'summary' in request.GET:
-                    material = Materiale.objects.get(
-                                materiales_id=request.GET['scode'])
+                    material = Materiale.objects.get(materiales_id=request.GET['scode'])
                     price = None
                     try:
                         price = DetCompra.objects.filter(
                             materiales_id=material.materiales_id).latest(
-                            'compra__registrado').precio
+                                'compra__registrado').precio
                     except ObjectDoesNotExist, e:
                         price = 0
-                    context['summary'] = {
+                    kwargs['summary'] = {
                         'materials': material.materiales_id,
                         'name': material.matnom,
                         'measure': material.matmed,
                         'unit': material.unidad.uninom,
                         'price': price
                     }
-                    context['status'] = True
+                    kwargs['status'] = True
             except ObjectDoesNotExist, e:
-                context['raise'] = e.__str__()
-                context['status'] = False
-            return self.render_to_json_response(context)
+                kwargs['raise'] = e.__str__()
+                kwargs['status'] = False
+            return self.render_to_json_response(kwargs)
         else:
             try:
-                context['materials'] = Materiale.objects.all().order_by(
-                                        'matnom')[:50]
-                context['unidad'] = Unidade.objects.all()
+                kwargs['materials'] = Materiale.objects.all().order_by('matnom')[:50]
+                kwargs['unidad'] = Unidade.objects.all()
                 return render_to_response(
                     'home/crud/materials.html',
-                    context,
+                    kwargs,
                     context_instance=RequestContext(request))
-            except TemplateDoesNotExist, e:
+            except TemplateDoesNotExist as e:
                 raise Http404(e)
 
     @method_decorator(login_required)

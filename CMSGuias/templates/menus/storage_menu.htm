@@ -62,6 +62,21 @@
           </ul>
         </li>
         <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Herramienta<b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a class="black-text" href="{% url 'viewherramienta' %}">Herramientas</a></li>
+            <li class="divider"></li>
+            <li><a class="black-text" href="{% url 'viewguiaherra' %}">Guia Herramienta</a></li>
+            <li><a class="black-text" href="{% url 'viewinventario' %}">Inventario</a></li>
+            <li class="divider"></li>
+            <li><a class="black-text" href="{% url 'viewdevolucion' %}">Doc Devolucion</a></li>
+            <li><a class="black-text" href="{% url 'viewconsulta' %}">Consulta</a></li>
+            <li><a class="black-text" href="{% url 'viewestherramienta' %}">Estado Herramienta</a></li>
+            <li class="divider"></li>
+            <li><a class="black-text" href="{% url 'viewcarga' %}">Cargar Herramienta</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Compras <b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li><a href="{% url 'view_purchase_input' %}">Ingreso de Compras</a></li>
