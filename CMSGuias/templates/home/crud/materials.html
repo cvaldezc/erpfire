@@ -1,161 +1,196 @@
-{% extends "base.html" %}
-{% block script %}
-    <!--<script src="http://cdnjs.cloudflare.com/ajax/libs/floatthead/1.2.8/jquery.floatThead.min.js"></script>-->
-    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
-    <script src="{{ MEDIA_URL }}js/home/materials.js"></script>
-    <script src="{{ MEDIA_URL }}js/floatThead.js"></script>
-{% endblock script %}
+{% extends "basemd.html" %}
 {% block title %}
-    Manager Materials
+    Manage Materials
 {% endblock title %}
 {% block menu %}
     {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-        {% include "menus/sale.htm" %}
+        {% include "menus/salesmd.html" %}
     {% endif %}
     {% if user.get_profile.empdni.charge.area|lower == 'logistica' %}
         {% include "menus/logistics.htm" %}
     {% endif %}
     {% if user.get_profile.empdni.charge.area|lower == 'operaciones' %}
-        {% include "menus/operations.htm" %}
+        {% include "menus/operationsmd.htm" %}
+    {% endif %}
+    {% if user.get_profile.empdni.charge.area|lower == 'almacen' %}
+        {% include "menus/storagemd.htm" %}
     {% endif %}
 {% endblock menu %}
 {% block content %}
-<div class="container-fluid">
-    <div class="well">
-        <header>
-            <h3>Materials</h3>
-            <aside class="bs-callout bs-callout-warning">
-                <strong>Busqueda de Materiales</strong>
-                <div class="row">
-                    <div class="col-md-2">
-                        <div class="form-group has-warning">
-                            <label class="control-label">Código</label>
-                            <input type="text" maxlength="15" name="searchCode" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="form-group has-warning">
-                            <label class="control-label">Descripción</label>
-                            <input type="text" name="searchDesc" class="form-control">
-                        </div>
+<!--block css -->
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL}}/vendor/chosen/chosen.css">
+<!--endblock  -->
+<section ng-app="app" ng-controller="ControllerMasterItem as vm">
+    <input type="hidden"  ng-init="vm.permissionarea='{{ user.get_profile.empdni.charge.area|lower }}'">
+    <header>
+        <aside class="card-panel">
+            <h5><i class="fa fa-bars"></i> Materiales</h5>
+            <strong><i class="fa fa-search"></i> Busqueda</strong>
+            <div class="row">
+                <div class="col s12 m3 l2">
+                    <div class="input-field">
+                        <input type="text" maxlength="15" name="searchCode" class="form-control" ng-model="vm.search['code']" ng-keyup="vm.searchMaster($event, 'code')">
+                        <label class="control-label">Código</label>
                     </div>
                 </div>
-                {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-                <button class="btn btn-primary btn-show-new">
-                    <span class="fa fa-plus"></span>
-                    <span class="form-class">Nuevo Material</span>
-                </button>
-                {% endif %}
-                <div class="panel panel-primary panel-new">
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <div class="form-group has-primary">
-                                    <label class="control-label">Codigo</label>
-                                    <input type="text" maxlength="15" class="form-control input-sm" name="materials" placeholder="Codigo">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group has-primary">
-                                    <label class="control-label">Descripción</label>
-                                    <input type="text" class="form-control input-sm" name="matnom" placeholder="Descripción">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group has-primary">
-                                    <label class="control-label">Diametro</label>
-                                    <input type="text" class="form-control input-sm" name="matmed" placeholder="Diametro">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group has-primary">
-                                    <label class="control-label">Unidad</label>
-                                    <select type="text" class="form-control input-sm" name="unidad" placeholder="Unidad">
-                                        {% for x in unidad %}
-                                            <option value="{{ x.unidad_id }}">{{ x.uninom }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group has-primary">
-                                    <label class="control-label">Acabado</label>
-                                    <input type="text" class="form-control input-sm" name="matacb" placeholder="Acabado">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group has-primary">
-                                    <label class="control-label">Area</label>
-                                    <input type="text" class="form-control input-sm" name="matare" placeholder="Area">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group has-primary">
-                                    <label class="control-label">Guardar Cambios</label>
-                                    <button class="btn btn-primary btn-save-material form-control">
-                                        <span class="fa fa-save fa-lg"></span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                <div class="col s12 m9 l10">
+                    <div class="input-field">
+                        <input type="text" name="searchDesc" class="form-control" ng-model="vm.search['desc']" ng-keyup="vm.searchMaster($event, 'desc')">
+                        <label class="control-label">Descripción</label>
                     </div>
-                </div>
-            </aside>
-        </header>
-        <section>
-            <div class="panel panel-warning">
-                <div class="table-responsive">
-                    <table class="table table-condensed table-hover">
-                        <thead>
-                            <tr class="brand-warning">
-                                <th class="text-center">
-                                    <button class="btn btn-xs btn-link btn-top-page text-black text-bold">
-                                        <span class="fa fa-angle-double-up"></span>
-                                    </button>
-                                </th>
-                                <th class="text-center">Codigo</th>
-                                <th class="text-center">Descripción</th>
-                                <th class="text-center">Diametro</th>
-                                <th class="text-center">Unidad</th>
-                                <th class="text-center">Acabado</th>
-                                {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-                                <th class="text-center">Area</th>
-                                <th class="text-center">Edit</th>
-                                <th class="text-center">Eliminar</th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for x in materials %}
-                                <tr>
-                                    <td class="text-center">{{ forloop.counter }}</td>
-                                    <td class="text-center">{{ x.materiales_id }}</td>
-                                    <td>{{ x.matnom }}</td>
-                                    <td>{{ x.matmed }}</td>
-                                    <td class="text-center">{{ x.unidad.uninom }}</td>
-                                    <td>{{ x.matacb }}</td>
-                                    {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-                                    <td>{{ x.matare }}</td>
-                                    <td class="text-center">
-                                        <button value="{{ x.materiales_id }}" class="btn btn-xs btn-link text-black" data-des="{{ x.matnom }}" data-met="{{ x.matmed }}" data-unit="{{ x.unidad_id }}" data-acb="{{ x.matacb }}" data-area="{{ x.matare }}" name="btnedit">
-                                            <span class="fa fa-edit"></span>
-                                        </button>
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-xs btn-link text-red" data-name="{{ x.matnom }}" data-measure="{{ x.matmed }}" value="{{ x.materiales_id }}" name="btndel">
-                                            <span class="fa fa-trash-o"></span>
-                                        </button>
-                                    </td>
-                                    {% endif %}
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
                 </div>
             </div>
-        </section>
-    </div>
-</div>
+            <button class="waves-effect waves-light btn light-green grey-text text-darken-3" ng-click="vm.blocknew=!vm.blocknew" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                <i class="fa fa-plus"></i>
+                <span class="hide-on-small-only">Nuevo</span>
+            </button>
+
+            <button class="waves-effect waves-light btn red" ng-click="vm.selectedDelete()" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                <i class="fa fa-free-code-camp"></i>
+                <span class="hide-on-small-only">Eliminar Seleccionados</span>
+            </button>
+            <div class="card" ng-show="vm.blocknew">
+                <div class="card-content">
+                    <div class="row">
+                        <div class="col s12 m2 l2">
+                            <div class="input-field">
+                                <input type="text" maxlength="15" name="materials" ng-model="vm.master['materiales_id']" placeholder="Codigo">
+                                <label class="control-label">Código</label>
+                            </div>
+                        </div>
+                        <div class="col s12 m5 l5">
+                            <div class="input-field">
+                                <input type="text" name="matnom" placeholder="Descripción" ng-model="vm.master['matnom']">
+                                <label class="control-label">Descripción</label>
+                            </div>
+                        </div>
+                        <div class="col s12 m5 l5">
+                            <div class="input-field">
+                                <input type="text" name="matmed" placeholder="Diametro" ng-model="vm.master['matmed']">
+                                <label class="control-label">Diametro</label>
+                            </div>
+                        </div>
+                        <div class="col s12 m2 l2">
+                            <div class="input-field">
+                                <input type="text" name="matacb" placeholder="Acabado" ng-model="vm.master['matacb']">
+                                <label class="control-label">Acabado</label>
+                            </div>
+                        </div>
+                        <div class="col s12 m2 l2">
+                            <div class="input-field">
+                                <input type="number" step="0.10" name="matare" class="right-align" placeholder="Area" ng-model="vm.master['matare']">
+                                <label class="control-label">Area</label>
+                            </div>
+                        </div>
+                        <div class="col s12 m2 l2">
+                            <div class="input-field">
+                                <input type="number" step="0.10" name="metweight" class="right-align" placeholder="Peso" ng-model="vm.master['weight']">
+                                <label class="control-label">Peso</label>
+                            </div>
+                        </div>
+                        <div class="col s12 m2 l2 input-field">
+                            <label class="active">Unidad</label>
+                            <select class="browser-default select-chosen" name="unidad" placeholder="Unidad" ng-model="vm.master['unidad']">
+                                {% for x in unidad %}
+                                    <option value="{{ x.unidad_id }}">{{ x.uninom }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col s12 m2 l2 input-field">
+                            <label class="active">Categoria</label>
+                            <select class="browser-default select-chosen" id="tipo" ng-model="vm.master.tipo" ng-options="x.id as x.name for x in vm.categories"></select>
+                        </div>
+                        <div class="col s12 m2 l2">
+                            <div class="input-field">
+                                <!-- <label class="active">Guardar Materiales</label>
+                                <br> -->
+                                <button type="button" class="waves-effect waves-light btn btn-save-material light-blue pulse" ng-click="vm.saveMaster()" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                                    <i class="fa fa-save fa-2x"></i>
+                                    <span class="hide-on-small-only">Guardar</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </header>
+    {% verbatim %}
+    <section>
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <!-- Switch -->
+                <div class="switch">
+                    <label>
+                    Ninguno
+                    <input type="checkbox" ng-model="vm['selected']" ng-change="vm.changeSelected()">
+                    <span class="lever red"></span>
+                    Todos
+                    </label>
+                </div>
+                <table class="table highlight responsive-table">
+                    <thead>
+                        <tr class="light-blue accent-4">
+                            <th class="center-align col-1">
+                                <a href="#!pageup" class="btn-top-page grey-text text-darken-3">
+                                    <i class="fa fa-angle-double-up"></i>
+                                </a>
+                            </th>
+                            <th></th>
+                            <th class="center-align col-2">Código</th>
+                            <th class="left-align">Descripción</th>
+                            <!-- <th class="center-align">Diametro</th> -->
+                            <th class="col-2 center-align">Unidad</th>
+                            <th class="col-3 center-align">Acabado</th>
+                            <th class="col-2 center-align">Area</th>
+                            <th class="col-2 center-align">Peso</th>
+                            <th class="col-2 center-align">Categoria</th>
+                            <th class="col-1 center-align" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')"></th>
+                            <th class="col-1 center-align" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="x in vm.masters">
+                            <td class="center-align">{{$index+1}}</td>
+                            <td class="center-align">
+                                <input type="checkbox" id="{{x.pk}}" class="filled-in red" ng-model="vm.delselected[x.pk]['status']" ng-init="vm.delselected[x.pk]['status']=false">
+                                <label for="{{x.pk}}"></label>
+                                <input type="hidden" ng-model="vm.delselected[x.pk]['pk']" ng-init="vm.delselected[x.pk]['pk']=x.pk">
+                            </td>
+                            <td class="center-align"><small>{{x.pk}}</small></td>
+                            <td><small>{{x.fields.matnom}} - {{x.fields.matmed}}</small></td>
+                            <td class="center-align">{{x.fields.unidad}}</td>
+                            <td class="center-align">{{x.fields.matacb}}</td>
+                            <td class="right-align">{{x.fields.matare}}</td>
+                            <td class="right-align">{{x.fields.weight}}</td>
+                            <td class="center-align">{{x.fields.tipo}}</td>
+                            <td class="center-align" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                                <a href="#!pencil" value="{{ x.materiales_id }}" class="blue-text" name="btnedit" ng-click="vm.showEditing(x)">
+                                    <span class="fa fa-pencil"></span>
+                                </a>
+                            </td>
+                            <td class="center-align" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                                <a href="#!trash" class="red-text" data-name="{{ x.matnom }}" data-measure="{{ x.matmed }}" value="{{ x.materiales_id }}" name="btndel" ng-click="vm.singleDelete(x)">
+                                    <span class="fa fa-trash"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot ng-hide="vm.masters.length > 0">
+                        <tr>
+                            <td colspan="9">
+                                <div class="progress light-green lighten-4">
+                                    <div class="indeterminate light-green"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </section>
+    {% endverbatim %}
+</section>
 <!-- block modal -->
 <div class="modal fade meditmat">
     <div class="modal-dialog">
@@ -167,20 +202,20 @@
             <div class="modal-body">
                 <div class="form-group has-warning">
                     <div class="form-group">
-                        <label class="control-label">Descripcion</label>
-                        <input type="text" class="form-control input-sm" name="ematnom">
+                        <label class="input-field">
+                        <input type="text" name="ematnom">
                     </div>
                 </div>
                 <div class="form-group has-warning">
                     <div class="form-group">
-                        <label class="control-label">Diametro</label>
-                        <input type="text" class="form-control input-sm" name="ematmed">
+                        <label class="input-field">
+                        <input type="text" name="ematmed">
                     </div>
                 </div>
                 <div class="form-group has-warning">
                     <div class="form-group">
-                        <label class="control-label">Unidad</label>
-                        <select name="eunidad" class="form-control input-sm">
+                        <label class="input-field">
+                        <select name="eunidad">
                             {% for x in unidad %}
                                 <option value="{{ x.unidad_id }}">{{ x.uninom }}</option>
                             {% endfor %}
@@ -189,14 +224,14 @@
                 </div>
                 <div class="form-group has-warning">
                     <div class="form-group">
-                        <label class="control-label">Acabado</label>
-                        <input type="text" class="form-control input-sm" name="ematacb">
+                        <label class="input-field">
+                        <input type="text" name="ematacb">
                     </div>
                 </div>
                 <div class="form-group has-warning">
                     <div class="form-group">
-                        <label class="control-label">Area</label>
-                        <input type="text" class="form-control input-sm" name="ematare">
+                        <label class="input-field">
+                        <input type="text" name="ematare">
                     </div>
                 </div>
             </div>
@@ -214,4 +249,10 @@
     </div>
 </div>
 {% csrf_token %}
+<!-- block script -->
+<script defer src="{{MEDIA_URL}}vendor/chosen/chosen.jquery.js"></script>
+<script defer src="{{MEDIA_URL}}vendor/angular/angular.min.js"></script>
+<script defer src="{{MEDIA_URL}}vendor/angular-cookies/angular-cookies.min.js"></script>
+<!-- <script defer src="{{MEDIA_URL}}vendor/trumbowyg/dist/trumbowyg.min.js"></script> -->
+<script defer src="{{ MEDIA_URL }}js/home/materials.js"></script>
 {% endblock content %}
