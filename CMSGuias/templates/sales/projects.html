@@ -224,12 +224,12 @@
               <input type="text" data-ng-model="scustomers">
               <label>Buscar por clientes</label>
             </div>
-            <div class="col l12 input-field" data-ng-model="sfprojects" data-ng-show="sfprojects">
+            <div class="col l12 m12 s12 input-field" data-ng-model="sfprojects" data-ng-show="sfprojects">
               <i class="fa fa-filter prefix"></i>
               <input type="text" data-ng-model="sprojects">
               <label>Buscar por Proyectos</label>
             </div>
-            <div class="col l12 " ng-show="sfprojects">
+            <div class="col l12 m12 s12" ng-show="sfprojects">
               <!--<i class="fa fa-dot-circle-o prefix"></i>-->
               <label>Estado de Proyecto</label>
               <select class="browser-default" ng-model="pstatus" ng-options="x.key as x.val for x in gstatus" ng-change="gprojectstatus()">

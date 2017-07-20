@@ -1854,7 +1854,7 @@ listherraguia = function () {
 }
 
 verdocherrapdf = function () {
-  window.open('http://' + location.hostname + ':8089/reports/toolsguidereturn?ndoc=' + this.value, '_blank');
+  window.open('http://' + location.hostname + ':8089/reports/guide/toolsreturn?ndoc=' + this.value, '_blank');
 }
 
 verguiaherrapdf = function () {

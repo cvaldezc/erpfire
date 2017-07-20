@@ -1010,6 +1010,8 @@ class RestfulExchangeRate(JSONResponseMixin, DetailView):
         return self.render_to_json_response(context, **kwargs)
 
 class RestfulDataRuc(JSONResponseMixin, View):
+
+    @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         if request.is_ajax():
             context = dict()
@@ -1061,6 +1063,8 @@ def parseSunat(url):
 # stage2dev
 # Country
 class ViewContry(JSONResponseMixin, View):
+
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
             context = dict()
@@ -1074,6 +1078,8 @@ class ViewContry(JSONResponseMixin, View):
             return self.render_to_json_response(context)
 
 class ViewDepartament(JSONResponseMixin, View):
+
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
             context = dict()
@@ -1087,6 +1093,8 @@ class ViewDepartament(JSONResponseMixin, View):
             return self.render_to_json_response(context)
 
 class ViewProvince(JSONResponseMixin, View):
+
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
             context = dict()
@@ -1100,6 +1108,8 @@ class ViewProvince(JSONResponseMixin, View):
             return self.render_to_json_response(context)
 
 class ViewDistrict(JSONResponseMixin, View):
+
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
             context = dict()
@@ -1113,6 +1123,8 @@ class ViewDistrict(JSONResponseMixin, View):
             return self.render_to_json_response(context)
 
 class ViewCopyMaterialesProjectsSale(JSONResponseMixin, DetailView):
+
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
             context = dict()
@@ -1163,6 +1175,7 @@ class ViewCopyMaterialesProjectsSale(JSONResponseMixin, DetailView):
                 context['status'] = False
             return self.render_to_json_response(context)
 
+    @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         if request.is_ajax():
             context = dict()
@@ -1200,13 +1213,23 @@ class ViewCopyMaterialesProjectsSale(JSONResponseMixin, DetailView):
                 context['status'] = False
             return self.render_to_json_response(context)
 
+
 class TreePath(View):
-    def post(self, request, *args, **kwargs):
-        path = uploadFiles.listDir(request.POST.get('dir'))
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        print request.GET
+        path = uploadFiles.listDir(request.GET['dir'])
         return HttpResponse(path, 'text/plain')
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        path = uploadFiles.listDir(request.POST['dir'])
+        return HttpResponse(path, 'text/plain')
+
 
 # Request IVA by year
 class GetIVAYear(JSONResponseMixin, View):
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         context = dict()
         try:
