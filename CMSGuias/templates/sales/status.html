@@ -2,6 +2,7 @@
 {% block menu %}
     {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
         {% include "menus/salesmd.html" %}
+        <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/jqueryFileTree.css">
     {% endif %}
     {% if user.get_profile.empdni.charge.area|lower == 'logistica'%}
         {% include "menus/logisticsmd.htm" %}
@@ -31,7 +32,39 @@
                     <dd>{{pro.direccion}}</dd>
                 <dt>Cliente: </dt>
                     <dd>{{pro.ruccliente_id}} {{pro.ruccliente.razonsocial}}</dd>
+                <dt>Documentos de Cierre:</dt>
+                <dd><a href="{% url 'closedproject_view' pro.proyecto_id %}"><i class="fa fa-text-file"></i> Revisar</a></dd>
             </dl>
         </div>
+        {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+            <small>Vista solo Adminitradores y ventas</small>
+            <div class="card-panel">
+                <div class="row">
+                    <div class="col s12 m6 l6">
+                        <h5>Archivos Administrativos</h5>
+                        <div class="administrative"></div>
+                    </div>
+                    <div class="col s12 m6 l6"></div>
+                </div>
+            </div>
+            <script defer src="{{ MEDIA_URL }}js/jqueryFileTree.js"></script>
+            <script defer>
+                $(document).ready(function() {
+                    $.get(
+                        '/json/get/path/',
+                        {'dir': '/storage/projects/{{pro.registrado|date:"Y"}}/{{pro.proyecto_id}}/administrative/'},
+                        function(response) {
+                            var $padmin = $('.administrative');
+                            $padmin.empty();
+                            console.log(response);
+                            $padmin.html(response);
+                            setTimeout(function(){
+                                $('.jqueryFileTree').css('display', 'block');
+                            },400);
+                        }
+                    );
+                });
+            </script>
+        {% endif %}
     </section>
 {% endblock content %}

@@ -80,7 +80,7 @@ class ClosedProjectView(JSONResponseMixin, View):
                     kwargs['status'] = False
                     kwargs['raise'] = str(ex)
                 return self.render_to_json_response(kwargs)
-            kwargs['pr'] = Proyecto.objects.get(proyecto_id=kwargs['pro'], flag=True, status='AC')
+            kwargs['pr'] = Proyecto.objects.get(proyecto_id=kwargs['pro'], flag=True)
             return render(request, 'sales/closedproject.html', kwargs)
         except TemplateDoesNotExist as ex:
             raise Http404(ex)
