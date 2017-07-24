@@ -1,70 +1,71 @@
 {% extends "basemd.html" %}
+
 {% block title %}
-  Herramienta
+  Listado
 {% endblock %}
 {% block menu %}
   {% include "menus/storagemd.htm" %}
 {% endblock %}
 {% block content %}
 <script src="/media/js/almacen/guiaherramienta.js"></script>
-<link rel="stylesheet" href="/media/css/almacen/guiaherramienta.css">
-<div>
+<link rel="stylesheet" href="/media/css/almacen/guia.css">
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
 
+<div class="row" style="margin:20px">
+  <div class="input-field col" id="divtipoacce">
+    <div class="panel-group">
+      <div class="panel" style="margin-left:20px;margin-right:20px;">
+        <div class="panel-heading" style="">
+          <h4 class="panel-title">Listado</h4>
+        </div>
+          <div class="panel-body" style="margin-top:-15px">
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchhe"/>
+            <label for="switchhe" id="switchhe" style="font-size:15px;font-weight:bold;color:black;">HERRAMIENTA</label>
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchepps"/>
+            <label for="switchepps" id="switchepps" style="font-size:15px;font-weight:bold;color:black;">EPPs</label>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div align="center">
+  <h4 class="lbltipoacce"></h4>
+</div>
+<div style="margin:50px; display:none" id="divherramienta">
   <div class="row divcabherra">
-    <div class="card" style="width:95%;">
+    <div class="card">
     <div class="card-action" style="height:100px;">
       <div class="input-field col s4">
-      	<div class="btnaddherr">
-        	<button type="button" name="btnopennewherra" data-herra="btnnewherra" class="btn waves-effect teal lighten-1 btnopennewherra">
-                  <i class="fa fa-plus"></i>
-        	        <span><strong>AGREGAR HERRAMIENTA</strong></span>
-        	</button>
-      	</div>
+      	<button style="width:300px;" type="button" name="btnopennewherra" data-herra="btnnewherra" class="btn waves-effect teal lighten-1 btnopennewherra">
+                <i class="fa fa-plus"></i>
+      	        <span><strong>AGREGAR <strong class="lbltipoacce"></strong></strong></span>
+      	</button>
       </div>
       <div class="input-field col s7">
         <div class="divbuscar">
           <i class="prefix fa fa-search"></i>
-          <input class="txtbuscar" style="width:90%;" type="search" placeholder="Buscar Herramienta" data-table="tabl" name="txtbuscar" id="txtbuscar" >
+          <input class="txtbuscar" style="width:90%;" type="search" placeholder="Codigo o descripcion" data-table="tabl" name="txtbuscar" id="txtbuscar" >
         </div>
       </div>
     </div>
     </div>
   </div>
-
-    <table class="tabla-herra" id="tabla-herra">
-
-        <thead>
+    <table class="table responsive-table highlight table-condensed tabla-herra" id="tabla-herra" style="margin-bottom:50px">
+        <thead class="cab">
           <tr>
-            <th class="tnumherra">#</th>
-            <th class="tcodherra">Codigo</th>
-            <th class="tnameherra">Herramienta</th>
-            <th class="tmarcaherra">Marca</th>
-            <th class="tunidherra">Unidad</th>
-            <th class="teditherra"></th>
-            <!--<th class="titedit"></th>-->
-            <!--<th></th>-->
-
+            <th class="colst40">#</th>
+            <th class="colst150">CODIGO</th>
+            <th ><h6 class="lbltipoacce" style="font-weight:bold"></h6></th>
+            <th >MEDIDA</th>
+            <th class="colst150">MARCA</th>
+            <th class="colst150">UNIDAD</th>
+            <th class="colst150">ACCIONES</th>
           </tr>
         </thead>
-        <tbody id="fbody" class="bodydetailsherra">
-          {% for x in lherra %}
-          <tr class="fer">
-            <td class="tnumherra">{{ forloop.counter }}</td>
-            <td class="tcodherra">{{ x.herramienta_id }}</td>
-            <td class="tnameherra">{{ x.nombre }} - {{ x.medida }}</td>
-            <td class="tmarcaherra">{{ x.marca.brand }}</td>
-            <td class="tunidherra">{{ x.unidad.uninom }}</td>
-            <td class="teditherra">
-			<button type="button" class="btn btneditherramienta" value="{{ x.herramienta_id }}" ><i class="fa fa-pencil" data-nombre = "7" data-medida="{{ x.medida }}" data-marca="{{ x.marca_id }}" data-unidad="{{ x.unidad_id }}" data-tvida="{{ x.tvida }}"></i><span class="glyphicon glyphicon-edit"></span></button>
-			</td>
-      <!--
-			<td class="titedit">
-			<button type="button" class="btn red btndelherramienta" value="{{ herramienta_id }}"><i class="fa fa-trash-o"></i></button>
-			</td>
-      -->
-          </tr>
-          {% endfor %}
-          </tbody>
+        <tbody></tbody>
     </table>
 </div>
 

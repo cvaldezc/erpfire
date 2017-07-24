@@ -1,0 +1,319 @@
+{% extends "basemd.html" %}
+
+{% block title %}
+  Traslado
+{% endblock %}
+{% block menu %}
+  {% include "menus/storagemd.htm" %}
+{% endblock %}
+{% block content %}
+<script src="/media/js/almacen/guiaherramienta.js"></script>
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+<link rel="stylesheet" href="/media/css/almacen/guia.css">
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+
+<div class="row" style="margin:20px">
+  <div class="input-field col" id="divtipoacce">
+    <div class="panel-group">
+      <div class="panel" style="margin-left:20px;margin-right:20px;">
+        <div class="panel-heading" style="">
+          <h4 class="panel-title">Traslados</h4>
+        </div>
+          <div class="panel-body" style="margin-top:-15px">
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchhe"/>
+            <label for="switchhe" id="switchhe" style="font-size:15px;font-weight:bold;color:black;">HERRAMIENTA</label>
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchepps"/>
+            <label for="switchepps" id="switchepps" style="font-size:15px;font-weight:bold;color:black;">EPPS</label>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div align="center">
+  <h4 class="lbltipoacce"></h4>
+</div>
+
+<div style="margin:50px;display:none" id="divtrasladohe">
+  <div class="card">
+    <div class="card-action">
+      <div class="input-field col s12">
+        <i class="prefix fa fa-sign-in"></i>
+        <input class="txttrherramienta"  type="text" placeholder="">
+        <label for="txttrherramienta">CODIGO O DESCRIPCION</label>
+      </div>
+    </div>
+  </div>
+
+  <div id="divcontent" style="display:none">
+    <div class="row">
+      <div class="col s12">
+        <ul class="tabs">
+          <li class="tab col s6"><a href="#divtab-trldetgherra" style="font-weight:bold">ITEMS EN OBRA</a></li>
+          <li class="tab col s6"><a href="#divtab-trldetalle" style="font-weight:bold">Detalle de Traslado</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="divtab-trldetgherra" style="">
+        <div class="row">
+          <div class="input-field col">
+            <input onclick="javascript:trselradio();" name="estdetradio" type="radio" id="radtrall" value="all" class="estdetradio" checked="true"/>
+            <label for="radtrall" style="font-weight:bold;color:black;">Todos</label>
+            <input onclick="javascript:trselradio();" name="estdetradio" type="radio" id="radtrnone" value="none" class="estdetradio" />
+            <label for="radtrnone" style="font-size:15px;font-weight:bold;color:black;">Ninguno</label>
+          </div>
+          <div class="input-field col" style="margin-left:5%">
+            <h6 class="tittrdeshe" style="font-weight:bold"></h6>
+          </div>
+        </div>
+
+      <div style="overflow-y:scroll;height:330px;">
+        <table class="table table-condensed responsive-table highlight tab-trldetgherra">
+          <thead class="cab">
+            <tr>
+              <th class="colst40">#</th>
+              <th >Proyecto</th>
+              <th class="colst150">Guia</th>
+              <th class="colst150">Cantidad</th>
+              <th class="colst150">C.Devuelto</th>
+              <th class="colst50">Cant.</th>
+              <th class="colst50"></th>
+              <th class="colst150">Estado</th>
+              <th>Comentario</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div align="right">
+          <button style="border:none;" type="button" class="btn waves-effect teal lighten-1 btntraddherra" value=""><i class="fa fa-plus-square"></i><span>
+          <strong>Agregar</strong>
+          </span>
+          </button>
+      </div>
+    </div>
+
+    <div id="divtab-trldetalle">
+
+      <div style="overflow-y:scroll;height:330px;margin-top:85px">
+        <table class="table table-condensed responsive-table highlight tab-trldetalle">
+          <thead class="cab">
+            <tr>
+              <th class="colst40">#</th>
+              <th class="colst150">PROYECTO</th>
+              <th class="colst150">GUIA</th>
+              <th class="colst150">CODIGO</th>
+              <th class="lbltipoacce" style="font-weight:bold"></th>
+              <th class="colst150">MARCA</th>
+              <th class="colst150">CANTIDAD</th>
+              <th class="colst150">ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div align="right">
+          <button style="border:none;" type="button" class="btn waves-effect teal lighten-1 btntrsavetras" value=""><i class="fa fa-floppy-o"></i><span>
+          <strong>Guardar</strong>
+          </span>
+          </button>
+      </div>
+    </div>
+  </div>
+    <!--
+    <div id="tabproyectos" class="">
+      <div class="col s12" style="overflow-y:scroll;height:520px">
+        <table class="table table-condensed responsive-table highlight tab-trlproyectos">
+          <div class="row">
+            <div class="input-field col">
+              <h5>Lista de Proyectos</h5>
+            </div>
+          </div>
+          <thead class="cab">
+            <tr>
+              <th class="colst40">#</th>
+              <th>Proyecto</th>
+              <th>Supervisor</th>
+              <th class="colst150">Fecha de Salida</th>
+              <th class="colst150"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="tabguias">
+      <div class="col s12" style="overflow-y:scroll;height:520px;">
+        <table class="table table-condensed responsive-table highlight tab-trlguia">
+          <div class="row">
+            <div class="input-field col">
+              <h5 class="tittabcodproy"></h5>
+            </div>
+            <div class="input-field col">
+              <h5 class="tittabnameproy"></h5>
+            </div>
+          </div>
+          <thead class="cab">
+            <tr>
+              <th class="colst40">#</th>
+              <th class="colst150">Guia</th>
+              <th class="colst150">F.Salida</th>
+              <th>Registrado por: </th>
+              <th class="colst150">F.Registro</th>
+              <th class="colst150">Comentario</th>
+              <th class="colst150"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    -->
+</div>
+
+<div class="modal modtrlherra" style="height:80%;width:90%">
+  <div class="modal-content">
+    <div class="input-field col s12">
+      <i class="prefix fa fa-search"></i>
+      <input class="txttrbuscherra" id="txttrbuscherra"  type="text" placeholder="Codigo o descripcion">
+    </div>
+    <div style="overflow-y:scroll;height:430px">
+      <table class="table table-condensed highlight responsive-table tab-trlherra" id="tab-trlherra">
+        <thead class="cab">
+          <tr>
+            <th class="colst40">#</th>
+            <th class="colst150">CODIGO</th>
+            <th class="lbltipoacce" style="font-weight:bold"></th>
+            <th class="colst150">MARCA</th>
+            <th class="colst150">UNIDAD</th>
+            <th class="colst150">ACCIONES</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div align="right">
+      <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+      <i class="fa fa-times"></i><span>SALIR</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal modcabfintras" style="height:80%;width:80%">
+  <div class="modal-content">
+    <div class="row">
+      <div class="input-field col">
+        <h5>DATOS GENERALES DEL TRASLADO DE </h5>
+      </div>
+      <div class="input-field col">
+        <h5 class="lbltipoacce"></h5>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="input-field col" style="margin-top:25px">
+        <h6 style="font-weight:bold">Codigo: </h6>
+      </div>
+      <div class="input-field col s4">
+        <input onclick="javascript:viewtrcodguia();" name="stguiatr" type="radio" id="radiomanual"/>
+        <label for="radiomanual" style="font-size:15px;font-weight:bold;color:black;">Manual</label>
+        <input onclick="javascript:viewtrcodguia();" name="stguiatr" type="radio" id="radioauto" class="rexamen"/>
+        <label for="radioauto" style="font-size:15px;font-weight:bold;color:black;">Autogenerado</label>
+      </div>
+      <div class="input-field col s2" id="divtrserieguia">
+        <input type="text" placeholder="" class="trserieguia" readonly>
+        <label for="trserieguia">SERIE</label>
+      </div>
+      <div class="input-field col s4" id="divtrcodguia">
+        <input type="text" placeholder="" class="trcodguia" maxlength="8" length="8">
+        <label for="trcodguia">NUMERO DE GUIA</label>
+      </div>
+    </div>
+    <div class="row" style="margin-bottom:50px">
+      <div class="input-field col s6">
+        <select id="trcboproyecto" class="browser-default trcboproyecto">
+          <option value=""></option>
+          {% for x in trlproyecto %}
+            <option value="{{ x.proyecto_id }}">{{ x.proyecto_id }} {{ x.nompro }}</option>
+          {% endfor %}
+        </select>
+        <h6 for="trcboproyecto" style="margin-top:-45px;color:#0091ea" >Proyecto de Destino</h6>
+      </div>
+      <div class="input-field col s6">
+        <select id="trcboautoriz" class="browser-default trcboautoriz">
+          <option value=""></option>
+          {% for x in trlempautor %}
+            <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
+          {% endfor %}
+        </select>
+        <h6 for="trcboautoriz" style="margin-top:-45px;color:#0091ea">Autorizado por:</h6>
+      </div>
+    </div>
+
+    <div class="row" style="margin-bottom:50px;">
+      <div class="input-field col s6">
+        <select id="trcbotransp" class="browser-default trcbotransp">
+        <option value=""></option>
+        {% for x in ltransport %}
+            <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
+        {% endfor %}
+        </select>
+        <h6 for="trcbotransp" style="margin-top:-45px;color:#0091ea" >Transportista</h6>
+      </div>
+      <div class="input-field col s6">
+        <select id="trcbocond" class="browser-default trcbocond"></select>
+        <h6 for="trcbocond" style="margin-top:-45px;color:#0091ea">Conductor</h6>
+      </div>
+    </div>
+    <div class="row" style="margin-bottom:50px">
+      <div class="input-field col s6">
+        <select id="trcboplaca" class="browser-default trcboplaca"></select>
+        <h6 for="trcboplaca" style="margin-top:-45px;color:#0091ea">Placa</h6>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="input-field col s6">
+        <input placeholder="" type="date" class="trfecha trfechtrasl">
+        <label for="trfechtrasl">FECHA DE TRASLADO</label>
+      </div>
+      <div class="input-field col s6">
+        <textarea placeholder="" length="200" maxlength="200" class="materialize-textarea trcoment" name="trcoment"></textarea>
+        <label for="trcoment">COMENTARIO</label>
+      </div>
+    </div>
+    <div class="input-field col" align="center" style="margin-top:50px;">
+      <button type="button" class="btn waves-effect teal lighten-1 btntrsavetrasl" value=""><i class="fa fa-floppy-o"></i><span><strong>GUARDAR</strong></span>
+      </button>
+      <button type="button" class="btn modal-action modal-close red lighten-1 btn-flat btncancelar" style="font-weight:bold;color:white"><i class="fa fa-times"></i><span>CANCELAR</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal trmodfdev">
+  <div class="modal-content">
+    <div class="panel">
+      <div class="card-panel">
+        <h6 class="lbltrnumrow"></h6>
+          <div class="input-field col">
+            <input placeholder="" type="date" class="trfecha trfdevhe">
+            <label for="trfdevhe">FECHA DE DEVOLUCION</label>
+          </div>
+          <div class="input-field col" align="center" style="margin-top:50px;">
+            <button type="button" class="btn waves-effect teal lighten-1 btntrsavefdev" value=""><i class="fa fa-floppy-o"></i><span><strong>GUARDAR</strong></span>
+            </button>
+            <button type="button" class="btn modal-action modal-close red lighten-1 btn-flat btncancelar" style="font-weight:bold;color:white"><i class="fa fa-times"></i><span>CANCELAR</span>
+            </button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% csrf_token %}
+
+{% endblock %}

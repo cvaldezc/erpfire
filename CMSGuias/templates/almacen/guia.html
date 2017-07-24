@@ -1,7 +1,6 @@
 {% extends "basemd.html" %}
-
 {% block title %}
-  Guia
+  Guia Remision
 {% endblock %}
 {% block menu %}
   {% include "menus/storagemd.htm" %}
@@ -11,21 +10,41 @@
 <script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
 <link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
 <link rel="stylesheet" href="/media/css/almacen/guia.css">
-<div >
 
+<div style="margin:20px">
+  <div class="input-field col" id="divtipoacce">
+    <div class="panel-group">
+      <div class="panel" style="margin-left:20px;margin-right:20px;">
+        <div class="panel-heading" style="">
+          <h4 class="panel-title">Guias de Remision</h4>
+        </div>
+
+          <div class="panel-body" style="margin-top:-15px">
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchhe"/>
+            <label for="switchhe" id="switchhe" style="font-size:15px;font-weight:bold;color:black;">HERRAMIENTA</label>
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchepps"/>
+            <label for="switchepps" id="switchepps" style="font-size:15px;font-weight:bold;color:black;">EPPS</label>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:none" id="divguia">
 <div class="row">
   <div class="input-field col s4">
     <div class="btnaddguia">
-    <button type="button" name="btnopennewguia" data-herra="btnnewguia" class="btn waves-effect teal lighten-1 btnopennewguia">
+    <button style="width:350px" type="button" name="btnopennewguia" data-herra="btnnewguia" class="btn waves-effect teal lighten-1 btnopennewguia">
       <i class="fa fa-file"></i>
-      <span><strong>GENERAR GUIA DE HERRAMIENTA</strong></span>
+      <span><strong>GENERAR GUIA DE <strong class="lbltipoacce"></strong></strong></span>
     </button>
     </div>
   </div>
   <div class="input-field col s7">
     <div class="divbuscarguia">
       <i class="prefix fa fa-search"></i>
-      <input class="txtbuscarguia" style="width:90%;" type="search" placeholder="Buscar Guia" name="txtbuscarguia" id="txtbuscarguia" >
+      <input class="txtbuscarguia" style="width:90%;" type="search" placeholder="Buscar Guia o Codigo de Proyecto" name="txtbuscarguia" id="txtbuscarguia" >
     </div>
   </div>
 </div>
@@ -39,24 +58,23 @@
             <label for="radioge" style="font-size:15px;font-weight:bold;color:black;">Generada</label>
 
             <input onclick="javascript:viewestguia();" name="estguia" type="radio" id="radioco" value="PE"/>
-            <label for="radioco" style="font-size:15px;font-weight:bold;color:black;">Devuelta</label>
+            <label for="radioco" style="font-size:15px;font-weight:bold;color:black;">Devoluciones</label>
           </div>
 
-          <div class="col l5 m5 s5" style="margin-left:3%;margin-top:25px;width:45%;">
-              <select id="searchInput" class="searchInput">
-                <option value=""><label>Todos Los Proyectos</label></option>
-              {% for x in lproyecto %}
-                <option value="{{ x.proyecto_id }}">{{ x.proyecto_id }} {{ x.proyecto.nompro }}</option>
-              {% endfor %}
+          <div class="input-field col s4" style="margin-left:3%;margin-top:25px;">
+              <select id="cboproyectos" class="browser-default searchInput">
               </select>
           </div>
           <div class="input-field col s1.5" style="width:12%;">
-            <input id="searchFrom" class="searchInputFech" type="text" placeholder="dd-mm-aaaa"/>
-            <label for="searchInputFech">Fecha Inicial</label>
+            <input class="fecha fechinicial" type="text" placeholder=""/>
+            <label for="fechinicial">Fecha Inicial</label>
           </div>
           <div class="input-field col s1.5" style="width:12%;">
-            <input id="searchTo" class="searchInputFech" type="text" placeholder="dd-mm-aaaa">
-            <label for="searchInputFech">Fecha Final</label>
+            <input class="fecha fechfinal" type="text" placeholder="">
+            <label for="fechfinal">Fecha Final</label>
+          </div>
+          <div class="input-field col">
+            <button type="button" class="transparent btnfiltxfech" style="border:none;font-size:20px;;"><a style="color:#039be5"><i class="fa fa-search"></i></a></button>
           </div>
         </div>
       </div>
@@ -64,125 +82,59 @@
 
 <!--GUIA PENDIENTE-->
   <div id="divtableguiape">
-    <table class="tabla-guia" id="tabla-guia">
+    <table class="table responsive-table table-condensed highlight tabla-guia" id="tabla-guia" style="margin-bottom:50px;">
     <h4 style="margin-left:20px;">Guias Pendientes</h4>
         <thead class="cab">
           <tr>
-            <th class="tnum">#</th>
-            <th class="tproy">Proyecto</th>
-            <th class="tguia">Guia</th>
-            <th class="tcond">Supervisor</th>
-            <th class="tsalid">F.Salida</th>
-            <th></th>
+            <th class="colst40">#</th>
+            <th >Proyecto</th>
+            <th class="colst150">Guia</th>
+            <th >Supervisor</th>
+            <th class="colst150">F.Salida</th>
+            <th class="colst150">Acciones</th>
           </tr>
         </thead>
-        <tbody id="fbody" class="bodydetailsguia">
-          {% for x in lguiape %}
-          <tr class="{{ x.proyecto_id }}">
-            <td class="tnum">{{ forloop.counter }}</td>
-            <td class="tproy"><strong>{{ x.proyecto_id }}</strong>  {{ x.proyecto.nompro }}</td>
-            <td class="tguia">{{ x.guia_id }}</td>
-            <td class="tcond">{{ x.proyecto.empdni.lastname }} {{ x.proyecto.empdni.firstname }}</td>
-            <td class="tsalid">{{ x.fechsalida | date:'d-m-Y' }}</td>
-            <td>
-              <ul id="drop" style="width:10px;">
-                <li>
-                <a><i class="fa fa-list"></i></a>
-                  <ul>
-                    <li class="litguia">
-                    <button style="border:none;" type="button" class="transparent btngenguia" id="btngenguia" value="{{ x.guia_id }}"><a class="title"><i class="fa fa-check-square-o"></i>Generar Guia</a>
-                    </button>
-                    </li>
-                    <li class="litguia">
-                      <button style="border:none;" type="button" class="transparent btneditguia" id="btneditguia" value="{{ x.guia_id }}" data-proy="{{ x.proyecto_id }}" data-transp="{{ x.traruc_id }}" data-conductor="{{ x.condni_id }}" data-placa="{{ x.nropla_id }}" data-fechasalida="{{ x.fechsalida | date:'Y-m-d' }}" data-comentario="{{ x.comentario }}"><a class="title"><i class="fa fa-pencil-square"></i>Editar Guia</a>
-                    </button>
-                    </li>
-                    <li class="litdet">
-                    <button style="border:none;" type="button" class="transparent btnshowdetalle" id="btnshowdetalle" data-dsuperv="{{ x.proyecto.empdni.lastname }} {{ x.proyecto.empdni.firstname }}" data-dllega="{{ x.proyecto.direccion }}" data-ddest="{{ x.proyecto.ruccliente.razonsocial }}" data-dnomproy="{{ x.proyecto_id }} {{ x.proyecto.nompro }}" data-dnumguia="{{ x.guia_id }}" data-dproyid="{{ x.proyecto_id }}" data-dtrans="{{ x.traruc.tranom }}" data-dcond="{{ x.condni.connom }}" data-dplaca="{{ x.nropla_id }} {{ x.nropla.marca }}" data-dfsalid="{{ x.fechsalida }}" data-dcoment="{{ x.comentario }}" value="{{ x.guia_id }}"><a class="title"><i class="fa fa-info-circle"></i>Detalle</a></button>
-                    </li>
-                    <li class="litanul">
-                    <button style="border:none;" type="button" class="transparent btndelguiape" value="{{ x.guia_id }}" data-idproy="{{ x.proyecto_id }}"><a class="title"><i class="fa fa-times-circle"></i>Anular</a></button>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </td>
-          </tr>
-          {% endfor %}
-          </tbody>
+        <tbody></tbody>
     </table>
   </div>
 
+  <!--Guias Generadas-->
   <div id="divtableguiagene" style="display:none;">
-    <table class="tabla-guiagene" id="tabla-guiagene">
+    <table class="table responsive-table highlight table-condensed tabla-guiagene" id="tabla-guiagene" style="margin-bottom:50px;">
       <h4 style="margin-left:20px;">Guias Generadas</h4>
         <thead class="cab">
           <tr>
-            <th class="tnum">#</th>
-            <th class="tproy">Proyecto</th>
-            <th class="tguia">Guia</th>
-            <th class="tcond">Supervisor</th>
-            <th class="tsalid">F.Salida</th>
-            <th class=""></th>
-          </tr>
-        </thead>
-        <tbody id="fbody" class="bodydetailsguiagene">
-          {% for x in lguiagene %}
-          <tr class="{{ x.proyecto_id }}">
-            <td class="tnum">{{ forloop.counter }}</td>
-            <td class="tproy"><strong>{{ x.proyecto_id }}</strong>  {{ x.proyecto.nompro }}</td>
-            <td class="tguia">{{ x.guia_id }}</td>
-            <td class="tcond">{{ x.proyecto.empdni.lastname }} {{ x.proyecto.empdni.firstname }}</td>
-            <td class="tsalid">{{ x.fechsalida | date:'d-m-Y' }}</td>
-            <td class="">
-              <button type="button" style="border:none;font-weight:bold;" class="transparent btnshowdetalle" id="btnshowdetalle" data-dsuperv="{{ x.proyecto.empdni.lastname }} {{ x.proyecto.empdni.firstname }}" data-dllega="{{ x.proyecto.direccion }}" data-ddest="{{ x.proyecto.ruccliente.razonsocial }}" data-dnomproy="{{ x.proyecto_id }} {{ x.proyecto.nompro }}" data-dnumguia="{{ x.guia_id }}" data-dproyid="{{ x.proyecto_id }}" data-dtrans="{{ x.traruc.tranom }}" data-dcond="{{ x.condni.connom }}" data-dplaca="{{ x.nropla_id }} {{ x.nropla.marca }}" data-dfsalid="{{ x.fechsalida }}" data-dcoment="{{ x.comentario }}" value="{{ x.guia_id }}"><i class="fa fa-info-circle"></i></button>
-
-              <button type="button" style="border:none;font-weight:bold;" class="transparent btnviewguiaherrapdf" id="btndev" value="{{ x.guia_id }}"><i class="fa fa-file-pdf-o"></i></button>
-              <button type="button" style="border:none;font-weight:bold;" class="transparent btndev" id="btndev" value="{{ x.guia_id }}"><small>devolucion</small></button>
-            </td>
-
-          </tr>
-          {% endfor %}
-          </tbody>
-    </table>
-  </div>
-
-
-  <div id="divtableguiaco" style="display:none;">
-    <table class="tabla-guiaco" id="tabla-guiaco" style="margin-left:20px;">
-    <h4 style="margin-left:20px;">Guias Devuelta</h4>
-        <thead class="cab">
-          <tr>
-            <th class="tnum">#</th>
-            <th class="tproy">Proyecto</th>
-            <th class="tguia">Guia</th>
-            <th class="tsalid">F.Salida</th>
-            <th class="tcond">Supervisor</th>
+            <th class="colst40">#</th>
+            <th >Proyecto</th>
+            <th class="colst150">Guia</th>
+            <th >Supervisor</th>
+            <th class="colst150">F.Salida</th>
+            <th class="colst150">Acciones</th>
             <th></th>
           </tr>
         </thead>
-        <tbody id="fbody" class="bodydetailsguia">
-          {% for x in lguiaco %}
-          <tr class="{{ x.proyecto_id }}">
-            <td class="tnum">{{ forloop.counter }}</td>
-            <td class="tproy"><strong>{{ x.proyecto_id }}</strong>  {{ x.proyecto.nompro }}</td>
-            <td class="tguia">{{ x.guia_id }}</td>
-            <td class="tsalid">{{ x.fechsalida | date:'d-m-Y' }}</td>
-            <td class="tcond">{{ x.proyecto.empdni.lastname }} {{ x.proyecto.empdni.firstname }}</td>
-            <td>
-              <button type="button" style="border:none;font-weight:bold;" class="transparent btnviewguiacopdf" id="btnguiaco" value="{{ x.guia_id }}"><i class="fa fa-file-pdf-o"></i></button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
+        <tbody></tbody>
     </table>
   </div>
 
-
-
-
-
-
+  <!--Documentos de devolucion-->
+  <div id="divtablelistdev" style="display:none">
+    <table class="table responsive-table highlight table-condensed tabla-listdev" id="tabla-listdev" style="margin-bottom:50px;">
+        <h4 style="margin-left:20px;">Guias de Devolucion</h4>
+        <thead class="cab">
+          <tr>
+            <th class="colst40">#</th>
+            <th class="colst150">N° Doc</th>
+            <th class="colst150">Guia</th>
+            <th >Transporte</th>
+            <th class="colst150">F.Retorno</th>
+            <th>Conductor</th>
+            <th class="colst150"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+  </div>
 </div>
 
 {% csrf_token %}
@@ -193,7 +145,8 @@
 {% include "almacen/form/newguiadevolucion.html" %}
 {% include "almacen/form/newherraguiadev.html" %}
 {% include "almacen/form/editguia.html" %}
+{% include "almacen/form/editguiage.html" %}
 {% include "almacen/form/editherraguia.html" %}
-{% include "almacen/form/neweditherramientaguia.html" %}
+{% include "almacen/form/listherraguiadev.html" %}
 
 {% endblock %}

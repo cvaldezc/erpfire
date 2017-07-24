@@ -80,6 +80,7 @@ class Compra(models.Model):
     observation = models.TextField(null=True, blank=True)
     paid = models.CharField(max_length=1, blank=True, default='0')
     flag = models.BooleanField(default=True)
+    tipoing = models.CharField(max_length=2, default='MT')
 
     audit_log = AuditLog()
 

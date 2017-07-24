@@ -1,6 +1,7 @@
 {% extends "basemd.html" %}
+
 {% block title %}
-  Devolucion
+  Guias Completas
 {% endblock %}
 {% block menu %}
   {% include "menus/storagemd.htm" %}
@@ -8,9 +9,32 @@
 {% block content %}
 <script src="/media/js/almacen/guiaherramienta.js"></script>
 <link rel="stylesheet" href="/media/css/almacen/guia.css">
-<div>
-    <h4 align="center">Documentos de Devolucion</h4>
-    <div class="card" style="width:95%;margin-left:20px;">
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+
+<div class="row" style="margin:20px">
+  <div class="input-field col" id="divtipoacce">
+    <div class="panel-group">
+      <div class="panel" style="margin-left:20px;margin-right:20px;">
+        <div class="panel-heading" style="">
+          <h5 class="panel-title">Guias con Devolucion Completa</h5>
+        </div>
+          <div class="panel-body" style="margin-top:-15px">
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchhe"/>
+            <label for="switchhe" id="switchhe" style="font-size:15px;font-weight:bold;color:black;">HERRAMIENTA</label>
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchepps"/>
+            <label for="switchepps" id="switchepps" style="font-size:15px;font-weight:bold;color:black;">EPPS</label>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div align="center">
+  <h4 class="lbltipoacce"></h4>
+</div>
+<div style="display:none" style="margin:20px" id="divdevolucion">
+    <div class="card">
       <div class="card-action">
         <div class="input-field col s12">
           <i class="prefix fa fa-search"></i>
@@ -18,33 +42,33 @@
         </div>
       </div>
     </div>
-    <table class="tabla-listdev" id="tabla-listdev">
-        <thead class="cab">
-          <tr>
-            <th class="colnum">#</th>
-            <th>N° Doc</th>
-            <th>Guia</th>
-            <th>Transporte</th>
-            <th>F.Retorno</th>
-            <th>Conductor</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="fbody" class="bodydetlistdev">
-          {% for x in listadocdev %}
-          <tr class="fer">
-            <td class="colnum">{{ forloop.counter }}</td>
-            <td>{{ x.docdev.docdev_id }}</td>
-            <td>{{ x.guia_id }}</td>
-            <td>{{ x.docdev.traruc.tranom }}</td>
-            <td>{{ x.docdev.fechretorno }}</td>
-            <td>{{ x.docdev.condni.connom }}</td>
-            <td>
-            <button type="button" style="border:none;font-weight:bold;" class="transparent btnviewdocdevpdf" id="" value="{{ x.docdev_id }}"><i class="fa fa-file-pdf-o"></i></button>
-            <button type="button" style="border:none;font-weight:bold;" class="transparent viewherradocdev" id="" value="{{ x.docdev_id }}"><i class="fa fa-briefcase"></i></button></td>
-          </tr>
-          {% endfor %}
-          </tbody>
+
+    <table class="table table-condensed responsive-table highlight tabla-guiaco" id="tabla-guiaco">
+      <thead class="cab">
+        <tr>
+          <th class="colst40">#</th>
+          <th >Proyecto</th>
+          <th class="colst150">Guia</th>
+          <th class="colst150">F.Salida</th>
+          <th >Supervisor</th>
+          <th class="colst150">Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <!--
+        {% for x in lguiaco %}
+        <tr class="{{ x.proyecto_id }}">
+          <td class="colst40">{{ forloop.counter }}</td>
+          <td ><strong>{{ x.proyecto_id }}</strong>  {{ x.proyecto.nompro }}</td>
+          <td class="colst150">{{ x.guia_id }}</td>
+          <td class="colst150">{{ x.fechsalida | date:'d-m-Y' }}</td>
+          <td >{{ x.proyecto.empdni.lastname }} {{ x.proyecto.empdni.firstname }}</td>
+          <td class="colst150">
+            <button type="button" style="border:none;font-size:20px;" class="transparent btnviewguiacopdf" id="btnguiaco" value="{{ x.guia_id }}"><i class="fa fa-file-pdf-o"></i></button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>  -->
     </table>
 </div>
 

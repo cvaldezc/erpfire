@@ -4,18 +4,22 @@
 
 <div class="modal ldetherradev">
     <div class="modal-content">
-        <table class="table-detherradev" id="table-detherradev" >
-            <thead class="cab">
-                <tr class="brand-primary">
-                    <th class="colnum">#</th>
-                    <th>Herramienta</th>
-                    <th>Cantidad</th>
-                    <th>Estado</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody class="bodydetherradev" style="height:500px;"></tbody>
-        </table>
+        <div style="overflow-y:scroll;height:500px" >
+            <table class="table table-condensed highlight responsive-table table-detherradev" id="table-detherradev" >
+                <thead class="cab">
+                    <tr class="brand-primary">
+                        <th class="colst40">#</th>
+                        <th class="colst150">CODIGO</th>
+                        <th class="lbltipoacce" style="font-weight:bold"></th>
+                        <th class="colst150">MARCA</th>
+                        <th class="colst100">CANTIDAD</th>
+                        <th class="colst150">ESTADO</th>
+                        <th class="colst150">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
         <div align="right" style="">
         <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
             <i class="fa fa-times"></i>
@@ -33,10 +37,11 @@
         </div>
         <div class="row">
             <div class="input-field col s12">
-                <h5 class="titherradev"></h5>    
+                <h5 class="titherradev"></h5>
             </div>
-            
+
         </div>
+        <hr>
         <div class="row">
             <div class="input-field col s0">
                 <h6>CANTIDAD: </h6>
@@ -51,6 +56,7 @@
                 <h6 class="iddev"></h6>
             </div>
         </div>
+        <hr>
         <div class="row">
           <div class="input-field col s4">
             <input placeholder="" id="cantherradev" name="cantherradev" type="text" class="cantherradev">
@@ -62,11 +68,11 @@
             <p>Estado:</p>
           </div>
           <div class="input-field col s6" id="comboestherradev">
-            <select id="comboestherradev" class="browser-default comboestherradev">  
+            <select id="comboestherradev" class="browser-default comboestherradev">
               <option value="BUENO">Bueno</option>
               <option value="REPARACION">Reparacion</option>
               <option value="BAJA">De Baja</option>
-            </select>                 
+            </select>
           </div>
         </div>
       <div class="moda-footer" align="center" style="margin-top:50px;">

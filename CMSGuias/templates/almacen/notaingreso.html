@@ -1,0 +1,281 @@
+{% extends "basemd.html" %}
+{% block title %}
+  Nota de Ingreso
+{% endblock %}
+{% block menu %}
+  {% include "menus/storagemd.htm" %}
+{% endblock %}
+{% block content %}
+<script src="/media/js/almacen/guiaherramienta.js"></script>
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+<link rel="stylesheet" href="/media/css/almacen/guia.css">
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+<div class="row" style="margin:20px">
+  <div class="input-field col" id="divtipoacce">
+    <div class="panel-group">
+      <div class="panel" style="margin-left:20px;margin-right:20px;">
+        <div class="panel-heading" style="">
+          <h5 class="panel-title" style="font-weight:bold">Nota de Ingreso</h5>
+        </div>
+          <div class="panel-body" style="margin-top:-15px">
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchhe"/>
+            <label for="switchhe" id="switchhe" style="font-size:15px;font-weight:bold;color:black;">HERRAMIENTA</label>
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchepps"/>
+            <label for="switchepps" id="switchepps" style="font-size:15px;font-weight:bold;color:black;">EPPS</label>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div align="center">
+  <h4 class="lbltipoacce"></h4>
+</div>
+
+
+<!--PRINCIPAL-->
+<div style="margin:20px;display:none" id="divnotaingreso">
+	<div class="card">
+		<div class="card-content">
+			<div class="input-field col s6">
+				<i class="prefix fa fa-filter"></i>
+				<input class="keyupcompra" style="width:90%" type="search" placeholder="Buscar por Codigo">
+			</div>
+		</div>
+	</div>
+	<div class="row">
+      <div class="col s12">
+        <ul class="tabs">
+          <li class="tab col s6"><a href="#divtab-ordcompras" data-toggle="taba" style="font-weight:bold">ORDENES DE COMPRA</a></li>
+          <li class="tab col s6"><a href="#divtab-notingreso" data-toggle="taba" style="font-weight:bold">NOTAS DE INGRESO</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="divtab-ordcompras">
+		<table class="table table-condensed responsive-table highlight tabcompra">
+			<thead class="cab">
+				<th class="colst40">#</th>
+				<th class="colst150">CODIGO</th>
+				<th>PROVEEDOR</th>
+				<th class="colst150">PROYECTO</th>
+				<th class="colst150">DOCUMENTO</th>
+				<th class="colst150">F.TRASLADO</th>
+				<th class="colst150">ACCIONES</th>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+	<div id="divtab-notingreso">
+		<table class="table table-condensed responsive-table highlight tabnoting">
+			<thead class="cab">
+				<th class="colst40">#</th>
+				<th class="colst150">NOTA DE INGRESO</th>
+				<th>ALMACEN</th>
+				<th class="colst150">ORDEN DE COMPRA</th>
+				<th class="colst150">FACTURA</th>
+				<th>MOTIVO</th>
+				<th class="colst150">ESTADO</th>
+				<th class="coslt150">ACCIONES</th>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+</div>
+
+
+
+
+<!--MODAL NUEVA NOTA DE INGRESO-->
+<div class="modal modnewnoting" style="width:98%;height:96%;margin-top:-60px">
+	<div class="modal-content">
+		<div style="width:100%;float:left">
+			<div style="width:25%;float:left">
+				<h5>Ingreso de Orden de Compra</h5>
+			</div>
+			<div style="width:20%;float:left">
+				<h5 class="lblingcodcompra"></h5>
+			</div>
+			<div style="width:50%;float:left">
+				<div class="panel-group">
+	                <div class="panel" style="margin-left:10px;margin-right:10px;">
+	                    <div class="panel-heading" style="">
+	                        <h6 style="font-weight:bold;color:red">!IMPORTANTE!</h6>
+	                    </div>
+	                    <div class="panel-collapse collapse in">
+	                        <div class="panel-body">
+	                            <h6 style="font-weight:bold;color:red">
+	                            En caso un item se encuentra sombreado de color rojo,
+	                            realizar conversion de unidad.<button type="button" style="border:none;font-weight:bold;" class="transparent btninfoconvert"><small style="color:green">¿Cómo convertir?</small></button></h6>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+			</div>
+		</div>
+		<!--
+		<div class="row">
+			<div class="input-field col">
+				<h5>Ingreso de Orden de Compra</h5>
+			</div>
+			<div class="input-field col">
+				<h5 class="lblingcodcompra"></h5>
+			</div>
+		</div>
+		-->
+		<hr>
+		<br>
+		<div style="float:left;width:100%">
+			<div style="float:left;width:60%;">
+				<div class="row">
+					<div class="input-field col s3">
+						<input type="text" placeholder="" class="ingguiarem" maxlength="12" length="12">
+						<label for="ingguiarem">GUIA REMISION</label>
+					</div>
+					<div class="input-field col s3">
+						<input type="text" placeholder="" class="ingfactura" maxlength="12" length="12">
+						<label for="ingfactura">NUMERO DE FACTURA</label>
+					</div>
+					<div class="input-field col s5">
+						<input type="text" placeholder="" maxlength="60" class="ingmoting" value="COMPRA">
+						<label for="ingmoting">MOTIVO DE INGRESO</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s11">
+						<textarea class="materialize-textarea" placeholder="" name="ingcomentario" maxlength="200" length="200"></textarea>
+						<label for="ingcomentario">COMENTARIO</label>
+					</div>
+				</div>
+			</div>
+			<div style="float:left;width:38%;">
+				<div class="row" style="margin-bottom:40px">
+					<div class="input-field col s12">
+						<select id="cboingalmacen">
+							{% for x in  lalmacen%}
+							<option value="{{ x.almacen_id }}">{{ x.nombre }}</option>
+							{% endfor %}
+						</select>
+						<h6 for="cboingalmacen" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">ALMACEN</h6>
+					</div>
+				</div>
+				<div class="row" style="margin-bottom:40px">
+					<div class="input-field col s12">
+						<select id="cboingrecibido">
+							{% for x in  lalmaceneros%}
+							<option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
+							{% endfor %}
+						</select>
+						<h6 for="cboingrecibido" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">RECIBIDO POR</h6>
+					</div>
+				</div>
+				<div class="row" style="margin-bottom:40px">
+					<div class="input-field col s12">
+						<select id="cboinginspecc">
+							{% for x in  lalmaceneros%}
+							<option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
+							{% endfor %}
+						</select>
+						<h6 for="cboinginspecc" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">INSPECCIONADO POR</h6>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s12">
+						<select id="cboingaprobado">
+							{% for x in  lalmaceneros%}
+							<option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
+							{% endfor %}
+						</select>
+						<h6 for="cboingaprobado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">APROBADO POR</h6>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div style="float:left;width:100%">
+			<div style="float:left;width:20%">
+				<input onclick="javascript:checkingselect();" name="estselect" type="radio" id="radingall" checked="true"/>
+	            <label for="radingall" style="font-size:15px;font-weight:bold;color:black;">Todo</label>
+	            <input onclick="javascript:checkingselect();" name="estselect" type="radio" id="radingnone"/>
+	            <label for="radingnone" style="font-size:15px;font-weight:bold;color:black;">Ninguno</label>
+			</div>
+			<div align="right" style="float:left;width:80%;margin-bottom:10px">
+				<button type="button" class="btn waves-effect teal lighten-1 btnsavenotaing" value=""><i class="fa fa-floppy-o"></i><span><strong>GENERAR NOTA DE INGRESO</strong></span>
+				</button>
+			</div>
+		</div>
+		<div style="overflow-y:scroll;height:240px;float:left;width:100%">
+			<table class="table table-condensed responsive-table highlight tabdetcompra">
+				<thead class="cab">
+					<th class="colst40">#</th>
+					<th class="colst150">CODIGO</th>
+					<th><h6 class="lbltipoacce" style="font-weight:bold"></h6></th>
+					<th class="colst150">MEDIDA</th>
+					<th class="colst150">UNIDAD</th>
+					<th class="colst150">MARCA</th>
+					<th class="colst40">CANTIDAD</th>
+					<th class="colst40">PENDIENTE</th>
+					<th class="colst40">INGRESO</th>
+					<th class="colst40"></th>
+					<th class="colst40">CONVERTIR</th>
+					<th class="colst40"></th>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		<div align="right">
+	      <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+	      <i class="fa fa-times"></i><span>SALIR</span>
+	      </button>
+	    </div>
+	</div>
+</div>
+
+
+<!--MODAL EDITAR NOTA DE INGRESO-->
+<div class="modal bottom-sheet modlistnoting" style="height:55%;">
+	<div class="modal-content">
+		<h5 class="lbllistnoting"></h5>
+		<div style="overflow-y:scroll;height:270px">
+			<table class="table table-condensed responsive-table highlight tabdetnoting">
+				<thead class="cab">
+					<th class="colst40">#</th>
+					<th class="colst150">CODIGO</th>
+					<th><h6 class="lbltipoacce" style="font-weight:bold"></h6></th>
+					<th class="colst150">MEDIDA</th>
+					<th class="colst150">UNIDAD</th>
+					<th class="colst150">MARCA</th>
+					<th class="colst40">CANT.</th>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		<div align="right">
+	      <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+	      <i class="fa fa-times"></i><span>SALIR</span>
+	      </button>
+	    </div>
+	</div>
+</div>
+
+<div class="modal modinfoconvert">
+	<div class="modal-content">
+		<h6>
+		<strong>Item = Herramienta o Epp</strong><br><br>
+		Esto se debe a que la unidad del item de la orden de compra es distinta a la del sistema.<br><br>
+		Para el ingreso correcto guiarse de la ultima fila de cada item(la primera unidad pertenece al item del sistema y la seguda unidad a la orden de compra).<strong>Ejm: 'Unid*PQT' = </strong>Es decir el item en el sistema esta en Unidades y en la orden de compra esta en Paquete.
+		<br><br>
+		<strong>Ejemplo de Conversion:</strong><br><br>
+		<strong>1. 'Unid*PQT' =</strong>Ingresar en el campo conversion cuantas unidades corresponde a un Paquete.<br><br>
+	    <strong>2. 'Unid*Metro' =</strong> Ingresar en conversion cuantas unidades corresponde a un Metro.
+	    </h6>
+	    <div align="right">
+	      <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat btnsalirmodal">
+	      <i class="fa fa-times"></i><span>SALIR</span>
+	      </button>
+	    </div>
+	</div>
+</div>
+
+{% csrf_token %}
+{% endblock %}

@@ -8,21 +8,15 @@
 {% endblock %}
 {% block content %}
 <script src="/media/js/almacen/guiaherramienta.js"></script>
-<link rel="stylesheet" href="/media/css/almacen/guiaherramienta.css">
+<link rel="stylesheet" href="/media/css/almacen/guia.css">
 
-<div style="margin-left:25%;width:50%;">
-	<h2>Carga de Herramientas Exitosa!</h2>
-	<ul>
-	<hr>
-	</br>
-	{% if lisherra != "" %}
-	<label><h5 style="align:center;">Herramientas que anteriormente ya se habia cargado:</h5></label>
-	{% for x in lisherra %}
-	<li><label>* {{ x.hc }} - {{ x.hn }} - {{ x.hm }}
-	</label></li>
-	{% endfor %}
-	{% endif %}
-	</ul>
+<div style="text-align:center">
+	<h2>Carga de {{tipoacce}} Exitosa!</h2>
+	<button type="button" class="transparent btnregrcarga" style="border:none;">
+	<a style="font-size:80px;">
+	<i class="fa fa-arrow-circle-left"></i>
+	</a>
+	</button>
 </div>
 
 {% csrf_token %}

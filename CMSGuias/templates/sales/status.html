@@ -36,35 +36,53 @@
                 <dd><a href="{% url 'closedproject_view' pro.proyecto_id %}"><i class="fa fa-text-file"></i> Revisar</a></dd>
             </dl>
         </div>
-        {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
             <small>Vista solo Adminitradores y ventas</small>
             <div class="card-panel">
                 <div class="row">
                     <div class="col s12 m6 l6">
+        {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
                         <h5>Archivos Administrativos</h5>
                         <div class="administrative"></div>
+        {% endif %}
                     </div>
-                    <div class="col s12 m6 l6"></div>
+                    <div class="col s12 m6 l6">
+                        <h5>Archivos de Operaciones</h5>
+                        <div class="operations"></div>
+                    </div>
                 </div>
             </div>
             <script defer src="{{ MEDIA_URL }}js/jqueryFileTree.js"></script>
             <script defer>
                 $(document).ready(function() {
+                    var $padmin = $('.administrative');
+                    if ($padmin.length > 0) {
+                        $.get(
+                            '/json/get/path/',
+                            {'dir': '/storage/projects/{{pro.registrado|date:"Y"}}/{{pro.proyecto_id}}/administrative/'},
+                            function(response) {
+                                $padmin.empty();
+                                console.log(response);
+                                $padmin.html(response);
+                                setTimeout(function(){
+                                    $('.jqueryFileTree').css('display', 'block');
+                                }, 400);
+                            }
+                        );
+                    }
                     $.get(
                         '/json/get/path/',
-                        {'dir': '/storage/projects/{{pro.registrado|date:"Y"}}/{{pro.proyecto_id}}/administrative/'},
+                        {'dir': '/storage/projects/{{pro.registrado|date:"Y"}}/{{pro.proyecto_id}}/operations/'},
                         function(response) {
-                            var $padmin = $('.administrative');
-                            $padmin.empty();
+                            var $operations = $('.operations');
+                            $operations.empty();
                             console.log(response);
-                            $padmin.html(response);
+                            $operations.html(response);
                             setTimeout(function(){
                                 $('.jqueryFileTree').css('display', 'block');
-                            },400);
+                            }, 400);
                         }
                     );
                 });
             </script>
-        {% endif %}
     </section>
 {% endblock content %}

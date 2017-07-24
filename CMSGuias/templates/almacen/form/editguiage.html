@@ -1,0 +1,97 @@
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<div class="modal editguiage" >
+    <div class="modal-content">
+    <div class="row">
+      <div class="input-field col s4" readonly>
+        <input readonly placeholder="" type="text" class="editgenumguia">
+        <label for="editgenumguia" >NUMERO DE GUIA</label>
+      </div>
+      <div class="input-field col s0">
+        <p>Proyecto:</p>
+      </div>
+      <div class="input-field col s6" style="margin-top:30px;">
+        <select id="cboeditgeproy" class="browser-default">
+            {% for x in lproyectos %}
+          <option value="{{ x.proyecto_id }}">{{ x.proyecto_id }} {{ x.nompro }}</option>
+            {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s0">
+        <p>Transportista:</p>
+      </div>
+      <div class="input-field col s2" style="margin-top:25px">
+        <select id="cboeditgetransp" class="browser-default">
+        {% for x in ltransportista %}
+          <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
+        {% endfor %}
+        </select>
+      </div>
+      <div class="input-field col s0">
+        <p>Conductor:</p>
+      </div>
+      <div class="input-field col s2" style="margin-top:25px">
+        <select id="cboeditgecond" class="browser-default">
+        {% for x in lconductor %}
+          <option value="{{ x.condni_id }}">{{ x.connom }}</option>
+        {% endfor %}
+        </select>
+      </div>
+      <div class="input-field col s0">
+        <p>Placa:</p>
+      </div>
+      <div class="input-field col s2" style="margin-top:25px">
+        <select id="cboeditgeplaca" class="browser-default">
+        {% for x in ltransporte %}
+          <option value="{{ x.nropla_id }}">{{ x.nropla_id }} {{ x.marca }}</option>
+        {% endfor %}
+        </select>
+      </div>
+        <div class="input-field col s2">
+          <input placeholder="" type="date" name="fsaleditge" class="picker fsaleditge">
+          <label for="fsaleditge">Fecha de Salida</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-field col s6">
+          <textarea placeholder="" name="txtcomeditge" class="materialize-textarea txtcomeditge" maxlength="200" length="200"></textarea>
+          <label for="txtcomeditge">COMENTARIO</label>
+        </div>
+        <div class="input-field col s6" style="margin-top:60px;">
+        <button type="button" class="btn waves-effect green lighten-1 btnsaveeditguiage">
+          <i class="fa fa-floppy-o"></i>
+          <span><strong>GUARDAR CAMBIOS</strong></span>
+        </button>
+      </div>
+    </div>
+    <hr>
+    <div style="overflow-y:scroll;height:360px">
+      <table class="table table-condensed highlight responsive-table table-detguiageedit" id="table-detguiageedit">
+          <thead class="cab">
+              <tr>
+                  <th class="colst40">#</th>
+                  <th class="colst150">CODIGO</th>
+                  <th ><h6 class="lbltipoacce" style="font-weight:bold"></h6></th>
+                  <th class="colst100">CANTIDAD</th>
+                  <th >ESTADO</th>
+                  <th class="colst150">F.DEVOLUCION</th>
+                  <th class="colst100">ACCIONES</th>
+              </tr>
+          </thead>
+          <tbody></tbody>
+      </table>
+    </div>
+    <div align="right">
+      <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+        <i class="fa fa-times"></i>
+        <span>Salir</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+

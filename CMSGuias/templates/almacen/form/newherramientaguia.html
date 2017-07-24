@@ -1,69 +1,118 @@
 <div class="modal newherramientaguia" style="width:60%;">
-              <div class="modal-content">
+    <div class="modal-content">
+      <div style="display:none">
+        <h6 class="newglbltypesave"></h6>
+        <h6 class="newglblnamehe"></h6>
+        <h6 class="newglblmedhe"></h6>
+        <h6 class="newglblcodbrhe"></h6>
+        <h6 class="newglblbrhe"></h6>
+      </div>
+        <div class="row">
+          <div class="input-field col">
+            <h6 style="font-weight:bold">AGREGAR</h6>
+          </div>
+          <div class="input-field col">
+            <h6 class="lbltipoacce" style="font-weight:bold"></h6>
+          </div>
+          <div class="input-field col">
+            <h6 style="font-weight:bold">AL DETALLE</h6>
+          </div>
+        </div>
+        <hr>
+      <div class="row">
+        <div class="input-field col s3" style="margin-top:-5px">
+          <div class="switch" style="margin-top:-5px">
+            <label style="font-weight:bold">NO<input type="checkbox" id="switchgroup" onclick="javascript:viewestgrupo()" class="switchgroup"><span class="lever"></span>SI</label>
+            <h6 for="switchgroup" style="margin-top:-1;color:#0091ea;font-size:0.8rem">AGRUPAR</h6>
+          </div>
+        </div>
+        <div id="divlgrcreado" class="input-field col s2" style="margin-top:2px;display:none" >
+          <button type="button" style="border:none;font-size:20px;" class="transparent btnlgrcreados"><a style="color:#26a69a"><i class="fa fa-list"></i></a><span class="glyphicon glyphicon-edit"></span></button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12" id="divdescgrupo" style="display:none">
+          <input type="text" placeholder class="descripgrupo" maxlength="200" length="200">
+          <label for="descripgrupo">DESCRIPCION DE GRUPO</label>
+        </div>
+      </div>
 
-                <div class="row" style="display:none;">
-                  <label>PK:</label>
-                  <label style="" id="iddetguia" class="iddetguia" name="iddetguia"></label>
-                  <label>Guia:</label>
-                  <label style="" id="codguia" class="codguia" name="codguia"></label>
-                  <div style="">
-                  <input  id="accionguia" class="accionguia" name="accionguia">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="input-field col s0">
-                    <p>Herramienta:</p>
-                  </div>
-                  <div class="input-field col s7" style="margin-top:25px;">
-                    <select id="comboherra" class="browser-default comboherra">
-                    {% for x in lherramienta %}
-                      {% if x.cantalmacen > 0 %}
-                      <option value="{{ x.herramienta_id }}" data-n="{{ x.herramienta.nombre }}">{{ x.herramienta.nombre }} {{ x.herramienta.medida }} {{ x.herramienta.marca.brand }}</option>
-                      {% endif %}
-                    {% endfor %}
-                    </select>                 
-                  </div>
-                  <div class="input-field col s2">
-                    <h5 class="textstock"></h5>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="input-field col s4">
-                    <input placeholder="" id="guiaherracant" name="guiaherracant" type="text" class="guiaherracant">
-                    <label for="guiaherracant">Cantidad</label>
-                  </div>
-                </div>
+      <div class="row">
+        <div class="input-field col s7">
+          <select id="comboherra" class="browser-default comboherra">
+          </select>
+          <label for="comboherra" style="color:#0091ea;margin-top:-30px;font-size:0.8rem" class="lbltipoacce"></label>
+        </div>
+        <div class="input-field col">
+          <button type="button" style="border:none;font-size:20px;" class="transparent btnopeninv"><a style="color:#26a69a"><i class="fa fa-plus"></i></a><span class="glyphicon glyphicon-edit"></span></button>
+          <button type="button" style="border:none;font-size:20px;" class="transparent btnupdlisthe"><a style="color:#039be5"><i class="fa fa-refresh"></i></a><span class="glyphicon glyphicon-edit"></span></button>
+        </div>
+        <div class="input-field col">
+          <h6 style="font-weight:bold">Stock:</h6>
+        </div>
+        <div class="input-field col">
 
-                <div class="row">
-                  <div class="input-field col s1">
-                    <p>Estado: </p>
-                  </div>
-                  <div class="input-field col s5">
-                    <select id="idcomboestado" class="browser-default estpais">
-                      <option value="ALMACEN">ALMACEN</option>
-                      <option value="ALQUILER">ALQUILER</option>
-                    </select>                 
-                  </div>
-                    <div class="input-field col s4" id="divfdev" style="display:none;">
-                      <input placeholder="" id="fguiadevol" name="fguiadevol" type="date" class="datepicker fguiadevol">
-                      <label for="fguiadevol">Fecha Devolucion</label>
-                    </div>
-                </div>
-                  <div class="row">
-                    <div class="input-field col s12">
-                      <textarea placeholder="" id="txtcomentguiah" length="200" name="txtcomentguiah" class="materialize-textarea txtcomentguiah"></textarea>
-                      <label for="txtcomentguiah">COMENTARIO</label>
-                    </div>
-                  </div>
-                  <div class="moda-footer" align="center" style="margin-top:50px;">
-                    <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
-                      <i class="fa fa-times"></i>
-                      <span>Cancelar</span>
-                    </button>
-                    <button type="button" id="btnsaveguiaherra" name="btnsaveguiaherra" class="btn waves-effect green lighten-1 btnsaveguiaherra">
-                      <i class="fa fa-floppy-o"></i>
-                      <span><strong>Guardar</strong></span>
-                    </button>
-                  </div>
-            </div>              
+          <h6 class="textstock"></h6>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s4">
+          <input placeholder="" id="guiaherracant" name="guiaherracant" type="text" class="guiaherracant">
+          <label for="guiaherracant">CANTIDAD</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s5">
+          <select id="idcomboestado" class="browser-default idcomboestado">
+            <option value="ALMACEN">ALMACEN</option>
+            <option value="ALQUILER">ALQUILER</option>
+          </select>
+          <label for="idcomboestado" style="color:#0091ea;margin-top:-30px;font-size:0.8rem">ESTADO</label>
+        </div>
+          <div class="input-field col s4" id="divfdev" style="display:none;">
+            <input placeholder="" id="fguiadevol" name="fguiadevol" type="date" class="picker fguiadevol">
+            <label for="fguiadevol">FECHA DEVOLUCION</label>
+          </div>
+      </div>
+        <div class="row">
+          <div class="input-field col s12">
+            <textarea placeholder="" id="txtcomentguiah" length="200" maxlength="200" name="txtcomentguiah" class="materialize-textarea txtcomentguiah"></textarea>
+            <label for="txtcomentguiah">COMENTARIO</label>
+          </div>
+        </div>
+        <div class="moda-footer" align="center" style="margin-top:50px;">
+          <button type="button" class="modal-action modal-close btn waves-effect grey lighten-5 grey-text text-darken-3">
+            <i class="fa fa-times"></i>
+            <span>Cancelar</span>
+          </button>
+          <button type="button" id="btnsaveguiaherra" name="btnsaveguiaherra" class="btn waves-effect green lighten-1 btnsaveguiaherra">
+            <i class="fa fa-floppy-o"></i>
+            <span><strong>Guardar</strong></span>
+          </button>
+        </div>
+  </div>
+</div>
+
+<!--LIST GRUPOS CREADOS-->
+<div class="modal modlistgrupo" style="width:30%;height:50%">
+  <div class="modal-content">
+    <h5>GRUPOS</h5>
+    <div style="overflow:scroll;height:250px">
+      <table class="table table-condensed responsive-table tablegrupo">
+        <thead class="cab">
+          <th>#</th>
+          <th>Grupo</th>
+          <th>Acciones</th>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div align="right">
+      <button type="button" class="modal-action modal-close btn waves-effect red lighten-2">
+        <i class="fa fa-times"></i>
+        <span>Cancelar</span>
+      </button>
+    </div>
+  </div>
 </div>
