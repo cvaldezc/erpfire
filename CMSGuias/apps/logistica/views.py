@@ -1,6 +1,6 @@
-"""
+'''
 file view for module logistics
-"""
+'''
 # -*- coding: utf-8 -*-
 
 import json
@@ -1077,11 +1077,11 @@ class ListPurchase(JSONResponseMixin, TemplateView):
 
 
 class EditOrderPurchase(JSONResponseMixin, TemplateView):
-    """
+    '''
     add class for edit order purchase
     @Christian @status new
     2017-05-31 17:09:39
-    """
+    '''
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
@@ -1128,14 +1128,14 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         try:
-            """
+            '''
             block transaction for bedside
-            """
+            '''
             if 'savebedside' in request.POST:
                 def savePurchase(x):
-                    """
+                    '''
                     update object purchase
-                    """
+                    '''
                     try:
                         print x
                         print type(x['sigv'])
@@ -1153,6 +1153,7 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
                         obuy.sigv = True if x['sigv'] == 'true' else False
                         obuy.discount = x['discount']
                         obuy.observation = x['observation']
+                        obuy.tipoing = x['tipoing']
                         print request.FILES
                         if 'deposit' in request.FILES:
                             obuy.deposito = request.FILES['deposit']
@@ -1168,17 +1169,17 @@ class EditOrderPurchase(JSONResponseMixin, TemplateView):
                         return False
 
                 kwargs['status'] = savePurchase(request.POST)
-            """
+            '''
             block transaction for details
-            """
+            '''
             if 'ucpurchase' in request.POST:
                 # define search if object exists
                 def findObject():
-                    """
+                    '''
                     Find an object in purchase details to generate a new instance
                     or return an object from the table.
                     This way you can create or update at the same time
-                    """
+                    '''
                     brand = request.POST[
                         'oldbrand'] if 'oldbrand' in request.POST else request.POST['brand']
                     model = request.POST[
