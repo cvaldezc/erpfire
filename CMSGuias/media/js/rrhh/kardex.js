@@ -177,12 +177,13 @@ viewkardex = function(){
     }else{
       m = sum;
     }
+    var hreport = $("[name=hreport]").val();
     if (codbrand == "" && codmodel == "") {
       namemat = n;
-      window.open('http://'+ location.hostname +':6000/guiasherramienta/reportkardex?codmaterial='+codmat+'&nmaterial='+namemat+'&mes='+m+'&year='+y+'&type='+t0,'_blank');
+      window.open(hreport+'guiasherramienta/reportkardex?codmaterial='+codmat+'&nmaterial='+namemat+'&mes='+m+'&year='+y+'&type='+t0,'_blank');
     }else{
       namemat = n+" - "+mar+" - "+mode;
-      window.open('http://'+ location.hostname +':6000/guiasherramienta/reportkardex?codmaterial='+codmat+'&nmaterial='+namemat+'&mes='+m+'&year='+y+'&cbr='+codbrand+'&cmod='+codmodel+'&type='+t1,'_blank');
+      window.open(hreport+'guiasherramienta/reportkardex?codmaterial='+codmat+'&nmaterial='+namemat+'&mes='+m+'&year='+y+'&cbr='+codbrand+'&cmod='+codmodel+'&type='+t1,'_blank');
     }
 
   };

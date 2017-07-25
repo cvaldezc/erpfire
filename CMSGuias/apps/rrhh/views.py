@@ -2277,4 +2277,4 @@ class Kardex(JSONResponseMixin, TemplateView):
                 context['status'] = False
             return self.render_to_json_response(context)
         kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
-        return render(request,'rrhh/kardex.html')
+        return render(request, 'rrhh/kardex.html')
