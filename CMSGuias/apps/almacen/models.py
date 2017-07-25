@@ -1,12 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+
 from audit_log.models.managers import AuditLog
 from django.db import connection, models, transaction
 from CMSGuias.apps.ventas.models import Proyecto, Subproyecto, Sectore
 from CMSGuias.apps.operations.models import DSector
 from CMSGuias.apps.home.models import (
-    Materiale, Almacene, Transportista, Transporte, Conductore, Cliente, Brand, Model, Employee, Unidade)
+                                        Materiale,
+                                        Almacene,
+                                        Transportista,
+                                        Transporte,
+                                        Conductore,
+                                        Cliente,
+                                        Brand,
+                                        Model,
+                                        Unidade,
+                                        Moneda,
+                                        Employee)
 from CMSGuias.apps.logistica.models import Compra
 
 
@@ -522,30 +533,32 @@ class Balance(models.Model):
 
     def __unicode__(self):
         return '%s %s %s %f' % (self.materials_id, self.brand.brand, self.model.model, self.balance)
-"""
+
+
+'''
 Block Models for Tools
 2017-05-18 16:54:27
 2017-07-24 17:48:25 edit
 @Juan Julcapari
-"""
-class Herramienta(models.Model):
-    herramienta_id = models.CharField(max_length=15, primary_key=True)
-    nombre = models.CharField(max_length=200)
-    marca = models.ForeignKey(Brand, to_field='brand_id')
-    medida = models.CharField(max_length=20)
-    unidad = models.ForeignKey(Unidade, to_field='unidad_id')
-    tvida = models.CharField(max_length=20, null=True, blank=True)
+'''
+# class Herramienta(models.Model):
+#     herramienta_id = models.CharField(max_length=15, primary_key=True)
+#     nombre = models.CharField(max_length=200)
+#     marca = models.ForeignKey(Brand, to_field='brand_id')
+#     medida = models.CharField(max_length=20)
+#     unidad = models.ForeignKey(Unidade, to_field='unidad_id')
+#     tvida = models.CharField(max_length=20, null=True, blank=True)
 
 class InventarioHerra(models.Model):
     herramienta = models.ForeignKey(Materiale, to_field='materiales_id')
     marca = models.ForeignKey(Brand, to_field='brand_id')
     registro = models.DateTimeField(auto_now_add=True)
-    ingreso = models.FloatField(null=True,blank=True,default=0)
-    reparacion = models.FloatField(null=True,blank=True,default=0)
-    cantalmacen = models.FloatField(null=True,blank=True,default=0)
-    moneda = models.ForeignKey(Moneda, to_field='moneda_id',default='CU02')
+    ingreso = models.FloatField(null=True, blank=True, default=0)
+    reparacion = models.FloatField(null=True, blank=True, default=0)
+    cantalmacen = models.FloatField(null=True, blank=True, default=0)
+    moneda = models.ForeignKey(Moneda, to_field='moneda_id', default='CU02')
     price = models.FloatField(default=0)
-    tvida = models.CharField(max_length=20,null=True,blank=True)
+    tvida = models.CharField(max_length=20, null=True, blank=True)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
@@ -555,12 +568,13 @@ class InventarioHerra(models.Model):
 
 
 class ReparacionHerra(models.Model):
-    herramienta = models.ForeignKey(Herramienta, to_field='herramienta_id')
+    herramienta = models.ForeignKey(Materiale, to_field='materiales_id')
     cantidad = models.FloatField()
     fechreparacion = models.DateField()
     registro = models.DateTimeField(auto_now_add=True)
     lugarreparacion = models.CharField(max_length=100)
     comentario = models.CharField(max_length=200, null=True, blank=True)
+
 
 class GuiaHerramienta(models.Model):
     guia_id = models.CharField(max_length=12, primary_key=True)
@@ -572,11 +586,14 @@ class GuiaHerramienta(models.Model):
     traruc = models.ForeignKey(Transportista, to_field='traruc_id')
     registro = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=50, null=True, blank=True)
+    tipo = models.CharField(max_length=2, default='TL')
     comentario = models.CharField(max_length=200, null=True, blank=True)
+    motivo=models.CharField(max_length=2, default='AL')
+
 
 class detGuiaHerramienta(models.Model):
     guia = models.ForeignKey(GuiaHerramienta, to_field='guia_id')
-    herramienta = models.ForeignKey(Herramienta, to_field='herramienta_id')
+    herramienta = models.ForeignKey(Materiale, to_field='materiales_id')
     estado = models.CharField(max_length=20, null=True, blank=True)
     fechdevolucion = models.DateField(null=True, blank=True)
     cantidad = models.FloatField()
@@ -584,8 +601,9 @@ class detGuiaHerramienta(models.Model):
     comentario = models.CharField(max_length=200, null=True, blank=True)
     flagdev = models.BooleanField(default=False)
     brand = models.ForeignKey(Brand, to_field='brand_id')
-    grupo = models.CharField(max_length=200,null=True,blank=True)
+    grupo = models.CharField(max_length=200, null=True, blank=True)
     cantinicial = models.FloatField(default=0)
+
 
 class devolucionHerra(models.Model):
     docdev_id = models.CharField(max_length=12, primary_key=True)
@@ -601,15 +619,16 @@ class devolucionHerra(models.Model):
 class detDevHerramienta(models.Model):
     guia = models.ForeignKey(GuiaHerramienta, to_field='guia_id')
     docdev = models.ForeignKey(devolucionHerra, to_field='docdev_id')
-    herramienta = models.ForeignKey(Herramienta, to_field='herramienta_id')
+    herramienta = models.ForeignKey(Materiale, to_field='materiales_id')
     cantidad = models.FloatField()
     estado = models.CharField(max_length=10, null=True, blank=True)
     comentario = models.CharField(max_length=200, null=True, blank=True)
     brand = models.ForeignKey(Brand, to_field='brand_id')
     flag = models.BooleanField(default=True)
 
+
 class MovInventario(models.Model):
-    herramienta = models.ForeignKey(Herramienta, to_field='herramienta_id')
+    herramienta = models.ForeignKey(Materiale, to_field='materiales_id')
     cantidad = models.IntegerField(null=True, blank=True)
     estado = models.CharField(max_length=10, null=True, blank=True)
     registro = models.DateTimeField(auto_now_add=True)
@@ -753,7 +772,10 @@ class DetIngresoHe(models.Model):
     herramienta = models.ForeignKey(Materiale, to_field='materiales_id')
     cantidad = models.DecimalField(max_digits=8, decimal_places=2)
     marca = models.ForeignKey(Brand, to_field='brand_id')
-    convertto=models.DecimalField(max_digits=6,decimal_places=2)
+    convertto = models.DecimalField(max_digits=6, decimal_places=2)
     flag = models.BooleanField(default=True)
 
     audit_log = AuditLog()
+'''
+endblock
+'''

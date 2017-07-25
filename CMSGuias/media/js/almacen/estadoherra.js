@@ -136,7 +136,7 @@ switchgeneral=function(){
 		tipoacce='EP'
 		lbltipoacce='EPPS'
 	}else{
-		tipoacce='HE'
+		tipoacce='TL'
 		lbltipoacce='HERRAMIENTA'
 	}
 	$(".lbltipoacce").text(lbltipoacce)
