@@ -3307,7 +3307,7 @@ trsavefdev=function(){
 ///////EPPS
 
 switchgeneral=function(){
-	var rutabase='http://'+location.hostname+':8000/almacen/herramienta/'
+	var rutabase='http://'+location.hostname+(location.port != ''? ':'+location.port:'')+'/almacen/herramienta/'
 	getemple()
 	if (document.getElementById('switchepps').checked) {
 		tipoacce='EP'

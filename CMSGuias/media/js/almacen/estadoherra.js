@@ -140,7 +140,7 @@ switchgeneral=function(){
 		lbltipoacce='HERRAMIENTA'
 	}
 	$(".lbltipoacce").text(lbltipoacce)
-	if (urlactual=='http://'+location.hostname+':8000/almacen/herramienta/estados') {
+	if (urlactual=='http://'+location.hostname+(location.port != ''? ':'+location.port:'')+'/almacen/herramienta/estados') {
 		document.getElementById('divestado').style.display="block"
 	}
 }

@@ -235,7 +235,7 @@ FOR EACH ROW
 EXECUTE PROCEDURE proc_change_status_notaingresohe_op();
 ---------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------
--- DELETE NEED
+-- DELETE NEED before run trigger
 delete from almacen_detguiaherramienta;
 delete from almacen_detguiaherramienta;
 delete from almacen_movinventario;
