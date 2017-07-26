@@ -120,7 +120,7 @@ class Herramienta(JSONResponseMixin, TemplateView):
                     if 'saveherramienta' in request.POST:
                         print request.POST
                         tipoacce=request.POST.get('tipoacce')
-                        if tipoacce=="HE":
+                        if tipoacce=="TL":
                             codherra=genkeys.GenerateIdHerra()
                         else:
                             codherra=genkeys.GenerateIdEpps()
@@ -993,7 +993,7 @@ class Inventario(JSONResponseMixin, TemplateView):
         context = dict();
         if 'exportinv' in request.GET:
             tipoacce=request.GET.get('tipoacce')
-            if tipoacce=="HE":
+            if tipoacce=="TL":
                 lbltipoacce="HERRAMIENTA"
             else:
                 lbltipoacce="EPPS"
@@ -1812,7 +1812,7 @@ class Cargar(JSONResponseMixin, TemplateView):
             return HttpResponse("INGRESAR TIPO DE INGRESO(HERRAMIENTA O EPPS)")
             return False
         else:
-            if tipo=="HE":
+            if tipo=="TL":
                 tipoacce="HERRAMIENTAS"
             else:
                 tipoacce="EPPS"
@@ -1854,7 +1854,7 @@ class Cargar(JSONResponseMixin, TemplateView):
                 if hmedida == '' or hmedida == '-':
                     hmedida = "ESTANDAR"
 
-                if tipo=="HE":
+                if tipo=="TL":
                     codhe = genkeys.GenerateIdHerra()
                 else:
                     codhe = genkeys.GenerateIdEpps()
