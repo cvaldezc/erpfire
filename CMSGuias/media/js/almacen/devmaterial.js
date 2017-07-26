@@ -168,7 +168,7 @@ listdevmat()
 var urlactual=window.location.href;
 
 
-	if (urlactual=='http://'+location.hostname+':8000/almacen/devolucionmaterial/') {
+	if (urlactual=='http://'+location.hostname+(location.port != ''? ':'+location.port:'')+'/almacen/devolucionmaterial/') {
 		console.log(localStorage.getItem('codrandmat'))
 
 		openstorage()
@@ -1860,7 +1860,7 @@ saveguiafin = function(){
 	    			setTimeout(function(){
 	 					swal({
 	    				title:"GUIA DE DEVOLUCION GUARDADA",
-	    				text:"Para Generar el PDF <a href=\"http://"+location.hostname+":8000/almacen/devolucionguia\" target=\"_self\">clic aqui</a>",
+	    				text:"Para Generar el PDF <a href=\"http://"+location.hostname+(location.port != ''?':'+location.port:'')+"/almacen/devolucionguia\" target=\"_self\">clic aqui</a>",
 	    				showConfirmButton: true,
 	    				type:"success",
 	    				html:true},
