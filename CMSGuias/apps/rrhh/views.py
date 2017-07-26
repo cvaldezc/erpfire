@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
+
 import json
+
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.shortcuts import render_to_response
@@ -14,6 +17,8 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
+
 from CMSGuias.apps.rrhh.models import *
 from CMSGuias.apps.home.models import *
 from CMSGuias.apps.rrhh.forms import *
@@ -102,7 +107,7 @@ class Menu(JSONResponseMixin, TemplateView):
                 dicEmple={}
                 for x,num in emp.items():
                     dicEmple[x] = num
-        
+
                 context['status'] = True
             except ObjectDoesNotExist, e:
                 context['raise'] = str(e)
@@ -126,8 +131,8 @@ class Menu(JSONResponseMixin, TemplateView):
         proyecto=Proyecto.objects.filter(status='AC')
 
         return render(request,'rrhh/menu.html', {
-            'list':emple, 
-            'ltipemp':tipemp, 
+            'list':emple,
+            'ltipemp':tipemp,
             'lcargos':cargos,
             'ltipinst':tipoinst,
             'lproyecto':proyecto,
@@ -143,7 +148,7 @@ class Menu(JSONResponseMixin, TemplateView):
             'lcobsalud':tipocobsalud
             })
 
-        
+
 
     def post(self, request, *args, **kwargs):
         try:
@@ -185,7 +190,7 @@ class Menu(JSONResponseMixin, TemplateView):
                             cargopostula = request.POST.get('postula'),
                             distrito = request.POST.get('distr'),
                             tipoemple_id=request.POST.get('tipotrab'))
-                        context['status'] = True 
+                        context['status'] = True
 
 
                     if 'editemployee' in request.POST:
@@ -217,7 +222,7 @@ class Menu(JSONResponseMixin, TemplateView):
                         if fotoe != '':
                             uploadFiles.deleteFile(filenamefoto, True)
                             emple.foto = request.FILES['cambfoto']
-                        emple.discapacidad = True if request.POST['discap'] == 'true' else False 
+                        emple.discapacidad = True if request.POST['discap'] == 'true' else False
                         emple.tipoemple_id = request.POST['tipotrab']
                         emple.nacdpt = request.POST.get('dptnac')
                         emple.nacprov = request.POST.get('provnac')
@@ -228,11 +233,11 @@ class Menu(JSONResponseMixin, TemplateView):
                         emple.distrito = request.POST.get('distr')
                         emple.save()
                         context['status'] = True
-          
+
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
-                return self.render_to_json_response(context)    
+                return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
 
@@ -329,7 +334,7 @@ class Proyectos(JSONResponseMixin, TemplateView):
                                 'cli_apellidos':x.emplecampo.empdni.lastname,
                                 'cli_nombres': x.emplecampo.empdni.firstname,
                                 'cli_nompro':x.emplecampo.proyecto.nompro,
-                                'cli_conta':conta, 
+                                'cli_conta':conta,
                                 'cli_estad':x.estado})
                             conta = conta+1
                     if len(lisinducciones) == 0:
@@ -381,7 +386,7 @@ class Proyectos(JSONResponseMixin, TemplateView):
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
-                return self.render_to_json_response(context)    
+                return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
 
@@ -546,7 +551,7 @@ class SegSocial(JSONResponseMixin, TemplateView):
                 context['raise'] = str(e)
                 context['status'] = False
             return self.render_to_json_response(context)
-    
+
     def post(self, request, *args, **kwargs):
         try:
             context = dict()
@@ -567,7 +572,7 @@ class SegSocial(JSONResponseMixin, TemplateView):
                             empdni_id=request.POST.get('dniemple'),
                             fechinicio=request.POST.get('cobsalfechini'),
                             fechfin= None if request.POST.get('cobsalfechfin') == "" else request.POST.get('cobsalfechfin'),
-                            )               
+                            )
                         detSaludEmple.objects.create(
                             regimen_id=request.POST.get('regsalud'),
                             empdni_id=request.POST.get('dniemple'),
@@ -575,9 +580,9 @@ class SegSocial(JSONResponseMixin, TemplateView):
                             fechfin= None if request.POST.get('regsalfechfin') == "" else request.POST.get('regsalfechfin'),
                             entidad=request.POST.get('regsalentidad')
                             )
-                        context['status'] = True 
+                        context['status'] = True
 
-                    if 'saveeditregsalud' in request.POST:       
+                    if 'saveeditregsalud' in request.POST:
                         regsal = detSaludEmple.objects.get(
                             id=request.POST.get('codregsalud'),
                             empdni_id=request.POST.get('dni')
@@ -614,7 +619,7 @@ class SegSocial(JSONResponseMixin, TemplateView):
                             id=request.POST.get('pk')).delete()
                         context['status'] = True
 
-                    if 'saveeditcobsalud' in request.POST:       
+                    if 'saveeditcobsalud' in request.POST:
                         cobsal = detCobSaludEmple.objects.get(
                             id=request.POST.get('codcobsal'),
                             empdni_id=request.POST.get('dni')
@@ -640,7 +645,7 @@ class SegSocial(JSONResponseMixin, TemplateView):
                             fnac = request.POST.get('fnacfam'))
                         context['status'] = True
 
-                    if 'saveeditfamilia' in request.POST:       
+                    if 'saveeditfamilia' in request.POST:
                         fam = FamiliaEmple.objects.get(
                             id=request.POST.get('codfamilia'),
                             empdni_id=request.POST.get('dni')
@@ -730,7 +735,7 @@ class SegSocial(JSONResponseMixin, TemplateView):
                         famicr.areatrabajo = request.POST.get('famicrareatrab')
                         famicr.save()
                         context['status'] = True
-                        
+
                     if 'delfamiliaicr' in request.POST:
                         FamiliaIcr.objects.get(
                             empdni_id=request.POST.get('dni'),
@@ -766,7 +771,7 @@ class SegSocial(JSONResponseMixin, TemplateView):
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
-                return self.render_to_json_response(context)    
+                return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
 
@@ -802,7 +807,7 @@ class Phone(JSONResponseMixin, TemplateView):
             context = dict()
             if request.is_ajax():
                 try:
-                    
+
                     if 'exists' in request.POST:
                         try:
                             PhoneEmple.objects.get(
@@ -820,7 +825,7 @@ class Phone(JSONResponseMixin, TemplateView):
                             )
                         context['status'] = True
 
-                    if 'edittelefono' in request.POST:       
+                    if 'edittelefono' in request.POST:
                         pe = PhoneEmple.objects.get(
                             id=request.POST.get('codtelef'),
                             empdni_id=request.POST.get('dni')
@@ -835,11 +840,11 @@ class Phone(JSONResponseMixin, TemplateView):
                             empdni_id=request.POST.get('dni'),
                             phone=request.POST.get('phone')).delete()
                         context['status'] = True
-                
+
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
-                return self.render_to_json_response(context)    
+                return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
 
@@ -881,7 +886,7 @@ class CuentaCorriente(JSONResponseMixin, TemplateView):
             context = dict()
             if request.is_ajax():
                 try:
-                    
+
                     if 'exists' in request.POST:
                         try:
                             CuentaEmple.objects.get(
@@ -904,7 +909,7 @@ class CuentaCorriente(JSONResponseMixin, TemplateView):
                             )
                         context['status'] = True
 
-                    if 'editcuenta' in request.POST:       
+                    if 'editcuenta' in request.POST:
                         ce = CuentaEmple.objects.get(
                             id=request.POST.get('cod'),
                             empdni_id=request.POST.get('dni')
@@ -938,7 +943,7 @@ class CuentaCorriente(JSONResponseMixin, TemplateView):
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
-                return self.render_to_json_response(context)    
+                return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
 
@@ -968,7 +973,7 @@ class EstudiosEmpleado(JSONResponseMixin, TemplateView):
                              'regimen':x.regimen})
                         context['lestudios'] = listaestudios
                     context['status'] = True
-                    
+
                 if 'listexplab' in request.GET:
                     listaexplab = []
                     for x in ExperienciaLab.objects.filter(empdni_id=request.GET.get('employeeidexplab')):
@@ -1026,7 +1031,7 @@ class EstudiosEmpleado(JSONResponseMixin, TemplateView):
                         context['status'] = True
 
 
-                    if 'editestudio' in request.POST:       
+                    if 'editestudio' in request.POST:
                         dest = detEstudioEmple.objects.get(
                             id=request.POST.get('codestudio'),
                             empdni_id=request.POST.get('dni')
@@ -1074,7 +1079,7 @@ class EstudiosEmpleado(JSONResponseMixin, TemplateView):
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
-                return self.render_to_json_response(context)    
+                return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
 
@@ -1170,7 +1175,7 @@ class SuspensionEmple(JSONResponseMixin, TemplateView):
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
-                return self.render_to_json_response(context)    
+                return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
 
@@ -1183,7 +1188,7 @@ class DocumentoEmpleado(JSONResponseMixin, TemplateView):
             try:
                 if 'listexadoc' in request.GET:
                     listaexa = []
-                    
+
                     for x in ExamenEmple.objects.filter(empdni_id=request.GET.get('idexado')):
                         listaexa.append(
                             {'codexa':x.id,
@@ -1233,7 +1238,7 @@ class DocumentoEmpleado(JSONResponseMixin, TemplateView):
                             empdni_id=request.POST.get('dni'),
                             tipoexamen_id=request.POST.get('tipexa'),
                             fechinicio=request.POST.get('finiexa'),
-                            fechcaduca=None if request.POST.get('fcadexa') == "" else request.POST.get('fcadexa'), 
+                            fechcaduca=None if request.POST.get('fcadexa') == "" else request.POST.get('fcadexa'),
                             aptitud=request.POST.get('aptexa'),
                             comentario=request.POST.get('comentexa'),
                             archivo= '' if examen == "" else request.FILES['cambexa'],
@@ -1258,8 +1263,8 @@ class DocumentoEmpleado(JSONResponseMixin, TemplateView):
                         archivo = request.POST.get('arch');
                         empledni = request.POST.get('dni');
                         filename = '/storage/examedic/%s/examenes/%s' % (empledni,archivo);
-                        
-                        exa = request.POST.get('cambexa') 
+
+                        exa = request.POST.get('cambexa')
                         edexa = ExamenEmple.objects.get(
                             id=request.POST.get('codexa'),
                             empdni_id=request.POST.get('dni')
@@ -1281,7 +1286,7 @@ class DocumentoEmpleado(JSONResponseMixin, TemplateView):
                         empledni = request.POST.get('dni');
                         filename = '/storage/examedic/%s/documentos/%s' % (empledni,archivo);
 
-                        doc = request.POST.get('cambdocu') 
+                        doc = request.POST.get('cambdocu')
                         eddoc = DocumentoEmple.objects.get(
                             id=request.POST.get('coddocum'),
                             empdni_id=request.POST.get('dni')
@@ -1321,7 +1326,7 @@ class DocumentoEmpleado(JSONResponseMixin, TemplateView):
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
-                return self.render_to_json_response(context)    
+                return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
 
@@ -1346,7 +1351,7 @@ class ObraEmpleado(JSONResponseMixin, TemplateView):
 
                 if 'listobra' in request.GET:
                     listaobra = []
-                    
+
                     for x in EmpleCampo.objects.filter(
                         empdni_id=request.GET.get('employeeidobra')).order_by('-fechinicio'):
                         listaobra.append(
@@ -1429,7 +1434,7 @@ class ObraEmpleado(JSONResponseMixin, TemplateView):
                             )
                         context['status'] = True
 
-                    if 'editproy' in request.POST:       
+                    if 'editproy' in request.POST:
                         dempc = EmpleCampo.objects.get(
                             emplecampo_id=request.POST.get('codproy'),
                             empdni_id=request.POST.get('dni')
@@ -1442,7 +1447,7 @@ class ObraEmpleado(JSONResponseMixin, TemplateView):
                         dempc.save()
                         context['status'] = True
 
-                    if 'editinduccion' in request.POST:       
+                    if 'editinduccion' in request.POST:
                         edind = Induccion.objects.get(
                             id=request.POST.get('codinduccion'),
                             emplecampo_id=request.POST.get('dni')
@@ -1471,9 +1476,9 @@ class ObraEmpleado(JSONResponseMixin, TemplateView):
                         find.stat = request.POST.get('sta')
                         find.save()
                         context['status'] = True
-                        
 
-                    if 'editepps' in request.POST:       
+
+                    if 'editepps' in request.POST:
                         eepps = Epps.objects.get(
                             id=request.POST.get('codeppss'),
                             empdni_id=request.POST.get('dni')
@@ -1496,7 +1501,7 @@ class ObraEmpleado(JSONResponseMixin, TemplateView):
                         Epps.objects.get(
                             empdni_id=request.POST.get('dni'),
                             id=request.POST.get('pk')).delete()
-                        context['status'] = True                        
+                        context['status'] = True
 
                     if 'delinduccion' in request.POST:
                         delind = Induccion.objects.get(
@@ -1515,7 +1520,7 @@ class ObraEmpleado(JSONResponseMixin, TemplateView):
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
-                return self.render_to_json_response(context)    
+                return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
 
@@ -2252,7 +2257,7 @@ class Kardex(JSONResponseMixin, TemplateView):
                 if 'filtbrandmodel' in request.GET:
                     lism = []
                     count = 1;
-                    
+
                     for x in DetIngress.objects.filter(materials_id = request.GET.get('codm')).distinct('brand','model').order_by('brand'):
                         lism.append(
                             {'matcod':x.materials_id,
@@ -2271,5 +2276,5 @@ class Kardex(JSONResponseMixin, TemplateView):
                 context['raise'] = str(e)
                 context['status'] = False
             return self.render_to_json_response(context)
-
-        return render(request,'rrhh/kardex.html')
+        kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+        return render(request, 'rrhh/kardex.html')

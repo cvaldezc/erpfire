@@ -121,7 +121,7 @@
     	</button>
 	</div>
 </div>
-
+<input type="hidden" name="hreport" value="{{ hreport }}">
 {% csrf_token %}
 {% include "rrhh/forms/formfiltromat.html" %}
 {% endblock %}

@@ -458,6 +458,7 @@ saveOrderPurchase = function() {
           prm.append("savePurchase", true);
           prm.append('quotation', $("[name=quotation]").val());
           prm.append('observation', $("#observation_ifr").contents().find('body').html());
+          prm.append('tipoing', $('#tipo').val());
           if ($("input[name=deposito]").get(0).files.length) {
             prm.append("deposito", $("input[name=deposito]").get(0).files[1]);
           }

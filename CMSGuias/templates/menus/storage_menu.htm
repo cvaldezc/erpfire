@@ -64,16 +64,23 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Herramienta<b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a class="black-text" href="{% url 'viewherramienta' %}">Herramientas</a></li>
+            <li><a href="{% url 'viewherramienta' %}">Listado</a></li>
             <li class="divider"></li>
-            <li><a class="black-text" href="{% url 'viewguiaherra' %}">Guia Herramienta</a></li>
-            <li><a class="black-text" href="{% url 'viewinventario' %}">Inventario</a></li>
+            <li><a href="{% url 'viewguiaherra' %}">Guia de Remision</a></li>
             <li class="divider"></li>
-            <li><a class="black-text" href="{% url 'viewdevolucion' %}">Doc Devolucion</a></li>
-            <li><a class="black-text" href="{% url 'viewconsulta' %}">Consulta</a></li>
-            <li><a class="black-text" href="{% url 'viewestherramienta' %}">Estado Herramienta</a></li>
+            <li><a href="{% url 'viewnotaingreso' %}">Nota de Ingreso</a></li>
             <li class="divider"></li>
-            <li><a class="black-text" href="{% url 'viewcarga' %}">Cargar Herramienta</a></li>
+            <li><a href="{% url 'viewinventario' %}">Inventario</a></li>
+            <li class="divider"></li>
+            <li><a href="{% url 'viewdevolucion' %}">Guias Completas</a></li>
+            <li class="divider"></li>
+            <li><a href="{% url 'viewconsulta' %}">Consultas</a></li>
+            <li class="divider"></li>
+            <li><a href="{% url 'viewtrasladohe' %}">Traslado</a></li>
+            <li class="divider"></li>
+            <li><a href="{% url 'viewestherramienta' %}">Estado</a></li>
+            <li class="divider"></li>
+            <li><a href="{% url 'viewcarga' %}">Cargar Excel</a></li>
           </ul>
         </li>
         <li class="dropdown">

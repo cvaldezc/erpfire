@@ -1,4 +1,5 @@
 {% extends "basemd.html" %}
+
 {% block title %}
   Inventario
 {% endblock %}
@@ -9,88 +10,174 @@
 <script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
 <link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
 <script src="/media/js/almacen/guiaherramienta.js"></script>
-<link rel="stylesheet" href="/media/css/almacen/guiaherramienta.css">
-<div class="">
-  <h5>
-    INGRESO DE STOCK DE HERRAMIENTAS
-    <a href="/json/inventory/tools/export/" class="waves-effect btn-flat right">
-      <i class="fa fa-file-excel-o"></i>
-      <span class="hide-on-small-only">EXPORTAR</span>
-    </a>
-  </h5>
-  <div class="card" style="margin-left:70px;width:90%;">
-    <div class="action-card">
-      <div class="row">
-        <div class="input-field col s12 divbuscar">
-          <i class="prefix fa fa-search"></i>
-           <input class="txtbuscar" style="width:85%;" align="center" type="search" placeholder="Buscar Herramienta" name="txtbuscarherramienta" id="txtbuscarherramienta" >
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+<link rel="stylesheet" href="/media/css/almacen/guia.css">
+
+<div class="row" style="margin:20px">
+  <div class="input-field col" id="divtipoacce">
+    <div class="panel-group">
+      <div class="panel" style="margin-left:20px;margin-right:20px;">
+        <div class="panel-heading" style="">
+          <h4 class="panel-title">Inventario</h4>
         </div>
+          <div class="panel-body" style="margin-top:-15px">
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchhe"/>
+            <label for="switchhe" id="switchhe" style="font-size:15px;font-weight:bold;color:black;">HERRAMIENTA</label>
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchepps"/>
+            <label for="switchepps" id="switchepps" style="font-size:15px;font-weight:bold;color:black;">EPPS</label>
+          </div>
+
       </div>
     </div>
   </div>
+</div>
+<div align="center">
+  <h4 class="lbltipoacce"></h4>
+</div>
 
-  <div class="card cardherra" style="background-color:#f0f4c3;margin-left:70px; width:90%;display:none;">
+<div style="margin:50px;display:none;" id="divinventario">
+  <div class="card">
     <div class="action-card">
       <div class="row">
-      <div class="input-field col s2">
-          <input style="text-align:center;" placeholder="" id="hercod" name="hercod" type="text" class="hercod" readonly>
-          <label for="hercod" >Codigo</label>
-      </div>
-      <div class="input-field col s6">
-          <input placeholder=""  type="text" class="herstock" readonly>
-          <label for="herstock" >Herramienta</label>
-      </div>
-      <div class="input-field col s2">
-        <input placeholder="" id="ingcant" name="ingcant" type="text" class="ingcant">
-        <label for="ingcant" >Ingresar Cantidad</label>
-      </div>
-      <div class="input-field col s2">
-          <input placeholder="" id="ingprice" name="ingprice" type="text" class="ingprice">
-          <label for="ingprice" >Ingresar Precio</label>
-      </div>
-        <div class="input-field col s2">
-          <button type="button" id="btnaddstock" name="btnaddstock" class="btn waves-effect grey btnaddstock">
-            <i class="fa fa-check-square-o"></i>
-            <span><strong>Agregar</strong></span>
+        <div class="input-field col s8 divbuscar">
+          <i class="prefix fa fa-search"></i>
+           <input class="txtbuscar" style="width:85%;" align="center" type="search" placeholder="Codigo o Descripcion" name="txtbuscarherramienta" id="txtbuscarherramienta" >
+        </div>
+        <div class="input-field col">
+          <button type="button" class="btn waves-effect teal lighten-1 btnaddheinvent">
+          <i class="fa fa-plus"></i>
+          <span><strong class="lbltipoacce"></strong></span>
+          </button>
+        </div>
+        <div class="input-field col">
+          <button type="button" class="btn waves-effect teal lighten-1 btnexportinvent">
+          <i class="fa fa-file-excel-o"></i>
+          <span><strong>Exportar</strong></span>
           </button>
         </div>
       </div>
     </div>
   </div>
 
-    <table class="tabla-invent" id="tabla-invent">
+  <div class="card cardherra" style="background-color:#f0f4c3;margin-left:20px; width:98%;display:none;">
+    <div class="action-card">
+      <div style="width:100%;float:left;background-color:#c0ca33">
+        <div style="width:70%;float:left">
+          <label style="margin-left:20px;font-size:20px;color:#F44336;font-weight:bold">Edicion de Stock y Precio</label>
+          <label class="lblinvcodbr" style="display:none"></label>
+        </div>
+        <div style="width:30%;float:left">
+          <label style="color:#F44336;font-weight:bold">Moneda Actual del Sistema: </label>
+          <label style="color:#F44336;font-weight:bold">{{getmoned}}</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s2">
+            <input style="text-align:center;" placeholder="" id="hercod" name="hercod" type="text" class="hercod" readonly>
+            <label for="hercod" >CODIGO</label>
+        </div>
+        <div class="input-field col s4">
+            <input placeholder=""  type="text" class="herstock" readonly>
+            <label for="herstock" class="lbltipoacce"></label>
+        </div>
+          <div class="input-field col s1">
+            <input placeholder="" id="ingcant" name="ingcant" type="text" class="ingcant">
+            <label for="ingcant" >STOCK</label>
+          </div>
+          <div class="input-field col s2" style="margin-top:35px">
+            <select id="invtipomon" class="browser-default">
+              {% for x in ltipmoned %}
+              <option value="{{ x.moneda_id }}">{{ x.moneda }}</option>
+              {% endfor %}
+            </select>
+            <label style="font-size:0.8rem;color:#0091ea;margin-top:-45px" for="invtipomon">TIPO DE MONEDA</label>
+          </div>
+          <div class="input-field col s1">
+            <input placeholder="" type="text" class="ingprecio">
+            <label for="ingprecio" >PRECIO</label>
+          </div>
+          <div class="input-field col s2">
+            <button type="button" id="btneditstock" name="btneditstock" class="btn waves-effect red btneditstock">
+              <i class="fa fa-check-square-o"></i>
+              <span><strong>EDITAR STOCK</strong></span>
+            </button>
+          </div>
+      </div>
+    </div>
+  </div>
 
-        <thead>
+    <table class="table table-condensed highlight responsive-table tabla-invent" id="tabla-invent" style="margin-left:20px;width:98%">
+        <thead class="cab">
           <tr>
-            <th class="titnum">#</th>
-            <th class="titcodinvent">Codigo</th>
-            <th class="titherra">Herramienta</th>
-            <th class="titmarca">Marca</th>
-            <th class="titstock">Stock</th>
-            <th class="center-align">Precio</th>
-            <th class="titaddstock"></th>
+            <th class="colst40">#</th>
+            <th class="colst150">CODIGO</th>
+            <th class="lbltipoacce" style="font-weight:bold"></th>
+            <th >MEDIDA</th>
+            <th class="colst150">MARCA</th>
+            <th class="colst100">UNIDAD</th>
+            <th class="colst100">STOCK</th>
+            <th class="colst100">ACCIONES</th>
 
           </tr>
         </thead>
-        <tbody id="fbody" class="bodydetailinvent">
-          {% for x in linvent %}
-          <tr class="fer">
-            <td class="titnum">{{ forloop.counter }}</td>
-            <td class="titcodinvent">{{ x.herramienta_id }}</td>
-            <td class="titherra">{{ x.herramienta.nombre }} {{ x.herramienta.medida }}</td>
-            <td class="titmarca">{{ x.herramienta.marca.brand }}</td>
-            <td class="titstock">{{ x.cantalmacen }}</td>
-            <td class="right-align">
-              {{ x.price }}
-            </td>
-            <td class="titaddstock">
-              <button value="{{ x.herramienta_id }}" data-herrastock="{{ x.herramienta.nombre }} - {{ x.herramienta.medida }} - {{ x.herramienta.marca.brand }}" type="button" class="transparent btnviewdivstock" style="border:none;"><i class="fa fa-plus-square"></i>
-              </button>
-            </td>
-          </tr>
-          {% endfor %}
-          </tbody>
+        <tbody></tbody>
     </table>
+</div>
+
+<div class="modal bottom-sheet modnewherraguia" style="max-height:100%;height:400px">
+  <div class="modal-content">
+    <div style="width:100%;float:left">
+      <div style="width:7%;float:left">
+        <h5 style="font-weight:bold">CREAR</h5>
+      </div>
+      <div style="width:50%;float:left">
+        <h5 class="lbltipoacce" style="font-weight:bold"></h5>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="input-field col s3">
+        <input class="ngnamehe" placeholder="" type="text">
+        <label for="ngnamehe">NOMBRE</label>
+      </div>
+      <div class="input-field col s3">
+        <input class="ngmedhe" placeholder="" type="text">
+        <label for="ngmedhe">MEDIDA</label>
+      </div>
+      <div class="input-field col s3" style="margin-top:35px">
+        <select id="ngcbomarca" class="browser-default">
+          {% for x in lbrandhe %}
+            <option value="{{ x.brand_id }}">{{ x.brand }}</option>
+          {% endfor %}
+        </select>
+        <label for="ngcbomarca" style="color:#0091ea;margin-top:-30px;font-size:0.8rem">MARCA</label>
+      </div>
+      <div class="input-field col s3" style="margin-top:35px">
+        <select id="ngcbounidad" class="browser-default">
+          {% for x in lunidadhe %}
+            <option value="{{ x.unidad_id }}">{{ x.uninom }}</option>
+          {% endfor %}
+        </select>
+        <label for="ngcbounidad" style="color:#0091ea;margin-top:-30px;font-size:0.8rem">UNIDAD</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s3">
+        <input class="ngtvidahe" placeholder="" type="text">
+        <label for="ngtvidahe">TIEMPO DE VIDA</label>
+      </div>
+    </div>
+    <div class="moda-footer" align="center" style="margin-top:50px;">
+      <button type="button" id="btnngsaveherra" name="btnngsaveherra" class="btn waves-effect green lighten-1 btnngsaveherra">
+        <i class="fa fa-floppy-o"></i>
+        <span><strong>Guardar</strong></span>
+      </button>
+      <button type="button" class="modal-action modal-close btn waves-effect red lighten-2">
+        <i class="fa fa-times"></i>
+        <span>Cancelar</span>
+      </button>
+    </div>
+  </div>
 </div>
 
 {% csrf_token %}

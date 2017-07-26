@@ -1,38 +1,64 @@
 {% extends "basemd.html" %}
 
 {% block title %}
-  Cargar Herramienta
+  Cargar Excel
 {% endblock %}
 {% block menu %}
   {% include "menus/storagemd.htm" %}
 {% endblock %}
 {% block content %}
-<!--<script src="/media/js/almacen/guiaherramienta.js"></script>-->
-<link rel="stylesheet" href="/media/css/almacen/guiaherramienta.css">
+<script src="/media/js/almacen/guiaherramienta.js"></script>
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+<link rel="stylesheet" href="/media/css/almacen/guia.css">
 
-  <form method="post" action="{% url 'storare_view_carga_tools' %}" enctype="multipart/form-data">
-  <fieldset>
-  <legend align="center"><h4>Cargar lista de herramienta</h4></legend>
+<div class="row" style="margin:20px">
+  <div class="input-field col" id="divtipoacce">
+    <div class="panel-group">
+      <div class="panel" style="margin-left:20px;margin-right:20px;">
+        <div class="panel-heading" style="">
+          <h4 class="panel-title">Cargar Excel</h4>
+        </div>
+          <div class="panel-body" style="margin-top:-15px">
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchhe"/>
+            <label for="switchhe" id="switchhe" style="font-size:15px;font-weight:bold;color:black;">HERRAMIENTA</label>
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchepps"/>
+            <label for="switchepps" id="switchepps" style="font-size:15px;font-weight:bold;color:black;">EPPS</label>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin:50px;display:none" id="divcargarhe">
+  <button type="button" class="btn btndescformat" style="background-color:#039be5">
+    <i class="fa fa-download"></i>
+    <span>DESCARGAR FORMATO</span>
+  </button>
+  <div align="center">
+    <h4 class="lbltipoacce"></h4>
+  </div>
+  <form method="post" action="{% url 'viewcarga' %}" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="file-field input-field">
       <div class="btn">
         <i class="fa fa-file-excel-o"></i>
-        <span>Seleccione los Archivos</span>
-        <input type="file" name="files[]" multiple accept="application/vnd.ms-excel">
+        <span>Seleccionar Archivo</span>
+        <input accept="" type="file" name="files[]">
       </div>
       <div class="file-path-wrapper">
-        <input class="file-path validate" type="text">
+        <input class="file-path" name="txtnamearchivo" type="text">
       </div>
-      <button type="submit" class="right waves-effect waves-light btn red lighten-1">
+    </div>
+    <div align="right">
+      <button class="btn red" style="font-weight:bold" type="submit">
         <i class="fa fa-upload"></i>
-        <span class="hide-on-small-only">PROCESAR ARCHIVO</span>
+        <span>Cargar Archivo</span>
       </button>
     </div>
-    <!-- <div align="center" style="margin-top:20px;">
-      <input type="file" name="files[]" multiple/> <br/>
-      <input type="submit" value="Cargar" style="margin-top:20px;" />
-    </div> -->
-  </fieldset>
   </form>
+</div>
+
 {% csrf_token %}
 {% endblock %}

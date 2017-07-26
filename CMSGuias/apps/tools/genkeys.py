@@ -8,10 +8,11 @@ from django.db.models import Max
 
 from CMSGuias.apps.almacen.models import (
     Pedido, GuiaRemision, Suministro, NoteIngress, Restoration, devolucionHerra,
-    GrupoPedido, GuiaDevMat)
+    GrupoPedido, GuiaDevMat, GuiaHerramienta, NotaIngresoHe)
 from CMSGuias.apps.logistica.models import Cotizacion, Compra, ServiceOrder
 from CMSGuias.apps.ventas.models import Proyecto, ProjectItemizer
-from CMSGuias.apps.home.models import Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado, Rubro
+from CMSGuias.apps.home.models import (
+    Brand, Model, GroupMaterials, TypeGroup, TipoEmpleado, Rubro, Materiale)
 from CMSGuias.apps.operations.models import (
     Deductive, Letter, PreOrders, SGroup, DSector)
 from CMSGuias.apps.ventas.budget.models import AnalysisGroup, Analysis, Budget
@@ -760,4 +761,112 @@ def GenerateIdGuiaMatDev():
     except ObjectDoesNotExist, e:
         raise e
     return id
+# endblock
+# @Juan Julcapari 2017-07-25 09:12:59 -
+def GenerateIdHerra():
+    try:
+        lcods = []
+        for x in Materiale.objects.filter(materiales_id__startswith='999'):
+            lcods.append({
+                'num':x.materiales_id[3:15]
+                })
+        print 'lcods', lcods
+        if len(lcods) != 0:
+            cod = max(lcods)
+            print 'ee', cod
+            counter = int(cod['num'])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        print 'cou', counter
+        cod = '%s%s' % ('999', '{:0>12d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return cod
+
+def GenerateIdEpps():
+    try:
+        lcods=[]
+        for x in Materiale.objects.filter(
+            materiales_id__startswith='888'):
+            lcods.append({
+                'num':x.materiales_id[3:15]
+                })
+        print 'lcods', lcods
+        if len(lcods)!=0:
+            cod = max(lcods)
+            counter = int(cod['num'])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        print 'cou', counter
+        cod = '%s%s' % ('888','{:0>12d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return cod
+
+def GenerateIdGuiaHerra(serie):
+    id = None
+    try:
+        lcods = []
+        for x in GuiaHerramienta.objects.filter(guia_id__startswith=serie):
+            lcods.append(
+                {
+                    'num':x.guia_id[4:12]
+                }
+            )
+        if len(lcods) != 0:
+            cod = max(lcods)
+            counter = int(cod['num'])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s-%s' % (serie, '{:0>8d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+def GenerateIdNotaIngresoHe():
+    id = None
+    try:
+        code = NotaIngresoHe.objects.aggregate(max=Max('ingresohe_id'))
+        id = code['max']
+        yn = int(datetime.datetime.today().strftime(__year_str))
+        if id is not None:
+            yy = int(id[3:5])
+            counter = int(id[5:10])
+            if yn > yy:
+                counter = 1
+            else:
+                counter += 1
+        else:
+            counter = 1
+        id = '%s%s%s' % ('NIH', yn.__str__(), '{:0>5d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+### ULTIMO RRHH
+
+def GenerateIdAreaCargo():
+    id = None
+    try:
+        code = AreaCargo.objects.aggregate(max=Max('area_id'))
+        id = code['max']
+        if id is not None:
+            counter = int(id[2:7])
+            print counter
+            counter += 1
+        else:
+            counter = 1
+        id = '%s%s' % ('AR', '{:0>5d}'.format(counter))
+    except ObjectDoesNotExist, e:
+        raise e
+    return id
+
+
+
 # endblock

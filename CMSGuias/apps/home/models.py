@@ -84,8 +84,7 @@ class Materiale(models.Model):
     '''
     model class master for items for the project
     '''
-    materiales_id = models.CharField(
-        u'Mnemocode', unique=True, primary_key=True, max_length=15)
+    materiales_id = models.CharField(primary_key=True, max_length=15)
     matnom = models.CharField(max_length=200, null=False)
     matmed = models.CharField(max_length=200, null=False)
     unidad = models.ForeignKey(Unidade, to_field='unidad_id')

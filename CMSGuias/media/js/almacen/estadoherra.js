@@ -9,7 +9,17 @@ $(".txtestbuscardeth").on("keyup",buscardeth);
 $(".txtbuscdetalquiler").on("keyup",buscdetalquiler);
 $(".txtbuscdetrepar").on("keyup",buscdetrepar);
 
+combochosen("#comboestadherra")
+
 });
+
+combochosen = function(combo){
+$(combo).chosen({
+	allow_single_deselect:true,
+	width: '100%'});
+}
+
+var urlactual=window.location.href;
 
 
 changecolortd = function(tdata){
@@ -19,7 +29,7 @@ changecolortd = function(tdata){
   var data = new Date();
   var diares = d.getDate();
   d.setDate(diares + 7);
-  $(tdata).each(function(){ 
+  $(tdata).each(function(){
     var fech = $(this).text();
     var dat = fech.replace(/-/g , "/")
     var fechafinal = new Date(dat)
@@ -43,15 +53,12 @@ if (fech != "") {
 comentalmacen = function(){
 	var comen = this.getAttribute("data-coment");
 	if (comen != "") {
-		$(".txtcoment").text(comen);	
+		$(".txtcoment").text(comen);
 		$(".coment").modal("open");
 	}else{
-		Materialize.toast("No existe comentario para el material seleccionado",2500,"rounded");
-		return false;
+		swal({title:'No existe comentario para el material seleccionado',timer:1500,showConfirmButton:false,type:'error'});
+		return false
 	}
-	
-	
-	
 }
 
 detestalmacen = function(){
@@ -60,7 +67,7 @@ detestalmacen = function(){
 	nameh = this.getAttribute("data-nameh");
 	medh = this.getAttribute("data-medidah");
 	marcah = this.getAttribute("data-marcah");
-	descripcionh = nameh+" "+medh+" "+marcah 
+	descripcionh = nameh+" "+medh+" "+marcah
 	idest = $("select[id=comboestadherra]").val();
 	console.log(idest)
 	if (idest == "ALQUILER" || idest == "ALMACEN") {
@@ -79,7 +86,7 @@ detestalmacen = function(){
 		      	$(".titdescherra").text(descripcionh);
 		        $tb = $("table.table-detestalmacen > tbody");
 		        $tb.empty();
-		        template = "<tr><td class=\"colnum\">{{ count }}</td><td>{{ nompro }}</td><td>{{ numguia }}</td><td>{{ cantidad }}</td><td>{{ fechsalida }}</td><td><button type=\"button\" style=\"border:none;font-weight:bold;\" class=\"transparent btncomentalmacen\"  data-coment=\"{{ comentario }}\"><i class=\"fa fa-info-circle\"></i></button></td></tr>";
+		        template = "<tr><td class=\"colst40\">{{ count }}</td><td>{{ codproy }}{{ nompro }}</td><td class=\"colst150\">{{ numguia }}</td><td class=\"colst100\">{{ cantidad }}</td><td class=\"colst150\">{{ fechsalida }}</td><td class=\"colst100\"><button type=\"button\" style=\"border:none;font-size:25px\" class=\"transparent btncomentalmacen\" data-coment=\"{{ comentario }}\"><i style=\"color:#4caf50\" class=\"fa fa-commenting\"></i></button></td></tr>";
 	      	}else if(idest == "ALQUILER"){
 	      		console.log(idest)
 		      	$(".detestalquiler").modal("open");
@@ -87,9 +94,7 @@ detestalmacen = function(){
 		      	$(".titdherra").text(descripcionh);
 		        $tb = $("table.table-detestalquiler > tbody");
 		        $tb.empty();
-		        template = "<tr><td class=\"colnum\">{{ count }}</td><td>{{ nompro }}</td><td>{{ numguia }}</td><td>{{ cantidad }}</td><td>{{ fechsalida }}</td><td class=\"tdfecdev\">{{ fechdev }}</td><td>{{ dias }}</td><td><button type=\"button\" style=\"border:none;font-weight:bold;\" class=\"transparent btncomentalmacen\" data-coment=\"{{ comentario }}\"><i class=\"fa fa-info-circle\"></i></button></td></tr>";
-		        
-
+		        template = "<tr><td class=\"colnum\">{{ count }}</td><td>{{ codproy }}{{ nompro }}</td><td>{{ numguia }}</td><td>{{ cantidad }}</td><td>{{ fechsalida }}</td><td class=\"tdfecdev\">{{ fechdev }}</td><td>{{ dias }}</td><td><button type=\"button\" style=\"border:none;font-size:25px;\" class=\"transparent btncomentalmacen\" data-coment=\"{{ comentario }}\"><i style=\"color:#4caf50\" class=\"fa fa-commenting\"></i></button></td></tr>";
 	      	}
 	        for (x in response.lestalmacen) {
 	        response.lestalmacen[x].item = parseInt(x) + 1;
@@ -114,7 +119,7 @@ detestalmacen = function(){
 		      	$(".titdesherra").text(descripcionh);
 		        $tb = $("table.table-detestreparacion > tbody");
 		        $tb.empty();
-		        template = "<tr><td class=\"colnum\">{{ count }}</td><td>{{ nompro }}</td><td>{{ numguia }}</td><td>{{ cantidad }}</td><td>{{ fechsalida }}</td><td>{{ fechretorno }}</td><td><button type=\"button\" style=\"border:none;font-weight:bold;\" class=\"transparent btncomentalmacen\" data-coment=\"{{ comentario }}\"><i class=\"fa fa-info-circle\"></i></button></td></tr>";
+		        template = "<tr><td class=\"colnum\">{{ count }}</td><td>{{ nompro }}</td><td>{{ numguia }}</td><td>{{ cantidad }}</td><td>{{ fechsalida }}</td><td>{{ fechretorno }}</td><td><button type=\"button\" style=\"border:none;font-size:25px;\" class=\"transparent btncomentalmacen\" data-coment=\"{{ comentario }}\"><i style=\"color:#4caf50\" class=\"fa fa-commenting\"></i></button></td></tr>";
 	        for (x in response.lestreparacion) {
 	        response.lestreparacion[x].item = parseInt(x) + 1;
 	        $tb.append(Mustache.render(template, response.lestreparacion[x]));
@@ -124,46 +129,55 @@ detestalmacen = function(){
 	}
 }
 
+var tipoacce=''
+var lbltipoacce=''
+switchgeneral=function(){
+	if (document.getElementById('switchepps').checked) {
+		tipoacce='EP'
+		lbltipoacce='EPPS'
+	}else{
+		tipoacce='TL'
+		lbltipoacce='HERRAMIENTA'
+	}
+	$(".lbltipoacce").text(lbltipoacce)
+	if (urlactual=='http://'+location.hostname+':8000/almacen/herramienta/estados') {
+		document.getElementById('divestado').style.display="block"
+	}
+}
+
+
 
 
 $(function(){
 	$('#comboestadherra').change(function(){
-	  var data,id,nest;
-	  id = this.value;
-	  nest = $("select[id=comboestadherra] > option:selected").text();
-	  // $(".nombreproyecto").text(np);
-	  descrcaption = "HERRAMIENTAS"+"  "+nest;
-	  console.log(id);
-	  
-	  if (id !== "") {
-	  	if (id == "ALMACEN" || id == "ALQUILER") {
-	  		data = {
-			    estmat: id,
-			    lherraalmacen: true,
-	    };
-	  	}else{
-	  		data = {
-	  			estmat:id,
-	  			lhereparacion:true,
-	  		}
-	  	}
+		var id,nest;
+		id = this.value;
+		nest = $("select[id=comboestadherra] > option:selected").text();
+		console.log(id);
 
-	    $.getJSON("", data, function(response) {
-	        var $tb, template, x;
-	      if (response.status) {
-	      	$(".captiontable").text(descrcaption);
-	      	document.getElementById('divtabalmacen').style.display = 'block';
-	        $tb = $("table.table-lalmacen > tbody");
-	        $tb.empty();
-	        template = "<tr><td class=\"colnum\">{{ count }}</td><td class=\"colcod\">{{ codherra }}</td><td class=\"colherra\">{{ nameherra }}</td><td class=\"colmedida\">{{ medherra }}</td><td class=\"colmarca\">{{ marcherra }}</td><td class=\"coldetalle\"><button type=\"button\" style=\"border:none;font-weight:bold;\" class=\"transparent btndetestalmacen\" value=\"{{ codherra }}\" data-nameh=\"{{ nameherra }}\" data-medidah=\"{{ medherra }}\" data-marcah=\"{{ marcherra }}\"><i class=\"fa fa-info-circle\"></i></button></td></tr>";
-	        for (x in response.lestalmacen) {
-	        response.lestalmacen[x].item = parseInt(x) + 1;
-	        $tb.append(Mustache.render(template, response.lestalmacen[x]));
-	        }
-	    }
-	    });
-	  }
+		var data=new Object
+		data.estmat=id
+		data.tipoacce=tipoacce
+		if (id == "ALMACEN" || id == "ALQUILER") {
+			data.lherraalmacen=true
+		}else{
+			data.lhereparacion=true
+		}
 
+		$.getJSON("", data, function(response) {
+			var $tb, template, x;
+			if (response.status) {
+				$(".captiontable").text(nest);
+				document.getElementById('divtabalmacen').style.display = 'block';
+				$tb = $("table.table-lalmacen > tbody");
+				$tb.empty();
+				template = "<tr><td class=\"colst40\">{{ count }}</td><td class=\"colst150\">{{ codherra }}</td><td>{{ nameherra }}</td><td class=\"colst100\">{{ medherra }}</td><td class=\"colst150\">{{ marcherra }}</td><td class=\"colst100\"><button type=\"button\" style=\"border:none;font-size:20px;\" class=\"transparent btndetestalmacen\" value=\"{{ codherra }}\" data-nameh=\"{{ nameherra }}\" data-medidah=\"{{ medherra }}\" data-marcah=\"{{ marcherra }}\"><i class=\"fa fa-info-circle\"></i></button></td></tr>";
+				for (x in response.lestalmacen) {
+					response.lestalmacen[x].item = parseInt(x) + 1;
+					$tb.append(Mustache.render(template, response.lestalmacen[x]));
+				}
+			}
+		});
 	});
 });
 
@@ -186,9 +200,6 @@ buscdetrepar = function(event){
 }
 
 
-
-
-
 buscador = function(idtxtinput,idtable){
   var input,filter,table, tr, td,td2, i;
   input = document.getElementById(idtxtinput);
@@ -200,12 +211,13 @@ buscador = function(idtxtinput,idtable){
     td = tr[i].getElementsByTagName("td")[1];
     td2 = tr[i].getElementsByTagName("td")[2];
     if (td || td2) {
-      if (td.innerHTML.toUpperCase().indexOf(filter) > -1 || 
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1 ||
       	  td2.innerHTML.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = ""; 
+        tr[i].style.display = "";
       } else {
         tr[i].style.display = "none";
       }
     }
   }
 }
+

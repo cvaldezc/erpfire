@@ -4,6 +4,10 @@
 
 <div class="modal detguiagen">
       <div class="modal-content">
+        <h4>Detalle de Guia</h4>
+        <hr>
+        <label class="lbldetguiagen">Numero Guia: </label><label class="dnumguia dlbl" style="margin-left:40px;"></label>
+        </br>
         <label class="lbldetguiagen">Proyecto: </label><label class="dnameproy dlbl" style="margin-left:80px;"></label>
         </br>
         <label class="lbldetguiagen">Supervisor: </label><label class="dsupervisor dlbl" style="margin-left:60px;"></label>
@@ -11,8 +15,6 @@
         <label class="lbldetguiagen">P. de Llegada: </label><label class="dlleg dlbl" style="margin-left:40px;"></label>
         </br>
         <label class="lbldetguiagen">Destinatario: </label><label class="ddest dlbl" style="margin-left:50px;"></label>
-        </br>
-        <label class="lbldetguiagen">Numero Guia: </label><label class="dnumguia dlbl" style="margin-left:40px;"></label>
         </br>
         <label class="lbldetguiagen">Fecha de Salida: </label><label class="dfsalid dlbl" style="margin-left:20px;"></label>
         </br>
@@ -25,24 +27,27 @@
         <label class="lbldetguiagen">Obs.: </label><label class="dcoment dlbl" style="margin-left:115px;"></label>
         </br>
         <hr>
-          <table class="table-dguiagene" id="table-dguiagene" >
+        <div style="overflow-y: scroll; height:270px">
+          <table class="table responsive-table highlight table-condensed table-dguiagene" id="table-dguiagene" >
               <thead class="cab">
-                  <tr class="brand-primary">
-                      <th class="colnum">#</th>
-                      <th>Codigo</th>
-                      <th>Herramienta</th>
-                      <th>Enviado</th>
-                      <th>Estado</th>
-                      <th>F.Devolucion</th>
+                  <tr>
+                      <th class="colst40">#</th>
+                      <th class="colst150">GRUPO</th>
+                      <th class="colst150">CODIGO</th>
+                      <th class="lbltipoacce" style="font-weight:bold"></th>
+                      <th class="colst100">ENVIADO</th>
+                      <th>ESTADO</th>
+                      <th class="colst150">F.DEVOLUCION</th>
                   </tr>
               </thead>
-              <tbody class="bodydguiagene" style="height:270px;"></tbody>
+              <tbody></tbody>
           </table>
-          <div align="right" style="">
-          <button type="button" class="btn modal-action modal-close waves-effect waves-black blue lighten-1 btn-flat btnsalirmodal">
-          <i class="fa fa-times"></i><span>SALIR</span>
-          </button>
-          </div>
+        </div>
+        <div align="right" style="">
+        <button type="button" class="btn modal-action modal-close waves-effect waves-black blue lighten-1 btn-flat btnsalirmodal">
+        <i class="fa fa-times"></i><span>SALIR</span>
+        </button>
+        </div>
       </div>
 </div>
 
@@ -51,22 +56,24 @@
 <!--DETALLE HERRAMIENTAS COMPLETAS-->
 <div class="modal detherracompl">
   <div class="modal-content">
-    <table class="table-detherrac" id="table-detherrac">
-        <thead class="cab">
-            <tr class="brand-primary">
-                <th class="colnum">#</th>
-                <th>Herramienta</th>
-                <th>Enviado</th>
-            </tr>
-        </thead>
-        <tbody class="bodydetherracomp"></tbody>
-    </table>
+    <div style="overflow-y: scroll;height:600px">
+      <table class="table table-condensed responsive-table table-detherrac" id="table-detherrac">
+          <thead class="cab">
+              <tr>
+                  <th class="colst40">#</th>
+                  <th><h6 class="lbltipoacce" style="font-weight:bold"></h6></th>
+                  <th class="colst100">ENVIADO</th>
+              </tr>
+          </thead>
+          <tbody></tbody>
+      </table>
+    </div>
     <div align="right">
     <button type="button" class="btn modal-action modal-close waves-effect waves-black blue lighten-1 btn-flat btnsalirmodal">
     <i class="fa fa-times"></i>
     SALIR
     </button>
-    
+
     </div>
   </div>
 </div>

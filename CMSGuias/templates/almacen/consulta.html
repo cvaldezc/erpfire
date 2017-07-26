@@ -13,82 +13,106 @@
 <link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
 <link rel="stylesheet" href="/media/css/almacen/guia.css">
 <script src="{{ MEDIA_URL }}js/mustache.js"></script>
-<div>
-  <div class="row" style="margin-left:30px;">
-    <h4 align="center">Materiales en Campo</h4>
-    <div class="card" style="height:100px;width:98%">
-      <div class="card-action">
-        <div class="input-field col s5">
-          <i class="prefix fa fa-search"></i>
-          <input class="txtbuscarh"  type="search" placeholder="Ingresar Herramienta" name="txtbuscarh" id="txtbuscarh">
+
+<div class="row" style="margin:20px">
+  <div class="input-field col" id="divtipoacce">
+    <div class="panel-group">
+      <div class="panel" style="margin-left:20px;margin-right:20px;">
+        <div class="panel-heading" style="">
+          <h4 class="panel-title">Consultas en Obra</h4>
         </div>
-        <div class="input-field col s5" style="margin-left:10%;">
+          <div class="panel-body" style="margin-top:-15px">
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchhe"/>
+            <label for="switchhe" id="switchhe" style="font-size:15px;font-weight:bold;color:black;">HERRAMIENTA</label>
+            <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchepps"/>
+            <label for="switchepps" id="switchepps" style="font-size:15px;font-weight:bold;color:black;">EPPS</label>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div align="center">
+  <h4 class="lbltipoacce"></h4>
+</div>
+<div style="display:none;margin:20px" id="divconsulta" >
+  <div class="row">
+    <div class="card" style="height:100px">
+      <div class="card-action">
+        <div class="input-field col s4">
+          <i class="prefix fa fa-search"></i>
+          <input class="txtbuscarh"  type="search" placeholder="Ingresar Descripcion" name="txtbuscarh" id="txtbuscarh">
+        </div>
+        <div class="input-field col s5" style="margin-left:4%">
           <select id="combolproy" class="combolproy">
+          <!--
             <option value="" selected disabled><label>Seleccione un proyecto</label></option>
           {% for x in lpro %}
-            <option value="{{ x.proyecto_id }}">{{ x.proyecto_id }} {{ x.proyecto.nompro }}</option>
-          {% endfor %}
+            <option value="{{ x.proyecto_id }}" data-nameproy="{{ x.proyecto.nompro }}">{{ x.proyecto_id }} {{ x.proyecto.nompro }}</option>
+          {% endfor %}-->
           </select>
+        </div>
+        <div class="input-field col">
+          <button type="button" class="btn waves-effect teal lighten-1 btnconsexport" value=""><i class="fa fa-file-excel-o"></i><span><strong>Exportar</strong></span>
+          </button>
         </div>
       </div>
     </div>
   </div>
     <hr>
-    <!--
-    <div class="row" style="margin-bottom:50px;">
-
-      <div class="input-field col s0">
-        <p>Herramienta:</p>
-      </div>
-      <div class="input-field col s5">
-        <select id="combolherra" class="browser-default combolherra">
-        {% for x in lhe %}
-          <option value="{{ x.herramienta_id }}">{{ x.herramienta.nombre }} {{ x.herramienta.medida }}</option>
-        {% endfor %}
-        </select>
-      </div>
-
-    </div>
-  -->
-
     <div id="divtabherraproy" class="divtabherraproy" style="display:none;">
-      <table class="tabla-detherraproy" id="tabla-detherraproy">
+      <table class="table table-condensed highlight tabla-detherraproy" id="tabla-detherraproy">
         <div class="card">
           <div class="card-action">
             <h6><strong><label class="lblcodhe" style="display:none;"></label><h5 class="nombreherra" style="color:black"></h5></strong></h6>
           </div>
         </div>
-          <caption><h4>Proyectos por Herramienta</h4></caption>
+        <div class="row">
+          <div class="input-field col">
+            <h4>PROYECTOS POR </h4>
+          </div>
+          <div class="input-field col">
+            <h4 class="lbltipoacce"></h4>
+          </div>
+        </div>
           <thead class="cab">
             <tr>
-              <th class="colnum">#</th>
+              <th class="colst40">#</th>
               <th>Proyecto</th>
-              <th>Cantidad Enviada</th>
-              <th></th>
+              <th class="colst150">Cantidad Enviada</th>
+              <th class="colst150">Acciones</th>
             </tr>
           </thead>
-          <tbody id="fbody" class="bodydetherraproy">
-            </tbody>
+          <tbody></tbody>
       </table>
     </div>
     <div id="divtabproyherra" class="divtabproyherra" style="display:none;">
-      <table class="tabla-detproyherra" id="tabla-detproyherra">
+      <table class="table table-condensed highlight responsive-table tabla-detproyherra" id="tabla-detproyherra">
           <div class="card">
             <div class="card-action">
                 <h6><strong><h5 class="nombreproyecto" style="color:black"></h5></strong></h6>
             </div>
           </div>
-          <caption><h4>Herramientas por Proyecto</h4></caption>
+          <div class="row">
+            <div class="input-field col">
+              <h4 class="lbltipoacce"></h4>
+            </div>
+            <div class="input-field col">
+              <h4> POR PROYECTO</h4>
+            </div>
+          </div>
           <thead class="cab">
             <tr>
-              <th class="colnum">#</th>
-              <th>Herramienta</th>
-              <th>Cantidad</th>
-              <th></th>
+              <th class="colst40">#</th>
+              <th ><h6 class="lbltipoacce" style="font-weight:bold"></h6></th>
+              <th >MEDIDA</th>
+              <th class="colst150">MARCA</th>
+              <th class="colst150">UNIDAD</th>
+              <th class="colst150">CANTIDAD</th>
+              <th class="colst150">ACCIONES</th>
             </tr>
           </thead>
-          <tbody id="fbody" class="bodydetherraproy">
-            </tbody>
+          <tbody></tbody>
       </table>
     </div>
 </div>

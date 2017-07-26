@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# from django.conf.urls.defaults import patterns, url
-from django.conf.urls import patterns, url, include
 
-from CMSGuias.apps.almacen.views import *
-from CMSGuias.apps.almacen.vtools import *
+from .views import *
+from .vtools import *
+
+
+from django.conf.urls import patterns, url
+# from django.conf.urls.defaults import patterns, url
+# from . import vtools
 
 
 urlpatterns = patterns(
-    'CMSGuias.apps.almacen.views',
+    '',
     url(r'^$', StorageHome.as_view(), name='vista_storage'),
     # orders
     url(r'^pedido/generate/$', 'view_pedido', name='vista_pedido'),
@@ -124,21 +127,31 @@ urlpatterns = patterns(
     url(r'^return/with/$', ReturnWith.as_view(), name='returnw_view'),
     url(r'^return/without/$', ReturnWithout.as_view(), name='returnwo_view'),
     # part for tools
-    url(r'^herramienta/$', Herramient.as_view(), name='viewherramienta'),
-    url(r'^cargar/$', Cargar.as_view(), name='storare_view_carga_tools'),
+    # @Juan Julpacapari 2017-07-24 17:28:38
+    # url(r'^herramienta/inicio$', Inicio.as_view(), name='viewinicio'),
+
+
+    url(r'^herramienta/lista$', Herramienta.as_view(), name='viewherramienta'),
     url(r'^herramienta/guia$', Guia.as_view(), name='viewguiaherra'),
     url(r'^herramienta/inventario$', Inventario.as_view(), name='viewinventario'),
     url(r'^herramienta/guia/devolucion$', Devolucion.as_view(), name='viewdevolucion'),
     url(r'^herramienta/guia/consulta$', Consulta.as_view(), name='viewconsulta'),
     url(r'^herramienta/cargar$', Cargar.as_view(), name='viewcarga'),
     url(r'^herramienta/estados$', EstadoHerramienta.as_view(), name='viewestherramienta'),
+    url(r'^herramienta/trasladohe$', Trasladohe.as_view(), name='viewtrasladohe'),
+    url(r'^herramienta/notaingreso$', NotaIngreso.as_view(), name='viewnotaingreso'),
+
+
+
     # # devolucion material
     # url(r'^devolucionmaterial/$', DevMaterial.as_view(), name='viewdevolucionmat'),
     # 2017-05-19 09:16:53
     # Juan Julcapari
     # for return item from guide
+
     url(r'^pedidoap/$', Pedidoap.as_view(), name='viewpedidopap'),
     url(r'^grupopedido/$', GrupPedido.as_view(), name='viewgrupoped'),
+
     # @Juan Julcapari 2017-07-17 11:39:52
     # devolucion material
     url(r'^devolucionmaterial/$', DevConMaterial.as_view(), name='viewdevolucionmat'),
