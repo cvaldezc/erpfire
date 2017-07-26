@@ -977,7 +977,7 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
                                 kwargs['nodel'].append(materialsdel[x]['pk'])
                     kwargs['status'] = True if len(kwargs['nodel']) == 0 else False
                     if not kwargs['status']:
-                        kwargs['raise'] = 'Alguno de los materiales no hay eliminado'
+                        kwargs['raise'] = 'Alguno de los materiales no han eliminado'
                         kwargs['nodel'] = json.dumps(kwargs['nodel'])
             except ObjectDoesNotExist, e:
                 kwargs['raise'] = e.__str__()
