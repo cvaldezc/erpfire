@@ -1,4 +1,5 @@
 {% extends "basemd.html" %}
+
 {% block title %}
   Devolucion de Material
 {% endblock %}
@@ -13,38 +14,40 @@
 
 <script src="{{ MEDIA_URL }}js/floatThead.js"></script>
 
-<div>
+<div style="margin:30px">
 	<h4 align="center">Devolucion de Material con Guia</h4>
-	<div class="card" id="divsearchguia" style="width:95%;margin-left:50px;">
+	<div class="card" id="divsearchguia">
 		<div class="card-action">
 		  <div class="input-field col s12">
-		    <input class="txtbuscarguia" style="width:90%;" type="search" placeholder="Ingresar Numero de Guia" name="txtbuscarguia" id="txtbuscarguia" >
+		  	<i class="prefix fa fa-sign-in"></i>
+		    <input class="txtbuscarguia" style="width:90%;" type="text" placeholder="Ingresar Numero de Guia" name="txtbuscarguia" id="txtbuscarguia" >
 		  </div>
 		</div>
 	</div>
 
-	<div class="row">
-		<div class="input-field col s3" style="width:25%;margin-left:40px;">
-		    <input checked="true" onclick="javascript:viewestguiamatdev();" name="estguiamatdev" type="radio" id="radiope" value="PE" />
+	<div class="row" style="width:100%;float:left">
+		<div class="input-field" style="width:30%;float:left">
+			<input checked="true" onclick="javascript:viewestguiamatdev();" name="estguiamatdev" type="radio" id="radiope" value="PE" />
 		    <label for="radiope" style="font-size:15px;font-weight:bold;color:black;">Pendiente</label>
 		    <input onclick="javascript:viewestguiamatdev();" name="estguiamatdev" type="radio" id="radioge" value="PE"/>
 		    <label for="radioge" style="font-size:15px;font-weight:bold;color:black;">Generada</label>
 		</div>
-		<div class="input-field col s6" style="margin-left:300px;">
+		<div class="input-field" style="width:70%;float:left">
 			<i class="prefix fa fa-search"></i>
-		    <input class="txtbuscguiatable" style="width:90%;" type="search" placeholder="Buscar Documento" name="txtbuscguiatable" id="txtbuscguiatable" >
+		    <input class="txtbuscguiatable" style="width:90%;" type="text" placeholder="Buscar Guia" name="txtbuscguiatable" id="txtbuscguiatable" >
 		</div>
+
 	</div>
 	<hr>
 
-	<div id="divtabledevpe" style="margin-left:50px;width:95%;">
+	<div id="divtabledevpe">
 		<table id="table-guiadevpe" class="table responsive-table table-condensed highlight table-guiadevpe">
 			<h5 align="center"><strong>PENDIENTE</strong></h5>
 			<thead class="cab">
 				<tr>
 					<th class="colst40">#</th>
-					<th class="colst100">Doc</th>
-					<th>Proyecto</th>
+					<th class="colst200">Guia Dev</th>
+					<th >Proyecto</th>
 					<th >Autorizado por:</th>
 					<th class="colst150">F.Registro</th>
 					<th class="colst150">F.Devolucion</th>
@@ -55,13 +58,13 @@
 		</table>
 	</div>
 
-	<div id="divtabledevge" style="display:none;margin-left:50px;width:95%;">
+	<div id="divtabledevge" style="display:none;">
 		<table id="table-guiadevge" class="table responsive-table table-condensed highlight table-guiadevge">
 			<h5 align="center"><strong>GENERADA</strong></h5>
 			<thead class="cab">
 				<tr>
 					<th class="colst40">#</th>
-					<th class="colst100">Doc</th>
+					<th class="colst200">Guia Dev</th>
 					<th >Proyecto</th>
 					<th >Autorizado por:</th>
 					<th class="colst150">F.Registro</th>

@@ -79,6 +79,8 @@ class Detpedido(models.Model):
     cantenv = models.FloatField(blank=True, default=0)
     flagcantenv = models.BooleanField(blank=True, default=False)
     flag = models.BooleanField(default=True)
+    cenvdevmat = models.FloatField(default=0) #devmaterial
+    flagcenvdevmat = models.BooleanField(default=False) #d
 
     audit_log = AuditLog()
 
@@ -264,6 +266,8 @@ class NipleGuiaRemision(models.Model):
     flag = models.BooleanField(default=True)
     related = models.IntegerField(null=True, blank=True, default=0)
     order = models.ForeignKey(Pedido, to_field='pedido_id', null=True, blank=True)
+    cenvdevmat = models.FloatField(default=0)
+    flagcenvdevmat = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['materiales']
@@ -695,7 +699,7 @@ class GrupoPedNiple(models.Model):
 model return materials from guide remission
 '''
 class GuiaDevMat(models.Model):
-    guiadevmat_id = models.CharField(max_length=8, primary_key=True)
+    guiadevmat_id = models.CharField(max_length=12, primary_key=True)
     fechadevolucion = models.DateField()
     emple_aut = models.ForeignKey(
         Employee, related_name='AuthAsEmployee', null=True, blank=True)
@@ -715,6 +719,7 @@ class detGuiaDevMat(models.Model):
     guiadevmat = models.ForeignKey(GuiaDevMat, to_field='guiadevmat_id')
     guia = models.ForeignKey(
         GuiaRemision, to_field='guia_id', null=True, blank=True) #quitar null y blank
+    pedido = models.ForeignKey(Pedido, to_field='pedido_id')
     material = models.ForeignKey(Materiale, to_field='materiales_id')
     marca = models.ForeignKey(Brand, to_field='brand_id')
     model = models.ForeignKey(Model, to_field='model_id')
@@ -726,20 +731,22 @@ class detGuiaDevMat(models.Model):
 
 
 class GuiaDevMatNiple(models.Model):
-    guiadevmat = models.ForeignKey(GuiaDevMat, to_field='guiadevmat_id')
-    guia = models.ForeignKey(
-        GuiaRemision, to_field='guia_id', null=True, blank=True) #quitar null y blank
+    guiadevmat = models.ForeignKey(GuiaDevMat, to_field='guiadevmat_id', max_length=12)
+    guia = models.ForeignKey(GuiaRemision, to_field='guia_id', null=True, blank=True)#quitar null y blank
+    pedido = models.ForeignKey(Pedido, to_field='pedido_id', null=True)
     material = models.ForeignKey(Materiale, to_field='materiales_id')
     marca = models.ForeignKey(Brand, to_field='brand_id')
     model = models.ForeignKey(Model, to_field='model_id')
     cantidad = models.FloatField()
     metrado = models.FloatField()
     tipo = models.CharField(max_length=1)
-    idref = models.ForeignKey(Niple, to_field='id')
+    idnipgrem = models.ForeignKey(NipleGuiaRemision, to_field='id')
     motivo = models.CharField(max_length=60)
     comentario = models.CharField(max_length=200, null=True, blank=True)
 
-    audit_log = AuditLog()
+    # audit_log = AuditLog()
+
+
 '''
 endblock
 '''

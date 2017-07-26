@@ -3224,18 +3224,22 @@ class DevConGuia(JSONResponseMixin, TemplateView):
         context = dict();
         if request.is_ajax():
             try:
+
                 if 'viewcant' in request.GET:
                     context = DetGuiaRemision.objects.values(
                         'cantguide',
                         'cantdev'
                         ).get(
                         guia_id=request.GET.get('numguia'),
+                        order_id=request.GET.get('codped'),
                         materiales_id=request.GET.get('codmat'),
                         brand_id=request.GET.get('codbrand'),
                         model_id=request.GET.get('codmodel'))
                     if len(context) > 0:
                         context['status'] = True
                     context['status'] = True
+
+
                 if 'lmatguiadev' in request.GET:
                     lmat = []
                     count = 1
@@ -3246,6 +3250,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             'numguia':x.guia_id,
                             'guiadevmat':x.guiadevmat_id,
                             'count':count,
+                            'codped':x.pedido_id,
                             'codmat':x.material_id,
                             'nommat':x.material.matnom,
                             'medmat':x.material.matmed,
@@ -3255,14 +3260,12 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             'nommodel': x.model.model,
                             'cantidad':x.cantidad,
                             'coment':x.comentario,
-                            'motiv':x.motivo,
-                            'idsector':x.guia.pedido.sector_id,
-                            'iddsector':x.guia.pedido.dsector_id,
-                            'idpedido':x.guia.pedido_id,
-                            'idproyecto':x.guia.pedido.proyecto_id,
+                            'motiv':x.motivo
                             })
+
                         count = count +1
                     context['lmat'] = lmat
+
                     context['status'] = True
 
                 if 'listmaterials' in request.GET:
@@ -3272,7 +3275,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                     for x in DetGuiaRemision.objects.filter(
                         guia_id=request.GET.get('txtingresado'),
                         stcantdev=False,
-                        guia__pedido__flag=True,
+                        order__flag=True,
                         guia__status='GE',
                         guia__flag = True
                         ).order_by('materiales__matnom'):
@@ -3288,10 +3291,10 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             'cantguide':x.cantguide,
                             'count':count,
                             'cantdev':x.cantdev,
-                            'codped':x.guia.pedido.pedido_id,
+                            'codped':x.order_id,
                             'countcod':countcod,
-                            'codproy':x.guia.pedido.proyecto_id,
-                            'coddsector':x.guia.pedido.dsector_id
+                            'codproy':x.order.proyecto_id,
+                            'coddsector':x.order.dsector_id
                             })
                         count = count + 1
                         countcod = countcod + 1
@@ -3302,63 +3305,22 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                     else:
                         context['listmat'] = False
                     context['sizelistmat'] = len(lmat)
+
                     context['status'] = True
-
-                # if 'listgroup' in request.GET:
-                #     lgroup = []
-                #     count = 1
-                #     for x in DSMetrado.objects.filter(materials_id = request.GET.get('groupmat_id'), dsector__sgroup__sector_id = request.GET.get('idsector')).distinct('dsector__sgroup__sgroup_id').order_by('dsector__sgroup__sgroup_id'):
-                #         lgroup.append({
-                #             'count': count,
-                #             'codgroup':x.dsector.sgroup.sgroup_id,
-                #             'namegroup': x.dsector.sgroup.name
-                #             })
-                #         count = count + 1
-                #     context['lgroup'] = lgroup
-                #     if len(lgroup) > 0:
-                #         context['estgroup'] = True
-                #     else:
-                #         context['estgroup'] = False
-                #     context['status'] = True
-
-                # if 'listdsector' in request.GET:
-                #     ldsector = []
-                #     count = 1
-                #     countcod = 0
-                #     for x in DSMetrado.objects.filter(materials_id = request.GET.get('dsectormat_id'), dsector__sgroup_id = request.GET.get('idgroup')):
-                #         ldsector.append({
-                #             'countcod':countcod,
-                #             'count':count,
-                #             'cod_dsector':x.dsector.dsector_id,
-                #             'name_dsector':x.dsector.name,
-                #             'codbrand':x.brand_id,
-                #             'brand':x.brand.brand,
-                #             'codmodel':x.model_id,
-                #             'model':x.model.model,
-                #             'cantidad':x.quantity
-                #             })
-                #         count = count + 1
-                #         countcod = countcod + 1
-                #     context['ldsector'] = ldsector
-                #     if len(ldsector) > 0:
-                #         context['estdsector'] = True
-                #     else:
-                #         context['estdsector'] = False
-                #     context['status'] = True
 
                 if 'getlnip' in request.GET:
                     listnip = []
                     countcod = 0
-                    for x in Niple.objects.filter(
-                        pedido_id = request.GET.get('codped'),
+                    for x in NipleGuiaRemision.objects.filter(
+                        order_id = request.GET.get('codped'),
                         materiales_id = request.GET.get('codmat'),
                         brand_id = request.GET.get('codbr'),
                         model_id = request.GET.get('codmod'),
                         flag = True,
                         flagcenvdevmat=False).order_by('materiales__matnom'):
                         listnip.append({
-                            'idtable':x.id,
-                            'codped':x.pedido_id,
+                            'idtabnipgrem':x.id,
+                            'codped':x.order_id,
                             'codmat':x.materiales_id,
                             'namemat':x.materiales.matnom,
                             'medmat':x.materiales.matmed,
@@ -3366,7 +3328,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             'namebran':x.brand.brand,
                             'codmod':x.model_id,
                             'namemod':x.model.model,
-                            'cantidad':x.cantidad,
+                            'cantidad':x.cantguide,
                             'metrado':x.metrado,
                             'num':request.GET.get('num'),
                             'row':countcod,
@@ -3376,12 +3338,12 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             'cenvmat':x.cenvdevmat,
                             'countcod':countcod,
                             'tipo':x.tipo,
-                            'canti':x.cantidad
+                            'canti':x.cantguide
                             })
                         countcod = countcod + 1
 
                     context['listnip'] = listnip
-                    # print len(listnip)
+                    print len(listnip)
                     if len(listnip) > 0:
                         context['stlistnip'] = True
                     else:
@@ -3389,22 +3351,19 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                     context['status'] = True
 
                 if 'existsnip' in request.GET:
-                    print 'sew'
-                    # lnip=[]
                     lstniple=[]
                     lmat = json.loads(request.GET.get('lmat'))
-                    print lmat
                     for y in lmat:
                         lnip=[]
-                        for x in Niple.objects.filter(
-                            pedido_id = y['codped'],
+                        for x in NipleGuiaRemision.objects.filter(
+                            order_id = y['codped'],
                             materiales_id = y['codmat'],
                             brand_id = y['codbrand'],
-                            model_id = y['codmodel']):
+                            model_id = y['codmodel'],
+                            flag=True):
                             lnip.append({
                                 'id':x.id
                                 })
-                        print 'lnip',lnip
                         if len(lnip)>0:
                             estado = True
                         else:
@@ -3417,9 +3376,6 @@ class DevConGuia(JSONResponseMixin, TemplateView):
 
                 if 'existguiape' in request.GET:
                     lgdev=[]
-                    # for x in GuiaDevMat.objects.filter(
-                    #     guia_id=request.GET.get('codguia'),
-                    #     estado='PE'):
                     for x in detGuiaDevMat.objects.filter(
                         guia_id=request.GET.get('codguia'),
                         guiadevmat__estado='PE'):
@@ -3462,6 +3418,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                     for x in GuiaDevMatNiple.objects.filter(
                         guiadevmat_id=request.GET.get('idgdevmat'),
                         material_id=request.GET.get('idmat'),
+                        pedido_id=request.GET.get('codped'),
                         marca_id=request.GET.get('idbr'),
                         model_id=request.GET.get('idmod')
                         ):
@@ -3479,6 +3436,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                     for x in GuiaDevMatNiple.objects.filter(
                         guiadevmat_id=request.GET.get('codgdevmat'),
                         material_id=request.GET.get('codmat'),
+                        pedido_id=request.GET.get('codped'),
                         marca_id=request.GET.get('codbr'),
                         model_id=request.GET.get('codmod')):
                         lnipdev.append({
@@ -3492,7 +3450,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             'cantidad':x.cantidad,
                             'metrado':x.metrado,
                             'tipo':x.tipo,
-                            'idrefid':x.idref_id,
+                            'idrefid':x.idnipgrem_id,
                             'motivo':x.motivo,
                             'comentario':x.comentario
                             })
@@ -3501,9 +3459,9 @@ class DevConGuia(JSONResponseMixin, TemplateView):
 
                 if 'getcantnip' in request.GET:
                     print request.GET.get('codtabnip')
-                    context = Niple.objects.values(
+                    context = NipleGuiaRemision.objects.values(
                                 'cenvdevmat',
-                                'cantidad'
+                                'cantguide'
                                 ).get(id=request.GET.get('codtabnip'))
 
                     context['status'] =True
@@ -3522,12 +3480,12 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                     lmat=json.loads(request.GET.get('lmat'))
                     ldetgrem=[]
                     ldetinven=[]
-                    ldetdsmetrado=[]
-
+                    ldetpedido=[]
+                    # ldetdsmetrado=[]
                     for x in lmat:
                         for y in DetGuiaRemision.objects.filter(
                             guia_id=x['numguia'],
-                            order_id=x['idpedido'],
+                            order_id=x['codped'],
                             materiales_id=x['codmat'],
                             brand_id=x['codmarca'],
                             model_id=x['codmodel']):
@@ -3538,60 +3496,79 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                                 'codbr':y.brand_id,
                                 'codmod':y.model_id,
                                 'cdevuelta':y.cantdev,
-                                'cantsum':round((float(x['cantidad'])+float(y.cantdev))*100)/100
-                                })
-
-
-                        for z in InventoryBrand.objects.filter(
-                            materials_id=x['codmat'],
-                            brand_id=x['codmarca'],
-                            model_id=x['codmodel']):
-                            ldetinven.append({
-                                'idtable':z.id,
-                                'codmat':z.materials_id,
-                                'codbr':z.brand_id,
-                                'codmod':z.model_id,
-                                'stock':z.stock,
-                                'finstock':round((float(z.stock)+float(x['cantidad']))*100)/100
+                                'updcantguide':round((float(y.cantguide)-float(x['cantidad']))*100)/100,
+                                'updcantdev':round((float(x['cantidad'])+float(y.cantdev))*100)/100
                                 })
 
                         try:
-                            DSMetrado.objects.get(
-                                dsector_id=x['iddsector'],
+                            InventoryBrand.objects.get(
                                 materials_id=x['codmat'],
                                 brand_id=x['codmarca'],
                                 model_id=x['codmodel'])
                             codbrand=x['codmarca']
                             codmodel=x['codmodel']
-                            print 'existe'
-                        except DSMetrado.DoesNotExist, e:
-                            codbrand='BR000'
-                            codmodel='MO000'
-                            print 'no existe'
 
-                        for n in DSMetrado.objects.filter(
-                            dsector_id=x['iddsector'],
+                        except InventoryBrand.DoesNotExist, e:
+                            try:
+                                InventoryBrand.objects.get(
+                                    materials_id=x['codmat'],
+                                    brand_id=x['codmarca'])
+                                codbrand=x['codmarca']
+                                codmodel='MO000'
+
+                            except InventoryBrand.DoesNotExist, e:
+                                codbrand='BR000'
+                                codmodel='MO000'
+
+                        for z in InventoryBrand.objects.filter(
                             materials_id=x['codmat'],
-                            # brand_id=x['codmarca'],
-                            # model_id=x['codmodel']):
                             brand_id=codbrand,
                             model_id=codmodel):
-                            ldetdsmetrado.append({
-                                'idtable':n.id,
-                                'dsector_id':n.dsector_id,
-                                'codmat':n.materials_id,
-                                'codbr':n.brand_id,
-                                'codmod':n.model_id,
-                                'qorder':n.qorder,
-                                'cantsum':round((float(n.qorder)+float(x['cantidad']))*100)/100,
-                                'updcantdev':round((float(n.cantdev)+float(x['cantidad']))*100)/100
+                            ldetinven.append({
+                                'idtabinvbrand':z.id,
+                                'codmat':z.materials_id,
+                                'codbr':z.brand_id,
+                                'codmod':z.model_id,
+                                'stock':z.stock,
+                                'updstock':round((float(z.stock)+float(x['cantidad']))*100)/100
                                 })
+                        try:
+                            Detpedido.objects.get(
+                                pedido_id=x['codped'],
+                                materiales_id=x['codmat'],
+                                brand_id=x['codmarca'],
+                                model_id=x['codmodel'])
+                            codbrand=x['codmarca']
+                            codmodel=x['codmodel']
+                            print 'existe'
+                        except Detpedido.DoesNotExist, e:
+                            try:
+                                Detpedido.objects.get(
+                                    pedido_id=x['codped'],
+                                    materiales_id=x['codmat'],
+                                    brand_id=x['codmarca'])
+                                codbrand=x['codmarca']
+                                codmodel='MO000'
+                            except Detpedido.DoesNotExist, e:
+                                codbrand='BR000'
+                                codmodel='MO000'
 
-
+                        for n in Detpedido.objects.filter(
+                            pedido_id=x['codped'],
+                            materiales_id=x['codmat'],
+                            brand_id=codbrand,
+                            model_id=codmodel):
+                            ldetpedido.append({
+                                'idtabdetped':n.id,
+                                'cantstatic':n.cantidad,
+                                'updcantshop':round((float(n.cantshop)+float(x['cantidad']))*100)/100,
+                                'updcantguide':round((float(n.cantguide)-float(x['cantidad']))*100)/100,
+                                'updcantenv':round((float(n.cenvdevmat)+float(x['cantidad']))*100)/100,
+                                })
 
                     context['ldetgrem']=ldetgrem
                     context['ldetinven']=ldetinven
-                    context['ldetdsmetrado']=ldetdsmetrado
+                    context['ldetpedido']=ldetpedido
 
                     context['status']=True
 
@@ -3600,6 +3577,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                     for x in GuiaDevMatNiple.objects.filter(
                         guiadevmat_id=request.GET.get('ngdevmat')):
                         lgdevmatnip.append({
+                            'idgdevmatniple':x.id,
                             'codguiadevmat':x.guiadevmat_id,
                             'codmat':x.material_id,
                             'codbr':x.marca_id,
@@ -3607,54 +3585,52 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             'cantidad':x.cantidad,
                             'metrado':x.metrado,
                             'tipo':x.tipo,
-                            'idref':x.idref_id,
-                            'idoper_nipple':x.idref.related,
-                            'idsector':x.guia.pedido.sector_id,
-                            'idproy':x.guia.pedido.proyecto_id,
-                            'iddsector':x.guia.pedido.dsector_id
+                            'idtabnipgrem':x.idnipgrem_id,
+                            'idtabniple':x.idnipgrem.related
                             })
                     context['lgdevmatnip']=lgdevmatnip
                     context['status']=True
 
                 if 'sumcantnip' in request.GET:
                     lgdevmatnip = json.loads(request.GET.get('lgdevmatnip'))
-                    lgdev=[]
+                    # lgdev=[]
                     lnip=[]
+                    lnippedido=[]
                     for x in lgdevmatnip:
-                        for y in Nipple.objects.filter(
-                            id=x['idoper_nipple'],
-                            proyecto_id=x['idproy'],
-                            sector_id=x['idsector'],
-                            materiales_id=x['codmat'],
-                            area_id=x['iddsector']):
-                            lgdev.append({
-                                'idtable':y.id,
-                                'idproy':y.proyecto_id,
-                                'idsector':y.sector_id,
-                                'idmat':y.materiales_id,
-                                'cantidad':y.cantidad,
-                                'metrado':y.metrado,
-                                'tipo':y.tipo,
-                                'sumcant':float(y.cantenvnip)+float(x['cantidad'])
-                                })
-
-                        for z in Niple.objects.filter(
-                            id=x['idref']):
+                        for z in NipleGuiaRemision.objects.filter(
+                            id=x['idtabnipgrem']):
                             lnip.append({
-                                'idtabniple':z.id,
+                                'idtabnipgrem':z.id,
                                 'codmat':z.materiales_id,
                                 'codbr':z.brand_id,
+                                'codped':z.order_id,
                                 'codmod':z.model_id,
-                                'cant':z.cantidad,
+                                'cant':z.cantguide,
                                 'metrado':z.metrado,
                                 'tipo':z.tipo,
                                 'updcantguide':float(z.cantguide)-float(x['cantidad']),
-                                'updcant':float(z.cenvdevmat)+float(x['cantidad'])
+                                'updcantenv':float(z.cenvdevmat)+float(x['cantidad'])
+                                # 'updcantshop':float(z.cantshop)+float(x['cantidad']),
+                                })
+                        for y in Niple.objects.filter(
+                            id=x['idtabniple']):
+                            lnippedido.append({
+                                'idtabnipped':y.id,
+                                'cantstatic':y.cantidad,
+                                'codmat':y.materiales_id,
+                                'codbr':y.brand_id,
+                                'codmod':y.model_id,
+                                'codped':y.pedido_id,
+                                'metrado':y.metrado,
+                                'tipo':y.tipo,
+                                'updcantguide':float(y.cantguide)-float(x['cantidad']),
+                                'updcantenv':float(y.cenvdevmat)+float(x['cantidad']),
+                                'updcantshop':float(y.cantshop)+float(x['cantidad'])
                                 })
 
 
                     context['lnip']=lnip
-                    context['lgdev']=lgdev
+                    context['lnippedido']=lnippedido
                     context['status'] = True
 
                 if 'lguiasdev' in request.GET:
@@ -3664,7 +3640,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                     if estsearch=='true':
                         for x in GuiaDevMat.objects.filter(
                             guiadevmat_id=request.GET.get('idguiadevmat'),
-                            estado=request.GET.get('stguia')).order_by('-guiadevmat_id'):
+                            estado=request.GET.get('stguia')).order_by('-registro'):
                             lguia.append({
                                 'empleaut':x.emple_aut_id,
                                 'codproy':x.proyecto_id,
@@ -3682,7 +3658,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                         context['lguia']=lguia
                     else:
                         for x in GuiaDevMat.objects.filter(
-                            estado=request.GET.get('stguia')).order_by('-guiadevmat_id'):
+                            estado=request.GET.get('stguia')).order_by('-registro'):
                             lguia.append({
                                 'empleaut':x.emple_aut_id,
                                 'codproy':x.proyecto_id,
@@ -3700,94 +3676,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
 
                         context['lguia']=lguia[0:50]
                     context['status']=True
-                if 'searchxguia' in request.GET:
-                    lxguia=[]
-                    print 'unmgu'
-                    print request.GET.get('numguia')
-                    for x in detGuiaDevMat.objects.filter(
-                        guia_id=request.GET.get('numguia')).distinct('guia'):
-                        lxguia.append({
-                            'empleaut':x.guiadevmat.emple_aut_id,
-                            'codguiadev':x.guiadevmat.guiadevmat_id,
-                            'fechdev':x.guiadevmat.fechadevolucion,
-                            'autnames':'%s, %s' % (x.guiadevmat.emple_aut.lastname,x.guiadevmat.emple_aut.firstname),
-                            'genero':'%s, %s' % (x.guiadevmat.empdni.lastname,x.guiadevmat.empdni.firstname),
-                            'coment':x.guiadevmat.comentario
-                            })
-                    print'asa'
-                    # print lxguia
-                    context['lguia']=lxguia
-                    context['status']=True
 
-                if 'getldetmat' in request.GET:
-                    ldetmat=[]
-                    for x in DetGuiaRemision.objects.filter(
-                        guia_id=request.GET.get('nguia'),
-                        stcantdev=False,
-                        guia__status='GE',
-                        guia__flag=True):
-                        ldetmat.append({
-                            'nguia':x.guia_id,
-                            'codmat':x.materiales_id,
-                            'cantrest':float(x.cantguide)-float(x.cantdev),
-                            'codbr':x.brand_id,
-                            'codmod':x.model_id,
-                            'idped':x.guia.pedido_id,
-                            'idsector':x.guia.pedido.sector_id,
-                            'idproy':x.guia.pedido.proyecto_id,
-                            })
-                    context['ldetmat']=ldetmat
-                    context['status']=True
-
-                if 'getlallnip' in request.GET:
-                    ldetmat = json.loads(request.GET.get('ldetmat'))
-                    ldetni=[]
-                    ldetnonip=[]
-                    for y in ldetmat:
-                        # ldetnonip=[]
-                        lcountnip=[]
-                        for x in Niple.objects.filter(
-                            pedido_id=y['codped'],
-                            proyecto_id=y['codproy'],
-                            dsector_id=y['coddsector'],
-                            materiales_id=y['codmat'],
-                            brand_id=y['codbr'],
-                            model_id=y['codmod'],
-                            flagcenvdevmat=False):
-                            ldetni.append({
-                                'idtabniple':x.id,
-                                'codped':x.pedido_id,
-                                'codproy':x.proyecto_id,
-                                'codsector':x.sector_id,
-                                'codmat':x.materiales_id,
-                                'codbr':x.brand_id,
-                                'codmod':x.model_id,
-                                'metrado':x.metrado,
-                                'tipo':x.tipo,
-                                'cantrest':float(x.cantguide)-float(x.cenvdevmat),
-                                'numguia':y['numguia'],
-                                'canti':y['inputcant']
-                                })
-                            lcountnip.append({
-                                'codped':x.pedido_id
-                                })
-                        print 'ldetni'
-                        # print len(lcountnip)
-                        if len(lcountnip)==0:
-                            ldetnonip.append({
-                                'inputcant':y['inputcant'],
-                                'codbr':y['codbr'],
-                                'codmat':y['codmat'],
-                                'codmod':y['codmod'],
-                                'codped':y['codped'],
-                                'codproy':y['codproy'],
-                                'numguia':y['numguia'],
-                                'comment':y['comment'],
-                                'motivo':y['motivo']
-                                })
-                    context['ldetnonip']=ldetnonip
-                    context['ldetni']=ldetni
-                    context['status']=True
 
                 if 'lcbotransxguia' in request.GET:
                     lcond = []
@@ -3810,6 +3699,12 @@ class DevConGuia(JSONResponseMixin, TemplateView):
 
                     context['status'] = True
 
+                if 'getuser' in request.GET:
+                    user='%s, %s' % (request.user.get_profile().empdni.lastname,
+                                      request.user.get_profile().empdni.firstname)
+                    context['user']=user
+                    context['status']=True
+
 
             except ObjectDoesNotExist, e:
                 context['raise'] = str(e)
@@ -3823,7 +3718,7 @@ class DevConGuia(JSONResponseMixin, TemplateView):
         lplaca= Transporte.objects.filter(flag=True)
         lconduct=Conductore.objects.filter(flag=True)
 
-        return render(request,'almacen/devolucionmaterial.html', {
+        return render(request,'almacen/devolucionmaterial.html',{
             'lguiadevmat':lguiadevmat,
             'lguiadevmatge':lguiadevmatge,
             'lemple':lemple,
@@ -3832,18 +3727,47 @@ class DevConGuia(JSONResponseMixin, TemplateView):
             'lconduct':lconduct
             })
 
+# ///////////////////////////
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         try:
             context = dict()
             if request.is_ajax():
                 try:
+                    if 'exists' in request.POST:
+                        try:
+                            GuiaRemision.objects.get(
+                                guia_id=request.POST.get('codguia'))
+                            context['status'] = True
+                        except GuiaRemision.DoesNotExist, e:
+                            context['status'] = False
+
+                    if 'exguiadevmat' in request.POST:
+                        try:
+                            GuiaDevMat.objects.get(
+                                guiadevmat_id=request.POST.get('codguia'))
+                            context['status'] = True
+                        except GuiaDevMat.DoesNotExist, e:
+                            context['status'] = False
+
                     if 'updestguiadevmat' in request.POST:
-                        updest = GuiaDevMat.objects.get(
-                            guiadevmat_id=request.POST.get('codguidevmat'))
-                        updest.estado = request.POST.get('estado')
-                        updest.save()
+                        lgdevmatnip = json.loads(request.POST.get('lgdevmatnip'))
+                        ldetgdevmat = json.loads(request.POST.get('ldetgdevmat'))
+                        print 'lgdevmatnip', lgdevmatnip
+                        if len(lgdevmatnip)>0:
+                            for x in lgdevmatnip:
+                                GuiaDevMatNiple.objects.get(
+                                    id=x['idgdevmatniple']).delete()
+
+                        if len(ldetgdevmat)>0:
+                            for x in ldetgdevmat:
+                                detGuiaDevMat.objects.get(
+                                    id=x['id']).delete()
+
+                        GuiaDevMat.objects.get(
+                            guiadevmat_id=request.POST.get('codguidevmat')).delete()
                         context['status'] = True
+
                     if 'saveeditmat' in request.POST:
                         edmat = detGuiaDevMat.objects.get(
                             id = request.POST.get('idt'))
@@ -3852,10 +3776,14 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                         edmat.motivo = request.POST.get('motivo')
                         edmat.save()
                         context['status'] = True
+
+
                     if 'delmatdet' in request.POST:
                         detGuiaDevMat.objects.get(
                             id=request.POST.get('idtable')).delete()
                         context['status'] = True
+
+
                     if 'savecabgdev' in request.POST:
                         cabgdev = GuiaDevMat.objects.get(
                             guiadevmat_id = request.POST.get('codgdev'))
@@ -3864,52 +3792,45 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                         cabgdev.comentario = request.POST.get('coment')
                         cabgdev.save()
                         context['status'] = True
+
+
                     if 'savedevmat' in request.POST:
-                        guiadevmat = genkeys.GenerateIdGuiaMatDev();
                         lniplefinal2=json.loads(request.POST.get('lniplefinal2'))
                         ldetdev = json.loads(request.POST.get('ldetdev'))
-                        print 'lniplefinal2 ', len(lniplefinal2)
-                        gdm = GuiaDevMat()
-                        gdm.guiadevmat_id=guiadevmat
-                        gdm.fechadevolucion=request.POST.get('fdev')
-                        gdm.emple_aut_id=request.POST.get('empdniaut')
-                        gdm.empdni_id=request.user.get_profile().empdni_id
-                        gdm.condni_id=request.POST.get('cond')
-                        gdm.nropla_id=request.POST.get('placa')
-                        gdm.proyecto_id=request.POST.get('codproy')
-                        gdm.traruc_id=request.POST.get('transport')
-                        gdm.estado=request.POST.get('est')
-                        gdm.comentario=request.POST.get('comen')
-                        gdm.save()
-                        # GuiaDevMat.objects.create(
-                        #     guiadevmat_id=guiadevmat,
-                        #     fechadevolucion=request.POST.get('fdev'),
-                        #     emple_aut_id=request.POST.get('empdniaut'),
-                        #     empdni_id=request.user.get_profile().empdni_id,
-                        #     condni_id=request.POST.get('cond'),
-                        #     nropla_id=request.POST.get('placa'),
-                        #     proyecto_id=request.POST.get('codproy'),
-                        #     traruc_id=request.POST.get('transport'),
-                        #     estado=request.POST.get('est'),
-                        #     comentario=request.POST.get('comen'))
-                        # ldetnip = json.loads(request.POST.get('ldetnip'))
-                        # ldetni = json.loads(request.POST.get('ldetni'))
+
+
+                        GuiaDevMat.objects.create(
+                            guiadevmat_id = request.POST.get('numeroguia'),
+                            fechadevolucion = request.POST.get('fdev'),
+                            emple_aut_id = request.POST.get('empdniaut'),
+                            empdni_id = request.user.get_profile().empdni_id,
+                            condni_id=request.POST.get('cond'),
+                            nropla_id=request.POST.get('placa'),
+                            proyecto_id=request.POST.get('codproy'),
+                            traruc_id=request.POST.get('transport'),
+                            estado = request.POST.get('est'),
+                            comentario = request.POST.get('comen')
+                            )
+
+
                         if len(ldetdev) > 0:
                             for x in ldetdev:
                                 detGuiaDevMat.objects.create(
-                                    guiadevmat_id = guiadevmat,
+                                    guiadevmat_id = request.POST.get('numeroguia'),
                                     guia_id=x['numguia'],
                                     material_id = x['codmat'],
                                     marca_id = x['codbr'],
                                     model_id = x['codmod'],
                                     cantidad = x['inputcant'],
                                     comentario = x['comment'],
-                                    motivo = x['motivo']
+                                    motivo = x['motivo'],
+                                    pedido_id=x['codped']
                                     )
+
                         if len(lniplefinal2) > 0:
                             for y in lniplefinal2:
                                 GuiaDevMatNiple.objects.create(
-                                    guiadevmat_id=guiadevmat,
+                                    guiadevmat_id=request.POST.get('numeroguia'),
                                     guia_id=y['numguia'],
                                     material_id=y['codmat'],
                                     marca_id=y['codbr'],
@@ -3917,31 +3838,20 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                                     cantidad=y['canti'],
                                     metrado=y['metrado'],
                                     tipo=y['tipo'],
-                                    idref_id=y['idtable'],
+                                    idnipgrem_id=y['idtabnipgrem'],
                                     motivo='' if y['motinip']==None else y['motinip'],
-                                    comentario='' if y['comnip']==None else y['comnip']
+                                    comentario='' if y['comnip']==None else y['comnip'],
+                                    pedido_id=y['codped']
                                     )
-                        # if len(ldetni) > 0:
-                        #     for z in ldetni:
-                        #         GuiaDevMatNiple.objects.create(
-                        #             guiadevmat_id=guiadevmat,
-                        #             guia_id=z['numguia'],
-                        #             material_id=z['codmat'],
-                        #             marca_id=z['codbr'],
-                        #             model_id=z['codmod'],
-                        #             cantidad=z['cantrest'],
-                        #             metrado=z['metrado'],
-                        #             tipo=z['tipo'],
-                        #             idref_id=z['idtabniple'],
-                        #             motivo='OT',
-                        #             comentario='')
 
                         context['status'] = True
+
                     if 'upddevmatniple' in request.POST:
                         nip=GuiaDevMatNiple.objects.get(
                             id=request.POST.get('codtab'))
                         nip.cantidad=request.POST.get('cantupdnip')
                         nip.save()
+
                         detgdev=detGuiaDevMat.objects.get(
                             guiadevmat_id=request.POST.get('codguiadevmat'),
                             material_id=request.POST.get('codmat'),
@@ -3949,10 +3859,14 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             model_id=request.POST.get('codmod'))
                         detgdev.cantidad=request.POST.get('canttot')
                         detgdev.save()
+
                         context['status']=True
+
                     if 'delnipdevmat' in request.POST:
+
                         GuiaDevMatNiple.objects.get(
                             id=request.POST.get('idtable')).delete()
+
                         upd=detGuiaDevMat.objects.get(
                             guiadevmat_id=request.POST.get('codgdevmat'),
                             material_id=request.POST.get('codmat'),
@@ -3960,104 +3874,106 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                             model_id=request.POST.get('codmod'))
                         upd.cantidad=request.POST.get('canttotal')
                         upd.save()
+
                         context['status']=True
+
                     if 'updsavedevmat' in request.POST:
+                        # update detguiaremision
                         ldetgrem = json.loads(request.POST.get('ldetgrem'))
-                        ldetinven = json.loads(request.POST.get('ldetinven'))
-                        ldetdsmetrado = json.loads(request.POST.get('ldetdsmetrado'))
-                        lgdevnip=json.loads(request.POST.get('lgdevnip'))
+                        # update nipleguiaremision
                         lnip=json.loads(request.POST.get('lnip'))
+                        # update inventorybrand
+                        ldetinven = json.loads(request.POST.get('ldetinven'))
+                        # update detpedido
+                        ldetpedido = json.loads(request.POST.get('ldetpedido'))
+                        #update niple(pedido)
+                        lnippedido = json.loads(request.POST.get('lnippedido'))
 
-                        for x in ldetgrem:
-                            dgr=DetGuiaRemision.objects.get(
-                                id=x['idtabdetgrem'])
-                            dgr.cantdev=x['cantsum']
-                            dgr.save()
 
-                        for x in ldetinven:
-                            inv=InventoryBrand.objects.get(
-                                materials_id=x['codmat'],
-                                brand_id=x['codbr'],
-                                model_id=x['codmod'])
-                            inv.stock=x['finstock']
-                            inv.save()
+                        if len(ldetgrem)>0:
+                            for x in ldetgrem:
+                                dgr=DetGuiaRemision.objects.get(
+                                    id=x['idtabdetgrem'])
+                                dgr.cantdev=x['updcantdev']
+                                dgr.cantguide=x['updcantguide']
+                                dgr.save()
+                            context['status']=True
 
-                        for x in ldetdsmetrado:
-                            dsmet=DSMetrado.objects.get(
-                                dsector_id=x['dsector_id'],
-                                materials_id=x['codmat'],
-                                brand_id=x['codbr'],
-                                model_id=x['codmod'],)
-                            dsmet.qorder=x['cantsum']
-                            dsmet.cantdev=x['updcantdev']
-                            dsmet.save()
+                        if len(lnip)>0:
+                            for x in lnip:
+                                if x['cant']==x['updcantenv']:
+                                    estado=True
+                                else:
+                                    estado=False
 
-                        for x in lnip:
-                            ni=Niple.objects.get(
-                                id=x['idtabniple'])
-                            ni.cenvdevmat=x['updcant']
-                            ni.cantguide=x['updcantguide']
-                            ni.save()
+                                ni=NipleGuiaRemision.objects.get(
+                                    id=x['idtabnipgrem'])
+                                ni.cenvdevmat=x['updcantenv']
+                                ni.cantguide=x['updcantguide']
+                                ni.flagcenvdevmat=estado
+                                ni.save()
+                            context['status']=True
 
-                        for x in lgdevnip:
-                            nipp=Nipple.objects.get(
-                                id=x['idtable'])
-                            nipp.cantenvnip=x['sumcant']
-                            nipp.save()
+                        if len(ldetpedido)>0:
+                            for x in ldetpedido:
+                                if x['updcantshop']== x['cantstatic']:
+                                    tag = '0'
+                                elif x['updcantshop'] > 0 and x['updcantshop'] < x['cantstatic']:
+                                    tag = '1'
+                                else:
+                                    tag = '2'
+
+                                dped=Detpedido.objects.get(
+                                    id=x['idtabdetped'])
+                                dped.cantshop=x['updcantshop']
+                                dped.cantguide=x['updcantguide']
+                                dped.cenvdevmat=x['updcantenv']
+                                dped.tag=tag
+                                dped.save()
+                            context['status']=True
+
+                        if len(lnippedido)>0:
+                            for x in lnippedido:
+
+                                if x['updcantshop']==x['cantstatic']:
+                                    tag='0'
+                                elif x['updcantshop'] > 0 and x['updcantshop'] < x['cantstatic']:
+                                    tag = '1'
+                                else:
+                                    tag = '2'
+
+                                print 'tag', tag
+
+                                nipped=Niple.objects.get(
+                                    id=x['idtabnipped'])
+                                nipped.cantshop=x['updcantshop']
+                                nipped.cantguide=x['updcantguide']
+                                nipped.cenvdevmat=x['updcantenv']
+                                nipped.tag=tag
+                                nipped.save()
+                            context['status']=True
 
                         gdevmat=GuiaDevMat.objects.get(
                             guiadevmat_id=request.POST.get('codguiadevmat'))
                         gdevmat.estado='GE'
                         gdevmat.save()
 
+                        if len(ldetinven)>0:
+                            for x in ldetinven:
+                                inv=InventoryBrand.objects.get(
+                                    id=x['idtabinvbrand'])
+                                inv.stock=x['updstock']
+                                inv.save()
+
                         context['status']=True
 
-                    if 'saveallmat' in request.POST:
-                        ldetnonip = json.loads(request.POST.get('ldetnonip'))
-                        ldetni = json.loads(request.POST.get('ldetni'))
-                        guiadevmat = genkeys.GenerateIdGuiaMatDev();
 
-                        GuiaDevMat.objects.create(
-                            guiadevmat_id = guiadevmat,
-                            # guia_id = request.POST.get('nguia'),
-                            fechadevolucion = request.POST.get('fdev'),
-                            emple_aut_id = request.POST.get('empdniaut'),
-                            empdni_id = request.user.get_profile().empdni_id,
-                            estado = request.POST.get('est'),
-                            comentario = request.POST.get('comen')
-                            )
-
-                        for x in ldetnonip:
-                            nonip=detGuiaDevMat.objects.create(
-                                guiadevmat_id=guiadevmat,
-                                guia_id=request.POST.get('nguia'),
-                                material_id=x['codmat'],
-                                marca_id=x['codbr'],
-                                model_id=x['codmod'],
-                                cantidad=x['cantrest'],
-                                motivo=request.POST.get('motivo'),
-                                comentario='')
-
-                        for x in ldetni:
-                            nip=GuiaDevMatNiple.objects.create(
-                                guiadevmat_id=guiadevmat,
-                                guia_id=request.POST.get('nguia'),
-                                material_id=x['codmat'],
-                                marca_id=x['codbr'],
-                                model_id=x['codmod'],
-                                cantidad=x['cantrest'],
-                                metrado=x['metrado'],
-                                tipo=x['tipo'],
-                                idref_id=x['idtabniple'],
-                                motivo=request.POST.get('motivo'),
-                                comentario='')
-                        context['status']=True
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
                 return self.render_to_json_response(context)
         except Exception, e:
-            print str(e)
+            print e.__str__()
 
 
 class DevConMaterial(JSONResponseMixin, TemplateView):

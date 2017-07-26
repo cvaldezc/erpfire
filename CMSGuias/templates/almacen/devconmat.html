@@ -1,6 +1,7 @@
 {% extends "basemd.html" %}
+
 {% block title %}
-  Devolución de Material
+  Devolucion de Material
 {% endblock %}
 {% block menu %}
   {% include "menus/storagemd.htm" %}
@@ -38,11 +39,39 @@
 		</button>
 	</div>
 	<div class="card">
-		<div class="card-action" style="background-color:#f5f5f5">
+		<div class="card-action" style="height:150px;background-color:#f5f5f5">
+			<div style="width:100%;float:left">
+				<div style="width:50%;float:left">
+					<div class="input-field col">
+						<i class="prefix fa fa-sign-in"></i>
+						<input class="txtlistaproy" type="text" placeholder="" name="txtlistaproy" id="txtlistaproy" >
+						<label for="txtlistaproy">CODIGO O DESCRIPCION DE MATERIAL</label>
+					</div>
+				</div>
+				<div style="width:50%;float:left">
+					<div class="input-field col" id="divdescmat" style="display:none;margin-left:5%;border:1px solid;border-color:#039be5;border-radius:15px;margin-top:-10px;">
+						<div class="panel-group">
+							<div class="panel" style="margin-left:20px;margin-right:20px;">
+								<div class="panel-heading" style="">
+									<h6 class="panel-title lblcodmat" style="font-weight:bold"></h6>
+								</div>
+								<div class="panel-collapse collapse in">
+									<div class="panel-body">
+										<h6 class="lblnamematerial"></h6>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--
 			<div class="row">
-				<div class="input-field col" style="width:20%;">
-					<input class="txtlistaproy" type="search" placeholder="" name="txtlistaproy" id="txtlistaproy" >
-					<label for="txtlistaproy">Codigo o Descripcion de Material</label>
+				<div class="input-field col">
+					<i class="prefix fa fa-sign-in"></i>
+					<input class="txtlistaproy" type="text" placeholder="" name="txtlistaproy" id="txtlistaproy" >
+					<label for="txtlistaproy">CODIGO O DESCRIPCION DE MATERIAL</label>
 				</div>
 				<div class="input-field col" id="divdescmat" style="display:none;margin-left:40%;width:40%;border:1px solid;border-color:#039be5;border-radius:15px;margin-top:-10px;">
 					<div class="panel-group">
@@ -59,117 +88,68 @@
 					</div>
 				</div>
 			</div>
+			-->
 			<h6 class="lblcodproystorage" style="font-weight:bold"></h6>
 		</div>
 	</div>
 
 			<!--DETALLE-->
-	<div class="card" id="divcabguiadev" style="display:none;background-color:#e0e0e0">
+	<div class="card" id="divcabguiadev" style="height:300px;display:none;background-color:#e0e0e0">
 		<div class="card-action">
-			<div class="row">
-				<div class="input-field col s4">
+			<div style="width:100%:float:left">
+				<div style="width:80%;float:left">
 					<h5><strong>Cabecera de Guia de Devolucion</strong></h5>
 				</div>
-				<div class="input-field col s1">
-					<h6 class="lblmincodproy" style="font-weight:bold"></h6>
-				</div>
-				<div class="input-field col s2">
-					<h6 class="lblmincodsector" style="font-weight:bold"></h6>
-				</div>
-				<div class="input-field col s2">
-					<h6 class="lblmincodgrupo" style="font-weight:bold"></h6>
-				</div>
-				<div class="input-field col" style="">
-					<button style="border:none;" type="button" class="transparent btnocultarcab"><a style="font-size:30px;"><i class="fa fa-compress"></i></a>
-					</button>
-				</div>
 
-				<div class="input-field col">
+				<div style="width:20%;float:left">
 					<button style="border:none;" type="button" class="btn waves-effect red lighten-1 btnopencab" value=""><i class="fa fa-floppy-o"></i><span><strong>Guardar Guia</strong>
 					</span>
 					</button>
 				</div>
 			</div>
-			<hr>
-			<div class="row divsubcab">
-				<div class="input-field col s3">
-					<div class="panel-group" id="divtitproy" style="display:none;">
-						<div class="panel">
-							<div class="panel-heading">
-								<div class="row">
-									<div class="input-field col">
-										<h5 class="panel-title">Proyecto</h5>
-									</div>
-									<div class="input-field col" style="margin-top:30px;">
-										<button style="border:none;" type="button" class="transparent btnlistagainproy"><a style="font-size:15px;"><i class="fa fa-list"></i></a>
-							            </button>
-									</div>
-								</div>
-							</div>
-							<div class="panel-collapse collapse in">
-								<div class="panel-body">
-									<div class="input-field col" style="display:none">
-										<h6 class="lblcodproject"></h6>
-									</div>
-									<h6 class="lblnameproject"></h6>
-								</div>
-							</div>
+			<div style="width:100%;float:left">
+				<hr>
+				<div style="width:70%;float:left">
+					<div class="row" id="divtitproy" style="display:none">
+						<div class="input-field col" style="margin-top:30px;">
+							<button style="border:none;" type="button" class="transparent btnlistagainproy"><a style="font-size:15px;"><i class="fa fa-list"></i></a>
+				            </button>
+						</div>
+						<div class="input-field col">
+							<h5 class="panel-title">Proyecto: </h5>
+						</div>
+						<div class="input-field col">
+							<h5 class="lblcodproject"></h5>
+						</div>
+						<div class="input-field col">
+							<h5 class="lblnameproject"></h5>
 						</div>
 					</div>
-				</div>
-				<div class="input-field col s3">
-					<div class="panel-group" id="divtitsector" style="display:none;">
-						<div class="panel">
-							<div class="panel-heading" style="">
-								<div class="row">
-									<div class="input-field col">
-										<h5 class="panel-title">Sector</h5>
-									</div>
-									<div class="input-field col" style="margin-top:30px;">
-										<button style="border:none;" type="button" class="transparent btnlistagainsector"><a style="font-size:15px;"><i class="fa fa-list"></i></a>
-							            </button>
-									</div>
-								</div>
-							</div>
-							<div class="panel-collapse collapse in">
-								<div class="panel-body">
-									<div class="input-field col" style="display:none">
-										<h6 class="lblcodsector"></h6>
-									</div>
-									<h6 class="lblnamesector"></h6>
-								</div>
-							</div>
-						</div>
+					<div class="input-field col s6" id="divcbolistguia" style="display:none;margin-top:50px;">
+						<select id="cbolistguias" class="browser-default cbolistguias">
+						</select>
+						<label for="cbolistguias" style="margin-top:-45px;color:#0091ea;font-size:0.8rem">SELECCIONAR SECTOR || GRUPO || AREA || GUIA</label>
 					</div>
 				</div>
-				<div class="input-field col s2">
-					<div class="panel-group" id="divtitgrupo" style="display:none;">
-						<div class="panel">
-							<div class="panel-heading" style="">
-								<div class="row">
-									<div class="input-field col">
-										<h5 class="panel-title">Grupo</h5>
-									</div>
-									<div class="input-field col" style="margin-top:30px;">
-										<button style="border:none;" type="button" class="transparent btnlistagaingrupo"><a style="font-size:15px;"><i class="fa fa-list"></i></a>
-							            </button>
-									</div>
-								</div>
-							</div>
-							<div class="panel-collapse collapse in">
-								<div class="panel-body">
-									<div class="input-field col" style="display:none">
-										<h6 class="lblcodgrupo"></h6>
-									</div>
-									<h6 class="lblnamegrupo"></h6>
-								</div>
-							</div>
+				<div style="display:none;margin-left:5%;width:25%;float:left;" id="divdetsectors">
+					<div class="row">
+						<div class="input-field col">
+							<h6 class="lblnamesector"></h6>
+							<h6 for="lblnamesector" style="margin-top:-35px;font-weight:bold;color:#0091ea">SECTOR</h6>
 						</div>
 					</div>
-				</div>
-				<div class="input-field col s4" id="divcbolistguia" style="display:none;margin-top:50px;">
-					<select id="cbolistguias" class="browser-default cbolistguias">
-					</select>
+					<div class="row">
+						<div class="input-field col">
+							<h6 class="lblnamegrupo"></h6>
+							<h6 for="lblnamegrupo" style="margin-top:-35px;font-weight:bold;color:#0091ea">GRUPO</h6>
+						</div>
+					</div>
+					<div class="row">
+						<div class="input-field col">
+							<h6 class="lblnamearea"></h6>
+							<h6 for="lblnamearea" style="margin-top:-35px;font-weight:bold;color:#0091ea">AREA</h6>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -184,7 +164,7 @@
 				</div>
 				<div class="input-field col s6" style="margin-left:10%">
 					<i class="prefix fa fa-search" style="font-size:30px;"></i>
-				    <input class="txtbuscproyecto" id="txtbuscproyecto" style="height:30px;" type="search" placeholder="Codigo o descripcion de Proyecto">
+				    <input class="txtbuscproyecto" id="txtbuscproyecto" style="height:30px;" type="text" placeholder="Codigo o descripcion de Proyecto">
 				</div>
 			</div>
 			<thead class="cab">
@@ -199,6 +179,7 @@
 		</table>
 	</div>
 
+	<!--
 	<div id="divtablesector" style="display:none">
 		<h5 align="center">SECTORES</h5>
 		<div style="overflow-y: scroll;height:250px;">
@@ -215,7 +196,8 @@
 			</table>
 		</div>
 	</div>
-
+	-->
+	<!--
 	<div id="divtablegroup" style="display:none;">
 		<h5 align="center">GRUPOS</h5>
 		<div style="overflow-y: scroll;height:250px;">
@@ -232,6 +214,7 @@
 			</table>
 		</div>
 	</div>
+	-->
 		<!--LISTA DE DETALLE DE MATERIALES-->
 
 	<div id="divtabldetguiarem" style="display:none">
@@ -314,7 +297,7 @@
 			<div class="row">
 				<div class="input-field col s6">
 					<i class="prefix fa fa-search"></i>
-					<input class="txtbuscmat" style="width:90%;" type="search" placeholder="Buscar Material" name="txtbuscmat" id="txtbuscmat" >
+					<input class="txtbuscmat" style="width:90%;" type="text" placeholder="Buscar Material" name="txtbuscmat" id="txtbuscmat" >
 				</div>
 			</div>
 			<div style="overflow-y: scroll;height:550px;">
@@ -489,43 +472,42 @@
 <div class="modal modcabecera">
 	<div class="modal-content">
 		<div class="row">
-			<div class="input-field col s3">
-				<p>Transportista:</p>
+			<div class="input-field col s9">
+				<input type="text" class="matnumeroguia" placeholder="" maxlength="12" length="12"/>
+				<label for="matnumeroguia">NUMERO DE GUIA</label>
 			</div>
+		</div>
+		<div class="row">
 			<div class="input-field col s9">
                 <select id="cbomattransp" class="browser-default cbomattransp">
+                <option value=""></option>
                 {% for x in ltransportmat %}
                     <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
                 {% endfor %}
                 </select>
+                <label for="cbomattransp" style="margin-top:-30px;font-size:0.8rem;color:#0091ea">TRANSPORTISTA</label>
             </div>
 		</div>
 		<div class="row">
-			<div class="input-field col s3">
-                <p>Conductor:</p>
-            </div>
             <div class="input-field col s9">
                 <select id="cbomatcond" class="browser-default cbomatcond"></select>
+                <label for="cbomatcond" style="margin-top:-30px;font-size:0.8rem;color:#0091ea">CONDUCTOR</label>
             </div>
 		</div>
 		<div class="row">
-			<div class="input-field col s3">
-                <p>Placa:</p>
-            </div>
             <div class="input-field col s9">
                 <select id="cbomatplaca" class="browser-default cbomatplaca"></select>
+                <label for="cbomatplaca" style="margin-top:-30px;font-size:0.8rem;color:#0091ea">PLACA</label>
             </div>
 		</div>
 		<div class="row">
-			<div class="input-field col s3">
-				<p>Autorizado por:</p>
-			</div>
 			<div class="input-field col s9">
-			<select id="cbolistempleado" class="browser-default cbolistempleado">
-                {% for x in lempleados %}
-                <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
-                {% endfor %}
-        	</select>
+				<select id="cbolistempleado" class="browser-default cbolistempleado">
+	                {% for x in lempleados %}
+	                <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
+	                {% endfor %}
+	        	</select>
+	        	<label for="cbolistempleado" style="margin-top:-30px;font-size:0.8rem;color:#0091ea">AUTORIZADO POR</label>
 			</div>
 		</div>
 		<div class="row">

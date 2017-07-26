@@ -746,21 +746,22 @@ def GenerateIDItemizerProject(pro):
 
 # @Juan Julcapari 2017-07-17 10:44:40
 # generate number id for guide return materials
-def GenerateIdGuiaMatDev():
-    id = None
-    try:
-        code = GuiaDevMat.objects.aggregate(max=Max('guiadevmat_id'))
-        id = code['max']
-        if id is not None:
-            counter = int(id[2:7])
-            print counter
-            counter += 1
-        else:
-            counter = 1
-        id = '%s%s' % ('DM', '{:0>5d}'.format(counter))
-    except ObjectDoesNotExist, e:
-        raise e
-    return id
+# 2017-07-26 17:08:35 - delete
+# def GenerateIdGuiaMatDev():
+#     id = None
+#     try:
+#         code = GuiaDevMat.objects.aggregate(max=Max('guiadevmat_id'))
+#         id = code['max']
+#         if id is not None:
+#             counter = int(id[2:7])
+#             print counter
+#             counter += 1
+#         else:
+#             counter = 1
+#         id = '%s%s' % ('DM', '{:0>5d}'.format(counter))
+#     except ObjectDoesNotExist, e:
+#         raise e
+#     return id
 # endblock
 # @Juan Julcapari 2017-07-25 09:12:59 -
 def GenerateIdHerra():

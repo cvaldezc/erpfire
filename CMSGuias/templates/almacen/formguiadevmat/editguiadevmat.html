@@ -1,13 +1,15 @@
 {% block script %}
     <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+
 {% endblock script %}
+
 <div class="modal leditmaterials">
     <div class="modal-content">
         <div class="row">
             <label class="lblcodgdevmat" style="display:none;"></label>
             <div class="input-field col s2">
                 <input readonly placeholder="" type="text" class="ednumdoc">
-                <label for="ednumdoc" >NUMERO DE DOCUMENTO</label>
+                <label for="ednumdoc" >NUMERO DE GUIA</label>
             </div>
             <div class="input-field col s3" style="margin-top:30px;">
                 <select id="cboedguiatr" class="browser-default cboedguiatr">
@@ -16,9 +18,7 @@
                     <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
                 {% endfor %}
                 </select>
-            </div>
-            <div class="input-field col s0">
-                <p>Conductor:</p>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">TRANSPORTISTA</label>
             </div>
             <div class="input-field col s2" style="margin-top:30px;">
                 <select id="cboedguiacond" class="browser-default cboedguiacond">
@@ -26,9 +26,7 @@
                     <option value="{{ x.condni_id }}">{{ x.connom }}</option>
                 {% endfor %}
                 </select>
-            </div>
-            <div class="input-field col s0">
-                <p>Placa:</p>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">CONDUCTOR</label>
             </div>
             <div class="input-field col s2" style="margin-top:30px;">
                 <select id="cboedguiaplaca" class="browser-default cboedguiaplaca">
@@ -36,6 +34,7 @@
                     <option value="{{ x.nropla_id }}">{{ x.nropla_id }} {{ marca }}</option>
                 {% endfor %}
                 </select>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">PLACA</label>
             </div>
         </div>
         <div class="row">
@@ -45,11 +44,11 @@
             </div>
             <div class="input-field col s3" style="margin-top:35px;">
                 <select id="comboeditempleado" class="browser-default comboeditempleado">
-                    <option value="" disabled selected>Autorizado por</option>
                     {% for x in lemple %}
                     <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
                     {% endfor %}
                 </select>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">AUTORIZADO POR</label>
             </div>
             <div class="input-field col s4">
                 <input placeholder="" length="200" name="comenteditguiadev" type="text" class="comenteditguiadev">
@@ -75,11 +74,12 @@
                     <tr>
                         <th class="col5" style="text-align:center">#</th>
                         <th class="col10">Guia</th>
+                        <th class="col10">Pedido</th>
                         <th class="col10">Codigo</th>
-                        <th class="col35">Material</th>
+                        <th >Material</th>
                         <th class="col10">Marca</th>
                         <th class="col10">Modelo</th>
-                        <th class="col10">Cantidad</th>
+                        <th class="col5">Cantidad</th>
                         <th class="col10">Acciones</th>
                     </tr>
                 </thead>

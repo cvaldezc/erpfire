@@ -297,8 +297,8 @@ class DSMetrado(models.Model):
     nipple = models.BooleanField(default=False, blank=True)
     flag = models.BooleanField(default=True)
     # @Juan Julcapari 2017-07-17 10:40:02 - return materials from guide remission
-    cantdev = models.FloatField(default=0, blank=True, null=True)
-    stcantdev = models.BooleanField(default=True)
+    #cantdev = models.FloatField(default=0, blank=True, null=True)
+    #stcantdev = models.BooleanField(default=True)
     # endblock
 
     audit_log = AuditLog()
@@ -393,8 +393,8 @@ class Nipple(models.Model):
     tag = models.CharField(max_length=1, default='0')
     flag = models.BooleanField(default=True)
     # @Juan Julcapari 2017-07-17 10:42:25 - return materials from guide remission
-    cantenvnip = models.FloatField(default=0, blank=True, null=True)
-    stcantenvnip = models.FloatField(default=0, blank=True, null=True)
+    # cantenvnip = models.FloatField(default=0, blank=True, null=True)
+    # stcantenvnip = models.FloatField(default=0, blank=True, null=True)
     # endblock
 
     class Meta:
