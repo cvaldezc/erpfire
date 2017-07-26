@@ -71,7 +71,9 @@
       </tbody>  -->
     </table>
 </div>
-
+<!--utils -->
+<input type="hidden" name="hreport" value="{{ hreport }}">
+<input type="hidden" name="ruc" value="{{ ruc }}">
 {% csrf_token %}
 {% include "almacen/form/listherraguiadev.html" %}
 {% endblock %}

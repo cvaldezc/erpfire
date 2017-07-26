@@ -651,7 +651,9 @@ class Guia(JSONResponseMixin, TemplateView):
             'lproyectos':lproyecto,
             'lguiagene':lguiagene,
             'listadocdev':ldocdev,
-            'lmonedahe':lmonedahe
+            'lmonedahe':lmonedahe,
+            'hreport': SettingsApp.objects.get(flag=True).serverreport,
+            'ruc': request.session['company']['ruc']
             })
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
@@ -1133,6 +1135,7 @@ class Inventario(JSONResponseMixin, TemplateView):
         except Exception, e:
             print e.__str__()
 
+
 class Devolucion(JSONResponseMixin, TemplateView):
     @method_decorator(login_required)
     def get(self,request,*args,**kwargs):
@@ -1180,9 +1183,11 @@ class Devolucion(JSONResponseMixin, TemplateView):
             return self.render_to_json_response(context)
 
         lguiacomp = GuiaHerramienta.objects.filter(estado='DEVCOMP').order_by('guia_id')
-        return render(request,'almacen/devolucion.html',{
-            'lguiaco':lguiacomp
-            })
+        kwargs['lguiaco'] = lguiacomp
+        kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+        kwargs['ruc'] = request.session['company']['ruc']
+        return render(request, 'almacen/devolucion.html', kwargs)
+
 
 class Consulta(JSONResponseMixin, TemplateView):
     @method_decorator(login_required)
@@ -1562,14 +1567,12 @@ class Trasladohe(JSONResponseMixin, TemplateView):
                 context['raise'] = str(e)
                 context['status'] = False
             return self.render_to_json_response(context)
-        trlempautor=Employee.objects.filter(flag=True).order_by('lastname')
-        ltransport = Transportista.objects.filter(flag=True).order_by('tranom')
-        trlproyecto = Proyecto.objects.filter(status='AC').order_by('-registrado')
-        return render(request, 'almacen/trasladohe.html',{
-            'trlempautor':trlempautor,
-            'ltransport':ltransport,
-            'trlproyecto':trlproyecto
-            })
+        kwargs['trlempautor']=Employee.objects.filter(flag=True).order_by('lastname')
+        kwargs['ltransport'] = Transportista.objects.filter(flag=True).order_by('tranom')
+        kwargs['trlproyecto'] = Proyecto.objects.filter(status='AC').order_by('-registrado')
+        kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+        kwargs['ruc'] = request.session['company']['ruc']
+        return render(request, 'almacen/trasladohe.html', kwargs)
 
     def post(self,request,*args,**kwargs):
         try:
@@ -1609,7 +1612,8 @@ class Trasladohe(JSONResponseMixin, TemplateView):
                                 fechdevolucion=None if x['fdev']=="" else x['fdev'],
                                 cantidad=x['cantidad'],
                                 comentario=x['comenthe'],
-                                cantinicial=x['cantidad'])
+                                cantinicial=x['cantidad'],
+                                grupo='')
 
                         for y in ltrdghe:
                             upd=detGuiaHerramienta.objects.get(
@@ -1725,12 +1729,11 @@ class NotaIngreso(JSONResponseMixin, TemplateView):
                 context['raise'] = str(e)
                 context['status'] = False
             return self.render_to_json_response(context)
-        lalmaceneros=Employee.objects.filter(charge__area='Almacen',flag=True)
-        lalmacen=Almacene.objects.filter(flag=True)
-        return render(request,'almacen/notaingreso.html',{
-            'lalmaceneros':lalmaceneros,
-            'lalmacen':lalmacen
-            })
+        kwargs['lalmaceneros']=Employee.objects.filter(charge__area='Almacen',flag=True)
+        kwargs['lalmacen']=Almacene.objects.filter(flag=True)
+        kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+        kwargs['ruc'] = request.session['company']['ruc']
+        return render(request, 'almacen/notaingreso.html', kwargs)
 
     def post(self,request,*args,**kwargs):
         try:

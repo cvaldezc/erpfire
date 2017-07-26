@@ -161,6 +161,7 @@ $(document).on("click", ".btntrsavefdev", trsavefdev);
 
 
 
+
 //////////////////
 
 
@@ -199,6 +200,10 @@ $(document).on("click", ".btninfoconvert", infoconvert);
 show_hide_combestado("#idcomboestado",".fguiadevol","#divfdev");
 show_hide_combestado("#comboeditestado",".editfdev","#diveditfdev");
 show_hide_combestado("#cbogrupoest",".fdevgrupohe","#divgrupofdev");
+
+
+////// REPORT NOTE INGRESS TOOLS
+$(document).on("click", ".btnviewpdfnota", showreportnoteingress);
 
 });
 
@@ -2100,7 +2105,7 @@ save_or_edit_herramienta = function(){
 		tipoacce="EP"
 		desc="EPPS"
 	}else{
-		tipoacce="HE"
+		tipoacce="TL"
 		desc="HERRAMIENTA"
 	}
 
@@ -2385,8 +2390,10 @@ verdocherrapdf = function(){
 		}else{
 			est='NO'
 		}
-		window.open('http://'+ location.hostname +':6000/guiasherramienta/reportguiadevherra?ndoc='+codgdev+'&estformat='+est+'&emple='+emple,'_blank');
-		// window.open('http://'+ location.hostname +':6000/guiasherramienta/reportguiaherra?ng='+codguia+'&estformat='+est+'&emple='+emple,'_blank');
+		var hreport = $("[name=hreport]").val();
+		var ruc = $("[name=ruc]").val();
+		window.open(hreport+'guide/toolsreturn?iddoc='+codgdev+'&ruc='+ruc+'&emple='+emple,'_blank');
+
 	})
 
 
@@ -2419,19 +2426,22 @@ verguiaherrapdf = function(){
 	confirmButtonColor:'#ef5350',
 	html:true
 	},function(isConfirm){
+		var hreport = $("[name=hreport]").val();
+		var ruc = $("[name=ruc]").val();
 		if (isConfirm) {
-			est='SI'
+			window.open(hreport + 'guide/tools?ng='+codguia+'&ruc='+ruc+'&format='+est+'&emple='+emple,'_blank');
 		}else{
-			est='NO'
+			window.open(hreport + 'guide/tools?ng='+codguia+'&ruc='+ruc+'&emple='+emple,'_blank');
 		}
-		window.open('http://'+ location.hostname +':6000/guiasherramienta/reportguiaherra?ng='+codguia+'&estformat='+est+'&emple='+emple,'_blank');
 	})
 }
 
 
 verguiacompdf = function(){
-	window.open('http://'+ location.hostname +':6000/guiasherramienta/reportguiaherra?ng='+this.value+'&estformat=SI&emple='+emple,'_blank');
-// window.open('http://'+ location.hostname +':6000/guiasherramienta/reportguiaherra?ng='+this.value,'_blank');
+	var hreport = $("[name=hreport]").val();
+	var ruc = $("[name=ruc]").val();
+	var codguia=this.value
+	window.open(hreport + 'guide/tools?ng='+codguia+'&ruc='+ruc+'&format=true&emple='+emple,'_blank');
 }
 
 generarguia = function(){
@@ -2459,7 +2469,9 @@ generarguia = function(){
       $.post("", data, function(response) {
         if (response.status) {
         	getemple()
-        	window.open('http://'+ location.hostname +':6000/guiasherramienta/reportguiaherra?ng='+btn.value+'&estformat=SI&emple='+emple,'_blank');
+        	var hreport = $("[name=hreport]").val();
+			var ruc = $("[name=ruc]").val();
+			window.open(hreport + 'guide/tools?ng='+data.numguia+'&ruc='+ruc+'&format=true&emple='+emple,'_blank');
 			tipolist='all'
 			estadoguiaherra='PE'
 			tableguia='tabla-guia'
@@ -2514,8 +2526,8 @@ listarherramienta=function(){
 	data.texto=textoherra
 	data.tipolist=tipolist
 	data.getherra=true
-	if (tipoacce=="HE") {
-		data.tipoacce="HE"
+	if (tipoacce=="TL") {
+		data.tipoacce="TL"
 	}else{
 		data.tipoacce="EP"
 	}
@@ -3654,4 +3666,11 @@ delnoting=function(){
 			})
 		};
 	})
+}
+// @cvaldezch 2017-07-26 11:15:18 - add event function show report note ingress
+showreportnoteingress = function() {
+	var code = this.value;
+	var hreport = $('[name=hreport]').val();
+	var ruc = $('[name=ruc]').val();
+	window.open(hreport+'tools/note/ingress?idnota='+code+'&ruc='+ruc, '_blank');
 }
