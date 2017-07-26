@@ -139,10 +139,11 @@ moveTopBottom = (key) ->
 # code
 searchMaterialCode = (code) ->
   pass = false
-  if code.length < 15 or code.length > 15
-    $().toastmessage "showWarningToast", "Format Code Invalid!"
+  if code.length < 12 or code.length > 15
+    $().toastmessage "showWarningToast", "Formato de Código Invalido!"
     pass = false
-  else pass = true  if code.length is 15
+  else
+    pass = true
   if pass
     data = new Object()
     data["code"] = code
