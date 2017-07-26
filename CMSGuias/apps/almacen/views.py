@@ -6,6 +6,7 @@ import json
 import os
 from decimal import Decimal
 
+
 from django.shortcuts import (
     render_to_response,
     get_object_or_404,
@@ -27,7 +28,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from openpyxl import load_workbook
 
-from ..almacen.models import *
+from .models import *
 from CMSGuias.apps.home.models import *
 from CMSGuias.apps.ventas.models import Proyecto, Sectore, Subproyecto
 from CMSGuias.apps.almacen import forms
