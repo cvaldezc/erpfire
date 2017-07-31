@@ -966,6 +966,7 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
                     materialsdel = json.loads(request.POST['materials'])
                     counter = 0
                     kwargs['nodel'] = list()
+                    kwargs['exception'] = list()
                     for x in materialsdel:
                         if materialsdel[x]['status'] == True:
                             try:
@@ -975,6 +976,8 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
                             except Exception as e:
                                 counter += 1
                                 kwargs['nodel'].append(materialsdel[x]['pk'])
+                                kwargs['exception'].append({materialsdel[x]['pk']: str(e)})
+
                     kwargs['status'] = True if len(kwargs['nodel']) == 0 else False
                     if not kwargs['status']:
                         kwargs['raise'] = 'Alguno de los materiales no han eliminado'

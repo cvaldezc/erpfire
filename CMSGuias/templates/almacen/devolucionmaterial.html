@@ -78,6 +78,10 @@
 </div>
 
 
+<!-- hreport and ruc -->
+<input type="hidden" id="hreport" value="{{hreport}}">
+<input type="hidden" id="ruc" value="{{ruc}}">
+
 {% csrf_token %}
 {% include "almacen/formguiadevmat/listmaterial.html" %}
 {% include "almacen/formguiadevmat/editguiadevmat.html" %}

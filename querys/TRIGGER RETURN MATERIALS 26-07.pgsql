@@ -150,6 +150,8 @@ EXECUTE PROCEDURE proc_delete_guiadevmat()
 
 ------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------
+--- TRIGGER EDITED 2017-07-31 11:03:05
+------------------------------------------------------------------------------------------------------
 -- TRIGGERS ELIMINADOS
 DROP FUNCTION proc_change_stdsmetrado() -- trigger -- DROP TRIGGER change_stdsmetrado_trigger ON operations_dsmetrado
 DROP FUNCTION proc_change_stopernipple() -- trigger -- DROP TRIGGER change_stopernipple_trigger ON operations_nipple
@@ -162,7 +164,7 @@ CREATE OR REPLACE FUNCTION proc_suma_cantdetguiadevmat()
   RETURNS trigger AS
 $BODY$
 DECLARE
-  _cant DOUBLE PRECISION :=0;
+  _cant DOUBLE PRECISION := 0;
   _cantfinal DOUBLE PRECISION := 0;
   _cantdevmat DOUBLE PRECISION := 0;
 BEGIN

@@ -3711,21 +3711,15 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                 context['status'] = False
             return self.render_to_json_response(context)
 
-        lemple = Employee.objects.filter(flag=True).order_by('lastname')
-        lguiadevmat = GuiaDevMat.objects.filter(estado = 'PE').order_by('guiadevmat_id')
-        lguiadevmatge = GuiaDevMat.objects.filter(estado = 'GE').order_by('guiadevmat_id')
-        ltransportist = Transportista.objects.filter(flag=True).order_by('tranom')
-        lplaca= Transporte.objects.filter(flag=True)
-        lconduct=Conductore.objects.filter(flag=True)
-
-        return render(request,'almacen/devolucionmaterial.html',{
-            'lguiadevmat':lguiadevmat,
-            'lguiadevmatge':lguiadevmatge,
-            'lemple':lemple,
-            'ltransportist':ltransportist,
-            'lplaca':lplaca,
-            'lconduct':lconduct
-            })
+        kwargs['lemple'] = Employee.objects.filter(flag=True).order_by('lastname')
+        kwargs['lguiadevmat'] = GuiaDevMat.objects.filter(estado = 'PE').order_by('guiadevmat_id')
+        kwargs['lguiadevmatge'] = GuiaDevMat.objects.filter(estado = 'GE').order_by('guiadevmat_id')
+        kwargs['ltransportist'] = Transportista.objects.filter(flag=True).order_by('tranom')
+        kwargs['lplaca']= Transporte.objects.filter(flag=True)
+        kwargs['lconduct']=Conductore.objects.filter(flag=True)
+        kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+        kwargs['ruc'] = request.session['company']['ruc']
+        return render(request, 'almacen/devolucionmaterial.html', kwargs)
 
 # ///////////////////////////
     @method_decorator(login_required)
@@ -3798,19 +3792,19 @@ class DevConGuia(JSONResponseMixin, TemplateView):
                         lniplefinal2=json.loads(request.POST.get('lniplefinal2'))
                         ldetdev = json.loads(request.POST.get('ldetdev'))
 
+                        print request.POST
 
                         GuiaDevMat.objects.create(
-                            guiadevmat_id = request.POST.get('numeroguia'),
-                            fechadevolucion = request.POST.get('fdev'),
-                            emple_aut_id = request.POST.get('empdniaut'),
-                            empdni_id = request.user.get_profile().empdni_id,
+                            guiadevmat_id=request.POST.get('numeroguia'),
+                            fechadevolucion=request.POST.get('fdev'),
+                            emple_aut_id=request.POST.get('empdniaut'),
+                            empdni_id=request.user.get_profile().empdni_id,
                             condni_id=request.POST.get('cond'),
                             nropla_id=request.POST.get('placa'),
                             proyecto_id=request.POST.get('codproy'),
                             traruc_id=request.POST.get('transport'),
-                            estado = request.POST.get('est'),
-                            comentario = request.POST.get('comen')
-                            )
+                            estado=request.POST.get('est'),
+                            comentario=request.POST.get('comen'))
 
 
                         if len(ldetdev) > 0:
@@ -4381,10 +4375,11 @@ class DevConMaterial(JSONResponseMixin, TemplateView):
             return self.render_to_json_response(context)
         lempleados = Employee.objects.filter(flag=True).order_by('lastname')
         ltransportmat = Transportista.objects.filter(flag=True).order_by('tranom')
-        return render(request,'almacen/devconmat.html',{
-            'lempleados':lempleados,
-            'ltransportmat':ltransportmat
-            })
+        kwargs['lempleados'] = lempleados
+        kwargs['ltransportmat'] = ltransportmat
+        kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+        kwargs['ruc'] = request.session['company']['ruc']
+        return render(request, 'almacen/devconmat.html', kwargs)
 
     def post(self, request, *args, **kwargs):
         try:

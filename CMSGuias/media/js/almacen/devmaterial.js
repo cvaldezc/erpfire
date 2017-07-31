@@ -1257,7 +1257,7 @@ genguiadev = function(){
 				    					if (response.status) {
 				    						console.log('aoskao')
 				    						swal({title:'Guia de Devolucion GENERADA',timer:2000,showConfirmButton: false,type: "success"});
-				    						genpdf(codgdevmat)
+				    						genpdf(codgdevmat, false)
 				    						search_one=false
 				    						estguia='PE'
 											listdevmat()
@@ -1277,8 +1277,14 @@ genguiadev = function(){
 }
 
 
-genpdf = function(codguiadev){
-	window.open('http://'+ location.hostname +(location.port != ''? ':'+location.port:'')+'/guiasherramienta/reportguiadevmaterial?nguiadevmat='+codguiadev,'_blank');
+genpdf = function(codguiadev, format) {
+	var hreport = $('#hreport').val();
+	var ruc = $('#ruc').val();
+	if (format) {
+		window.open(hreport + 'guide/return/materials?nguide='+codguiadev+'&format=true&ruc='+ruc,'_blank');
+	}else{
+		window.open(hreport + 'guide/return/materials?nguide='+codguiadev+'&ruc='+ruc,'_blank');
+	}
 }
 
 savecabgdev = function(){
@@ -1292,7 +1298,7 @@ savecabgdev = function(){
 	empleaut = $("select[id=comboeditempleado]").val();
 
 	if (fdev == "") {
-		swal({title:'Debe ingresar una FECHA DE DEVOLUCION',timer:2500,showConfirmButton: false,type: "error"});
+		swal({title:'Debe ingresar una FECHA DE DEVOLUCION', timer:2500, showConfirmButton: false,type: "error"});
 		return false;
 	}
 
@@ -1510,7 +1516,7 @@ getRow=function(countcod,cantguide,cantdev,niple,codped,codmat,codbr,codmod,numg
 
 }
 
-var cped='',cmat='',cbr='',cmod='',coucod=''
+var cped='', cmat='', cbr='', cmod='', coucod=''
 getdataRow = function(countcod,idped,idmat,namemat,medmat,idbr,idmod){
 	console.log(idped,idmat,idbr,idmod)
 	cped=idped,
@@ -1791,12 +1797,12 @@ saveguiafin = function(){
 				    }
 				  });
 				}else{
-					swal({title:'Guia ya existe en Guias de Devolucion',timer:1500,showConfirmButton:false,type:'error'})
+					swal({title:'Guia ya existe en Guias de Devolucion', timer:1500, showConfirmButton: false, type:'error'})
 					return false
 				}
 			})
 		}else{
-			swal({title:'Guia ya existe en Guias de Remision',timer:1500,showConfirmButton:false,type:'error'})
+			swal({title:'Guia ya existe en Guias de Remision', timer:1500, showConfirmButton: false, type:'error'})
 			return false
 		}
 	})
@@ -1863,8 +1869,8 @@ savenipple = function(){
 
 
 	console.log(txtnull)
-	if (txtnull.length==listanipple.length) {
-		swal({title:'Devolver al menos un niple',timer:1500,showConfirmButton: false,type: "error"})
+	if (txtnull.length == listanipple.length) {
+		swal({title:'Devolver al menos un niple', timer: 1500, showConfirmButton: false,type: "error"})
 		return false;
 	};
 
@@ -1968,12 +1974,8 @@ savenipple = function(){
 				})
 	    	}
 
-
-
 			console.log(lnippleselect)
 			console.log(ldetdevfin)
-
-
 
 	    	var ldetniple=JSON.stringify(lnippleselect)
 			var ldetdev=JSON.stringify(ldetdevfin)
@@ -2240,7 +2242,6 @@ savedevmat = function(){
 	placa=$("select[id=cboguiaplaca]").val()
 	codproy=$(".lblcodproyguia").text()
 
-
 	console.log(fdev)
 	console.log(auth)
 	console.log(transport)
@@ -2258,8 +2259,6 @@ savedevmat = function(){
 		swal({title:'Debe Ingresar Fecha de Devolucion',timer:1500,showConfirmButton: false,type: "error"});
 		return false
 	}
-
-
 
 
 	console.log(lmat)
@@ -2472,11 +2471,11 @@ viewpdf = function(){
 				if (response.status) {
 					var user = response.user
 					console.log(user) //USUARIO
-					genpdf(cod)
+					genpdf(cod, true)
 				};
 			})
 		}else{
-			console.log('Sin Formato')
+			genpdf(cod, false)
 		}
 	})
 }

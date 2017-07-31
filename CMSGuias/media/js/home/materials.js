@@ -186,7 +186,7 @@ var ControllerMasterItem = (function () {
                             _this.initialize();
                         }
                         else {
-                            Materialize.toast("Error: " + response['data']['raise'], 8000);
+                            Materialize.toast("Error: " + response['data']['raise'] + " " + response['data']['nodel'], 8000);
                         }
                     });
                 }

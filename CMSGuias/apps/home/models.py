@@ -101,7 +101,7 @@ class Materiale(models.Model):
     register = models.DateTimeField(auto_now_add=True, blank=True, null=False)
     #endblock
 
-    audit_log = AuditLog()
+    # audit_log = AuditLog() 2017-07-31 11:31:27
 
     class Meta:
         ordering = ['matnom']
