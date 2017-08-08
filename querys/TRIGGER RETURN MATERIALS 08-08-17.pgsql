@@ -273,3 +273,37 @@ EXECUTE PROCEDURE proc_delete_detguiadevmat()
 update almacen_detguiaremision set cantmov = cantguide;
 update almacen_nipleguiaremision set cantmov = cantguide;
 ------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+-- CREATE 2017-08-08 11:08:55 @cvaldezch
+------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION detguideremisioninsertquantityforcantmov_proc()
+  RETURNS trigger AS
+$BODY$
+  UPDATE almacen_detguiaremision SET cantmov = cantguide
+    WHERE guia_id = NEW.guia_id
+      AND materiales_id = NEW.materiales_id
+      AND brand_id = NEW.brand_id AND model_id = NEW.model_id;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+
+CREATE TRIGGER detguideremisioninsertquantityforcantmov_trigger
+AFTER INSERT ON almacen_detguiaremision
+FOR EACH ROW EXECUTE PROCEDURE detguideremisioninsertquantityforcantmov_proc();
+
+
+CREATE OR REPLACE FUNCTION nipleguideremisioninsertquantityforcantmov_proc()
+  RETURNS trigger AS
+$BODY$
+  UPDATE almacen_nipleguiaremision SET cantmov = NEW.cantguide
+    WHERE guia_id = NEW.guia_id
+      AND materiales_id = NEW.materiales_id
+      AND brand_id = NEW.brand_id AND model_id = NEW.model_id;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+
+CREATE TRIGGER nipleguideremisioninsertquantityforcantmov_trigger
+AFTER INSERT ON almacen_detguiaremision
+FOR EACH ROW EXECUTE PROCEDURE nipleguideremisioninsertquantityforcantmov_proc();
+---------------------------------------------------------------------------------
+-- ENDBLOCK
+---------------------------------------------------------------------------------
