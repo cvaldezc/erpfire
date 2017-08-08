@@ -3568,7 +3568,7 @@ trsavefdev=function(){
 
 switchgeneral=function(){
 
-	var rutabase='http://'+location.hostname+((location.port != "" ? location.port : ""))+'/almacen/herramienta/'
+	var rutabase='http://'+location.hostname+((location.port != "" ? ':'+location.port : ""))+'/almacen/herramienta/'
 	getemple()
 	if (document.getElementById('switchepps').checked) {
 		tipoacce='EP'
