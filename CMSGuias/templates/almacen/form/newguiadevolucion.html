@@ -9,74 +9,51 @@
       </div>
     </div>
     <hr>
-
-    <div style="width:100%;float:left">
-      <div style="width:50%;float:left">
-        <div class="row" id="divradio">
-          <div class="input-field col">
-          <input onclick="javascript:viewguiahedev();" name="stguiahe" type="radio" id="rddevman" checked="true"/>
-          <label for="rddevman" style="font-weight:bold;color:black;">Manual</label>
-          <input onclick="javascript:viewguiahedev();" name="stguiahe" type="radio" id="rddevauto"/>
-          <label for="rddevauto" style="font-weight:bold;color:black;">Autogenerado</label>
-          <label for="stguiahe" style="margin-top:-20px;color:#0091ea;font-size:0.8rem">CODIGO</label>
-          </div>
-        </div>
-
-
-        <div class="row">
-          <div class="input-field col s2" id="divdevnumserie">
-            <input readonly placeholder="" type="text" class="devnumserie"/>
-            <label for="devnumserie">SERIE</label>
-          </div>
-          <div class="input-field col s6" id="divdevnumguia">
-            <input placeholder="" id="devnumguia" name="devnumguia" type="text" class="devnumguia" maxlength="8" length="8"/>
-            <label for="devnumguia" >NUMERO DE GUIA</label>
-          </div>
-        </div>
+    <div class="row">
+      <div class="input-field col s2" id="divdevnumguia">
+        <input placeholder="" id="devnumguia" name="devnumguia" type="text" class="devnumguia" maxlength="12" length="12"/>
+        <label for="devnumguia" >NUMERO DE GUIA</label>
       </div>
-      <div style="width:50%;float:left">
-        <div class="row">
-          <div class="input-field col s6" style="margin-top:25px">
-            <select id="devcotrans" class="browser-default devcotrans">
-            <option value=""></option>
-            {% for x in ltransportista %}
-            <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
-            {% endfor %}
-            </select>
-            <label for="devcotrans" style="color:#039be5;font-size:0.8rem;margin-top:-30px">TRANSPORTISTA</label>
-          </div>
-          <div class="input-field col s6" style="margin-top:25px">
-            <select id="devcoconduc" class="browser-default devcoconduc">
-            </select>
-            <label for="devcoconduc" style="color:#039be5;font-size:0.8rem;margin-top:-30px">CONDUCTOR</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="input-field col s6" style="margin-top:25px">
-            <select id="devcoplaca" class="browser-default devcoplaca">
-            </select>
-            <label for="devcoplaca" style="color:#039be5;font-size:0.8rem;margin-top:-30px">PLACA</label>
-          </div>
-          <div class="input-field col s6">
-            <input placeholder="" id="fdevret" name="fdevret" type="date" class="picker fdevret">
-            <label for="fdevret">Fecha de Retorno</label>
-          </div>
-        </div>
+      <div class="input-field col s3" style="margin-top:25px">
+        <select id="devcotrans" class="browser-default devcotrans">
+        <option value=""></option>
+        {% for x in ltransportista %}
+        <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
+        {% endfor %}
+        </select>
+        <label for="devcotrans" style="color:#039be5;font-size:0.8rem;margin-top:-30px">TRANSPORTISTA</label>
+      </div>
+      <div class="input-field col s3" style="margin-top:25px">
+        <select id="devcoconduc" class="browser-default devcoconduc">
+        </select>
+        <label for="devcoconduc" style="color:#039be5;font-size:0.8rem;margin-top:-30px">CONDUCTOR</label>
+      </div>
+      <div class="input-field col s2" style="margin-top:25px">
+        <select id="devcoplaca" class="browser-default devcoplaca">
+        </select>
+        <label for="devcoplaca" style="color:#039be5;font-size:0.8rem;margin-top:-30px">PLACA</label>
+      </div>
+      <div class="input-field col s2">
+        <input placeholder="" id="fdevret" name="fdevret" type="date" class="picker fdevret">
+        <label for="fdevret">Fecha de Retorno</label>
       </div>
     </div>
-    <hr>
-
     <div class="row">
-      <div class="input-field col s0">
+      <div class="input-field col s6">
+        <textarea placeholder="" name="devcomentario" class="materialize-textarea" length="200" maxlength="200"></textarea>
+        <label for="devcomentario">COMENTARIO</label>
+      </div>
+      <div class="input-field col" style="margin-top:50px">
         <button type="button" style="border:none;font-weight:bold;" class="transparent btndetherracompletas" value=""><small>Detalle Completo</small></button>
       </div>
-      <div class="input-field col s2" style="margin-left:800px;">
+      <div class="input-field col s4" style="margin-top:50px">
         <button type="button" name="saveguiadev" class="btn waves-effect teal lighten-1 saveguiadev">
         <i class="fa fa-floppy-o"></i>
-        <span><strong>GUARDAR DATOS</strong></span>
+        <span><strong>GENERAR GUIA DEVOLUCION</strong></span>
         </button>
       </div>
     </div>
+    <hr>
     <div style="overflow-y:scroll;height:350px">
       <table class="table table-condensed responsive-table highlight table-herradev " id="table-herradev">
           <thead class="cab">

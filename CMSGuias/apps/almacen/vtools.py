@@ -22,6 +22,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from xlrd import open_workbook, XL_CELL_EMPTY
+from openpyxl import load_workbook
 
 
 from CMSGuias.apps.home.models import *
@@ -56,10 +57,11 @@ class Herramienta(JSONResponseMixin, TemplateView):
                 if 'getherra' in request.GET:
                     lherra=[]
                     tipolist=request.GET.get('tipolist')
+                    conta=0
                     if tipolist=='all':
                         for x in InventarioHerra.objects.filter(
                             herramienta__tipo=request.GET.get('tipoacce'),
-                            flag=True).order_by('herramienta__matnom'):
+                            flag=True).order_by('herramienta__matnom')[:50]:
                             lherra.append({
                                 'codherra':x.herramienta.materiales_id,
                                 'nameherra':x.herramienta.matnom,
@@ -68,10 +70,11 @@ class Herramienta(JSONResponseMixin, TemplateView):
                                 'brand':x.marca.brand,
                                 'codunid':x.herramienta.unidad.unidad_id,
                                 'tvida':x.tvida,
+                                'conta':conta,
                                 'unid':x.herramienta.unidad.uninom
                                 })
-
-                        context['lherra']=lherra[:50]
+                            conta=conta+1
+                        context['lherra']=lherra
                     else:
                         for x in InventarioHerra.objects.filter(
                             Q(herramienta__materiales_id=request.GET.get('texto')) | Q(herramienta__matnom__icontains=request.GET.get('texto')),
@@ -85,9 +88,38 @@ class Herramienta(JSONResponseMixin, TemplateView):
                                 'brand':x.marca.brand,
                                 'codunid':x.herramienta.unidad.unidad_id,
                                 'tvida':x.tvida,
+                                'conta':conta,
                                 'unid':x.herramienta.unidad.uninom
                                 })
+                            conta=conta+1
                         context['lherra']=lherra
+                    context['status']=True
+
+                if 'usedherra' in request.GET:
+                    lcodsherra=json.loads(request.GET.get('lcodsherra'))
+                    lcodsused=[]
+                    lcodnotused=[]
+                    for y in lcodsherra:
+                        herra = detGuiaHerramienta.objects.filter(
+                            herramienta_id=y['codherra'],
+                            brand_id=y['codbr']).exists()
+
+                        herradev = detDevHerramienta.objects.filter(
+                            herramienta_id=y['codherra'],
+                            brand_id=y['codbr']).exists()
+
+                        if herra | herradev:
+                            lcodsused.append({
+                                'codherra':y['codherra'],
+                                'codbr':y['codbr']
+                                })
+                        else:
+                            lcodnotused.append({
+                                'codherra':y['codherra'],
+                                'codbr':y['codbr']
+                                })
+                    context['lcodsused']=lcodsused
+                    context['lcodnotused'] = lcodnotused
                     context['status']=True
 
             except ObjectDoesNotExist, e:
@@ -163,6 +195,19 @@ class Herramienta(JSONResponseMixin, TemplateView):
                         eherra.save()
                         context['status'] = True
 
+                    if 'delherramienta' in request.POST:
+                        lcodnotused=json.loads(request.POST.get('lcodnotused'))
+
+                        for x in lcodnotused:
+                            InventarioHerra.objects.get(
+                                herramienta_id=x['codherra'],
+                                marca_id=x['codbr']).delete()
+
+                        for y in lcodnotused:
+                            Materiale.objects.get(
+                                materiales_id=y['codherra']).delete()
+                        context['status']=True
+
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
@@ -173,6 +218,13 @@ class Herramienta(JSONResponseMixin, TemplateView):
 class Guia(JSONResponseMixin, TemplateView):
     @method_decorator(login_required)
     def get(self,request,*args,**kwargs):
+        if 'downxlshe' in request.GET:
+            file_path = '{}/formats/{}'.format(settings.STATIC_ROOT, "FI_DETALLE_HE_Y_EPPS.xlsx")
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type='application/vnd.ms-excel;charset=utf-16')
+                response['Content-Disposition'] = 'inline; filename=FI_DETALLE_HE_Y_EPPS.xlsx'
+            return response
+
         context = dict();
         if request.is_ajax():
             try:
@@ -181,7 +233,8 @@ class Guia(JSONResponseMixin, TemplateView):
                     arrherradev = []
                     count = 0
                     for x in detGuiaHerramienta.objects.filter(
-                        guia_id=request.GET.get('nguia'),flagdev=False):
+                        guia_id=request.GET.get('nguia'),
+                        flagdev=False).order_by('herramienta__matnom'):
                         arrherradev.append(
                             {'nguia': x.guia_id,
                             'codherra':x.herramienta_id,
@@ -223,7 +276,7 @@ class Guia(JSONResponseMixin, TemplateView):
                 if 'ldetherraguia' in request.GET:
                     lisherraguia = []
                     for x in detGuiaHerramienta.objects.filter(
-                        guia_id=request.GET.get('idherraguia')):
+                        guia_id=request.GET.get('idherraguia')).order_by('herramienta__matnom'):
                         lisherraguia.append(
                             {'id': x.id,
                             'codguia' : x.guia_id,
@@ -248,7 +301,7 @@ class Guia(JSONResponseMixin, TemplateView):
                     for x in lis:
                         k = 0
                         for x in detGuiaHerramienta.objects.filter(
-                            guia_id=lis[j]):
+                            guia_id=lis[j]).order_by('herramienta__matnom'):
                             li.append({
                                 'nameherra':x.herramienta.nombre,
                                 'medherra':x.herramienta.medida,
@@ -266,7 +319,7 @@ class Guia(JSONResponseMixin, TemplateView):
                     i = 1
                     for x in detGuiaHerramienta.objects.filter(
                         guia_id=request.GET.get('idherraguia'),
-                        flagdev=False):
+                        flagdev=False).order_by('herramienta__matnom'):
                         lisherraguia.append(
                             {'id': x.id,
                             'codguia' : x.guia_id,
@@ -313,13 +366,28 @@ class Guia(JSONResponseMixin, TemplateView):
                         for x in GuiaHerramienta.objects.filter(
                             tipo=request.GET.get('tipoacce'),
                             estado=request.GET.get('estadoguiaherra')).order_by('-registro'):
+                            if x.proyecto_id==None:
+                                codproy=""
+                                nameproy=""
+                                apesuperv=""
+                                namesuperv=""
+                                direcproy=""
+                                rzcliente=""
+                            else:
+                                codproy=x.proyecto_id
+                                nameproy=x.proyecto.nompro
+                                apesuperv=x.proyecto.empdni.lastname
+                                namesuperv=x.proyecto.empdni.firstname
+                                direcproy=x.proyecto.direccion
+                                rzcliente=x.proyecto.ruccliente.razonsocial
+
                             lguiasherra.append({
                                 'numguiaherra':x.guia_id,
-                                'codproy':x.proyecto_id,
-                                'nameproy':x.proyecto.nompro,
+                                'codproy':codproy,
+                                'nameproy':nameproy,
                                 'fsalida':x.fechsalida,
-                                'apesuperv':x.proyecto.empdni.lastname,
-                                'namesuperv':x.proyecto.empdni.firstname,
+                                'apesuperv':apesuperv,
+                                'namesuperv':namesuperv,
                                 'codtransporte':x.traruc_id,
                                 'transporte':x.traruc.tranom,
                                 'codconductor':x.condni_id,
@@ -327,8 +395,8 @@ class Guia(JSONResponseMixin, TemplateView):
                                 'codplaca':x.nropla_id,
                                 'comentario':x.comentario,
                                 'marcatransporte':x.nropla.marca,
-                                'direcproy':x.proyecto.direccion,
-                                'rzcliente':x.proyecto.ruccliente.razonsocial
+                                'direcproy':direcproy,
+                                'rzcliente':rzcliente
                                 })
                         context['lguiasherra']=lguiasherra[:50]
                     elif tipolist=='rangofecha':
@@ -336,13 +404,27 @@ class Guia(JSONResponseMixin, TemplateView):
                             tipo=request.GET.get('tipoacce'),
                             fechsalida__range=[request.GET.get('fechfrom'),request.GET.get('fechto')],
                             estado=request.GET.get('estadoguiaherra')).order_by('-registro'):
+                            if x.proyecto_id==None:
+                                codproy=""
+                                nameproy=""
+                                apesuperv=""
+                                namesuperv=""
+                                direcproy=""
+                                rzcliente=""
+                            else:
+                                codproy=x.proyecto_id
+                                nameproy=x.proyecto.nompro
+                                apesuperv=x.proyecto.empdni.lastname
+                                namesuperv=x.proyecto.empdni.firstname
+                                direcproy=x.proyecto.direccion
+                                rzcliente=x.proyecto.ruccliente.razonsocial
                             lguiasherra.append({
                                 'numguiaherra':x.guia_id,
-                                'codproy':x.proyecto_id,
-                                'nameproy':x.proyecto.nompro,
+                                'codproy':codproy,
+                                'nameproy':nameproy,
                                 'fsalida':x.fechsalida,
-                                'apesuperv':x.proyecto.empdni.lastname,
-                                'namesuperv':x.proyecto.empdni.firstname,
+                                'apesuperv':apesuperv,
+                                'namesuperv':namesuperv,
                                 'codtransporte':x.traruc_id,
                                 'transporte':x.traruc.tranom,
                                 'codconductor':x.condni_id,
@@ -350,8 +432,8 @@ class Guia(JSONResponseMixin, TemplateView):
                                 'codplaca':x.nropla_id,
                                 'comentario':x.comentario,
                                 'marcatransporte':x.nropla.marca,
-                                'direcproy':x.proyecto.direccion,
-                                'rzcliente':x.proyecto.ruccliente.razonsocial
+                                'direcproy':direcproy,
+                                'rzcliente':rzcliente
                                 })
                         context['lguiasherra']=lguiasherra
                     else:
@@ -359,13 +441,27 @@ class Guia(JSONResponseMixin, TemplateView):
                             Q(guia_id__icontains=request.GET.get('texto')) | Q(proyecto_id=request.GET.get('texto')),
                             tipo=request.GET.get('tipoacce'),
                             estado=request.GET.get('estadoguiaherra')).order_by('-registro'):
+                            if x.proyecto_id==None:
+                                codproy=""
+                                nameproy=""
+                                apesuperv=""
+                                namesuperv=""
+                                direcproy=""
+                                rzcliente=""
+                            else:
+                                codproy=x.proyecto_id
+                                nameproy=x.proyecto.nompro
+                                apesuperv=x.proyecto.empdni.lastname
+                                namesuperv=x.proyecto.empdni.firstname
+                                direcproy=x.proyecto.direccion
+                                rzcliente=x.proyecto.ruccliente.razonsocial
                             lguiasherra.append({
                                 'numguiaherra':x.guia_id,
-                                'codproy':x.proyecto_id,
-                                'nameproy':x.proyecto.nompro,
+                                'codproy':codproy,
+                                'nameproy':nameproy,
                                 'fsalida':x.fechsalida,
-                                'apesuperv':x.proyecto.empdni.lastname,
-                                'namesuperv':x.proyecto.empdni.firstname,
+                                'apesuperv':apesuperv,
+                                'namesuperv':namesuperv,
                                 'codtransporte':x.traruc_id,
                                 'transporte':x.traruc.tranom,
                                 'codconductor':x.condni_id,
@@ -373,8 +469,8 @@ class Guia(JSONResponseMixin, TemplateView):
                                 'codplaca':x.nropla_id,
                                 'comentario':x.comentario,
                                 'marcatransporte':x.nropla.marca,
-                                'direcproy':x.proyecto.direccion,
-                                'rzcliente':x.proyecto.ruccliente.razonsocial
+                                'direcproy':direcproy,
+                                'rzcliente':rzcliente
                                 })
 
                         context['lguiasherra']=lguiasherra
@@ -597,20 +693,28 @@ class Guia(JSONResponseMixin, TemplateView):
                     context['status']=True
 
                 if 'getlastguiama' in request.GET:
-                    cguia=genkeys.GenerateIdGuiaHerra('002')
-                    context['cguia']=cguia[4:12]
+                    cguia=genkeys.GetLastIdGuiaHerra()
+                    context['cguia']=cguia
                     context['status']=True
 
                 if 'lproyguia' in request.GET:
                     listproyguia=[]
                     for x in GuiaHerramienta.objects.filter(
                         tipo=request.GET.get('tipoacce')).distinct('proyecto__proyecto_id').order_by('proyecto__proyecto_id'):
+                        if x.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                        else:
+                            codproy=x.proyecto_id
+                            nameproy=x.proyecto.nompro
+
                         listproyguia.append({
-                            'codproy':x.proyecto.proyecto_id,
-                            'nameproy':x.proyecto.nompro
+                            'codproy':codproy,
+                            'nameproy':nameproy
                             })
                     context['listproyguia']=listproyguia
                     context['status']=True
+
                 if 'getemple' in request.GET:
                     emple='%s, %s' % (request.user.get_profile().empdni.lastname,
                                       request.user.get_profile().empdni.firstname)
@@ -661,6 +765,60 @@ class Guia(JSONResponseMixin, TemplateView):
             context = dict()
             if request.is_ajax():
                 try:
+
+                    if 'listhexls' in request.POST:
+
+                        arch = request.FILES['archivo']
+                        filename = uploadFiles.upload('/storage/temporary/', arch)
+                        book = load_workbook(filename, data_only=True)
+                        sheet = book['REQUERIMIENTO DE HERRAMIENTAS']
+
+                        lheexcel=[]
+                        for m in range(7, sheet.max_row):
+                            item = sheet.cell(row=m,column=1).value
+                            codhe = sheet.cell(row=m, column=2).value
+                            codbr = sheet.cell(row=m, column=4).value
+                            cant = sheet.cell(row=m, column=7).value
+                            grupo = sheet.cell(row=m, column=8).value
+                            estado = sheet.cell(row=m, column=9).value
+                            fdev = sheet.cell(row=m, column=10).value
+                            coment = sheet.cell(row=m, column=11).value
+
+                            if codhe!= None:
+
+                                if grupo == None:
+                                    grupo = ""
+
+                                if coment == None:
+                                    coment = ""
+
+                                if estado == None:
+                                    estado = 'ALMACEN'
+
+                                if estado == 'ALQUILER':
+                                    if fdev == None:
+                                        mens ="INGRESAR FECHA DE DEVOLUCION EN ITEM "+str(item)
+                                        context['mens']=mens
+                                        context['status']=False
+
+                                if fdev == None:
+                                    fdev = ""
+
+                                lheexcel.append({
+                                    'xlsitem':item,
+                                    'xlscodhe':codhe,
+                                    'xlsbrand':codbr,
+                                    'xlscantidad':cant,
+                                    'xlsgrupo':grupo,
+                                    'xlsestado':estado,
+                                    'xlsfdev':fdev,
+                                    'xlscoment':coment
+                                    })
+                        context['mens']=""
+                        context['lheexcel']=lheexcel
+                        context['status']=True
+
+
                     if 'exists' in request.POST:
                         print request.POST.get('numguia')
                         try:
@@ -701,16 +859,8 @@ class Guia(JSONResponseMixin, TemplateView):
 
 
                     if 'savecabguia' in request.POST:
-                        cguia=genkeys.GenerateIdGuiaHerra('001')
-                        codguia=''
                         linventrest=json.loads(request.POST.get('linventrest'))
-
-                        tipocod=request.POST.get('tipocod')
-                        if tipocod=='auto':
-                            codguia=cguia
-                        else:
-                            codguia=request.POST.get('codguia')
-
+                        codguia=request.POST.get('codguia')
                         GuiaHerramienta.objects.create(
                             guia_id=codguia,
                             proyecto_id=request.POST.get('codproy'),
@@ -826,12 +976,6 @@ class Guia(JSONResponseMixin, TemplateView):
                         context['status'] = True
 
 
-                        det = request.POST.getlist('lthg[]')
-                        print 'nvale'
-                        print det
-                        context['status'] = True
-
-
                     if 'eddetguia' in request.POST:
                         detguia = detGuiaHerramienta.objects.get(
                             id=request.POST.get('idtable')
@@ -901,13 +1045,8 @@ class Guia(JSONResponseMixin, TemplateView):
                     if 'updcreategdev' in request.POST:
                         linv=json.loads(request.POST.get('linv'))
                         ldetghe=json.loads(request.POST.get('ldetghe'))
-                        cguia=genkeys.GenerateIdGuiaHerra('001')
-                        tipocod=request.POST.get('tipocod')
+                        numguia=request.POST.get('numguia')
 
-                        if tipocod=='auto':
-                            numguia=cguia
-                        else:
-                            numguia=request.POST.get('numguiatot')
 
                         devolucionHerra.objects.create(
                             docdev_id=numguia,
@@ -916,7 +1055,8 @@ class Guia(JSONResponseMixin, TemplateView):
                             empdni_id=request.user.get_profile().empdni_id,
                             condni_id=request.POST.get('codcond'),
                             nropla_id=request.POST.get('codplaca'),
-                            traruc_id=request.POST.get('transp')
+                            traruc_id=request.POST.get('transp'),
+                            comentario=request.POST.get('coment'),
                             )
 
                         for x in linv:
@@ -939,6 +1079,8 @@ class Guia(JSONResponseMixin, TemplateView):
                                 cantidad=x['inputcant'],
                                 estado=x['estado'],
                                 comentario=x['comenthe'])
+
+                        context['status']=True
 
                         context['status']=True
 
@@ -978,6 +1120,54 @@ class Guia(JSONResponseMixin, TemplateView):
                             except GuiaHerramienta.DoesNotExist, e:
                                 context['status'] = False
 
+                    if 'exherra' in request.POST:
+                        lhepermit=[]
+                        lhenotpermit=[]
+                        lheexcel=json.loads(request.POST.get('lheexcel'))
+                        tipoacce=request.POST.get('tipoacce')
+                        for x in lheexcel:
+                            try:
+                                InventarioHerra.objects.get(
+                                    herramienta_id=x['xlscodhe'],
+                                    herramienta__tipo=tipoacce)
+
+                                he = InventarioHerra.objects.get(
+                                    herramienta_id=x['xlscodhe'],
+                                    herramienta__tipo=tipoacce)
+
+                                if float(x['xlscantidad']) > float(he.cantalmacen):
+
+                                    lhenotpermit.append({
+                                        'xlscodhe':x['xlscodhe'],
+                                        'error':'No hay stock disponible'
+                                        })
+                                else:
+
+                                    lhepermit.append({
+                                        'codherra':x['xlscodhe'],
+                                        'brandherra':he.marca.brand,
+                                        'cantidad':x['xlscantidad'],
+                                        'codbrherra':he.marca_id,
+                                        'coment':x['xlscoment'],
+                                        'descgeneral':x['xlsgrupo'],
+                                        'estado':x['xlsestado'],
+                                        'fdev':x['xlsfdev'],
+                                        'medherra':he.herramienta.matmed,
+                                        'nameherra':he.herramienta.matnom
+                                        })
+
+                            except InventarioHerra.DoesNotExist, e:
+                                lhenotpermit.append({
+                                    'xlscodhe':x['xlscodhe'],
+                                    'error':'No existe en la base'
+                                    })
+
+                        print 'lhenotpermit', lhenotpermit
+                        print 'lhepermit', lhepermit
+                        context['lhenotpermit'] = lhenotpermit
+                        context['lhepermit'] = lhepermit
+                        context['status']=True
+
 
                 except Exception, e:
                     context['raise'] = str(e)
@@ -985,6 +1175,7 @@ class Guia(JSONResponseMixin, TemplateView):
                 return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
+
 
 datenow=globalVariable.date_now('datetime')
 class Inventario(JSONResponseMixin, TemplateView):
@@ -1056,21 +1247,23 @@ class Inventario(JSONResponseMixin, TemplateView):
                     tipolist=request.GET.get('tipolist')
                     print 'tipolist', tipolist
                     if tipolist=='all':
-                        print 'alll'
                         for x in InventarioHerra.objects.filter(
                             herramienta__tipo=request.GET.get('tipoacce'),
                             flag=True).order_by('herramienta__matnom'):
-                            linvent.append({
-                                'codherra':x.herramienta.materiales_id,
-                                'nameherra':x.herramienta.matnom,
-                                'medherra':x.herramienta.matmed,
-                                'codbr':x.marca.brand_id,
-                                'lastprice':x.price,
-                                'areaemple':True if areaemple=="ADMINISTRATOR" else False,
-                                'unid':x.herramienta.unidad.uninom,
-                                'brand':x.marca.brand,
-                                'cantalmacen':x.cantalmacen
-                                })
+
+                            if x.cantalmacen > 0:
+                                linvent.append({
+                                    'codherra':x.herramienta.materiales_id,
+                                    'nameherra':x.herramienta.matnom,
+                                    'medherra':x.herramienta.matmed,
+                                    'codbr':x.marca.brand_id,
+                                    'lastprice':x.price,
+                                    'areaemple':True if areaemple=="ADMINISTRATOR" else False,
+                                    'unid':x.herramienta.unidad.uninom,
+                                    'brand':x.marca.brand,
+                                    'codmoneda':x.moneda_id,
+                                    'cantalmacen':x.cantalmacen
+                                    })
                         context['linvent']=linvent[:50]
                     else:
                         for x in InventarioHerra.objects.filter(
@@ -1084,9 +1277,10 @@ class Inventario(JSONResponseMixin, TemplateView):
                                 'medherra':x.herramienta.matmed,
                                 'codbr':x.marca.brand_id,
                                 'lastprice':x.price,
-                                'areaemple':areaemple,
+                                'areaemple':True if areaemple=="ADMINISTRATOR" else False,
                                 'unid':x.herramienta.unidad.uninom,
                                 'brand':x.marca.brand,
+                                'codmoneda':x.moneda_id,
                                 'cantalmacen':x.cantalmacen,
                                 })
                         context['linvent']=linvent
@@ -1137,6 +1331,7 @@ class Inventario(JSONResponseMixin, TemplateView):
 
 
 class Devolucion(JSONResponseMixin, TemplateView):
+
     @method_decorator(login_required)
     def get(self,request,*args,**kwargs):
         context = dict();
@@ -1166,13 +1361,23 @@ class Devolucion(JSONResponseMixin, TemplateView):
                     for x in GuiaHerramienta.objects.filter(
                         tipo=request.GET.get('tipoacce'),
                         estado='DEVCOMP'):
+                        if x.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                            lastnamesup=""
+                            firstnamesup=""
+                        else:
+                            codproy=x.proyecto_id
+                            nameproy=x.proyecto.nompro
+                            lastnamesup=x.proyecto.empdni.lastname
+                            firstnamesup=x.proyecto.empdni.firstname
                         lgcomp.append({
-                            'codproy':x.proyecto_id,
-                            'nameproy':x.proyecto.nompro,
+                            'codproy':codproy,
+                            'nameproy':nameproy,
                             'codguia':x.guia_id,
                             'fsalida':x.fechsalida,
-                            'lastnamesup':x.proyecto.empdni.lastname,
-                            'firstnamesup':x.proyecto.empdni.firstname
+                            'lastnamesup':lastnamesup,
+                            'firstnamesup':firstnamesup
                             })
                     context['lgcomp']=lgcomp
                     context['status']=True
@@ -1241,8 +1446,11 @@ class Consulta(JSONResponseMixin, TemplateView):
                 if 'ldetcons' in request.GET:
                     arrdetcons = []
                     count = 1
+                    codproy=request.GET.get('numproy')
+                    if codproy=="":
+                        codproy=None
                     for x in detGuiaHerramienta.objects.filter(
-                        guia__proyecto_id=request.GET.get('numproy'),
+                        guia__proyecto_id=codproy,
                         herramienta_id = request.GET.get('idherramienta'),
                         guia__estado='GE'):
                         arrdetcons.append(
@@ -1268,9 +1476,16 @@ class Consulta(JSONResponseMixin, TemplateView):
                     for x in detGuiaHerramienta.objects.filter(
                         herramienta_id=request.GET.get('codigoherra'),
                         guia__estado = 'GE'):
+                        if x.guia.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                        else:
+                            codproy=x.guia.proyecto_id
+                            nameproy=x.guia.proyecto.nompro
+
                         lish.append(
-                            {'proyc':x.guia.proyecto.proyecto_id,
-                            'proynom':x.guia.proyecto.nompro,
+                            {'proyc':codproy,
+                            'proynom':nameproy,
                             'fsalid':x.guia.fechsalida,
                             'guiacod':x.guia.guia_id,
                             'conta':count,
@@ -1283,8 +1498,12 @@ class Consulta(JSONResponseMixin, TemplateView):
                 if 'lproyherra' in request.GET:
                     lisherra = []
                     count = 1;
+                    codproy = request.GET.get('codigoproy')
+                    if codproy=="":
+                        codproy=None
+
                     for x in detGuiaHerramienta.objects.filter(
-                        guia__proyecto_id=request.GET.get('codigoproy'),
+                        guia__proyecto_id=codproy,
                         guia__tipo=request.GET.get('tipoacce'),
                         guia__estado = 'GE').order_by('herramienta__matnom'):
 
@@ -1334,9 +1553,17 @@ class Consulta(JSONResponseMixin, TemplateView):
                     for x in GuiaHerramienta.objects.filter(
                         tipo=request.GET.get('tipoacce'),
                         estado='GE').distinct('proyecto__proyecto_id').order_by('proyecto__proyecto_id'):
+
+                        if x.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                        else:
+                            codproy=x.proyecto_id
+                            nameproy=x.proyecto.nompro
+
                         lprocons.append({
-                            'codproy':x.proyecto.proyecto_id,
-                            'nameproy':x.proyecto.nompro
+                            'codproy':codproy,
+                            'nameproy':nameproy
                             })
                     context['lprocons']=lprocons
                     context['status']=True
@@ -1389,7 +1616,9 @@ class EstadoHerramienta(JSONResponseMixin, TemplateView):
                     for x in detDevHerramienta.objects.filter(
                         guia__tipo=request.GET.get('tipoacce'),
                         estado=request.GET.get('estmat'),
-                        docdev__estado = 'GE').distinct('herramienta__matnom','herramienta__matmed').order_by('herramienta__matmed'):
+                        docdev__estado = 'GE').distinct(
+                            'herramienta__matnom',
+                            'herramienta__matmed').order_by('herramienta__matmed'):
                         lestalmacen.append(
                             {'codherra':x.herramienta_id,
                             'nameherra':x.herramienta.matnom,
@@ -1414,17 +1643,24 @@ class EstadoHerramienta(JSONResponseMixin, TemplateView):
                             day = x.fechdevolucion - x.guia.fechsalida
                             dayf = day.days
 
+                        if x.guia.proyecto_id==None:
+                            codproy = ""
+                            nameproy = ""
+                        else:
+                            codproy = x.guia.proyecto_id
+                            nameproy = x.guia.proyecto.nompro
+
                         lestalmacen.append(
-                            {'fechsalida':x.guia.fechsalida,
-                            'fechdev':x.fechdevolucion,
-                            'codproy':x.guia.proyecto.proyecto_id,
-                            'nompro':x.guia.proyecto.nompro,
-                            'numguia':x.guia_id,
-                            'dias':dayf,
-                            'count':count,
-                            'cantidad':x.cantidad,
-                            'comentario':x.comentario}
-                            )
+                                {'fechsalida':x.guia.fechsalida,
+                                'fechdev':x.fechdevolucion,
+                                'codproy':codproy,
+                                'nompro':nameproy,
+                                'numguia':x.guia_id,
+                                'dias':dayf,
+                                'count':count,
+                                'cantidad':x.cantidad,
+                                'comentario':x.comentario}
+                                )
                         count = count + 1;
                         context['lestalmacen'] = lestalmacen
                     context['status'] = True
@@ -1436,11 +1672,16 @@ class EstadoHerramienta(JSONResponseMixin, TemplateView):
                         herramienta_id=request.GET.get('codhe'),
                         estado=request.GET.get('idestado'),
                         docdev__estado = 'GE').order_by('herramienta__matnom'):
+                        if x.guia.proyecto_id==None:
+                            nameproy = ""
+                        else:
+                            nameproy = x.guia.proyecto.nompro
+
                         lestrepar.append(
                             {'fechsalida':x.guia.fechsalida,
                             'registro':x.docdev.registro,
                             'fechretorno':x.docdev.fechretorno,
-                            'nompro':x.guia.proyecto.nompro,
+                            'nompro':nameproy,
                             'numguia':x.guia_id,
                             'count':count,
                             'cantidad':x.cantidad,
@@ -1486,6 +1727,13 @@ class Trasladohe(JSONResponseMixin, TemplateView):
                         herramienta_id=request.GET.get('txtcodherra'),
                         guia__estado='GE',
                         flagdev=False).order_by('herramienta__matnom'):
+                        if x.guia.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                        else:
+                            codproy=x.guia.proyecto_id
+                            nameproy=x.guia.proyecto.nompro
+
                         ltrherra.append({
                             'codguia':x.guia_id,
                             'codherra':x.herramienta.materiales_id,
@@ -1498,8 +1746,8 @@ class Trasladohe(JSONResponseMixin, TemplateView):
                             'cantdev':x.cantdev,
                             'conta':conta,
                             'estadohe':x.estado,
-                            'codproy':x.guia.proyecto.proyecto_id,
-                            'nameproy':x.guia.proyecto.nompro
+                            'codproy':codproy,
+                            'nameproy':nameproy
                             })
                         conta=conta+1
                     context['ltrherra']=ltrherra
@@ -1580,16 +1828,9 @@ class Trasladohe(JSONResponseMixin, TemplateView):
             if request.is_ajax():
                 try:
                     if 'savetraslado' in request.POST:
-                        codauto=request.POST.get('codauto')
-                        codigo=''
-                        if codauto=='true':
-                            codigo=genkeys.GenerateIdGuiaHerra('001')
-                        else:
-                            codigo=request.POST.get('numguiatr')
-
                         sumdettras=json.loads(request.POST.get('sumdettras'))
                         ltrdghe=json.loads(request.POST.get('ltrdghe'))
-
+                        codigo = request.POST.get('numguiatr')
                         GuiaHerramienta.objects.create(
                             guia_id=codigo,
                             proyecto_id=request.POST.get('codproydest'),
@@ -1612,8 +1853,8 @@ class Trasladohe(JSONResponseMixin, TemplateView):
                                 fechdevolucion=None if x['fdev']=="" else x['fdev'],
                                 cantidad=x['cantidad'],
                                 comentario=x['comenthe'],
-                                cantinicial=x['cantidad'],
-                                grupo='')
+                                grupo='',
+                                cantinicial=x['cantidad'])
 
                         for y in ltrdghe:
                             upd=detGuiaHerramienta.objects.get(
@@ -1686,16 +1927,31 @@ class NotaIngreso(JSONResponseMixin, TemplateView):
                         Q(flag='0')|Q(flag='1'),
                         compra_id=request.GET.get('codcompra')
                         ).order_by('materiales__matnom'):
-                        uni = x.unit_id
+                        unidcompra= x.unit_id
+                        unidmat=x.materiales.unidad_id
+                        nameunidmat=x.materiales.unidad.uninom
+
+                        if unidcompra == None:
+                            unidad = nameunidmat
+                        else:
+                            unidad = x.unit.uninom
+
+                        if unidad == unidmat:
+                            sameunit = True
+                            printrow = False
+                        else:
+                            sameunit = False
+                            printrow = True
+
                         ldetcomp.append({
                             'idtabdetcompra':x.id,
                             'codmat':x.materiales.materiales_id,
                             'namemat':x.materiales.matnom,
                             'medmat':x.materiales.matmed,
                             'uninomhe':x.materiales.unidad.uninom,
-                            'unidad':x.materiales.unidad.uninom if uni==None else x.unit.uninom,
-                            'sameunit':True if uni==None else False,
-                            'printrow':False if uni==None else True,
+                            'unidad': unidad,
+                            'sameunit': sameunit,
+                            'printrow': printrow,
                             'codbrand':x.brand_id,
                             'brand':x.brand.brand,
                             'conta':conta,
@@ -1791,6 +2047,7 @@ class Cargar(JSONResponseMixin, TemplateView):
     def get(self,request,*args,**kwargs):
         if 'descformat' in request.GET:
             file_path = '{}/formats/{}'.format(settings.STATIC_ROOT, "FI_HERRAMIENTAS_Y_EPPS.xls")
+            print 'filepath',file_path
             with open(file_path, 'rb') as fh:
                 response = HttpResponse(fh.read(), content_type='application/vnd.ms-excel;charset=utf-16')
                 response['Content-Disposition'] = 'inline; filename=FI_HERRAMIENTAS_Y_EPPS.xls'

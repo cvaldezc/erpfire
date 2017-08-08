@@ -214,28 +214,15 @@
     </div>
     <hr>
     <div class="row">
-      <div class="input-field col" style="margin-top:25px">
-        <h6 style="font-weight:bold">Codigo: </h6>
-      </div>
-      <div class="input-field col s4">
-        <input onclick="javascript:viewtrcodguia();" name="stguiatr" type="radio" id="radiomanual"/>
-        <label for="radiomanual" style="font-size:15px;font-weight:bold;color:black;">Manual</label>
-        <input onclick="javascript:viewtrcodguia();" name="stguiatr" type="radio" id="radioauto" class="rexamen"/>
-        <label for="radioauto" style="font-size:15px;font-weight:bold;color:black;">Autogenerado</label>
-      </div>
-      <div class="input-field col s2" id="divtrserieguia">
-        <input type="text" placeholder="" class="trserieguia" readonly>
-        <label for="trserieguia">SERIE</label>
-      </div>
       <div class="input-field col s4" id="divtrcodguia">
-        <input type="text" placeholder="" class="trcodguia" maxlength="8" length="8">
+        <input type="text" placeholder="" class="trcodguia" maxlength="12" length="12">
         <label for="trcodguia">NUMERO DE GUIA</label>
       </div>
     </div>
-    <div class="row" style="margin-bottom:50px">
+    <div class="row" style="margin-bottom:30px">
       <div class="input-field col s6">
         <select id="trcboproyecto" class="browser-default trcboproyecto">
-          <option value=""></option>
+          <option value="">Seleccionar una opcion</option>
           {% for x in trlproyecto %}
             <option value="{{ x.proyecto_id }}">{{ x.proyecto_id }} {{ x.nompro }}</option>
           {% endfor %}
@@ -253,7 +240,7 @@
       </div>
     </div>
 
-    <div class="row" style="margin-bottom:50px;">
+    <div class="row" style="margin-bottom:30px;">
       <div class="input-field col s6">
         <select id="trcbotransp" class="browser-default trcbotransp">
         <option value=""></option>
@@ -268,7 +255,7 @@
         <h6 for="trcbocond" style="margin-top:-45px;color:#0091ea">Conductor</h6>
       </div>
     </div>
-    <div class="row" style="margin-bottom:50px">
+    <div class="row" style="margin-bottom:30px">
       <div class="input-field col s6">
         <select id="trcboplaca" class="browser-default trcboplaca"></select>
         <h6 for="trcboplaca" style="margin-top:-45px;color:#0091ea">Placa</h6>
@@ -313,10 +300,6 @@
     </div>
   </div>
 </div>
-
-<!--utils -->
-<input type="hidden" name="hreport" value="{{ hreport }}">
-<input type="hidden" name="ruc" value="{{ ruc }}">
 
 {% csrf_token %}
 

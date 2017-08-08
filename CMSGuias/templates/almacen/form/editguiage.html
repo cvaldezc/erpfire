@@ -4,59 +4,58 @@
 
 <div class="modal editguiage" >
     <div class="modal-content">
+
     <div class="row">
-      <div class="input-field col s4" readonly>
+      <div class="input-field col s6" readonly>
         <input readonly placeholder="" type="text" class="editgenumguia">
         <label for="editgenumguia" >NUMERO DE GUIA</label>
       </div>
-      <div class="input-field col s0">
-        <p>Proyecto:</p>
-      </div>
+
       <div class="input-field col s6" style="margin-top:30px;">
         <select id="cboeditgeproy" class="browser-default">
+          <option value="">Sin Proyecto</option>
             {% for x in lproyectos %}
           <option value="{{ x.proyecto_id }}">{{ x.proyecto_id }} {{ x.nompro }}</option>
             {% endfor %}
         </select>
+        <h6 for="cboeditgeproy" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">PROYECTO</h6>
       </div>
+
     </div>
     <div class="row">
-      <div class="input-field col s0">
-        <p>Transportista:</p>
-      </div>
-      <div class="input-field col s2" style="margin-top:25px">
+
+      <div class="input-field col s3">
         <select id="cboeditgetransp" class="browser-default">
         {% for x in ltransportista %}
           <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
         {% endfor %}
         </select>
+        <h6 for="cboeditgetransp" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">TRANSPORTISTA</h6>
       </div>
-      <div class="input-field col s0">
-        <p>Conductor:</p>
-      </div>
-      <div class="input-field col s2" style="margin-top:25px">
+
+      <div class="input-field col s3">
         <select id="cboeditgecond" class="browser-default">
         {% for x in lconductor %}
           <option value="{{ x.condni_id }}">{{ x.connom }}</option>
         {% endfor %}
         </select>
+        <h6 for="cboeditgecond" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">CONDUCTOR</h6>
       </div>
-      <div class="input-field col s0">
-        <p>Placa:</p>
-      </div>
-      <div class="input-field col s2" style="margin-top:25px">
+
+      <div class="input-field col s3">
         <select id="cboeditgeplaca" class="browser-default">
         {% for x in ltransporte %}
           <option value="{{ x.nropla_id }}">{{ x.nropla_id }} {{ x.marca }}</option>
         {% endfor %}
         </select>
+        <h6 for="cboeditgeplaca" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">PLACA</h6>
       </div>
-        <div class="input-field col s2">
-          <input placeholder="" type="date" name="fsaleditge" class="picker fsaleditge">
-          <label for="fsaleditge">Fecha de Salida</label>
-        </div>
+      <div class="input-field col s3">
+        <input placeholder="" type="date" name="fsaleditge" class="picker fsaleditge">
+        <label for="fsaleditge">Fecha de Salida</label>
+      </div>
     </div>
-    <div class="row">
+    <div class="row" style="margin-top:60px">
         <div class="input-field col s6">
           <textarea placeholder="" name="txtcomeditge" class="materialize-textarea txtcomeditge" maxlength="200" length="200"></textarea>
           <label for="txtcomeditge">COMENTARIO</label>

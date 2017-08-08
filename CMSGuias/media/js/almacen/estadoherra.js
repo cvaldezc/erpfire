@@ -71,12 +71,10 @@ detestalmacen = function(){
 	idest = $("select[id=comboestadherra]").val();
 	console.log(idest)
 	if (idest == "ALQUILER" || idest == "ALMACEN") {
-		if (id !== "") {
-		data = {
-			codhe : id,
-			ldetalmacen : true,
-			idestado : idest,
-		};
+		var data = new Object
+		data.codhe = id
+		data.ldetalmacen = true
+		data.idestado = idest
 		$.getJSON("", data, function(response) {
 	        var $tb, template, x;
 	      if (response.status) {
@@ -97,32 +95,31 @@ detestalmacen = function(){
 		        template = "<tr><td class=\"colnum\">{{ count }}</td><td>{{ codproy }}{{ nompro }}</td><td>{{ numguia }}</td><td>{{ cantidad }}</td><td>{{ fechsalida }}</td><td class=\"tdfecdev\">{{ fechdev }}</td><td>{{ dias }}</td><td><button type=\"button\" style=\"border:none;font-size:25px;\" class=\"transparent btncomentalmacen\" data-coment=\"{{ comentario }}\"><i style=\"color:#4caf50\" class=\"fa fa-commenting\"></i></button></td></tr>";
 	      	}
 	        for (x in response.lestalmacen) {
-	        response.lestalmacen[x].item = parseInt(x) + 1;
-	        $tb.append(Mustache.render(template, response.lestalmacen[x]));
+		        response.lestalmacen[x].item = parseInt(x) + 1;
+		        $tb.append(Mustache.render(template, response.lestalmacen[x]));
 	        }
 	        changecolortd('td.tdfecdev');
 	    }
 	    });
-	}
+	// }
 
 	}else{
-		data = {
-			codhe :id,
-			ldetrepacion: true,
-			idestado: idest,
-		}
+		var data = new Object
+		data.codhe=id
+		data.ldetrepacion=true
+		data.idestado=idest
 		$.getJSON("", data, function(response) {
 	        var $tb, template, x;
 	      if (response.status) {
-		      	$(".detestreparacion").modal("open");
-		      	$(".titcoherra").text("CODIGO: "+id);
-		      	$(".titdesherra").text(descripcionh);
-		        $tb = $("table.table-detestreparacion > tbody");
-		        $tb.empty();
-		        template = "<tr><td class=\"colnum\">{{ count }}</td><td>{{ nompro }}</td><td>{{ numguia }}</td><td>{{ cantidad }}</td><td>{{ fechsalida }}</td><td>{{ fechretorno }}</td><td><button type=\"button\" style=\"border:none;font-size:25px;\" class=\"transparent btncomentalmacen\" data-coment=\"{{ comentario }}\"><i style=\"color:#4caf50\" class=\"fa fa-commenting\"></i></button></td></tr>";
+	      	$(".detestreparacion").modal("open");
+	      	$(".titcoherra").text("CODIGO: "+id);
+	      	$(".titdesherra").text(descripcionh);
+	        $tb = $("table.table-detestreparacion > tbody");
+	        $tb.empty();
+	        template = "<tr><td class=\"colnum\">{{ count }}</td><td>{{ nompro }}</td><td>{{ numguia }}</td><td>{{ cantidad }}</td><td>{{ fechsalida }}</td><td>{{ fechretorno }}</td><td><button type=\"button\" style=\"border:none;font-size:25px;\" class=\"transparent btncomentalmacen\" data-coment=\"{{ comentario }}\"><i style=\"color:#4caf50\" class=\"fa fa-commenting\"></i></button></td></tr>";
 	        for (x in response.lestreparacion) {
-	        response.lestreparacion[x].item = parseInt(x) + 1;
-	        $tb.append(Mustache.render(template, response.lestreparacion[x]));
+		        response.lestreparacion[x].item = parseInt(x) + 1;
+		        $tb.append(Mustache.render(template, response.lestreparacion[x]));
 	        }
 	    }
 	    });

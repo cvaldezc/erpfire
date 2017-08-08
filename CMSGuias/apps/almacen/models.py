@@ -582,7 +582,7 @@ class ReparacionHerra(models.Model):
 
 class GuiaHerramienta(models.Model):
     guia_id = models.CharField(max_length=12, primary_key=True)
-    proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
+    proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id', null=True, blank=True)
     fechsalida = models.DateField()
     empdni = models.ForeignKey(Employee, to_field='empdni_id', null=True)
     condni = models.ForeignKey(Conductore, to_field='condni_id')
@@ -618,6 +618,7 @@ class devolucionHerra(models.Model):
     condni = models.ForeignKey(Conductore, to_field='condni_id')
     nropla = models.ForeignKey(Transporte, to_field='nropla_id')
     traruc = models.ForeignKey(Transportista, to_field='traruc_id')
+    comentario = models.CharField(max_length=200, null=True, blank=True)
 
 
 class detDevHerramienta(models.Model):
