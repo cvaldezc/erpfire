@@ -279,10 +279,13 @@ update almacen_nipleguiaremision set cantmov = cantguide;
 CREATE OR REPLACE FUNCTION detguideremisioninsertquantityforcantmov_proc()
   RETURNS trigger AS
 $BODY$
+BEGIN
   UPDATE almacen_detguiaremision SET cantmov = cantguide
     WHERE guia_id = NEW.guia_id
       AND materiales_id = NEW.materiales_id
       AND brand_id = NEW.brand_id AND model_id = NEW.model_id;
+  RETURN NEW;
+END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
 
@@ -294,10 +297,13 @@ FOR EACH ROW EXECUTE PROCEDURE detguideremisioninsertquantityforcantmov_proc();
 CREATE OR REPLACE FUNCTION nipleguideremisioninsertquantityforcantmov_proc()
   RETURNS trigger AS
 $BODY$
+BEGIN
   UPDATE almacen_nipleguiaremision SET cantmov = NEW.cantguide
     WHERE guia_id = NEW.guia_id
       AND materiales_id = NEW.materiales_id
       AND brand_id = NEW.brand_id AND model_id = NEW.model_id;
+  RETURN NEW;
+END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
 
