@@ -260,12 +260,16 @@ BEGIN
   RETURN null;
 END;
 $BODY$
-LANGUAGE plpgsql VOLATILE
+LANGUAGE plpgsql VOLATILE;
 
 CREATE TRIGGER del_detguiadevmat_trigger
 AFTER UPDATE ON almacen_detguiadevmat
 FOR EACH ROW
 EXECUTE PROCEDURE proc_delete_detguiadevmat()
 --------------------------------------------------------------
-
-
+------------------------------------------------------------------------------
+--  UPDATE 2017-08-08 10:50:36 @Juan Julcapari
+------------------------------------------------------------------------------
+update almacen_detguiaremision set cantmov = cantguide;
+update almacen_nipleguiaremision set cantmov = cantguide;
+------------------------------------------------------------------------------

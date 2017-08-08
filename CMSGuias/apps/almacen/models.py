@@ -177,6 +177,9 @@ class tmpniple(models.Model):
 
 
 class GuiaRemision(models.Model):
+    '''
+    Document for storage guide remision
+    '''
     guia_id = models.CharField(primary_key=True, max_length=12)
     pedido = models.ForeignKey(
         Pedido, to_field='pedido_id', null=True, blank=True)
@@ -225,6 +228,8 @@ class DetGuiaRemision(models.Model):
     # @Juan Julcapari 2017-07-17 10:31:10
     cantdev = models.FloatField(default=0)
     stcantdev = models.BooleanField(default=0)
+    # @Juan Julcapari 2017-08-08 10:26:40
+    cantmov = models.FloatField(default=0, null=True, blank=True)
     # endblock
     flag = models.BooleanField(default=True)
 
@@ -266,8 +271,11 @@ class NipleGuiaRemision(models.Model):
     flag = models.BooleanField(default=True)
     related = models.IntegerField(null=True, blank=True, default=0)
     order = models.ForeignKey(Pedido, to_field='pedido_id', null=True, blank=True)
+    # @Juan Julcapari 2017-08-08 10:29:26
     cenvdevmat = models.FloatField(default=0)
     flagcenvdevmat = models.BooleanField(default=False)
+    cantmov = models.FloatField(default=0, null=True, blank=True)
+    # endblock
 
     class Meta:
         ordering = ['materiales']
