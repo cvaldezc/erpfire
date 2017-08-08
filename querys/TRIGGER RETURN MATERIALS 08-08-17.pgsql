@@ -270,6 +270,10 @@ EXECUTE PROCEDURE proc_delete_detguiadevmat()
 ------------------------------------------------------------------------------
 --  UPDATE 2017-08-08 10:50:36 @Juan Julcapari
 ------------------------------------------------------------------------------
+--TRIGGERS ELIMINADOS
+proc_change_stdsmetrado
+proc_change_stopernipple
+proc_change_stdevmatdetniple
 update almacen_detguiaremision set cantmov = cantguide;
 update almacen_nipleguiaremision set cantmov = cantguide;
 ------------------------------------------------------------------------------
