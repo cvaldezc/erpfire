@@ -469,45 +469,46 @@
 </div>
 
 <!--MODAL CABECERA-->
-<div class="modal modcabecera">
+<div class="modal modcabecera" style="height:91%">
 	<div class="modal-content">
 		<div class="row">
-			<div class="input-field col s9">
+			<div class="input-field col s12">
 				<input type="text" class="matnumeroguia" placeholder="" maxlength="12" length="12"/>
 				<label for="matnumeroguia">NUMERO DE GUIA</label>
 			</div>
 		</div>
 		<div class="row">
-			<div class="input-field col s9">
+			<div class="input-field col s12">
                 <select id="cbomattransp" class="browser-default cbomattransp">
-                <option value=""></option>
+                <option value="" disabled selected>Seleccionar</option>
                 {% for x in ltransportmat %}
                     <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
                 {% endfor %}
                 </select>
-                <label for="cbomattransp" style="margin-top:-30px;font-size:0.8rem;color:#0091ea">TRANSPORTISTA</label>
+                <label for="cbomattransp" style="margin-top:-20px;font-size:0.8rem;color:#0091ea">TRANSPORTISTA</label>
             </div>
 		</div>
 		<div class="row">
-            <div class="input-field col s9">
+            <div class="input-field col s12">
                 <select id="cbomatcond" class="browser-default cbomatcond"></select>
-                <label for="cbomatcond" style="margin-top:-30px;font-size:0.8rem;color:#0091ea">CONDUCTOR</label>
+                <label for="cbomatcond" style="margin-top:-20px;font-size:0.8rem;color:#0091ea">CONDUCTOR</label>
             </div>
 		</div>
 		<div class="row">
-            <div class="input-field col s9">
+            <div class="input-field col s12">
                 <select id="cbomatplaca" class="browser-default cbomatplaca"></select>
-                <label for="cbomatplaca" style="margin-top:-30px;font-size:0.8rem;color:#0091ea">PLACA</label>
+                <label for="cbomatplaca" style="margin-top:-20px;font-size:0.8rem;color:#0091ea">PLACA</label>
             </div>
 		</div>
 		<div class="row">
-			<div class="input-field col s9">
+			<div class="input-field col s12">
 				<select id="cbolistempleado" class="browser-default cbolistempleado">
-	                {% for x in lempleados %}
-	                <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
-	                {% endfor %}
+				<option value="" disabled selected>Seleccionar</option>
+                {% for x in lempleados %}
+                <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
+                {% endfor %}
 	        	</select>
-	        	<label for="cbolistempleado" style="margin-top:-30px;font-size:0.8rem;color:#0091ea">AUTORIZADO POR</label>
+	        	<label for="cbolistempleado" style="margin-top:-20px;font-size:0.8rem;color:#0091ea">AUTORIZADO POR</label>
 			</div>
 		</div>
 		<div class="row">
@@ -522,7 +523,7 @@
 				<label for="comentconmat">COMENTARIO</label>
 			</div>
 		</div>
-		<div class="input-fiel col" align="center" style="margin-top:50px;">
+		<div align="center">
 			<button style="border:none;" type="button" class="btn waves-effect teal lighten-1 btnsaveguiafin" value=""><i class="fa fa-floppy-o"></i><span><strong>Guardar</strong>
 			</span>
 			</button>

@@ -15,24 +15,24 @@
                 <input placeholder="" id="numguia" name="numguia" type="text" class="numguia" maxlength="12" length="12"/>
                 <label for="numguia" >NUMERO DE GUIA</label>
             </div>
-            <div class="input-field col s3" style="margin-top:30px;">
+            <div class="input-field col s3">
                 <select id="cboguiatransp" class="browser-default cboguiatransp">
-                <option value="" disabled selected>Transportista</option>
+                <option value="" disabled selected>Seleccionar</option>
                 {% for x in ltransportist %}
                     <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
                 {% endfor %}
                 </select>
-                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">TRANSPORTISTA</label>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-25px;font-size:0.8rem">TRANSPORTISTA</label>
             </div>
-            <div class="input-field col s2" style="margin-top:30px;">
+            <div class="input-field col s2">
                 <select id="cboguiaconductor" class="browser-default cboguiaconductor">
                 </select>
-                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">CONDUCTOR</label>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-25px;font-size:0.8rem">CONDUCTOR</label>
             </div>
-            <div class="input-field col s2" style="margin-top:30px;">
+            <div class="input-field col s2">
                 <select id="cboguiaplaca" class="browser-default cboguiaplaca">
                 </select>
-                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">PLACA</label>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-25px;font-size:0.8rem">PLACA</label>
             </div>
         </div>
         <div class="row">
@@ -40,13 +40,14 @@
                 <input placeholder="" type="date" class="datepicker fdevguiadev">
                 <label for="fdevguiadev">FECHA DE DEVOLUCION</label>
             </div>
-            <div class="input-field col s3" style="margin-top:35px;">
+            <div class="input-field col s3">
                 <select id="comboempleado" class="browser-default comboempleado">
+                    <option value="" disabled selected>Seleccionar</option>
                     {% for x in lemple %}
                     <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
                     {% endfor %}
                 </select>
-                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">AUTORIZADO POR:</label>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-25px;font-size:0.8rem">AUTORIZADO POR:</label>
             </div>
             <div class="input-field col s3">
                 <input placeholder="" length="200" name="comentguiadev" type="text" class="comentguiadev">
@@ -166,7 +167,7 @@
                         <th class="colst100">Cantidad</th>
                         <th class="colst100">Metrado</th>
                         <th class="colst40">Tipo</th>
-                        <th class="colst100">Enviado</th>
+                        <th class="colst100">Devolvio</th>
                         <th class="colst100">Enviar</th>
                         <th class="colst40"></th>
                         <th class="colst150">Motivo</th>

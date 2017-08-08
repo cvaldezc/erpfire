@@ -7,50 +7,56 @@
     <div class="modal-content">
         <div class="row">
             <label class="lblcodgdevmat" style="display:none;"></label>
-            <div class="input-field col s2">
+            <div class="input-field col s3">
                 <input readonly placeholder="" type="text" class="ednumdoc">
                 <label for="ednumdoc" >NUMERO DE GUIA</label>
             </div>
-            <div class="input-field col s3" style="margin-top:30px;">
+
+            <div class="input-field col s3">
                 <select id="cboedguiatr" class="browser-default cboedguiatr">
-                <option value="" disabled selected>Transportista</option>
+                <option value="" disabled selected>Seleccionar</option>
                 {% for x in ltransportist %}
                     <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
                 {% endfor %}
                 </select>
-                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">TRANSPORTISTA</label>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-25px;font-size:0.8rem">TRANSPORTISTA</label>
             </div>
-            <div class="input-field col s2" style="margin-top:30px;">
+
+            <div class="input-field col s3">
                 <select id="cboedguiacond" class="browser-default cboedguiacond">
                 {% for x in lconduct %}
                     <option value="{{ x.condni_id }}">{{ x.connom }}</option>
                 {% endfor %}
                 </select>
-                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">CONDUCTOR</label>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-25px;font-size:0.8rem">CONDUCTOR</label>
             </div>
-            <div class="input-field col s2" style="margin-top:30px;">
+
+            <div class="input-field col s3">
                 <select id="cboedguiaplaca" class="browser-default cboedguiaplaca">
                 {% for x in lplaca %}
                     <option value="{{ x.nropla_id }}">{{ x.nropla_id }} {{ marca }}</option>
                 {% endfor %}
                 </select>
-                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">PLACA</label>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-25px;font-size:0.8rem">PLACA</label>
             </div>
         </div>
         <div class="row">
-            <div class="input-field col s2">
+
+            <div class="input-field col s3">
                 <input placeholder="" type="date" class="datepicker fdeveditguiadev">
                 <label for="fdeveditguiadev">FECHA DE DEVOLUCION</label>
             </div>
-            <div class="input-field col s3" style="margin-top:35px;">
+
+            <div class="input-field col s3">
                 <select id="comboeditempleado" class="browser-default comboeditempleado">
                     {% for x in lemple %}
                     <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
                     {% endfor %}
                 </select>
-                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">AUTORIZADO POR</label>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-25px;font-size:0.8rem">AUTORIZADO POR</label>
             </div>
-            <div class="input-field col s4">
+
+            <div class="input-field col s6">
                 <input placeholder="" length="200" name="comenteditguiadev" type="text" class="comenteditguiadev">
                 <label for="comenteditguiadev">COMENTARIO</label>
             </div>
@@ -58,12 +64,12 @@
         <div class="row">
             <div class="input-field col s6">
                 <i class="prefix fa fa-search"></i>
-                <input class="txteditbuscmaterial" style="width:90%;height:30px;" type="search" placeholder="Codigo o Material" name="txteditbuscmaterial" id="txteditbuscmaterial">
+                <input class="txteditbuscmaterial" style="width:90%;height:30px;" type="text" placeholder="Codigo o Material" name="txteditbuscmaterial" id="txteditbuscmaterial">
             </div>
             <div class="input-field col s2" style="margin-left:30%">
                 <button type="button" class="btn waves-effect teal lighten-1 btnsavecabgdev">
                 <i class="fa fa-file"></i>
-                <span><strong>GUARDAR</strong></span>
+                <span><strong>GUARDAR CAMBIOS</strong></span>
                 </button>
             </div>
         </div>
