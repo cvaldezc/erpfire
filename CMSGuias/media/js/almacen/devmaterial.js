@@ -17,6 +17,7 @@ var text = '';
 var motdev = ''
 var lniple=''
 ldetdev=[]
+var codped=''
 ldetnip = []
 var codmat='',namemat='',medmat='',codmarcmat='',codmodmat='',textcodmat = ''
 var estguia=''
@@ -67,19 +68,12 @@ $(".btnsaveguiafin").click(saveguiafin);
 $(".btnsavenipple").click(savenipple);
 
 
-//devolver todo
-$(".btnsaveallmat").click(saveallmat);
-
-
 //Ediciones
 $(document).on("click", ".btneditmat", editmat);
 $(document).on("click", ".btneditguiadev", editguiadev);
 $(document).on("click", ".btneditmatdet_mat", editmatdet_mat);
 
 $(document).on("click", ".btnedsavemat", edsavemat);
-
-
-
 
 
 //genera pdf
@@ -111,26 +105,16 @@ $(document).on("click", ".btnviewpdf", viewpdf);
 $(document).on("click", ".btndelmatdet_mat", delmatdet_mat);
 
 
-
 //////////////////////////////
 $("input[name=txtlistaproy]").on("keyup", openlmat);
-
 $(document).on("click", ".btnopendetsector", listasector);
-$(document).on("click", ".btnopendetgroup", listagrupo);
-$(document).on("click", ".btnopendetdsector", listadsector);
-
 $(document).on("click", ".btnlistagainproy", listagainproy);
-$(document).on("click", ".btnlistagainsector", listagainsector);
-$(document).on("click", ".btnlistagaingrupo", listagaingrupo);
 $(document).on("click", ".btnaddmat", addmat);
-
 $(document).on("click", ".btnselectmat", selectmat);
-
 $(document).on("click", ".btncleardatatemp", cleardatatemp);
 
 
 $(document).on("click", ".btnopencab", opencab);
-$(document).on("click", ".btnocultarcab", ocultarcab);
 
 $(document).on("click", ".btnmataddcoment", mataddcoment);
 $(document).on("click", ".btnnipaddcoment", nipaddcoment);
@@ -157,8 +141,8 @@ combochosen("#cboguiaplaca")
 combochosen("#cboedguiatr")
 combochosen("#cboedguiacond")
 combochosen("#cboedguiaplaca")
-combochosen("#cbomattransp")
 combochosen("#cbomatcond")
+combochosen("#cbomattransp")
 combochosen("#cbomatplaca")
 
 estguia='PE'
@@ -166,7 +150,6 @@ search_one=false
 listdevmat()
 
 var urlactual=window.location.href;
-
 
 	if (urlactual=='http://'+location.hostname+(location.port != ''? ':'+location.port:'')+'/almacen/devolucionmaterial/') {
 		console.log(localStorage.getItem('codrandmat'))
@@ -513,33 +496,6 @@ mataddcoment = function(){
 	$("textarea[name=matcomentdet]").val(lastcoment)
 }
 
-ocultarcab=function(){
-	console.log('as')
-
-	var valtext=$(".lblmincodproy").text()
-
-	var cpro=$(".lblcodproject").text()
-	var csect=$(".lblcodsector").text()
-	var cgr=$(".lblcodgrupo").text()
-
-	$(".lblmincodproy").text(cpro)
-	$(".lblmincodsector").text(csect)
-	$(".lblmincodgrupo").text(cgr)
-
-	if (valtext=="") {
-		$(".divsubcab").slideUp(750);
-		$(".lblmincodproy").text(cpro)
-		$(".lblmincodsector").text(csect)
-		$(".lblmincodgrupo").text(cgr)
-	}else{
-		$(".divsubcab").slideDown(750);
-		$(".lblmincodproy").text("")
-		$(".lblmincodsector").text("")
-		$(".lblmincodgrupo").text("")
-	}
-}
-
-
 cleardatatemp=function(){
 	localStorage.clear();
 	blockornonediv('divbtnstorage','none')
@@ -650,7 +606,7 @@ buscmaterial = function(){
 	busc2colmat("txtbuscmaterial","table-lmaterials",1,2);
 }
 busceditmaterial = function(){
-	busc2colmat("txteditbuscmaterial","table-leditmaterials",1,2);
+	busc2colmat("txteditbuscmaterial","table-leditmaterials",1,4);
 }
 
 buscproy = function(){
@@ -673,7 +629,7 @@ devmatdelnip = function(){
 	console.log(ldetdevfin)
 
 	for (var i = 0; i < lnippleselect.length; i++) {
-		if (idvalue==lnippleselect[i]['idtabniple']) {
+		if (idvalue==lnippleselect[i]['idtabnipgrem']) {
 			lnippleselect.splice(i,1)
 		}
 	}
@@ -726,34 +682,59 @@ delmatdet_mat = function(){
 }
 
 delguiadev = function(){
-	var data,btn;
-	btn = this;
+	var cguiadevmat;
+	cguiadevmat=this.value
+
 	swal({
     title: "ANULAR GUIA",
     text: "Seguro de ANULAR Guia de Devolucion?",
-    type: "error",
+    type: "warning",
     showCancelButton: true,
     confirmButtonColor: "#dd6b55",
     confirmButtonText: "Si, Anular!",
     cancelButtonText: "No, Cancelar",
-    closeOnConfirm: true,
+    closeOnConfirm: false,
     closeOnCancel: true
   }, function(isConfirm) {
 
     if (isConfirm) {
-    data = new Object;
-	data.codguidevmat =  btn.value;
-	data.estado = 'AN'
-	data.updestguiadevmat = true;
-	data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
-      $.post("",data,function(response){
-		if (response.status) {
-			swal({title:'Guia de Devolucion de Material ANULADA',timer:2000,showConfirmButton: false,type: "success"});
-			search_one=false
-			estguia='PE'
-			listdevmat()
-		};
-	});
+
+    var dato = new Object
+    dato.ngdevmat=cguiadevmat
+    dato.getdetgdevmatnip= true
+    $.getJSON("",dato,function(response){
+    	if (response.status) {
+    		var lgdevmatnip=response.lgdevmatnip
+    		console.log(lgdevmatnip) //detalle nipleguiadevmat
+
+    		var dat= new Object
+    		dat.lmatguiadev=true
+    		dat.codgdevmat=cguiadevmat
+    		$.getJSON("",dat,function(response){
+    			if (response.status) {
+    				var ldetgdevmat=response.lmat
+    				console.log(ldetgdevmat) //detalle detgdevmat
+
+    				var data = new Object;
+					data.codguidevmat = cguiadevmat;
+					data.lgdevmatnip=JSON.stringify(lgdevmatnip)
+					data.ldetgdevmat=JSON.stringify(ldetgdevmat)
+					data.updestguiadevmat = true;
+					data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
+				      $.post("",data,function(response){
+						if (response.status) {
+							swal({title:'Guia de Devolucion de Material ANULADA',timer:2000,showConfirmButton: false,type: "success"});
+							search_one=false
+							estguia='PE'
+							listdevmat()
+						};
+					});
+
+    			};
+    		})
+    	};
+    })
+
     }
 
 
@@ -788,7 +769,6 @@ delmatdet = function(){
 	data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
       $.post("",data,function(response){
 		if (response.status) {
-			console.log('delete ok')
 			swal({title:'Eliminacion de material CORRECTA',timer:2000,showConfirmButton: false,type: "success"});
 			codgdevmat = coddev;
 			listmatguiadev();
@@ -915,8 +895,9 @@ editniple = function(){
 	$.getJSON("",data,function(response){
 		if (response.status) {
 			var cenvdevmat = response.cenvdevmat
-			var cantidad = response.cantidad
-			var cantpermit = parseFloat(cantidad)-parseFloat(cenvdevmat)
+			var cantidad = response.cantguide
+			// var cantpermit = parseFloat(cantidad)-parseFloat(cenvdevmat)
+			var cantpermit = parseFloat(cantidad)
 			console.log(response.cenvdevmat,response.cantidad)
 
 			var dat=new Object;
@@ -933,7 +914,7 @@ editniple = function(){
 
 					swal({
 					title: "Ingresar Cantidad",
-					text: "Solo puede ingresar hasta "+cantpermit+" items",
+					text: "Cantidad maxima a ingresar: "+cantpermit,
 					type: "input",
 					showCancelButton: true,
 					closeOnConfirm: false,
@@ -1037,12 +1018,14 @@ editmat = function(){
 	codgdevmat = this.getAttribute("data-guiadevmat");
 	comment = this.getAttribute("data-com")
 	numguia = this.getAttribute("data-numguia")
+	codped = this.getAttribute("data-codped")
 	codg = $(".neditguiadev").val();
 	console.log(cantidad)
 	var dato = new Object
 	dato.getniple = true
 	dato.idgdevmat=codgdevmat
 	dato.idmat=codmat
+	dato.codped=codped
 	dato.idbr=codmarcmat
 	dato.idmod=codmodmat
 	$.getJSON("",dato,function(response){
@@ -1062,6 +1045,7 @@ editmat = function(){
 				var data=new Object
 				data.viewcant = true;
 				data.codmat = codmat;
+				data.codped = codped
 				data.numguia = numguia;
 				data.codbrand = codmarcmat;
 				data.codmodel = codmodmat;
@@ -1091,6 +1075,7 @@ listdetnip = function(){
 	data.codmat=codmat
 	data.codbr=codmarcmat
 	data.codmod=codmodmat
+	data.codped=codped
 	data.glnipdevmat = true
 	$.getJSON("",data,function(response){
 		if (response.status) {
@@ -1172,8 +1157,8 @@ listmatguiadev = function(){
 						$(".leditmaterials").modal("open");
 					    $tb = $("table.table-leditmaterials > tbody");
 					    $tb.empty();
-					    template = "<tr><td class=\"col5\" style=\"text-align:center\">{{ count }}</td><td class=\"col10\">{{ numguia }}</td><td class=\"col10\">{{ codmat }}</td><td class=\"col35\">{{ nommat }} {{ medmat }}</td><td class=\"col10\">{{ nommarca }}</td><td class=\"col10\">{{ nommodel }}</td><td class=\"col10\">{{ cantidad }}</td><td class=\"col10\"><button type=\"button\" style=\"border:none;\" class=\"transparent btneditmat\" value=\"{{ codmat }}\" data-numguia=\"{{ numguia }}\" data-guiadevmat=\"{{ guiadevmat }}\" data-id=\"{{ id }}\" data-cantidad=\"{{ cantidad }}\" data-motiv=\"{{ motiv }}\" data-com=\"{{ coment }}\" data-codmat=\"{{ codmat }}\" data-nombmat=\"{{ nommat }}\" data-medmat=\"{{ medmat }}\" data-codmarcamat=\"{{ codmarca }}\" data-marcamat=\"{{ nommarca }}\" data-codmodmat=\"{{ codmodel }}\" data-modmat=\"{{ nommodel }}\"><a style=\"font-size:25px;\"><i class=\"fa fa-pencil-square\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btndelmatdet\" value=\"{{ id }}\" data-coddev=\"{{ guiadevmat }}\"><a style=\"font-size:25px;color:#ef5350;\"><i class=\"fa fa-times-circle\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btninfomatdet\" data-coment=\"{{ coment }}\"><a style=\"font-size:25px;color:#4caf50;\"><i class=\"fa fa-commenting\"></i></a></button></td></tr>";
-					    template2 = "<tr><td class=\"col5\" style=\"text-align:center\">{{ count }}</td><td class=\"col10\">{{ numguia }}</td><td class=\"col10\">{{ codmat }}</td><td class=\"col35\">{{ nommat }} {{ medmat }}</td><td class=\"col10\">{{ nommarca }}</td><td class=\"col10\">{{ nommodel }}</td><td class=\"col10\">{{ cantidad }}</td><td class=\"col10\"><button type=\"button\" style=\"border:none;\" class=\"transparent btneditmat\" value=\"{{ codmat }}\" data-numguia=\"{{ numguia }}\" data-guiadevmat=\"{{ guiadevmat }}\" data-id=\"{{ id }}\" data-cantidad=\"{{ cantidad }}\" data-motiv=\"{{ motiv }}\" data-com=\"{{ coment }}\" data-codmat=\"{{ codmat }}\" data-nombmat=\"{{ nommat }}\" data-medmat=\"{{ medmat }}\" data-codmarcamat=\"{{ codmarca }}\" data-marcamat=\"{{ nommarca }}\" data-codmodmat=\"{{ codmodel }}\" data-modmat=\"{{ nommodel }}\"><a style=\"font-size:25px;\"><i class=\"fa fa-pencil-square\"></i></a></button></td></tr>";
+					    template = "<tr><td class=\"col5\" style=\"text-align:center\">{{ count }}</td><td class=\"col10\">{{ numguia }}</td><td class=\"col10\">{{ codped }}</td><td class=\"col10\">{{ codmat }}</td><td>{{ nommat }} {{ medmat }}</td><td class=\"col10\">{{ nommarca }}</td><td class=\"col10\">{{ nommodel }}</td><td class=\"col5\">{{ cantidad }}</td><td class=\"col10\"><button type=\"button\" style=\"border:none;\" class=\"transparent btneditmat\" value=\"{{ codmat }}\" data-codped=\"{{ codped }}\" data-numguia=\"{{ numguia }}\" data-guiadevmat=\"{{ guiadevmat }}\" data-id=\"{{ id }}\" data-cantidad=\"{{ cantidad }}\" data-motiv=\"{{ motiv }}\" data-com=\"{{ coment }}\" data-codmat=\"{{ codmat }}\" data-nombmat=\"{{ nommat }}\" data-medmat=\"{{ medmat }}\" data-codmarcamat=\"{{ codmarca }}\" data-marcamat=\"{{ nommarca }}\" data-codmodmat=\"{{ codmodel }}\" data-modmat=\"{{ nommodel }}\"><a style=\"font-size:25px;\"><i class=\"fa fa-pencil-square\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btndelmatdet\" value=\"{{ id }}\" data-coddev=\"{{ guiadevmat }}\"><a style=\"font-size:25px;color:#ef5350;\"><i class=\"fa fa-times-circle\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btninfomatdet\" data-coment=\"{{ coment }}\"><a style=\"font-size:25px;color:#4caf50;\"><i class=\"fa fa-commenting\"></i></a></button></td></tr>";
+					    template2 = "<tr><td class=\"col5\" style=\"text-align:center\">{{ count }}</td><td class=\"col10\">{{ numguia }}</td><td class=\"col10\">{{ codped }}</td><td class=\"col10\">{{ codmat }}</td><td>{{ nommat }} {{ medmat }}</td><td class=\"col10\">{{ nommarca }}</td><td class=\"col10\">{{ nommodel }}</td><td class=\"col5\">{{ cantidad }}</td><td class=\"col10\"><button type=\"button\" style=\"border:none;\" class=\"transparent btneditmat\" value=\"{{ codmat }}\" data-codped=\"{{ codped }}\" data-numguia=\"{{ numguia }}\" data-guiadevmat=\"{{ guiadevmat }}\" data-id=\"{{ id }}\" data-cantidad=\"{{ cantidad }}\" data-motiv=\"{{ motiv }}\" data-com=\"{{ coment }}\" data-codmat=\"{{ codmat }}\" data-nombmat=\"{{ nommat }}\" data-medmat=\"{{ medmat }}\" data-codmarcamat=\"{{ codmarca }}\" data-marcamat=\"{{ nommarca }}\" data-codmodmat=\"{{ codmodel }}\" data-modmat=\"{{ nommodel }}\"><a style=\"font-size:25px;\"><i class=\"fa fa-pencil-square\"></i></a></button></td></tr>";
 					    for (x in lmat) {
 					    lmat[x].item = parseInt(x) + 1;
 					    if (lestados[parseInt(x)]['estado']==false) {
@@ -1186,8 +1171,9 @@ listmatguiadev = function(){
 					};
 				})
 			}else{
-				console.log('no response')
+				swal({title:'Guia sin detalle',showConfirmButton:true,type:'warning'})
 				$(".leditmaterials").modal("close")
+				$(".modedlniple").modal("close")
 				search_one=false
 				estguia='PE'
 				listdevmat()
@@ -1200,9 +1186,7 @@ listmatguiadev = function(){
 genguiadev = function(){
 	var codgdevmat,numguia,iddsector;
 	codgdevmat=this.value;
-	// numguia=this.getAttribute("data-guiaref")
 	iddsector=this.getAttribute("data-iddsector")
-	// console.log(numguia)
 	console.log(codgdevmat)
 
 	swal({
@@ -1237,11 +1221,10 @@ genguiadev = function(){
 	    				if (response.status) {
 	    					var ldetgrem = response.ldetgrem
 	    					var ldetinven = response.ldetinven
-	    					var ldetdsmetrado = response.ldetdsmetrado
-	    					console.log(ldetgrem)//lista de detguiaremision
-	    					console.log(ldetinven)//lista de inventorybrand
-	    					console.log(ldetdsmetrado)//lista de dsmetrado
-
+	    					var ldetpedido = response.ldetpedido
+	    					console.log(ldetgrem)//lista upd detguiaremision
+	    					console.log(ldetinven)//lista upd inventorybrand
+	    					console.log(ldetpedido)//lista upd ldetpedido
 
 
 	    					var lgdevmatnip = response.lgdevmatnip
@@ -1251,24 +1234,30 @@ genguiadev = function(){
 	    					da.lgdevmatnip = JSON.stringify(lgdevmatnip)
 	    					$.getJSON("",da, function(response){
 	    						if (response.status) {
-	    							var lgdevnip=response.lgdev
+	    							// var lgdevnip=response.lgdev
 	    							var lnip=response.lnip
-	    							console.log(lgdevnip)
-	    							console.log(lnip)
+	    							var lnippedido=response.lnippedido
+	    							// console.log(lgdevnip)
+	    							console.log(lnip) //lista upd nipleguiaremision
+	    							console.log(lnippedido) //lista upd niple
+
 
 	    							var dat=new Object
-				    				dat.updsavedevmat = true//funcion que actualiza todo
+				    				dat.updsavedevmat = true//Actualiza (detguiaremision,nipleguiaremision, niple,detpedido,inventorybrand)
 				    				dat.ldetgrem = JSON.stringify(ldetgrem)
+				    				dat.ldetpedido = JSON.stringify(ldetpedido)
 				    				dat.ldetinven = JSON.stringify(ldetinven)
-				    				dat.ldetdsmetrado = JSON.stringify(ldetdsmetrado)
-				    				dat.lgdevnip=JSON.stringify(lgdevnip)
+				    				dat.lnippedido = JSON.stringify(lnippedido)
+				    				// dat.ldetdsmetrado = JSON.stringify(ldetdsmetrado)
+				    				// dat.lgdevnip=JSON.stringify(lgdevnip)
 				    				dat.lnip=JSON.stringify(lnip)
 				    				dat.codguiadevmat=codgdevmat
 				    				dat.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
 				    				$.post("",dat,function(response){
 				    					if (response.status) {
+				    						console.log('aoskao')
 				    						swal({title:'Guia de Devolucion GENERADA',timer:2000,showConfirmButton: false,type: "success"});
-				    						genpdf(codgdevmat)
+				    						genpdf(codgdevmat, false)
 				    						search_one=false
 				    						estguia='PE'
 											listdevmat()
@@ -1288,20 +1277,14 @@ genguiadev = function(){
 }
 
 
-genpdf = function(codguiadev, format){
-	$.getJSON('/json/reports/', function (response) {
-		if (response['status']){
-			if (typeof format == 'undefined' || format === false) {
-				window.open(response['hreport'] + 'guide/return/materials?nguide='+codguiadev+'&ruc='+response['ruc'],'_blank');
-			}
-			else
-			{
-				window.open(response['hreport'] + 'guide/return/materials?nguide='+codguiadev+'&ruc='+response['ruc']+'&format=true','_blank');
-			}
-		}else{
-			swal('Error al mostrar reporte', ''+response['raise'], 'error');
-		}
-	});
+genpdf = function(codguiadev, format) {
+	var hreport = $('#hreport').val();
+	var ruc = $('#ruc').val();
+	if (format) {
+		window.open(hreport + 'guide/return/materials?nguide='+codguiadev+'&format=true&ruc='+ruc,'_blank');
+	}else{
+		window.open(hreport + 'guide/return/materials?nguide='+codguiadev+'&ruc='+ruc,'_blank');
+	}
 }
 
 savecabgdev = function(){
@@ -1315,13 +1298,7 @@ savecabgdev = function(){
 	empleaut = $("select[id=comboeditempleado]").val();
 
 	if (fdev == "") {
-		swal({title:'Debe ingresar una FECHA DE DEVOLUCION',timer:2500,showConfirmButton: false,type: "error"});
-		return false;
-	}
-
-	validafecha();
-	if (new Date(fdev) < datenow ) {
-		swal({title:'Fecha Ingresada es menor a la fecha actual',timer:2500,showConfirmButton: false,type: "error"});
+		swal({title:'Debe ingresar una FECHA DE DEVOLUCION', timer:2500, showConfirmButton: false,type: "error"});
 		return false;
 	}
 
@@ -1392,91 +1369,6 @@ saveeditmat = function(){
 	})
 }
 
-saveallmat = function(){
-	var nguia,fdev,empdniaut,est,comen;
-	nguia=$(".nguiadev").val()
-	fdev=$(".fdevguiadev").val()
-	empdniaut=$("select[id=comboempleado]").val();
-	comen=$(".comentguiadev").val()
-
-	if (fdev=="") {
-		swal({title:'Debe ingresar Fecha de devolucion',timer:1500,showConfirmButton: false,type: "error"});
-		return false;
-	};
-
-	if (empdniaut==null) {
-		swal({title:'Debe Seleccionar quien Autorizo devolucion',timer:1500,showConfirmButton: false,type: "error"});
-		return false
-	};
-
-
-	swal({
-	    title: "<h5><strong>Guardar Guia</strong></h5></br><h6>Seleccione un motivo de Devolucion:</h6></br><select style=\"font-size:15px\" class=\"browser-default\" id=\"cbomotgeneral\"><option style=\"font-size:15px;\" value=\"OT\">Otros</option><option style=\"font-size:15px;\" value=\"CA\">Cambio</option></select>",
-	    text: "Guardara lista total de materiales incluido los niples, si los tuviera",
-	    type: "warning",
-	    showCancelButton: true,
-	    confirmButtonColor: "#dd6b55",
-	    confirmButtonText: "Si, Guardar!",
-	    cancelButtonText: "No, Cancelar",
-	    closeOnConfirm: true,
-	    closeOnCancel: true,
-	    html:true
-
-	  }, function(isConfirm) {
-	    if (isConfirm) {
-	    	var cbomotgen=$("select[id=cbomotgeneral]").val()
-	    	console.log(cbomotgen)
-
-
-	    	var data=new Object
-			data.getldetmat=true
-			data.nguia=nguia
-			$.getJSON("",data,function(response){
-				if (response.status) {
-					var ldetmat = response.ldetmat
-					console.log('materials list')
-					console.log(ldetmat)
-
-					dato = new Object
-					dato.getlallnip=true
-					dato.ldetmat = JSON.stringify(ldetmat)
-					$.getJSON("",dato,function(response){
-						if (response.status) {
-							var ldetni = response.ldetni
-							var ldetnonip = response.ldetnonip
-							console.log('niple list')
-							console.log(ldetni)
-							console.log('no niple list')
-							console.log(ldetnonip)
-
-							dat = new Object
-
-							// dat.saveallmat=true
-							dat.nguia=nguia
-							dat.fdev=fdev
-							dat.empdniaut=empdniaut
-							dat.comen=comen
-							dat.est='PE'
-							dat.motivo=cbomotgen
-							dat.ldetnonip = JSON.stringify(ldetnonip)
-							dat.ldetni = JSON.stringify(ldetni)
-							dat.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
-							$.post("",dat,function(response){
-								if (response.status) {
-									search_one=false
-									estguia='PE'
-									listdevmat()
-									$(".lmaterials").modal("close")
-									swal({title:'Guia Guardada',timer:1500,showConfirmButton: false,type: "success"});
-								};
-							})
-						};
-					})
-				};
-			})
-	    }
-	  });
-}
 
 selectmat = function(){
 	$(".mlistmat").modal("close")
@@ -1516,7 +1408,7 @@ listdetmat = function(event){
 					      	lmat = response.lmaterials;
 					      	console.log(lmat)
 					      	var listmat = response.listmat;
-					      	sizelistmat = response.sizelistmat;
+					      	// sizelistmat = response.sizelistmat;
 					      	console.log(listmat);
 
 					      	var dato=new Object;
@@ -1525,7 +1417,7 @@ listdetmat = function(event){
 				      		$.getJSON("",dato,function(response){
 				      			if (response.status) {
 				      				var lstniple = response.lstniple
-				      				console.log('as')
+
 				      				console.log(lstniple)
 
 
@@ -1545,8 +1437,8 @@ listdetmat = function(event){
 								    $(".fdevguiadev").val(fechactual)
 								    $tb = $("table.table-lmaterials > tbody");
 								    $tb.empty();
-								    template = "<tr><td class=\"colst40\">{{ count }}</td><td class=\"colst150\">{{ codmat }}</td><td>{{ namemat }} {{ medmat }}</td><td>{{ namebrand }}</td><td>{{ namemodel }}</td><td class=\"colst100\">{{ cantguide }}</td><td class=\"colst100\">{{ cantdev }}</td><td class=\"colst100\" onclick=\"getdataRow('{{ countcod }}','{{ codped }}','{{ codmat }}','{{ namemat }}','{{ medmat }}','{{ codbrand }}','{{ codmodel }}')\"><div style=\"display:none\"><label class=\"lblnip{{ countcod }}\">noniple</label></div><input readOnly=\"true\" type=\"text\" class=\"cantdev{{ countcod }}\" id=\"cantdev{{ countcod}}\" style=\"width:40px;height:15px;\"></td><td class=\"colst40\"><input type=\"checkbox\" id=\"{{ countcod }}\" value=\"{{ countcod }}\" cantguide=\"{{ cantguide}}\" data-cantdev=\"{{ cantdev }}\" data-codmat=\"{{ codmat }}\" data-codbr=\"{{ codbrand }}\" data-codmod=\"{{ codmodel }}\" id=\"{{ countcod }}\"  name=\"checkdevmat{{ countcod }}\" class=\"checkbox{{ countcod }}\" onclick=\"getRow('{{ countcod }}','{{ cantguide }}','{{ cantdev }}','false','{{ codped }}','{{ codmat }}','{{ codbrand }}','{{ codmodel }}','{{ numguia }}')\"/><label for=\"{{ countcod }}\"></label></td><td class=\"colst150\"><div id=\"divcbomotivo{{ countcod }}\" style=\"\"><input type=\"text\" maxlength=\"55\" class=\"combomotivo{{ countcod }}\" style=\"height:30px\"></div></td><td><div id=\"divcommguiamat{{ countcod }}\" style=\"\"><button style=\"border:none;\" type=\"button\" class=\"transparent btncommguiamat\" data-countguiamat=\"{{ countcod }}\"><a style=\"font-size:25px;color:#039be5;\"><i class=\"fa fa-commenting\"></i></a></button></div><div style=\"display:none\"><input class=\"coment{{ countcod }}\" length=\"50px;\" style=\"height:15px;\"></td></td></tr>";
-								    template2 ="<tr><td class=\"colst40\">{{ count }}</td><td class=\"colst150\">{{ codmat }}</td><td>{{ namemat }} {{ medmat }}</td><td>{{ namebrand }}</td><td>{{ namemodel }}</td><td class=\"colst100\">{{ cantguide }}</td><td class=\"colst100\">{{ cantdev }}</td><td class=\"colst100\" onclick=\"getdataRow('{{ countcod }}','{{ codped }}','{{ codmat }}','{{ namemat }}','{{ medmat }}','{{ codbrand }}','{{ codmodel }}')\"><div style=\"display:none\"><label class=\"lblnip{{ countcod }}\">niple</label></div><input readOnly=\"true\" type=\"text\" class=\"cantdev{{ countcod }}\" id=\"cantdev{{ countcod}}\" style=\"width:40px;height:15px;\"></td><td class=\"colst40\"><input type=\"checkbox\" id=\"{{ countcod }}\" value=\"{{ countcod }}\" cantguide=\"{{ cantguide}}\" data-cantdev=\"{{ cantdev }}\" data-codmat=\"{{ codmat }}\" data-codbr=\"{{ codbrand }}\" data-codmod=\"{{ codmodel }}\" id=\"{{ countcod }}\"  name=\"checkdevmat{{ countcod }}\" class=\"checkbox{{ countcod }}\" onclick=\"getRow('{{ countcod }}','{{ cantguide }}','{{ cantdev }}','true','{{ codped }}','{{ codmat }}','{{ codbrand }}','{{ codmodel }}','{{ numguia }}')\"/><label for=\"{{ countcod }}\"></label><button style=\"border:none;\" type=\"button\" class=\"transparent btnopenlniple\" data-codopenlniple=\"{{ countcod }}\" data-codmat=\"{{ codmat }}\" data-descmat=\"{{ namemat }} {{ medmat }} {{ namebrand }} {{ namemodel }}\"><a style=\"color:#039be5;\"><i class=\"fa fa-list\"></i></a></button></td><td class=\"colst150\"></td><td class=\"colst40\"></td></tr>";
+								    template = "<tr><td class=\"colst40\">{{ count }}</td><td class=\"colst150\">{{ codmat }}</td><td class=\"colst150\">{{ codped }}</td><td>{{ namemat }} {{ medmat }}</td><td>{{ namebrand }}</td><td>{{ namemodel }}</td><td class=\"colst100\">{{ cantguide }}</td><td class=\"colst100\">{{ cantdev }}</td><td class=\"colst100\" onclick=\"getdataRow('{{ countcod }}','{{ codped }}','{{ codmat }}','{{ namemat }}','{{ medmat }}','{{ codbrand }}','{{ codmodel }}')\"><div style=\"display:none\"><label class=\"lblnip{{ countcod }}\">noniple</label></div><input readOnly=\"true\" type=\"text\" class=\"cantdev{{ countcod }}\" id=\"cantdev{{ countcod}}\" style=\"width:40px;height:15px;\"></td><td class=\"colst40\"><input type=\"checkbox\" id=\"{{ countcod }}\" value=\"{{ countcod }}\" cantguide=\"{{ cantguide}}\" data-cantdev=\"{{ cantdev }}\" data-codmat=\"{{ codmat }}\" data-codbr=\"{{ codbrand }}\" data-codmod=\"{{ codmodel }}\" id=\"{{ countcod }}\"  name=\"checkdevmat{{ countcod }}\" class=\"checkbox{{ countcod }}\" onclick=\"getRow('{{ countcod }}','{{ cantguide }}','{{ cantdev }}','false','{{ codped }}','{{ codmat }}','{{ codbrand }}','{{ codmodel }}','{{ numguia }}')\"/><label for=\"{{ countcod }}\"></label></td><td class=\"colst150\"><div id=\"divcbomotivo{{ countcod }}\" style=\"\"><input type=\"text\" maxlength=\"55\" class=\"combomotivo{{ countcod }}\" style=\"height:30px\"></div></td><td><div id=\"divcommguiamat{{ countcod }}\" style=\"\"><button style=\"border:none;\" type=\"button\" class=\"transparent btncommguiamat\" data-countguiamat=\"{{ countcod }}\"><a style=\"font-size:25px;color:#039be5;\"><i class=\"fa fa-commenting\"></i></a></button></div><div style=\"display:none\"><input class=\"coment{{ countcod }}\" length=\"50px;\" style=\"height:15px;\"></td></tr>";
+								    template2 ="<tr><td class=\"colst40\">{{ count }}</td><td class=\"colst150\">{{ codmat }}</td><td class=\"colst150\">{{ codped }}</td><td>{{ namemat }} {{ medmat }}</td><td>{{ namebrand }}</td><td>{{ namemodel }}</td><td class=\"colst100\">{{ cantguide }}</td><td class=\"colst100\">{{ cantdev }}</td><td class=\"colst100\" onclick=\"getdataRow('{{ countcod }}','{{ codped }}','{{ codmat }}','{{ namemat }}','{{ medmat }}','{{ codbrand }}','{{ codmodel }}')\"><div style=\"display:none\"><label class=\"lblnip{{ countcod }}\">niple</label></div><input readOnly=\"true\" type=\"text\" class=\"cantdev{{ countcod }}\" id=\"cantdev{{ countcod}}\" style=\"width:40px;height:15px;\"></td><td class=\"colst40\"><input type=\"checkbox\" id=\"{{ countcod }}\" value=\"{{ countcod }}\" cantguide=\"{{ cantguide}}\" data-cantdev=\"{{ cantdev }}\" data-codmat=\"{{ codmat }}\" data-codbr=\"{{ codbrand }}\" data-codmod=\"{{ codmodel }}\" id=\"{{ countcod }}\"  name=\"checkdevmat{{ countcod }}\" class=\"checkbox{{ countcod }}\" onclick=\"getRow('{{ countcod }}','{{ cantguide }}','{{ cantdev }}','true','{{ codped }}','{{ codmat }}','{{ codbrand }}','{{ codmodel }}','{{ numguia }}')\"/><label for=\"{{ countcod }}\"></label><button style=\"border:none;\" type=\"button\" class=\"transparent btnopenlniple\" data-codopenlniple=\"{{ countcod }}\" data-codmat=\"{{ codmat }}\" data-descmat=\"{{ namemat }} {{ medmat }} {{ namebrand }} {{ namemodel }}\"><a style=\"color:#039be5;\"><i class=\"fa fa-list\"></i></a></button></td><td class=\"colst150\"></td><td class=\"colst40\"></td></tr>";
 								    for (x in lmat) {
 								    	lmat[x].item = parseInt(x) + 1;
 								    	if (lstniple[parseInt(x)]['estado']== true) {
@@ -1582,7 +1474,7 @@ listdetmat = function(event){
 getRow=function(countcod,cantguide,cantdev,niple,codped,codmat,codbr,codmod,numguia){
 
 	var checkbox= "input[name=checkdevmat"+countcod+"]";
-	var cantrest=parseFloat(cantguide)-parseFloat(cantdev)
+	var cantrest=parseFloat(cantguide)
 	console.log(checkbox)
 	console.log(cantrest)
 
@@ -1624,7 +1516,7 @@ getRow=function(countcod,cantguide,cantdev,niple,codped,codmat,codbr,codmod,numg
 
 }
 
-var cped='',cmat='',cbr='',cmod='',coucod=''
+var cped='', cmat='', cbr='', cmod='', coucod=''
 getdataRow = function(countcod,idped,idmat,namemat,medmat,idbr,idmod){
 	console.log(idped,idmat,idbr,idmod)
 	cped=idped,
@@ -1712,7 +1604,7 @@ savedetniple = function(){
 		var txtcant=$(".cnipleenv"+i).val()
 		var motnip=$(".cbomotiv"+i).val()
 		var comnip=$(".comentnip"+i).val()
-		var suma=parseFloat(lniple[i]['cenvmat'])+parseFloat(txtcant)
+		var suma=parseFloat(txtcant)
 		console.log(lniple[i]['cenvmat'],txtcant)
 		// console.log(suma)
 		if (parseFloat(suma)>lniple[i]['cantidad']) {
@@ -1723,7 +1615,7 @@ savedetniple = function(){
 		if (txtcant.trim()!="") {
 			if (ldetnip.length>0) {
 				for (var y=0;y<ldetnip.length;y++) {
-					if (ldetnip[y]['idtable']==lniple[i]['idtable']) {
+					if (ldetnip[y]['idtabnipgrem']==lniple[i]['idtabnipgrem']) {
 						swal({title:'ITEM '+lniple[i]['item']+' ya esta agregado',showConfirmButton: true,type: "error"})
 						return false
 					};
@@ -1756,12 +1648,13 @@ savedetniple = function(){
 				'metrado':lniple[i]['metrado'],
 				'tipo':lniple[i]['tipo'],
 				'canti':txtcant,
-				'idtable':lniple[i]['idtable'],
+				'idtabnipgrem':lniple[i]['idtabnipgrem'],
 				'motinip':motnip,
 				'comnip':comnip,
+				'codped':lniple[i]['codped'],
 				'codbr':lniple[i]['codbr'],
 				'codmod':lniple[i]['codmod'],
-				'idniple':lniple[i]['idtable'],
+				'idtabnipgrem':lniple[i]['idtabnipgrem'],
 				'numguia':$(".nguiadev").val()
 			})
 
@@ -1797,7 +1690,8 @@ savedetniple = function(){
 }
 
 saveguiafin = function(){
-	var auth,fechdev,comenconmat,codtr,codcond,codplaca;
+	var auth,fechdev,comenconmat,codtr,codcond,codplaca,codguia;
+	codguia=$(".matnumeroguia").val()
 	codtr=$("select[id=cbomattransp]").val()
 	codcond=$("select[id=cbomatcond]").val()
 	codplaca=$("select[id=cbomatplaca]").val()
@@ -1808,6 +1702,17 @@ saveguiafin = function(){
 	console.log(ldetdevfin)
 	console.log(lnippleselect.length,ldetdevfin.length)
 
+	if (codguia.length !=12) {
+		swal({title:'Numero de Guia INCORRECTA',timer:1500,showConfirmButton: false,type: "error"})
+		return false
+	};
+
+	console.log(codtr)
+	if (codtr=="") {
+		swal({title:'Seleccionar Transportista',timer:1500,showConfirmButton: false,type: "error"})
+		return false
+	}
+
 	if (auth==null) {
 		swal({title:'Seleccionar personal que autorizo devolucion',timer:1500,showConfirmButton: false,type: "error"})
 		return false
@@ -1817,65 +1722,90 @@ saveguiafin = function(){
 		return false
 	}
 
-	swal({
-	    title: "GUARDAR DEVOLUCION",
-	    text: "Seguro de guardar guia de devolucion?",
-	    type: "warning",
-	    showCancelButton: true,
-	    confirmButtonColor: "#dd6b55",
-	    confirmButtonText: "Si, Guardar!",
-	    cancelButtonText: "No, Cancelar",
-	    closeOnConfirm: true,
-	    closeOnCancel: true
-	  }, function(isConfirm) {
-	    if (isConfirm) {
-	    	var lsinniple=[]
+	var dat= new Object
+	dat.exists=true
+	dat.codguia=codguia
+	dat.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
+	$.post("/almacen/devolucionguia/",dat, function(exists){
+		if (!exists.status) {
+			delete dat.exists;
+			var datos = new Object
+			datos.exguiadevmat=true
+			console.log('asfei')
+			datos.codguia=codguia
+			datos.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
+			$.post("/almacen/devolucionguia/",datos,function(exists){
+				if (!exists.status) {
+					delete datos.exists;
+					swal({
+				    title: "GUARDAR DEVOLUCION",
+				    text: "Seguro de guardar guia de devolucion?",
+				    type: "warning",
+				    showCancelButton: true,
+				    confirmButtonColor: "#dd6b55",
+				    confirmButtonText: "Si, Guardar!",
+				    cancelButtonText: "No, Cancelar",
+				    closeOnConfirm: true,
+				    closeOnCancel: true
+				  }, function(isConfirm) {
+				    if (isConfirm) {
+				    	var lsinniple=[]
 
-			for (var i = 0; i < ldetdevfin.length; i++) {
-				if (ldetdevfin[i]['niple']==false) {
-					lsinniple.push(ldetdevfin[i])
-				};
-			};
-			console.log(lsinniple)
+						for (var i = 0; i < ldetdevfin.length; i++) {
+							if (ldetdevfin[i]['niple']==false) {
+								lsinniple.push(ldetdevfin[i])
+							};
+						};
+						console.log(lsinniple)
 
-			var data=new Object
-	    	data.savefinconmat=true
-	    	data.auth=auth
-	    	data.cproy=$(".lblcodproystorage").text()
-	    	data.codtr=codtr
-	    	console.log(codtr,codcond,codplaca)
-	    	data.codcond=codcond
-	    	data.codplaca=codplaca;
-	    	data.comenconmat=comenconmat
-	    	data.estado='PE'
-	    	data.fechdev=fechdev
-	    	data.lnippleselect=JSON.stringify(lnippleselect)
-	    	data.ldetdevfin=JSON.stringify(lsinniple)
-	    	data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
-	    	$.post("",data,function(response){
-	    		if (response.status) {
-	    			// 'http://'+location.hostname+':8000/almacen/devolucionmaterial/'
-	    			localStorage.clear()
-	    			$(".modcabecera").modal("close")
-	    			setTimeout(function(){
-	 					swal({
-	    				title:"GUIA DE DEVOLUCION GUARDADA",
-	    				text:"Para Generar el PDF <a href=\"http://"+location.hostname+(location.port != ''?':'+location.port:'')+"/almacen/devolucionguia\" target=\"_self\">clic aqui</a>",
-	    				showConfirmButton: true,
-	    				type:"success",
-	    				html:true},
-		    				function(isConfirm) {
-							    if (isConfirm) {
-							    	location.reload()
-								}
-							}
-	    				);
+						var data=new Object
+				    	data.savefinconmat=true
+				    	data.auth=auth
+				    	data.cproy=$(".lblcodproystorage").text()
+				    	data.codtr=codtr
+						data.codguia=codguia
+				    	data.codcond=codcond
+				    	data.codplaca=codplaca;
+				    	data.comenconmat=comenconmat
+				    	data.estado='PE'
+				    	data.fechdev=fechdev
+				    	data.lnippleselect=JSON.stringify(lnippleselect)
+				    	data.ldetdevfin=JSON.stringify(lsinniple)
+				    	data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
+				    	$.post("",data,function(response){
+				    		if (response.status) {
+				    			// 'http://'+location.hostname+(location.port != ''? ':'+location.port:'')+'/almacen/devolucionmaterial/'
+				    			localStorage.clear()
+				    			$(".modcabecera").modal("close")
+				    			setTimeout(function(){
+				 					swal({
+				    				title:"GUIA DE DEVOLUCION GUARDADA",
+				    				text:"Para Generar el PDF <a href=\"http://"+location.hostname+(location.port != '' ? ':'+location.port: '')+"/almacen/devolucionguia\" target=\"_self\">clic aqui</a>",
+				    				showConfirmButton: true,
+				    				type:"success",
+				    				html:true},
+					    				function(isConfirm) {
+										    if (isConfirm) {
+										    	location.reload()
+											}
+										}
+				    				);
 
-		 			},500);
-	    		}
-	    	})
-	    }
-	  });
+					 			},500);
+				    		}
+				    	})
+				    }
+				  });
+				}else{
+					swal({title:'Guia ya existe en Guias de Devolucion', timer:1500, showConfirmButton: false, type:'error'})
+					return false
+				}
+			})
+		}else{
+			swal({title:'Guia ya existe en Guias de Remision', timer:1500, showConfirmButton: false, type:'error'})
+			return false
+		}
+	})
 }
 
 var lnippleselect=[]
@@ -1921,11 +1851,11 @@ savenipple = function(){
 				};
 				console.log(lnippleselect.length)
 				console.log(lnippleselect)
-				console.log(listanipple[i]['idtabniple'])
+				console.log(listanipple[i]['idtabnipgrem'])
 
 				if (lnippleselect.length > 0){
 					for (var y = 0; y < lnippleselect.length; y++) {
-						if (lnippleselect[y]['idtabniple']==listanipple[i]['idtabniple']) {
+						if (lnippleselect[y]['idtabnipgrem']==listanipple[i]['idtabnipgrem']) {
 							swal({title:'ITEM '+listanipple[i]['item']+" ya esta agregado al detalle",timer:1500,showConfirmButton: false,type: "error"})
 							return false;
 						};
@@ -1939,8 +1869,8 @@ savenipple = function(){
 
 
 	console.log(txtnull)
-	if (txtnull.length==listanipple.length) {
-		swal({title:'Devolver al menos un niple',timer:1500,showConfirmButton: false,type: "error"})
+	if (txtnull.length == listanipple.length) {
+		swal({title:'Devolver al menos un niple', timer: 1500, showConfirmButton: false,type: "error"})
 		return false;
 	};
 
@@ -1975,10 +1905,10 @@ savenipple = function(){
 						'codbr':listanipple[i]['codbr'],
 						'codmod':listanipple[i]['codmod'],
 						'codped':listanipple[i]['codped'],
-						'idtabniple':listanipple[i]['idtabniple'],
-						'idtab_opnipple':listanipple[i]['related'],
+						'idtabnipgrem':listanipple[i]['idtabnipgrem'],
+						// 'idtab_opnipple':listanipple[i]['related'],
 						'cenvdevmat':listanipple[i]['cenvdevmat'],
-						'numguia':$("select[id=cbolistguias]").val()
+						'numguia':$("select[id=cbolistguias] > option:selected").attr("data-codguia")
 					})
 					cantnipvirt= cantnipvirt+Math.round((parseFloat(cantnipdev)*(parseFloat(listanipple[i]['metrado'])/100))*1000)/1000;
 					console.log(cantnipvirt)
@@ -1991,7 +1921,7 @@ savenipple = function(){
 			var medmat=$(".nippmedmat").text()
 			var marca=$(".nippbrand").text()
 			var modelo=$(".nippmodel").text()
-			var nguia=$("select[id=cbolistguias]").val()
+			var nguia=$("select[id=cbolistguias] > option:selected").attr("data-codguia")
 			var namemat=$(".nippnamemat").text()
 
 			var existmat=''
@@ -2044,12 +1974,8 @@ savenipple = function(){
 				})
 	    	}
 
-
-
 			console.log(lnippleselect)
 			console.log(ldetdevfin)
-
-
 
 	    	var ldetniple=JSON.stringify(lnippleselect)
 			var ldetdev=JSON.stringify(ldetdevfin)
@@ -2078,7 +2004,7 @@ selboxnipguia=function(){
 	var cant,stcheck,mot;
 	for (var i = 0; i < lniple.length; i++) {
 		if (document.getElementById('radnipall').checked) {
-			cant=parseFloat(lniple[i]['canti'])-parseFloat(lniple[i]['cenvmat'])
+			cant=parseFloat(lniple[i]['canti'])
 			stcheck = true
 			mot="OTROS"
 		}else{
@@ -2115,7 +2041,7 @@ selboxnipmat=function(){
 checkguianip=function(countcod,cenvmat,canti){
 	var cant,mot;
 	if($(".boxguianip"+countcod).is(':checked')){
-		cant=parseFloat(canti)-parseFloat(cenvmat)
+		cant=parseFloat(canti)
 		mot="OTROS"
 	}else{
 		cant=""
@@ -2152,7 +2078,7 @@ selcheckbox = function(){
 
 selectall = function(estado,cantidad){
 	for(var i=0; i < lmat.length; i++){
-		var canti=lmat[i]['cantguide']-lmat[i]['cantdev']
+		var canti=lmat[i]['cantguide']
 		var mot;
 		if (estado==true){
 			var data=new Object
@@ -2204,7 +2130,7 @@ listtabniple=function(){
 		var listadetniple = lnippleselect
 		$tb = $("table.tab-detniple > tbody");
 	    $tb.empty();
-	    template = "<tr><td class=\"colst40\" style=\"text-align:center\">{{ item }}</td><td class=\"colst150\">{{ numguia }}</td><td class=\"colst150\">{{ codmat }}</td><td>{{ namemat }} {{ medmat }}</td><td class=\"colst40\">{{ inputcant }}</td><td class=\"colst100\">{{ metrado }}</td><td class=\"colst50\">{{ tipo }}</td><td class=\"colst100\"><button style=\"border:none;\" type=\"button\" class=\"transparent btndevmateditnip\" value=\"{{ idtabniple }}\" data-edcantniple=\"{{ cantidad }}\" data-item=\"{{ item }}\" data-edncodped=\"{{ codped }}\" data-edncodguia=\"{{ numguia }}\" data-edncodmat=\"{{ codmat }}\" data-edncodbr=\"{{ codbr }}\" data-edncodmod=\"{{ codmod }}\" data-edninputcant=\"{{ inputcant }}\" data-ednmetrado=\"{{ metrado }}\"><a style=\"font-size:25px;color:#039be5;\"><i class=\"fa fa-pencil-square\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btndevmatdelnip\" value=\"{{ idtabniple }}\" data-delcodped=\"{{ codped }}\" data-delnnguia=\"{{ numguia }}\" data-delncodmat=\"{{ codmat }}\" data-delncodbr=\"{{ codbr }}\" data-delncodmod=\"{{ codmod }}\" data-delninputcant=\"{{ inputcant }}\" data-delnmetrado=\"{{ metrado }}\"><a style=\"font-size:25px;color:#F44336;\"><i class=\"fa fa-times-circle\"></i></a></button></td></tr>";
+	    template = "<tr><td class=\"colst40\" style=\"text-align:center\">{{ item }}</td><td class=\"colst150\">{{ numguia }}</td><td class=\"colst150\">{{ codmat }}</td><td>{{ namemat }} {{ medmat }}</td><td class=\"colst40\">{{ inputcant }}</td><td class=\"colst100\">{{ metrado }}</td><td class=\"colst50\">{{ tipo }}</td><td class=\"colst100\"><button style=\"border:none;\" type=\"button\" class=\"transparent btndevmateditnip\" value=\"{{ idtabnipgrem }}\" data-edcantniple=\"{{ cantidad }}\" data-item=\"{{ item }}\" data-edncodped=\"{{ codped }}\" data-edncodguia=\"{{ numguia }}\" data-edncodmat=\"{{ codmat }}\" data-edncodbr=\"{{ codbr }}\" data-edncodmod=\"{{ codmod }}\" data-edninputcant=\"{{ inputcant }}\" data-ednmetrado=\"{{ metrado }}\"><a style=\"font-size:25px;color:#039be5;\"><i class=\"fa fa-pencil-square\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btndevmatdelnip\" value=\"{{ idtabnipgrem }}\" data-delcodped=\"{{ codped }}\" data-delnnguia=\"{{ numguia }}\" data-delncodmat=\"{{ codmat }}\" data-delncodbr=\"{{ codbr }}\" data-delncodmod=\"{{ codmod }}\" data-delninputcant=\"{{ inputcant }}\" data-delnmetrado=\"{{ metrado }}\"><a style=\"font-size:25px;color:#F44336;\"><i class=\"fa fa-times-circle\"></i></a></button></td></tr>";
 	    for (x in listadetniple) {
 		    listadetniple[x].item = parseInt(x) + 1;
 		    $tb.append(Mustache.render(template, listadetniple[x]));
@@ -2219,7 +2145,8 @@ listtabniple=function(){
 }
 
 
-
+// search_one=false
+// estguia='PE'
 listdevmat = function(){
 	var data=new Object
 	data.idguiadevmat = idguiadevmat
@@ -2230,43 +2157,31 @@ listdevmat = function(){
 		if (response.status) {
 			var lguia=response.lguia
 			console.log(lguia)
-			if (lguia.length>0) {
-				if (estguia=='PE') {
-					// floatThead('table-guiadevpe')
-					$tb = $("table.table-guiadevpe > tbody");
-				    $tb.empty();
-				    template= "<tr><td class=\"colst40\">{{ item }}</td><td class=\"colst100\">{{ codguiadev }}</td><td>{{ codproy }}-{{ nameproyecto }}</td><td>{{ autnames }}</td><td class=\"colst150\">{{ registro }}</td><td class=\"colst150\">{{ fechdev }}</td><td class=\"colst150\"><button style=\"border:none;\" type=\"button\" class=\"transparent btngenguiadev\" id=\"btngenguiadev\" value=\"{{ codguiadev }}\" data-iddsector=\"{{ iddsector }}\" data-guiaref=\"{{ nguia }}\"><a style=\"font-size:25px;color:#4caf50;\"><i class=\"fa fa-check-circle\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btneditguiadev\" id=\"btneditguiadev\" value=\"{{ codguiadev }}\" data-empleaut=\"{{ empleaut }}\" data-guiaref=\"{{ nguia }}\" data-fdev=\"{{ fechdev }}\" data-coment=\"{{ coment }}\" data-cond=\"{{ cond }}\" data-placa=\"{{ placa }}\" data-transp=\"{{ transp }}\"><a style=\"font-size:25px;\"><i class=\"fa fa-pencil-square\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btndelguiadev\" value=\"{{ codguiadev }}\"><a style=\"font-size:25px;color:#ef5350;\"><i class=\"fa fa-times-circle\"></i></a></button></td></tr>";
-			    	for (x in lguia) {
-			    		lguia[x].item = parseInt(x) + 1;
-			    		// if (lguia[parseInt(x)]['nguia']!="") {
-						    $tb.append(Mustache.render(template, lguia[x]));
-			    		// }else{
-			    			// $tb.append(Mustache.render(tempsinguia, lguia[x]));
-			    		// }
-					}
-				}else{
-					// floatThead('table-guiadevge')
-					$tb = $("table.table-guiadevge > tbody");
-				    $tb.empty();
-				    template2= "<tr><td class=\"colst40\">{{ item }}</td><td class=\"colst100\">{{ codguiadev }}</td><td>{{ codproy }}-{{ nameproyecto }}</td><td>{{ autnames }}</td><td class=\"colst150\">{{ registro }}</td><td class=\"colst150\">{{ fechdev }}</td><td class=\"colst150\"><button style=\"border:none;\" type=\"button\" class=\"transparent btnviewpdf\" value=\"{{ codguiadev }}\"><a style=\"font-size:25px\"><i class=\"fa fa-file-pdf-o\"></i></a></button></td></tr>";
-			    	for (x in response.lguia) {
-					    response.lguia[x].item = parseInt(x) + 1;
-					    $tb.append(Mustache.render(template2, response.lguia[x]));
-					}
+
+			if (estguia=='PE') {
+				// floatThead('table-guiadevpe')
+				$tb = $("table.table-guiadevpe > tbody");
+			    $tb.empty();
+			    template= "<tr><td class=\"colst40\">{{ item }}</td><td class=\"colst100\">{{ codguiadev }}</td><td>{{ codproy }}-{{ nameproyecto }}</td><td>{{ autnames }}</td><td class=\"colst150\">{{ registro }}</td><td class=\"colst150\">{{ fechdev }}</td><td class=\"colst150\"><button style=\"border:none;\" type=\"button\" class=\"transparent btngenguiadev\" id=\"btngenguiadev\" value=\"{{ codguiadev }}\" data-iddsector=\"{{ iddsector }}\" data-guiaref=\"{{ nguia }}\"><a style=\"font-size:25px;color:#4caf50;\"><i class=\"fa fa-check-circle\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btneditguiadev\" id=\"btneditguiadev\" value=\"{{ codguiadev }}\" data-empleaut=\"{{ empleaut }}\" data-guiaref=\"{{ nguia }}\" data-fdev=\"{{ fechdev }}\" data-coment=\"{{ coment }}\" data-cond=\"{{ cond }}\" data-placa=\"{{ placa }}\" data-transp=\"{{ transp }}\"><a style=\"font-size:25px;\"><i class=\"fa fa-pencil-square\"></i></a></button><button style=\"border:none;\" type=\"button\" class=\"transparent btndelguiadev\" value=\"{{ codguiadev }}\"><a style=\"font-size:25px;color:#ef5350;\"><i class=\"fa fa-times-circle\"></i></a></button></td></tr>";
+		    	for (x in lguia) {
+		    		lguia[x].item = parseInt(x) + 1;
+		    		// if (lguia[parseInt(x)]['nguia']!="") {
+					    $tb.append(Mustache.render(template, lguia[x]));
+		    		// }else{
+		    			// $tb.append(Mustache.render(tempsinguia, lguia[x]));
+		    		// }
 				}
 			}else{
-				console.log('des')
-				dato=new Object;
-				dato.searchxguia=true
-				dato.numguia=idguiadevmat
-				$.getJSON("",dato,function(response){
-					if (response.status) {
-						console.log('as')
-						console.log(response.lguia)
-					};
-				})
-
+				// floatThead('table-guiadevge')
+				$tb = $("table.table-guiadevge > tbody");
+			    $tb.empty();
+			    template2= "<tr><td class=\"colst40\">{{ item }}</td><td class=\"colst200\">{{ codguiadev }}</td><td>{{ codproy }}-{{ nameproyecto }}</td><td>{{ autnames }}</td><td class=\"colst150\">{{ registro }}</td><td class=\"colst150\">{{ fechdev }}</td><td class=\"colst150\"><button style=\"border:none;\" type=\"button\" class=\"transparent btnviewpdf\" value=\"{{ codguiadev }}\"><a style=\"font-size:25px\"><i class=\"fa fa-file-pdf-o\"></i></a></button></td></tr>";
+		    	for (x in response.lguia) {
+				    response.lguia[x].item = parseInt(x) + 1;
+				    $tb.append(Mustache.render(template2, response.lguia[x]));
+				}
 			}
+
 		};
 	})
 }
@@ -2275,8 +2190,6 @@ listdevmat = function(){
 closeguiadev = function(){
 	ldetnip=[]
 	numrow=[]
-	// $tb = $("table.tab-sellniple > tbody");
- //    $tb.empty();
 }
 
 
@@ -2318,26 +2231,27 @@ lmatdetguiarem = function(){
 }
 
 
-
-validafecha = function(){
-	var d = new Date();
-	datenow = new Date(d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
-}
-
-
-
 savedevmat = function(){
 
-	var fdev,auth,lblniple,transport,cond,placa,codproy;
+	var fdev,auth,lblniple,transport,cond,placa,codproy,codguia;
+	codguia=$(".numguia").val()
 	fdev = $(".fdevguiadev").val()
 	auth = $("select[id=comboempleado]").val();
 	transport=$("select[id=cboguiatransp]").val();
 	cond=$("select[id=cboguiaconductor]").val()
 	placa=$("select[id=cboguiaplaca]").val()
 	codproy=$(".lblcodproyguia").text()
+
 	console.log(fdev)
 	console.log(auth)
-	if (transport=="") {
+	console.log(transport)
+
+	if (codguia.length!=12) {
+		swal({title:'Numero de Guia INCORRECTA',timer:1500,showConfirmButton: false,type: "error"});
+		return false
+	};
+
+	if (transport==null) {
 		swal({title:'Debe Ingresar Transportista',timer:1500,showConfirmButton: false,type: "error"});
 		return false
 	};
@@ -2345,10 +2259,6 @@ savedevmat = function(){
 		swal({title:'Debe Ingresar Fecha de Devolucion',timer:1500,showConfirmButton: false,type: "error"});
 		return false
 	}
-	if (auth==null) {
-		swal({title:'Seleccionar Personal que Autorizo Devolucion',timer:2500,showConfirmButton: false,type: "error"});
-		return false
-	};
 
 
 	console.log(lmat)
@@ -2361,7 +2271,7 @@ savedevmat = function(){
 		if (txtcant.trim()!='' && combomotivo!='' && lblniple=='noniple') {
 			console.log(txtcant.length)
 			console.log(txtcant,txtcoment,combomotivo)
-			var suma = parseFloat(lmat[i]['cantdev'])+parseFloat(txtcant)
+			var suma = parseFloat(txtcant)
 			console.log(Math.round(suma*100)/100)
 			if (parseFloat(suma) > parseFloat(lmat[i]['cantguide'])) {
 				swal({title:'',text:'Cantidad es Mayor a la cantidad Enviada en ITEM '+lmat[i]['item'],showConfirmButton: true,type: "error"})
@@ -2429,59 +2339,87 @@ savedevmat = function(){
  	};
 
 	if (ldetdev.length > 0 || lniplefinal2.length>0) {
-		swal({
-	    title: "Guardar Guia",
-	    text: "Seguro de Guardar Guia de Devolucion?",
-	    type: "warning",
-	    showCancelButton: true,
-	    confirmButtonColor: "#dd6b55",
-	    confirmButtonText: "Si, Guardar!",
-	    cancelButtonText: "No, Cancelar",
-	    closeOnConfirm: true,
-	    closeOnCancel: true
-	  }, function(isConfirm) {
-	    if (isConfirm) {
 
-	    	var data=new Object;
-	    	//cabecera
-	    	data.ng=$(".nguiadev").val()
-	    	data.fdev=fdev
-	    	data.empdniaut=auth
-	    	data.transport=transport
-	    	data.cond=cond
-	    	data.placa=placa
-	    	data.codproy=codproy
-	    	data.est='PE'
-	    	data.comen=$(".comentguiadev").val()
-	    	//detalle
-	    	// data.ldetdev=JSON.stringify(ldetnonip);
-	    	data.ldetdev=JSON.stringify(ldetdev);
-	    	//detalleniple
-	    	data.lniplefinal2=JSON.stringify(lniplefinal2)
-	    	// data.ldetnip = JSON.stringify(ldetnip);
-	    	// data.ldetni =JSON.stringify(ldetni)
-	    	data.savedevmat = true
-    		data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
-	    	$.post("",data,function(response){
-	    		if (response.status) {
-	    			console.log('nj');
-	    			$(".lmaterials").modal("close");
-	    			search_one=false;
-	    			estguia='PE';
-	    			listdevmat();
-	 				setTimeout(function(){
-	 					swal('Guia Guardada', '',"success");
-	 					ldetdev=[]
-	 				},500);
-	    		};
-	    	})
+		var dat= new Object
+		dat.exists=true
+		dat.codguia=codguia
+		dat.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
+		$.post("",dat, function(exists){
+			if (!exists.status) {
+				delete dat.exists;
+				var datos = new Object
+				datos.exguiadevmat=true
+				datos.codguia=codguia
+				datos.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
+				$.post("",datos,function(exists){
+					if (!exists.status) {
+						delete datos.exists;
+						swal({
+						    title: "Guardar Guia",
+						    text: "Seguro de Guardar Guia de Devolucion?",
+						    type: "warning",
+						    showCancelButton: true,
+						    confirmButtonColor: "#dd6b55",
+						    confirmButtonText: "Si, Guardar!",
+						    cancelButtonText: "No, Cancelar",
+						    closeOnConfirm: false,
+						    closeOnCancel: true
+						  }, function(isConfirm) {
+						    if (isConfirm) {
 
-	    }else{
-	    	ldetdev=[]
+						    	var data=new Object;
+						    	//cabecera
+						    	data.ng=$(".nguiadev").val()
+						    	data.fdev=fdev
+						    	data.empdniaut=auth
+						    	data.transport=transport
+						    	data.cond=cond
+						    	data.placa=placa
+						    	data.codproy=codproy
+						    	data.est='PE'
+						    	data.comen=$(".comentguiadev").val()
+						    	//detalle
+						    	// data.ldetdev=JSON.stringify(ldetnonip);
+						    	data.ldetdev=JSON.stringify(ldetdev);
+						    	//detalleniple
+						    	data.lniplefinal2=JSON.stringify(lniplefinal2)
+						    	// data.ldetnip = JSON.stringify(ldetnip);
+						    	// data.ldetni =JSON.stringify(ldetni)
+						    	data.savedevmat = true
+						    	data.numeroguia=codguia
+					    		data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
+						    	$.post("",data,function(response){
+						    		if (response.status) {
+						    			$(".lmaterials").modal("close");
+						    			search_one=false;
+						    			estguia='PE';
+						    			listdevmat();
+						    			swal({title:'Guia Guardada',timer:1500,showConfirmButton:false,type:'success'})
+						    			ldetdev=[]
+						    		};
+						    	})
 
-	    }
+						    }else{
+						    	ldetdev=[]
 
-		});
+						    }
+
+							});
+
+
+					}else{
+						swal({title:'Numero de Guia existe en Guias de Devolucion', showConfirmButton:true,type:'error'})
+						ldetdev=[]
+						return false;
+					}
+				})
+
+			}else{
+				swal({title:'Numero de Guia Existe en Guias de Remision', showConfirmButton:true,type:'error'})
+				ldetdev=[]
+				return false;
+			}
+		})
 	}else{
 		swal({title:'Debe devolver al menos un material',timer:1500,showConfirmButton: false,type: "error"})
 		ldetdev=[]
@@ -2520,19 +2458,25 @@ viewpdf = function(){
 		confirmButtonText:'Con Formato',
 		cancelButtonText:'Sin Formato',
 		showConfirmButton:true,
-		showCancelButton:true,
 		closeOnConfirm:true,
+		showCancelButton:true,
 		closeOnCancel:true,
 		animation:'slide-from-top'
 	},function(isConfirm){
-		genpdf(cod, isConfirm);
-		// if (isConfirm) {
-		// 	console.log('con Formato');
-		// 	genpdf(cod, isConfirm);
-		// }else{
-		// 	console.log('Sin Formato');
-		// 	genpdf(cod, isConfirm);
-		// }
+		if (isConfirm) {
+			console.log('con Formato')
+			var data=new Object
+			data.getuser=true
+			$.getJSON("",data,function(response){
+				if (response.status) {
+					var user = response.user
+					console.log(user) //USUARIO
+					genpdf(cod, true)
+				};
+			})
+		}else{
+			genpdf(cod, false)
+		}
 	})
 }
 
@@ -2546,7 +2490,6 @@ ldetdevfinal = []
 var randmat=''
 addmat = function(){
 	console.log(ldetguiaremision)
-	// console.log(ldetmatareas)
 	var cantmat=ldetdevfin.length+lnippleselect.length
 	console.log(ldetdevfin.length)
 	console.log(lnippleselect.length)
@@ -2597,7 +2540,7 @@ addmat = function(){
 					ldetdevfin.push({
 					'it':i,
 					'codped':ldetguiaremision[i]['codped'],
-					'nguia':$("select[id=cbolistguias]").val(),
+					'nguia':$("select[id=cbolistguias] > option:selected").attr("data-codguia"),
 					'codgremision':ldetguiaremision[i]['codguiarem'],
 					'codmat':ldetguiaremision[i]['codmat'],
 					'namemat':ldetguiaremision[i]['namemat'],
@@ -2642,10 +2585,9 @@ addmat = function(){
 				listdetguiadev()
 			}else{
 				console.log('asds')
-				swal({title:'ITEM '+lexmat[0]['coditem']+' esta en el Doc ('+lexmat[0]['docdevmat']+') "PE"',text:'Debe Generar o Anular el Documento',showConfirmButton:true,type: "error"})
+				swal({title:'ITEM '+lexmat[0]['coditem']+' esta en la Guia ('+lexmat[0]['docdevmat']+') "PE"',text:'Debe Generar o Anular la guia',showConfirmButton:true,type: "error"})
 				return false
 			}
-
 		};
 	})
 }
@@ -2719,24 +2661,32 @@ listdetguiadev=function(){
 openlmat= function(){
 	var data= new Object;
 	if (event.which == 13) {
-		var txting=this.value
-		console.log(this.value)
+		var lblcodpro,txting,stlblcodpro;
+		lblcodpro=$(".lblcodproystorage").text()
+		console.log(lblcodpro)
+		if (lblcodpro=="") {
+			stlblcodpro=false
+		}else{
+			stlblcodpro=true
+		}
+
+		txting=this.value
 		data.matdesc = txting
 		data.listmat = true
+		data.lblcodpro=lblcodpro
+		data.stlblcodpro = stlblcodpro
 		$.getJSON("", data, function(response){
 			if (response.status) {
-				console.log(response.stlistamat)
-				if (response.stlistamat==true) {
-					console.log(response.listamat)
+				var listamat=response.listamat
+				console.log(listamat)
+				if (listamat.length>0) {
 					$(".mlistmat").modal("open")
-					var listamat = response.listamat
-					console.log(response.listamat)
 					$tb = $("table.tab-lmaterials > tbody");
 				    $tb.empty();
 				    template = "<tr><td>{{ item }}</td><td>{{ cmat }}</td><td>{{ namemat }} {{ medmat }}</td><td>{{ marca }}</td><td>{{ model }}</td><td>{{ unidad }}</td><td><button style=\"border:none;\" type=\"button\" class=\"transparent btnselectmat\" value=\"{{ cmat }}\"><a style=\"font-size:25px;color:#4caf50;\"><i class=\"fa fa-check-circle\"></i></a></button></td></tr>";
 				    for (x in listamat) {
-				    listamat[x].item = parseInt(x) + 1;
-				    $tb.append(Mustache.render(template, listamat[x]));
+					    listamat[x].item = parseInt(x) + 1;
+					    $tb.append(Mustache.render(template, listamat[x]));
 					}
 				}else{
 					text=txting
@@ -2754,7 +2704,7 @@ lproy = function(){
     	data = new Object;
 
     	if (lblcodpro=="") {
-    		data.lmatdetguia = true;
+    		data.lproyectos = true;
     	}else{
     		data.lmatdetguiapro=true;
     		data.cproy=lblcodpro
@@ -2763,21 +2713,24 @@ lproy = function(){
 	    data.txtcodmat = text;
 	    $.getJSON("", data, function(response) {
 	      if (response.status) {
-	      	var lmaterial = response.lmateriales;
-	      	var listmat = response.listmateriales;
-	      	console.log(listmat);
-	      	console.log(lmaterial);
-	      	if (listmat == true){
-	      		console.log(lmaterial[0]['matcod'])
+	      	// var lmaterial = response.lmateriales;
+	      	// var listmat = response.listmateriales;
+	      	var listprojects=response.listprojects
+	      	// console.log(listmat);
+	      	// console.log(lmaterial);
+	      	if (listprojects.length > 0){
+	      		console.log(listprojects[0]['matcod'])
 	      		textcodmat = text
 	      		$(".lblcodmat").text(textcodmat);
-	      		$(".lblnamematerial").text(lmaterial[0]['matnom']+" "+lmaterial[0]['matmed']);//get nombre de material
+	      		$(".lblnamematerial").text(listprojects[0]['matnom']+" "+listprojects[0]['matmed']);//get nombre de material
 	      		blockornonediv('divtableproy','block');
-	      		blockornonediv('divtablesector','none');
-	      		blockornonediv('divtablegroup','none');
+	      		// blockornonediv('divtablesector','none');
+	      		// blockornonediv('divtablegroup','none');
 	      		blockornonediv('divtitproy','none');
-	      		blockornonediv('divtitsector','none');
-	      		blockornonediv('divtitgrupo','none');
+	      		blockornonediv('divcabguiadev','none');
+
+	      		// blockornonediv('divtitsector','none');
+	      		// blockornonediv('divtitgrupo','none');
 	      		blockornonediv('divcbolistguia','none');
 	      		blockornonediv('divtabldetguiarem','none');
 	      		//
@@ -2785,15 +2738,15 @@ lproy = function(){
 
 			    $tb = $("table.tablelistproy > tbody");
 			    $tb.empty();
-			    template = "<tr><td class=\"colst50\" style=\"text-align:center\">{{ count }}</td><td class=\"colst150\">{{ codproy }}</td><td class=\"\">{{ nompro }}</td><td class=\"colst200\"><button style=\"border:none;\" type=\"button\" class=\"transparent btnopendetsector\" value=\"{{ codproy }}\" data-nompro=\"{{ nompro }}\"><a style=\"font-size:25px;color:#4caf50;\"><i class=\"fa fa-check-circle\"></i></a></button></td></tr>";
-			    for (x in response.lmateriales) {
-			    response.lmateriales[x].item = parseInt(x) + 1;
-			    $tb.append(Mustache.render(template, response.lmateriales[x]));
+			    template = "<tr><td class=\"colst50\" style=\"text-align:center\">{{ item }}</td><td class=\"colst150\">{{ codproy }}</td><td class=\"\">{{ nompro }}</td><td class=\"colst200\"><button style=\"border:none;\" type=\"button\" class=\"transparent btnopendetsector\" value=\"{{ codproy }}\" data-nompro=\"{{ nompro }}\"><a style=\"font-size:25px;color:#4caf50;\"><i class=\"fa fa-check-circle\"></i></a></button></td></tr>";
+			    for (x in listprojects) {
+			    listprojects[x].item = parseInt(x) + 1;
+			    $tb.append(Mustache.render(template, listprojects[x]));
 				  }
 	      	}else{
 	      		swal({
-	      			title:'Error en el ingreso de material',
-	      			text:'<p>No se encuentra en ningun proyecto o</p><br><p>No pertenece al proyecto de los materiales ya agregados</p>',
+	      			title:'Error',
+	      			text:'<h5>Material, No pertenece al proyecto de los materiales ya agregados</h5>',
 	      			showConfirmButton:true,
 	      			closeOnConfirm:true,
 	      			html:true,
@@ -2803,119 +2756,17 @@ lproy = function(){
 	      	}
 	      }
 	    });
-
      // }
 }
 
-listagrupo = function(){
-	csector = this.value;
-	dessector = this.getAttribute("data-descsector");
-	lgrupo();
-}
-
-lgrupo = function(){
-	var data,cmat;
-	data = new Object;
-	cmat = $(".lblcodmat").text();
-	data.groupmat_id = cmat;
-	data.idsector = csector;
-	data.listgroup = true;
-	$.getJSON("", data, function(response){
-		if (response.status) {
-			if (response.estgroup == true) {
-				//tablas
-				blockornonediv('divtablegroup','block');
-				blockornonediv('divtablesector','none');
-				blockornonediv('divtableproy','none');
-
-				//detalle
-				blockornonediv('divtitsector','block');
-				blockornonediv('divtitgrupo','none');
-
-				$(".lblcodsector").text(csector);
-				$(".lblnamesector").text(dessector);
-
-				$tb = $("table.tablelistgroup > tbody");
-			    $tb.empty();
-			    template = "<tr><td class=\"colst50\" style=\"text-align:center\">{{ count }}</td><td class=\"colst150\">{{ codgroup }}</td><td>{{ namegroup }}</td><td class=\"colst200\"><button style=\"border:none;\" type=\"button\" class=\"transparent btnopendetdsector\" value=\"{{ codgroup }}\" data-descgrupo=\"{{ namegroup }}\"><a style=\"font-size:25px;color:#4caf50;\"><i class=\"fa fa-check-circle\"></i></a></button></td></tr>";
-			    for (x in response.lgroup) {
-			    response.lgroup[x].item = parseInt(x) + 1;
-			    $tb.append(Mustache.render(template, response.lgroup[x]));
-				}
-
-			}else{
-				swal({title:'No existe Grupos para este Sector',timer:2500,showConfirmButton:false,type: "error"})
-				return false;
-			}
-		};
-	})
-}
-
-
-
-listadsector = function(){
-	cgroup = this.value;
-	descgroup = this.getAttribute("data-descgrupo");
-
-	data = new Object
-	data.getldsector=true
-	data.cgroup=cgroup
-	$.getJSON("",data,function(response){
-		if (response.status) {
-			var ldsectores = response.ldsectores
-			console.log(ldsectores)
-
-			dato=new Object
-			dato.getlpedidos=true
-			dato.ldsectores=JSON.stringify(ldsectores)
-			$.getJSON("",dato, function(response){
-				if (response.status) {
-					var lpedidos = response.lpedidos
-					console.log(lpedidos)
-
-					dat=new Object
-					dat.getlguiasrem=true
-					dat.codmat=$(".lblcodmat").text()
-					dat.lpedidos=JSON.stringify(lpedidos)
-					$.getJSON("",dat,function(response){
-						if (response.status) {
-							// blockornonediv('divtitsector','block');
-							blockornonediv('divtitgrupo','block');
-							$(".lblcodgrupo").text(cgroup)
-							$(".lblnamegrupo").text(descgroup)
-
-							var lgremision=response.lgremision
-							console.log(lgremision)
-
-							document.getElementById('divcbolistguia').style.display="block"
-							// llena combo de guias
-							$("#cbolistguias").empty()
-							var op= document.createElement("option")
-							op.textContent = "Seleccione una guia"
-							op.value=""
-							// op.setAttribute('disabled','selected')
-							cbolistguias.appendChild(op)
-							for (var i = 0; i < lgremision.length; i++) {
-								var opttr = lgremision[i]['numguia']
-								var eltr = document.createElement("option");
-								eltr.textContent = opttr;
-								eltr.value = opttr;
-								cbolistguias.appendChild(eltr)
-							}
-							$("#cbolistguias").trigger('chosen:updated');
-						};
-					})
-				};
-			})
-		};
-	})
-	// ldsector();
-}
 
 var ldetguiaremision='',sizeniple=''
 $(function(){
 	$('#cbolistguias').change(function(){
-		var codguia=this.value
+	  var codguia=$("select[id=cbolistguias] > option:selected").attr("data-codguia")
+	  var namesector=$("select[id=cbolistguias] > option:selected").attr("data-namesector")
+	  var namegrupo=$("select[id=cbolistguias] > option:selected").attr("data-namegrupo")
+	  var namearea=$("select[id=cbolistguias] > option:selected").attr("data-namearea")
 	  console.log(codguia)
 
 	  var data = new Object
@@ -2931,6 +2782,10 @@ $(function(){
 	  		dato.ldetguiaremision=JSON.stringify(ldetguiaremision)
 	  		$.getJSON("",dato,function(response){
 	  			if (response.status) {
+	  				document.getElementById('divdetsectors').style.display="block"
+	  				$(".lblnamesector").text(namesector)
+	  				$(".lblnamegrupo").text(namegrupo)
+	  				$(".lblnamearea").text(namearea)
 	  				$(".lbltitdetmat").text("DETALLE DE GUIA "+codguia)
 	  				sizeniple = response.sizeniple
 	  				console.log(sizeniple)
@@ -2946,8 +2801,8 @@ $(function(){
 
 listadetguiarem=function(){
 	blockornonediv('divtableproy','none');
-	blockornonediv('divtablesector','none');
-	blockornonediv('divtablegroup','none');
+	// blockornonediv('divtablesector','none');
+	// blockornonediv('divtablegroup','none');
 	blockornonediv('divtabldetguiarem','block');
 	$tb = $("table.tab-ldetguiarem > tbody");
     $tb.empty();
@@ -2970,49 +2825,6 @@ listadetguiarem=function(){
 	    	document.getElementById('divbtnadd').style.display="block"
 	    }
 	}
-}
-
-
-ldetmatareas=[]
-cdsector = ''
-ldsector = function(){
-
-	var data;
-	data = new Object;
-	comat = $(".lblcodmat").text();
-	data.listdsector = true;
-	data.dsectormat_id = comat;
-	data.idgroup = cgroup;
-
-
-	$.getJSON("", data, function(response){
-		if (response.status) {
-			//tablas
-			blockornonediv('divtableproy','none');
-			blockornonediv('divtablesector','none');
-			blockornonediv('divtablegroup','none');
-
-			//detalle
-			blockornonediv('divtitgrupo','block');
-			$(".lblcodgrupo").text(cgroup);
-			$(".lblnamegrupo").text(descgroup);
-
-			var ldsector = response.ldsector;
-			console.log(ldsector)
-			ldetmatareas = ldsector
-
-			$tb = $("table.tablelistdsector > tbody");
-		    $tb.empty();
-		    template = "<tr><td>{{ count }}</td><td>{{ name_dsector }}</td><td>{{ brand }}</td><td>{{ model }}</td><td>{{ cantidad }}</td><td>{{ cantdev }}</td><td onclick=\"getdata('{{ cod_dsector }}','{{ codmat }}','{{ namemat }}','{{ medmat }}','{{ codbrand }}','{{ codmodel }}','{{ countcod }}')\"><input type=\"text\" id=\"cantdevuelta{{ countcod }}\" class=\"cantdevuelta{{ countcod }}\" style=\"width:40px;height:30px\"></td><td><select id=\"cbomotivomat{{ countcod }}\" class=\"browser-default\"><option value=\"OT\">OTROS</option><option value=\"CA\">CAMBIO</option></select></td><td><input style=\"height:30px;\" class=\"comentario{{ countcod }}\"></td></tr>";
-		    for (x in response.ldsector) {
-		    response.ldsector[x].item = parseInt(x) + 1;
-		    $tb.append(Mustache.render(template, response.ldsector[x]));
-			}
-			// if ($("select[id=cbomotivomat0]") == "") {
-			// 	$("select[id=cbomotivomat0]").val(motdev);
-			// };
-		};
-	})
 }
 
 
@@ -3083,38 +2895,35 @@ lsector = function(){
 	data.mat_id = codmat;
 	$.getJSON("", data, function(response){
 		if (response.status) {
-			if (response.listsector == true) {
-				//abre cabecera
-				blockornonediv('divcabguiadev', 'block');
-				// blockornonediv('divtableddetfinal','block');
-				blockornonediv('divbtnsavefin','block');
-				//detalle
-				blockornonediv('divtitproy','block')
-				blockornonediv('divtitsector','none')
+			console.log(response.lsector)
+			var lgremision=response.lsector
 
-				//tabla
-				blockornonediv('divtablesector','block')
-				blockornonediv('divtableproy','none')
+			document.getElementById('divcabguiadev').style.display='block'
+			document.getElementById('divcbolistguia').style.display='block'
+			blockornonediv('divtitproy','block')
+			blockornonediv('divtableproy','none')
+			$(".lblcodproject").text(codpro);
+			$(".lblnameproject").text(nomproyecto);
+			$(".codproy").text(codpro);
 
-
-				$(".lblcodproject").text(codpro);
-				$(".lblnameproject").text(nomproyecto);
-				$(".codproy").text(codpro);
-				$(".lblcodmat").text(codmat);
-				$tb = $("table.tablelistsector > tbody");
-			    $tb.empty();
-			    template = "<tr><td class=\"colst50\" style=\"text-align:center\">{{ count }}</td><td class=\"colst150\">{{ codsector }}</td><td>{{ namesector }}</td><td class=\"colst200\"><button style=\"border:none;\" type=\"button\" class=\"transparent btnopendetgroup\" value=\"{{ codsector }}\" data-descsector=\"{{ namesector }}\" ><a style=\"font-size:25px;color:#4caf50;\"><i class=\"fa fa-check-circle\"></i></a></button></td></tr>";
-			    for (x in response.lsector) {
-			    response.lsector[x].item = parseInt(x) + 1;
-			    $tb.append(Mustache.render(template, response.lsector[x]));
-				}
-				console.log(response.lsector);
-			}else{
-				swal({title:'No existe Sectores para este Proyecto',timer:1500,showConfirmButton:false,type: "error"})
-				return false;
+			$("#cbolistguias").empty()
+			var op= document.createElement("option")
+			cbolistguias.appendChild(op)
+			for (var i = 0; i < lgremision.length; i++) {
+				var opttr = lgremision[i]['namesector']+' || '+
+							lgremision[i]['namegrupo']+' || '+
+							lgremision[i]['namedsector']+' || '+
+							lgremision[i]['codguia']+' || '
+				var eltr = document.createElement("option");
+				eltr.setAttribute("data-codguia",lgremision[i]['codguia'])
+				eltr.setAttribute("data-namesector",lgremision[i]['namesector'])
+				eltr.setAttribute("data-namegrupo",lgremision[i]['namegrupo'])
+				eltr.setAttribute("data-namearea",lgremision[i]['namedsector'])
+				eltr.textContent = opttr;
+				eltr.value = opttr;
+				cbolistguias.appendChild(eltr)
 			}
-
-
+			$("#cbolistguias").trigger('chosen:updated');
 		};
 	})
 
@@ -3123,50 +2932,10 @@ lsector = function(){
 listagainproy = function(){
 	text = $(".lblcodmat").text();
 	lproy();
-	//DETALLE
-	blockornonediv('divtitsector','none');
-	$(".lblcodsector").text("");
-	$(".lblnamesector").text("");
-	blockornonediv('divtitgrupo','none');
-	$(".lblcodgrupo").text("");
-	$(".lblnamegrupo").text("");
-
-	//TABLE
 	blockornonediv('divtableproy','block');
-	blockornonediv('divtablesector','none');
-	blockornonediv('divtablegroup','none');
 	blockornonediv('divtabldetguiarem','none');
 	blockornonediv('divcbolistguia','none');
-}
-
-listagainsector = function(){
-	codproyecto = $(".lblcodproject").text();
-	lsector();
-
-	//DETALLE
-	blockornonediv('divtitgrupo','none');
-	$(".lblcodgrupo").text("");
-	$(".lblnamegrupo").text("");
-	//TABLAS
-	blockornonediv('divtableproy','none');
-	blockornonediv('divtablesector','block');
-	blockornonediv('divtablegroup','none');
-	blockornonediv('divtabldetguiarem','none');
-	blockornonediv('divcbolistguia','none');
-
-}
-
-listagaingrupo = function(){
-	csector = $(".lblcodsector").text();
-	lgrupo();
-
-
-	//TABLA
-	blockornonediv('divtableproy','none');
-	blockornonediv('divtablesector','none');
-	blockornonediv('divtablegroup','block');
-	blockornonediv('divtabldetguiarem','none');
-	blockornonediv('divcbolistguia','none');
+	blockornonediv('divdetsectors','none');
 }
 
 

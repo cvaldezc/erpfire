@@ -26,7 +26,6 @@
             <input onclick="javascript:switchgeneral();" name="estacce" type="radio" id="switchepps"/>
             <label for="switchepps" id="switchepps" style="font-size:15px;font-weight:bold;color:black;">EPPs</label>
           </div>
-
       </div>
     </div>
   </div>
@@ -53,11 +52,27 @@
     </div>
     </div>
   </div>
+
+  <div class="row">
+    <div class="input-field col s9">
+      <div class="switch" style="margin-top:-5px">
+        <label style="font-weight:bold">Ninguno<input type="checkbox" id="switchherra" onclick="javascript:checkboxherra()" class="switchherra"><span class="lever"></span>Todos</label>
+        <h6 for="switchgroup" style="font-weight:bold;margin-top:-1;color:#0091ea;font-size:0.8rem">SELECCIONAR</h6>
+      </div>
+    </div>
+    <div class="input-field col s3">
+      <button style="width:300px;" type="button" class="btn waves-effect red lighten-1 btndelheselect">
+        <i class="fa fa-trash"></i>
+        <span><strong>Eliminar Seleccionados</strong></span>
+      </button>
+    </div>
+  </div>
     <table class="table responsive-table highlight table-condensed tabla-herra" id="tabla-herra" style="margin-bottom:50px">
         <thead class="cab">
           <tr>
             <th class="colst40">#</th>
             <th class="colst150">CODIGO</th>
+            <th class="colst40"></th>
             <th ><h6 class="lbltipoacce" style="font-weight:bold"></h6></th>
             <th >MEDIDA</th>
             <th class="colst150">MARCA</th>

@@ -22,6 +22,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from xlrd import open_workbook, XL_CELL_EMPTY
+from openpyxl import load_workbook
 
 
 from CMSGuias.apps.home.models import *
@@ -56,10 +57,11 @@ class Herramienta(JSONResponseMixin, TemplateView):
                 if 'getherra' in request.GET:
                     lherra=[]
                     tipolist=request.GET.get('tipolist')
+                    conta=0
                     if tipolist=='all':
                         for x in InventarioHerra.objects.filter(
                             herramienta__tipo=request.GET.get('tipoacce'),
-                            flag=True).order_by('herramienta__matnom'):
+                            flag=True).order_by('herramienta__matnom')[:50]:
                             lherra.append({
                                 'codherra':x.herramienta.materiales_id,
                                 'nameherra':x.herramienta.matnom,
@@ -68,10 +70,11 @@ class Herramienta(JSONResponseMixin, TemplateView):
                                 'brand':x.marca.brand,
                                 'codunid':x.herramienta.unidad.unidad_id,
                                 'tvida':x.tvida,
+                                'conta':conta,
                                 'unid':x.herramienta.unidad.uninom
                                 })
-
-                        context['lherra']=lherra[:50]
+                            conta=conta+1
+                        context['lherra']=lherra
                     else:
                         for x in InventarioHerra.objects.filter(
                             Q(herramienta__materiales_id=request.GET.get('texto')) | Q(herramienta__matnom__icontains=request.GET.get('texto')),
@@ -85,9 +88,38 @@ class Herramienta(JSONResponseMixin, TemplateView):
                                 'brand':x.marca.brand,
                                 'codunid':x.herramienta.unidad.unidad_id,
                                 'tvida':x.tvida,
+                                'conta':conta,
                                 'unid':x.herramienta.unidad.uninom
                                 })
+                            conta=conta+1
                         context['lherra']=lherra
+                    context['status']=True
+
+                if 'usedherra' in request.GET:
+                    lcodsherra=json.loads(request.GET.get('lcodsherra'))
+                    lcodsused=[]
+                    lcodnotused=[]
+                    for y in lcodsherra:
+                        herra = detGuiaHerramienta.objects.filter(
+                            herramienta_id=y['codherra'],
+                            brand_id=y['codbr']).exists()
+
+                        herradev = detDevHerramienta.objects.filter(
+                            herramienta_id=y['codherra'],
+                            brand_id=y['codbr']).exists()
+
+                        if herra | herradev:
+                            lcodsused.append({
+                                'codherra':y['codherra'],
+                                'codbr':y['codbr']
+                                })
+                        else:
+                            lcodnotused.append({
+                                'codherra':y['codherra'],
+                                'codbr':y['codbr']
+                                })
+                    context['lcodsused']=lcodsused
+                    context['lcodnotused'] = lcodnotused
                     context['status']=True
 
             except ObjectDoesNotExist, e:
@@ -163,6 +195,19 @@ class Herramienta(JSONResponseMixin, TemplateView):
                         eherra.save()
                         context['status'] = True
 
+                    if 'delherramienta' in request.POST:
+                        lcodnotused=json.loads(request.POST.get('lcodnotused'))
+
+                        for x in lcodnotused:
+                            InventarioHerra.objects.get(
+                                herramienta_id=x['codherra'],
+                                marca_id=x['codbr']).delete()
+
+                        for y in lcodnotused:
+                            Materiale.objects.get(
+                                materiales_id=y['codherra']).delete()
+                        context['status']=True
+
                 except Exception, e:
                     context['raise'] = str(e)
                     context['status'] = False
@@ -173,6 +218,13 @@ class Herramienta(JSONResponseMixin, TemplateView):
 class Guia(JSONResponseMixin, TemplateView):
     @method_decorator(login_required)
     def get(self,request,*args,**kwargs):
+        if 'downxlshe' in request.GET:
+            file_path = '{}/formats/{}'.format(settings.STATIC_ROOT, "FI_DETALLE_HE_Y_EPPS.xlsx")
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type='application/vnd.ms-excel;charset=utf-16')
+                response['Content-Disposition'] = 'inline; filename=FI_DETALLE_HE_Y_EPPS.xlsx'
+            return response
+
         context = dict();
         if request.is_ajax():
             try:
@@ -181,7 +233,8 @@ class Guia(JSONResponseMixin, TemplateView):
                     arrherradev = []
                     count = 0
                     for x in detGuiaHerramienta.objects.filter(
-                        guia_id=request.GET.get('nguia'),flagdev=False):
+                        guia_id=request.GET.get('nguia'),
+                        flagdev=False).order_by('herramienta__matnom'):
                         arrherradev.append(
                             {'nguia': x.guia_id,
                             'codherra':x.herramienta_id,
@@ -223,7 +276,7 @@ class Guia(JSONResponseMixin, TemplateView):
                 if 'ldetherraguia' in request.GET:
                     lisherraguia = []
                     for x in detGuiaHerramienta.objects.filter(
-                        guia_id=request.GET.get('idherraguia')):
+                        guia_id=request.GET.get('idherraguia')).order_by('herramienta__matnom'):
                         lisherraguia.append(
                             {'id': x.id,
                             'codguia' : x.guia_id,
@@ -248,7 +301,7 @@ class Guia(JSONResponseMixin, TemplateView):
                     for x in lis:
                         k = 0
                         for x in detGuiaHerramienta.objects.filter(
-                            guia_id=lis[j]):
+                            guia_id=lis[j]).order_by('herramienta__matnom'):
                             li.append({
                                 'nameherra':x.herramienta.nombre,
                                 'medherra':x.herramienta.medida,
@@ -266,7 +319,7 @@ class Guia(JSONResponseMixin, TemplateView):
                     i = 1
                     for x in detGuiaHerramienta.objects.filter(
                         guia_id=request.GET.get('idherraguia'),
-                        flagdev=False):
+                        flagdev=False).order_by('herramienta__matnom'):
                         lisherraguia.append(
                             {'id': x.id,
                             'codguia' : x.guia_id,
@@ -313,13 +366,28 @@ class Guia(JSONResponseMixin, TemplateView):
                         for x in GuiaHerramienta.objects.filter(
                             tipo=request.GET.get('tipoacce'),
                             estado=request.GET.get('estadoguiaherra')).order_by('-registro'):
+                            if x.proyecto_id==None:
+                                codproy=""
+                                nameproy=""
+                                apesuperv=""
+                                namesuperv=""
+                                direcproy=""
+                                rzcliente=""
+                            else:
+                                codproy=x.proyecto_id
+                                nameproy=x.proyecto.nompro
+                                apesuperv=x.proyecto.empdni.lastname
+                                namesuperv=x.proyecto.empdni.firstname
+                                direcproy=x.proyecto.direccion
+                                rzcliente=x.proyecto.ruccliente.razonsocial
+
                             lguiasherra.append({
                                 'numguiaherra':x.guia_id,
-                                'codproy':x.proyecto_id,
-                                'nameproy':x.proyecto.nompro,
+                                'codproy':codproy,
+                                'nameproy':nameproy,
                                 'fsalida':x.fechsalida,
-                                'apesuperv':x.proyecto.empdni.lastname,
-                                'namesuperv':x.proyecto.empdni.firstname,
+                                'apesuperv':apesuperv,
+                                'namesuperv':namesuperv,
                                 'codtransporte':x.traruc_id,
                                 'transporte':x.traruc.tranom,
                                 'codconductor':x.condni_id,
@@ -327,8 +395,8 @@ class Guia(JSONResponseMixin, TemplateView):
                                 'codplaca':x.nropla_id,
                                 'comentario':x.comentario,
                                 'marcatransporte':x.nropla.marca,
-                                'direcproy':x.proyecto.direccion,
-                                'rzcliente':x.proyecto.ruccliente.razonsocial
+                                'direcproy':direcproy,
+                                'rzcliente':rzcliente
                                 })
                         context['lguiasherra']=lguiasherra[:50]
                     elif tipolist=='rangofecha':
@@ -336,13 +404,27 @@ class Guia(JSONResponseMixin, TemplateView):
                             tipo=request.GET.get('tipoacce'),
                             fechsalida__range=[request.GET.get('fechfrom'),request.GET.get('fechto')],
                             estado=request.GET.get('estadoguiaherra')).order_by('-registro'):
+                            if x.proyecto_id==None:
+                                codproy=""
+                                nameproy=""
+                                apesuperv=""
+                                namesuperv=""
+                                direcproy=""
+                                rzcliente=""
+                            else:
+                                codproy=x.proyecto_id
+                                nameproy=x.proyecto.nompro
+                                apesuperv=x.proyecto.empdni.lastname
+                                namesuperv=x.proyecto.empdni.firstname
+                                direcproy=x.proyecto.direccion
+                                rzcliente=x.proyecto.ruccliente.razonsocial
                             lguiasherra.append({
                                 'numguiaherra':x.guia_id,
-                                'codproy':x.proyecto_id,
-                                'nameproy':x.proyecto.nompro,
+                                'codproy':codproy,
+                                'nameproy':nameproy,
                                 'fsalida':x.fechsalida,
-                                'apesuperv':x.proyecto.empdni.lastname,
-                                'namesuperv':x.proyecto.empdni.firstname,
+                                'apesuperv':apesuperv,
+                                'namesuperv':namesuperv,
                                 'codtransporte':x.traruc_id,
                                 'transporte':x.traruc.tranom,
                                 'codconductor':x.condni_id,
@@ -350,8 +432,8 @@ class Guia(JSONResponseMixin, TemplateView):
                                 'codplaca':x.nropla_id,
                                 'comentario':x.comentario,
                                 'marcatransporte':x.nropla.marca,
-                                'direcproy':x.proyecto.direccion,
-                                'rzcliente':x.proyecto.ruccliente.razonsocial
+                                'direcproy':direcproy,
+                                'rzcliente':rzcliente
                                 })
                         context['lguiasherra']=lguiasherra
                     else:
@@ -359,13 +441,27 @@ class Guia(JSONResponseMixin, TemplateView):
                             Q(guia_id__icontains=request.GET.get('texto')) | Q(proyecto_id=request.GET.get('texto')),
                             tipo=request.GET.get('tipoacce'),
                             estado=request.GET.get('estadoguiaherra')).order_by('-registro'):
+                            if x.proyecto_id==None:
+                                codproy=""
+                                nameproy=""
+                                apesuperv=""
+                                namesuperv=""
+                                direcproy=""
+                                rzcliente=""
+                            else:
+                                codproy=x.proyecto_id
+                                nameproy=x.proyecto.nompro
+                                apesuperv=x.proyecto.empdni.lastname
+                                namesuperv=x.proyecto.empdni.firstname
+                                direcproy=x.proyecto.direccion
+                                rzcliente=x.proyecto.ruccliente.razonsocial
                             lguiasherra.append({
                                 'numguiaherra':x.guia_id,
-                                'codproy':x.proyecto_id,
-                                'nameproy':x.proyecto.nompro,
+                                'codproy':codproy,
+                                'nameproy':nameproy,
                                 'fsalida':x.fechsalida,
-                                'apesuperv':x.proyecto.empdni.lastname,
-                                'namesuperv':x.proyecto.empdni.firstname,
+                                'apesuperv':apesuperv,
+                                'namesuperv':namesuperv,
                                 'codtransporte':x.traruc_id,
                                 'transporte':x.traruc.tranom,
                                 'codconductor':x.condni_id,
@@ -373,8 +469,8 @@ class Guia(JSONResponseMixin, TemplateView):
                                 'codplaca':x.nropla_id,
                                 'comentario':x.comentario,
                                 'marcatransporte':x.nropla.marca,
-                                'direcproy':x.proyecto.direccion,
-                                'rzcliente':x.proyecto.ruccliente.razonsocial
+                                'direcproy':direcproy,
+                                'rzcliente':rzcliente
                                 })
 
                         context['lguiasherra']=lguiasherra
@@ -597,20 +693,28 @@ class Guia(JSONResponseMixin, TemplateView):
                     context['status']=True
 
                 if 'getlastguiama' in request.GET:
-                    cguia=genkeys.GenerateIdGuiaHerra('002')
-                    context['cguia']=cguia[4:12]
+                    cguia=genkeys.GetLastIdGuiaHerra()
+                    context['cguia']=cguia
                     context['status']=True
 
                 if 'lproyguia' in request.GET:
                     listproyguia=[]
                     for x in GuiaHerramienta.objects.filter(
                         tipo=request.GET.get('tipoacce')).distinct('proyecto__proyecto_id').order_by('proyecto__proyecto_id'):
+                        if x.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                        else:
+                            codproy=x.proyecto_id
+                            nameproy=x.proyecto.nompro
+
                         listproyguia.append({
-                            'codproy':x.proyecto.proyecto_id,
-                            'nameproy':x.proyecto.nompro
+                            'codproy':codproy,
+                            'nameproy':nameproy
                             })
                     context['listproyguia']=listproyguia
                     context['status']=True
+
                 if 'getemple' in request.GET:
                     emple='%s, %s' % (request.user.get_profile().empdni.lastname,
                                       request.user.get_profile().empdni.firstname)
@@ -661,6 +765,60 @@ class Guia(JSONResponseMixin, TemplateView):
             context = dict()
             if request.is_ajax():
                 try:
+
+                    if 'listhexls' in request.POST:
+
+                        arch = request.FILES['archivo']
+                        filename = uploadFiles.upload('/storage/temporary/', arch)
+                        book = load_workbook(filename, data_only=True)
+                        sheet = book['REQUERIMIENTO DE HERRAMIENTAS']
+
+                        lheexcel=[]
+                        for m in range(7, sheet.max_row):
+                            item = sheet.cell(row=m,column=1).value
+                            codhe = sheet.cell(row=m, column=2).value
+                            codbr = sheet.cell(row=m, column=4).value
+                            cant = sheet.cell(row=m, column=7).value
+                            grupo = sheet.cell(row=m, column=8).value
+                            estado = sheet.cell(row=m, column=9).value
+                            fdev = sheet.cell(row=m, column=10).value
+                            coment = sheet.cell(row=m, column=11).value
+
+                            if codhe!= None:
+
+                                if grupo == None:
+                                    grupo = ""
+
+                                if coment == None:
+                                    coment = ""
+
+                                if estado == None:
+                                    estado = 'ALMACEN'
+
+                                if estado == 'ALQUILER':
+                                    if fdev == None:
+                                        mens ="INGRESAR FECHA DE DEVOLUCION EN ITEM "+str(item)
+                                        context['mens']=mens
+                                        context['status']=False
+
+                                if fdev == None:
+                                    fdev = ""
+
+                                lheexcel.append({
+                                    'xlsitem':item,
+                                    'xlscodhe':codhe,
+                                    'xlsbrand':codbr,
+                                    'xlscantidad':cant,
+                                    'xlsgrupo':grupo,
+                                    'xlsestado':estado,
+                                    'xlsfdev':fdev,
+                                    'xlscoment':coment
+                                    })
+                        context['mens']=""
+                        context['lheexcel']=lheexcel
+                        context['status']=True
+
+
                     if 'exists' in request.POST:
                         print request.POST.get('numguia')
                         try:
@@ -701,16 +859,8 @@ class Guia(JSONResponseMixin, TemplateView):
 
 
                     if 'savecabguia' in request.POST:
-                        cguia=genkeys.GenerateIdGuiaHerra('001')
-                        codguia=''
                         linventrest=json.loads(request.POST.get('linventrest'))
-
-                        tipocod=request.POST.get('tipocod')
-                        if tipocod=='auto':
-                            codguia=cguia
-                        else:
-                            codguia=request.POST.get('codguia')
-
+                        codguia=request.POST.get('codguia')
                         GuiaHerramienta.objects.create(
                             guia_id=codguia,
                             proyecto_id=request.POST.get('codproy'),
@@ -826,12 +976,6 @@ class Guia(JSONResponseMixin, TemplateView):
                         context['status'] = True
 
 
-                        det = request.POST.getlist('lthg[]')
-                        print 'nvale'
-                        print det
-                        context['status'] = True
-
-
                     if 'eddetguia' in request.POST:
                         detguia = detGuiaHerramienta.objects.get(
                             id=request.POST.get('idtable')
@@ -901,13 +1045,8 @@ class Guia(JSONResponseMixin, TemplateView):
                     if 'updcreategdev' in request.POST:
                         linv=json.loads(request.POST.get('linv'))
                         ldetghe=json.loads(request.POST.get('ldetghe'))
-                        cguia=genkeys.GenerateIdGuiaHerra('001')
-                        tipocod=request.POST.get('tipocod')
+                        numguia=request.POST.get('numguia')
 
-                        if tipocod=='auto':
-                            numguia=cguia
-                        else:
-                            numguia=request.POST.get('numguiatot')
 
                         devolucionHerra.objects.create(
                             docdev_id=numguia,
@@ -916,7 +1055,8 @@ class Guia(JSONResponseMixin, TemplateView):
                             empdni_id=request.user.get_profile().empdni_id,
                             condni_id=request.POST.get('codcond'),
                             nropla_id=request.POST.get('codplaca'),
-                            traruc_id=request.POST.get('transp')
+                            traruc_id=request.POST.get('transp'),
+                            comentario=request.POST.get('coment'),
                             )
 
                         for x in linv:
@@ -939,6 +1079,8 @@ class Guia(JSONResponseMixin, TemplateView):
                                 cantidad=x['inputcant'],
                                 estado=x['estado'],
                                 comentario=x['comenthe'])
+
+                        context['status']=True
 
                         context['status']=True
 
@@ -978,6 +1120,54 @@ class Guia(JSONResponseMixin, TemplateView):
                             except GuiaHerramienta.DoesNotExist, e:
                                 context['status'] = False
 
+                    if 'exherra' in request.POST:
+                        lhepermit=[]
+                        lhenotpermit=[]
+                        lheexcel=json.loads(request.POST.get('lheexcel'))
+                        tipoacce=request.POST.get('tipoacce')
+                        for x in lheexcel:
+                            try:
+                                InventarioHerra.objects.get(
+                                    herramienta_id=x['xlscodhe'],
+                                    herramienta__tipo=tipoacce)
+
+                                he = InventarioHerra.objects.get(
+                                    herramienta_id=x['xlscodhe'],
+                                    herramienta__tipo=tipoacce)
+
+                                if float(x['xlscantidad']) > float(he.cantalmacen):
+
+                                    lhenotpermit.append({
+                                        'xlscodhe':x['xlscodhe'],
+                                        'error':'No hay stock disponible'
+                                        })
+                                else:
+
+                                    lhepermit.append({
+                                        'codherra':x['xlscodhe'],
+                                        'brandherra':he.marca.brand,
+                                        'cantidad':x['xlscantidad'],
+                                        'codbrherra':he.marca_id,
+                                        'coment':x['xlscoment'],
+                                        'descgeneral':x['xlsgrupo'],
+                                        'estado':x['xlsestado'],
+                                        'fdev':x['xlsfdev'],
+                                        'medherra':he.herramienta.matmed,
+                                        'nameherra':he.herramienta.matnom
+                                        })
+
+                            except InventarioHerra.DoesNotExist, e:
+                                lhenotpermit.append({
+                                    'xlscodhe':x['xlscodhe'],
+                                    'error':'No existe en la base'
+                                    })
+
+                        print 'lhenotpermit', lhenotpermit
+                        print 'lhepermit', lhepermit
+                        context['lhenotpermit'] = lhenotpermit
+                        context['lhepermit'] = lhepermit
+                        context['status']=True
+
 
                 except Exception, e:
                     context['raise'] = str(e)
@@ -985,6 +1175,7 @@ class Guia(JSONResponseMixin, TemplateView):
                 return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
+
 
 datenow=globalVariable.date_now('datetime')
 class Inventario(JSONResponseMixin, TemplateView):
@@ -1056,21 +1247,23 @@ class Inventario(JSONResponseMixin, TemplateView):
                     tipolist=request.GET.get('tipolist')
                     print 'tipolist', tipolist
                     if tipolist=='all':
-                        print 'alll'
                         for x in InventarioHerra.objects.filter(
                             herramienta__tipo=request.GET.get('tipoacce'),
                             flag=True).order_by('herramienta__matnom'):
-                            linvent.append({
-                                'codherra':x.herramienta.materiales_id,
-                                'nameherra':x.herramienta.matnom,
-                                'medherra':x.herramienta.matmed,
-                                'codbr':x.marca.brand_id,
-                                'lastprice':x.price,
-                                'areaemple':True if areaemple=="ADMINISTRATOR" else False,
-                                'unid':x.herramienta.unidad.uninom,
-                                'brand':x.marca.brand,
-                                'cantalmacen':x.cantalmacen
-                                })
+
+                            if x.cantalmacen > 0:
+                                linvent.append({
+                                    'codherra':x.herramienta.materiales_id,
+                                    'nameherra':x.herramienta.matnom,
+                                    'medherra':x.herramienta.matmed,
+                                    'codbr':x.marca.brand_id,
+                                    'lastprice':x.price,
+                                    'areaemple':True if areaemple=="ADMINISTRATOR" else False,
+                                    'unid':x.herramienta.unidad.uninom,
+                                    'brand':x.marca.brand,
+                                    'codmoneda':x.moneda_id,
+                                    'cantalmacen':x.cantalmacen
+                                    })
                         context['linvent']=linvent[:50]
                     else:
                         for x in InventarioHerra.objects.filter(
@@ -1084,9 +1277,10 @@ class Inventario(JSONResponseMixin, TemplateView):
                                 'medherra':x.herramienta.matmed,
                                 'codbr':x.marca.brand_id,
                                 'lastprice':x.price,
-                                'areaemple':areaemple,
+                                'areaemple':True if areaemple=="ADMINISTRATOR" else False,
                                 'unid':x.herramienta.unidad.uninom,
                                 'brand':x.marca.brand,
+                                'codmoneda':x.moneda_id,
                                 'cantalmacen':x.cantalmacen,
                                 })
                         context['linvent']=linvent
@@ -1137,6 +1331,7 @@ class Inventario(JSONResponseMixin, TemplateView):
 
 
 class Devolucion(JSONResponseMixin, TemplateView):
+
     @method_decorator(login_required)
     def get(self,request,*args,**kwargs):
         context = dict();
@@ -1166,13 +1361,23 @@ class Devolucion(JSONResponseMixin, TemplateView):
                     for x in GuiaHerramienta.objects.filter(
                         tipo=request.GET.get('tipoacce'),
                         estado='DEVCOMP'):
+                        if x.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                            lastnamesup=""
+                            firstnamesup=""
+                        else:
+                            codproy=x.proyecto_id
+                            nameproy=x.proyecto.nompro
+                            lastnamesup=x.proyecto.empdni.lastname
+                            firstnamesup=x.proyecto.empdni.firstname
                         lgcomp.append({
-                            'codproy':x.proyecto_id,
-                            'nameproy':x.proyecto.nompro,
+                            'codproy':codproy,
+                            'nameproy':nameproy,
                             'codguia':x.guia_id,
                             'fsalida':x.fechsalida,
-                            'lastnamesup':x.proyecto.empdni.lastname,
-                            'firstnamesup':x.proyecto.empdni.firstname
+                            'lastnamesup':lastnamesup,
+                            'firstnamesup':firstnamesup
                             })
                     context['lgcomp']=lgcomp
                     context['status']=True
@@ -1241,8 +1446,11 @@ class Consulta(JSONResponseMixin, TemplateView):
                 if 'ldetcons' in request.GET:
                     arrdetcons = []
                     count = 1
+                    codproy=request.GET.get('numproy')
+                    if codproy=="":
+                        codproy=None
                     for x in detGuiaHerramienta.objects.filter(
-                        guia__proyecto_id=request.GET.get('numproy'),
+                        guia__proyecto_id=codproy,
                         herramienta_id = request.GET.get('idherramienta'),
                         guia__estado='GE'):
                         arrdetcons.append(
@@ -1268,9 +1476,16 @@ class Consulta(JSONResponseMixin, TemplateView):
                     for x in detGuiaHerramienta.objects.filter(
                         herramienta_id=request.GET.get('codigoherra'),
                         guia__estado = 'GE'):
+                        if x.guia.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                        else:
+                            codproy=x.guia.proyecto_id
+                            nameproy=x.guia.proyecto.nompro
+
                         lish.append(
-                            {'proyc':x.guia.proyecto.proyecto_id,
-                            'proynom':x.guia.proyecto.nompro,
+                            {'proyc':codproy,
+                            'proynom':nameproy,
                             'fsalid':x.guia.fechsalida,
                             'guiacod':x.guia.guia_id,
                             'conta':count,
@@ -1283,8 +1498,12 @@ class Consulta(JSONResponseMixin, TemplateView):
                 if 'lproyherra' in request.GET:
                     lisherra = []
                     count = 1;
+                    codproy = request.GET.get('codigoproy')
+                    if codproy=="":
+                        codproy=None
+
                     for x in detGuiaHerramienta.objects.filter(
-                        guia__proyecto_id=request.GET.get('codigoproy'),
+                        guia__proyecto_id=codproy,
                         guia__tipo=request.GET.get('tipoacce'),
                         guia__estado = 'GE').order_by('herramienta__matnom'):
 
@@ -1334,9 +1553,17 @@ class Consulta(JSONResponseMixin, TemplateView):
                     for x in GuiaHerramienta.objects.filter(
                         tipo=request.GET.get('tipoacce'),
                         estado='GE').distinct('proyecto__proyecto_id').order_by('proyecto__proyecto_id'):
+
+                        if x.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                        else:
+                            codproy=x.proyecto_id
+                            nameproy=x.proyecto.nompro
+
                         lprocons.append({
-                            'codproy':x.proyecto.proyecto_id,
-                            'nameproy':x.proyecto.nompro
+                            'codproy':codproy,
+                            'nameproy':nameproy
                             })
                     context['lprocons']=lprocons
                     context['status']=True
@@ -1389,7 +1616,9 @@ class EstadoHerramienta(JSONResponseMixin, TemplateView):
                     for x in detDevHerramienta.objects.filter(
                         guia__tipo=request.GET.get('tipoacce'),
                         estado=request.GET.get('estmat'),
-                        docdev__estado = 'GE').distinct('herramienta__matnom','herramienta__matmed').order_by('herramienta__matmed'):
+                        docdev__estado = 'GE').distinct(
+                            'herramienta__matnom',
+                            'herramienta__matmed').order_by('herramienta__matmed'):
                         lestalmacen.append(
                             {'codherra':x.herramienta_id,
                             'nameherra':x.herramienta.matnom,
@@ -1414,17 +1643,24 @@ class EstadoHerramienta(JSONResponseMixin, TemplateView):
                             day = x.fechdevolucion - x.guia.fechsalida
                             dayf = day.days
 
+                        if x.guia.proyecto_id==None:
+                            codproy = ""
+                            nameproy = ""
+                        else:
+                            codproy = x.guia.proyecto_id
+                            nameproy = x.guia.proyecto.nompro
+
                         lestalmacen.append(
-                            {'fechsalida':x.guia.fechsalida,
-                            'fechdev':x.fechdevolucion,
-                            'codproy':x.guia.proyecto.proyecto_id,
-                            'nompro':x.guia.proyecto.nompro,
-                            'numguia':x.guia_id,
-                            'dias':dayf,
-                            'count':count,
-                            'cantidad':x.cantidad,
-                            'comentario':x.comentario}
-                            )
+                                {'fechsalida':x.guia.fechsalida,
+                                'fechdev':x.fechdevolucion,
+                                'codproy':codproy,
+                                'nompro':nameproy,
+                                'numguia':x.guia_id,
+                                'dias':dayf,
+                                'count':count,
+                                'cantidad':x.cantidad,
+                                'comentario':x.comentario}
+                                )
                         count = count + 1;
                         context['lestalmacen'] = lestalmacen
                     context['status'] = True
@@ -1436,11 +1672,16 @@ class EstadoHerramienta(JSONResponseMixin, TemplateView):
                         herramienta_id=request.GET.get('codhe'),
                         estado=request.GET.get('idestado'),
                         docdev__estado = 'GE').order_by('herramienta__matnom'):
+                        if x.guia.proyecto_id==None:
+                            nameproy = ""
+                        else:
+                            nameproy = x.guia.proyecto.nompro
+
                         lestrepar.append(
                             {'fechsalida':x.guia.fechsalida,
                             'registro':x.docdev.registro,
                             'fechretorno':x.docdev.fechretorno,
-                            'nompro':x.guia.proyecto.nompro,
+                            'nompro':nameproy,
                             'numguia':x.guia_id,
                             'count':count,
                             'cantidad':x.cantidad,
@@ -1486,6 +1727,13 @@ class Trasladohe(JSONResponseMixin, TemplateView):
                         herramienta_id=request.GET.get('txtcodherra'),
                         guia__estado='GE',
                         flagdev=False).order_by('herramienta__matnom'):
+                        if x.guia.proyecto_id==None:
+                            codproy=""
+                            nameproy=""
+                        else:
+                            codproy=x.guia.proyecto_id
+                            nameproy=x.guia.proyecto.nompro
+
                         ltrherra.append({
                             'codguia':x.guia_id,
                             'codherra':x.herramienta.materiales_id,
@@ -1498,8 +1746,8 @@ class Trasladohe(JSONResponseMixin, TemplateView):
                             'cantdev':x.cantdev,
                             'conta':conta,
                             'estadohe':x.estado,
-                            'codproy':x.guia.proyecto.proyecto_id,
-                            'nameproy':x.guia.proyecto.nompro
+                            'codproy':codproy,
+                            'nameproy':nameproy
                             })
                         conta=conta+1
                     context['ltrherra']=ltrherra
@@ -1580,16 +1828,9 @@ class Trasladohe(JSONResponseMixin, TemplateView):
             if request.is_ajax():
                 try:
                     if 'savetraslado' in request.POST:
-                        codauto=request.POST.get('codauto')
-                        codigo=''
-                        if codauto=='true':
-                            codigo=genkeys.GenerateIdGuiaHerra('001')
-                        else:
-                            codigo=request.POST.get('numguiatr')
-
                         sumdettras=json.loads(request.POST.get('sumdettras'))
                         ltrdghe=json.loads(request.POST.get('ltrdghe'))
-
+                        codigo = request.POST.get('numguiatr')
                         GuiaHerramienta.objects.create(
                             guia_id=codigo,
                             proyecto_id=request.POST.get('codproydest'),
@@ -1612,8 +1853,8 @@ class Trasladohe(JSONResponseMixin, TemplateView):
                                 fechdevolucion=None if x['fdev']=="" else x['fdev'],
                                 cantidad=x['cantidad'],
                                 comentario=x['comenthe'],
-                                cantinicial=x['cantidad'],
-                                grupo='')
+                                grupo='',
+                                cantinicial=x['cantidad'])
 
                         for y in ltrdghe:
                             upd=detGuiaHerramienta.objects.get(
@@ -1686,16 +1927,31 @@ class NotaIngreso(JSONResponseMixin, TemplateView):
                         Q(flag='0')|Q(flag='1'),
                         compra_id=request.GET.get('codcompra')
                         ).order_by('materiales__matnom'):
-                        uni = x.unit_id
+                        unidcompra= x.unit_id
+                        unidmat=x.materiales.unidad_id
+                        nameunidmat=x.materiales.unidad.uninom
+
+                        if unidcompra == None:
+                            unidad = nameunidmat
+                        else:
+                            unidad = x.unit.uninom
+
+                        if unidad == unidmat:
+                            sameunit = True
+                            printrow = False
+                        else:
+                            sameunit = False
+                            printrow = True
+
                         ldetcomp.append({
                             'idtabdetcompra':x.id,
                             'codmat':x.materiales.materiales_id,
                             'namemat':x.materiales.matnom,
                             'medmat':x.materiales.matmed,
                             'uninomhe':x.materiales.unidad.uninom,
-                            'unidad':x.materiales.unidad.uninom if uni==None else x.unit.uninom,
-                            'sameunit':True if uni==None else False,
-                            'printrow':False if uni==None else True,
+                            'unidad': unidad,
+                            'sameunit': sameunit,
+                            'printrow': printrow,
                             'codbrand':x.brand_id,
                             'brand':x.brand.brand,
                             'conta':conta,
@@ -1791,6 +2047,7 @@ class Cargar(JSONResponseMixin, TemplateView):
     def get(self,request,*args,**kwargs):
         if 'descformat' in request.GET:
             file_path = '{}/formats/{}'.format(settings.STATIC_ROOT, "FI_HERRAMIENTAS_Y_EPPS.xls")
+            print 'filepath',file_path
             with open(file_path, 'rb') as fh:
                 response = HttpResponse(fh.read(), content_type='application/vnd.ms-excel;charset=utf-16')
                 response['Content-Disposition'] = 'inline; filename=FI_HERRAMIENTAS_Y_EPPS.xls'
@@ -1880,1090 +2137,1090 @@ class Cargar(JSONResponseMixin, TemplateView):
             return render(request, url+'/templates/almacen/form/resultherra.html',{'tipoacce':tipoacce})
 
 
-class DevConGuia(JSONResponseMixin, TemplateView):
-    @method_decorator(login_required)
-    def get(self,request,*args,**kwargs):
-        context = dict();
-        if request.is_ajax():
-            try:
-
-                if 'viewcant' in request.GET:
-                    context = DetGuiaRemision.objects.values(
-                        'cantguide',
-                        'cantdev'
-                        ).get(
-                        guia_id=request.GET.get('numguia'),
-                        order_id=request.GET.get('codped'),
-                        materiales_id=request.GET.get('codmat'),
-                        brand_id=request.GET.get('codbrand'),
-                        model_id=request.GET.get('codmodel'))
-                    if len(context) > 0:
-                        context['status'] = True
-                    context['status'] = True
-
-
-                if 'lmatguiadev' in request.GET:
-                    lmat = []
-                    count = 1
-                    for x in detGuiaDevMat.objects.filter(
-                        guiadevmat_id = request.GET.get('codgdevmat')).order_by('material__matnom'):
-                        lmat.append({
-                            'id': x.id,
-                            'numguia':x.guia_id,
-                            'guiadevmat':x.guiadevmat_id,
-                            'count':count,
-                            'codped':x.pedido_id,
-                            'codmat':x.material_id,
-                            'nommat':x.material.matnom,
-                            'medmat':x.material.matmed,
-                            'codmarca':x.marca_id,
-                            'nommarca':x.marca.brand,
-                            'codmodel': x.model_id,
-                            'nommodel': x.model.model,
-                            'cantidad':x.cantidad,
-                            'coment':x.comentario,
-                            'motiv':x.motivo
-                            })
-
-                        count = count +1
-                    context['lmat'] = lmat
-
-                    context['status'] = True
-
-                if 'listmaterials' in request.GET:
-                    lmat = []
-                    count = 1
-                    countcod = 0
-                    for x in DetGuiaRemision.objects.filter(
-                        guia_id=request.GET.get('txtingresado'),
-                        stcantdev=False,
-                        order__flag=True,
-                        guia__status='GE',
-                        flag=True,
-                        guia__flag = True
-                        ).order_by('materiales__matnom'):
-                        lmat.append(
-                            {'numguia':x.guia_id,
-                            'codmat':x.materiales_id,
-                            'namemat':x.materiales.matnom,
-                            'medmat':x.materiales.matmed,
-                            'codbrand':x.brand_id,
-                            'namebrand':x.brand.brand,
-                            'codmodel':x.model_id,
-                            'namemodel':x.model.model,
-                            'cantguide':x.cantguide,
-                            'count':count,
-                            'cantdev':x.cantdev,
-                            'codped':x.order_id,
-                            'countcod':countcod,
-                            'codproy':x.order.proyecto_id,
-                            'coddsector':x.order.dsector_id
-                            })
-                        count = count + 1
-                        countcod = countcod + 1
-                    context['lmaterials'] = lmat
-
-                    if len(lmat) > 0 :
-                        context['listmat'] = True
-                    else:
-                        context['listmat'] = False
-                    context['sizelistmat'] = len(lmat)
-
-                    context['status'] = True
-
-                if 'getlnip' in request.GET:
-                    listnip = []
-                    countcod = 0
-                    for x in NipleGuiaRemision.objects.filter(
-                        order_id = request.GET.get('codped'),
-                        materiales_id = request.GET.get('codmat'),
-                        brand_id = request.GET.get('codbr'),
-                        model_id = request.GET.get('codmod'),
-                        flag = True,
-                        flagcenvdevmat=False).order_by('materiales__matnom'):
-                        listnip.append({
-                            'idtabnipgrem':x.id,
-                            'codped':x.order_id,
-                            'codmat':x.materiales_id,
-                            'namemat':x.materiales.matnom,
-                            'medmat':x.materiales.matmed,
-                            'codbr':x.brand_id,
-                            'namebran':x.brand.brand,
-                            'codmod':x.model_id,
-                            'namemod':x.model.model,
-                            'cantidad':x.cantguide,
-                            'metrado':x.metrado,
-                            'num':request.GET.get('num'),
-                            'row':countcod,
-                            'numguia':request.GET.get('numguia'),
-                            'motinip':request.GET.get('motinip'),
-                            'comnip':request.GET.get('comnip'),
-                            'cenvmat':x.cenvdevmat,
-                            'countcod':countcod,
-                            'tipo':x.tipo,
-                            'canti':x.cantguide
-                            })
-                        countcod = countcod + 1
-
-                    context['listnip'] = listnip
-                    print len(listnip)
-                    if len(listnip) > 0:
-                        context['stlistnip'] = True
-                    else:
-                        context['stlistnip'] = False
-                    context['status'] = True
-
-                if 'existsnip' in request.GET:
-                    lstniple=[]
-                    lmat = json.loads(request.GET.get('lmat'))
-                    for y in lmat:
-                        lnip=[]
-                        for x in NipleGuiaRemision.objects.filter(
-                            order_id = y['codped'],
-                            materiales_id = y['codmat'],
-                            brand_id = y['codbrand'],
-                            model_id = y['codmodel'],
-                            flag=True):
-                            lnip.append({
-                                'id':x.id
-                                })
-                        if len(lnip)>0:
-                            estado = True
-                        else:
-                            estado = False
-                        lstniple.append({
-                            'estado': estado
-                            })
-                    context['lstniple'] = lstniple
-                    context['status'] = True
-
-                if 'existguiape' in request.GET:
-                    lgdev=[]
-                    for x in detGuiaDevMat.objects.filter(
-                        guia_id=request.GET.get('codguia'),
-                        guiadevmat__estado='PE'):
-                        lgdev.append({
-                            'coddevmat':x.guiadevmat_id
-                            })
-                    if len(lgdev) > 0:
-                        context['stlgdev'] = True
-                    else:
-                        context['stlgdev'] = False
-
-                    context['status'] = True
-
-                if 'getlistnip' in request.GET:
-                    listmat = json.loads(request.GET.get('listmat'))
-                    lstmat=[]
-                    for x in listmat:
-                        lmaterials = []
-                        for y in GuiaDevMatNiple.objects.filter(
-                            guiadevmat_id=x['guiadevmat'],
-                            material_id=x['codmat'],
-                            marca_id=x['codmarca'],
-                            model_id=x['codmodel']
-                            ):
-                            lmaterials.append({
-                                'id':y.id
-                                })
-                        if len(lmaterials)==0:
-                            estado=False
-                        else:
-                            estado=True
-                        lstmat.append({
-                            'estado':estado
-                            })
-                    context['lestados']=lstmat
-                    context['status']=True
-
-                if 'getniple' in request.GET:
-                    lni=[]
-                    for x in GuiaDevMatNiple.objects.filter(
-                        guiadevmat_id=request.GET.get('idgdevmat'),
-                        material_id=request.GET.get('idmat'),
-                        pedido_id=request.GET.get('codped'),
-                        marca_id=request.GET.get('idbr'),
-                        model_id=request.GET.get('idmod')
-                        ):
-                        lni.append({
-                            'id':x.id
-                            })
-                    if len(lni) > 0:
-                        context['stlni'] = True
-                    else:
-                        context['stlni'] = False
-                    context['status']=True
-
-                if 'glnipdevmat' in request.GET:
-                    lnipdev=[]
-                    for x in GuiaDevMatNiple.objects.filter(
-                        guiadevmat_id=request.GET.get('codgdevmat'),
-                        material_id=request.GET.get('codmat'),
-                        pedido_id=request.GET.get('codped'),
-                        marca_id=request.GET.get('codbr'),
-                        model_id=request.GET.get('codmod')):
-                        lnipdev.append({
-                            'idtable':x.id,
-                            'codguiadevmat':x.guiadevmat_id,
-                            'codmat':x.material_id,
-                            'namemat':x.material.matnom,
-                            'medmat':x.material.matmed,
-                            'codbr':x.marca_id,
-                            'codmod':x.model_id,
-                            'cantidad':x.cantidad,
-                            'metrado':x.metrado,
-                            'tipo':x.tipo,
-                            'idrefid':x.idnipgrem_id,
-                            'motivo':x.motivo,
-                            'comentario':x.comentario
-                            })
-                    context['lnipdev']=lnipdev
-                    context['status']=True
-
-                if 'getcantnip' in request.GET:
-                    print request.GET.get('codtabnip')
-                    context = NipleGuiaRemision.objects.values(
-                                'cenvdevmat',
-                                'cantguide'
-                                ).get(id=request.GET.get('codtabnip'))
-
-                    context['status'] =True
-
-                if 'getcantdevmat' in request.GET:
-                    context=detGuiaDevMat.objects.values(
-                            'cantidad').get(
-                            guiadevmat_id=request.GET.get('codgdevmat'),
-                            material_id=request.GET.get('codmat'),
-                            marca_id=request.GET.get('codbr'),
-                            model_id=request.GET.get('codmod'))
-                    context['status']=True
-
-                if 'getcantdetguiarem' in request.GET:
-
-                    lmat=json.loads(request.GET.get('lmat'))
-                    ldetgrem=[]
-                    ldetinven=[]
-                    ldetpedido=[]
-                    # ldetdsmetrado=[]
-                    for x in lmat:
-                        for y in DetGuiaRemision.objects.filter(
-                            guia_id=x['numguia'],
-                            order_id=x['codped'],
-                            materiales_id=x['codmat'],
-                            brand_id=x['codmarca'],
-                            model_id=x['codmodel']):
-                            ldetgrem.append({
-                                'idtabdetgrem':y.id,
-                                'numguia':y.guia_id,
-                                'codmat':y.materiales_id,
-                                'codbr':y.brand_id,
-                                'codmod':y.model_id,
-                                'cdevuelta':y.cantdev,
-                                'updcantguide':round((float(y.cantguide)-float(x['cantidad']))*100)/100,
-                                'updcantdev':round((float(x['cantidad'])+float(y.cantdev))*100)/100
-                                })
-
-                        try:
-                            InventoryBrand.objects.get(
-                                materials_id=x['codmat'],
-                                brand_id=x['codmarca'],
-                                model_id=x['codmodel'])
-                            codbrand=x['codmarca']
-                            codmodel=x['codmodel']
-
-                        except InventoryBrand.DoesNotExist, e:
-                            try:
-                                InventoryBrand.objects.get(
-                                    materials_id=x['codmat'],
-                                    brand_id=x['codmarca'])
-                                codbrand=x['codmarca']
-                                codmodel='MO000'
-
-                            except InventoryBrand.DoesNotExist, e:
-                                codbrand='BR000'
-                                codmodel='MO000'
-
-                        for z in InventoryBrand.objects.filter(
-                            materials_id=x['codmat'],
-                            brand_id=codbrand,
-                            model_id=codmodel):
-                            ldetinven.append({
-                                'idtabinvbrand':z.id,
-                                'codmat':z.materials_id,
-                                'codbr':z.brand_id,
-                                'codmod':z.model_id,
-                                'stock':z.stock,
-                                'updstock':round((float(z.stock)+float(x['cantidad']))*100)/100
-                                })
-                        try:
-                            Detpedido.objects.get(
-                                pedido_id=x['codped'],
-                                materiales_id=x['codmat'],
-                                brand_id=x['codmarca'],
-                                model_id=x['codmodel'])
-                            codbrand=x['codmarca']
-                            codmodel=x['codmodel']
-                            print 'existe'
-                        except Detpedido.DoesNotExist, e:
-                            try:
-                                Detpedido.objects.get(
-                                    pedido_id=x['codped'],
-                                    materiales_id=x['codmat'],
-                                    brand_id=x['codmarca'])
-                                codbrand=x['codmarca']
-                                codmodel='MO000'
-                            except Detpedido.DoesNotExist, e:
-                                codbrand='BR000'
-                                codmodel='MO000'
-
-                        for n in Detpedido.objects.filter(
-                            pedido_id=x['codped'],
-                            materiales_id=x['codmat'],
-                            brand_id=codbrand,
-                            model_id=codmodel):
-                            ldetpedido.append({
-                                'idtabdetped':n.id,
-                                'cantstatic':n.cantidad,
-                                'updcantshop':round((float(n.cantshop)+float(x['cantidad']))*100)/100,
-                                'updcantguide':round((float(n.cantguide)-float(x['cantidad']))*100)/100,
-                                'updcantenv':round((float(n.cenvdevmat)+float(x['cantidad']))*100)/100,
-                                })
-
-                    context['ldetgrem']=ldetgrem
-                    context['ldetinven']=ldetinven
-                    context['ldetpedido']=ldetpedido
-
-                    context['status']=True
-
-                if 'getdetgdevmatnip' in request.GET:
-                    lgdevmatnip=[]
-                    for x in GuiaDevMatNiple.objects.filter(
-                        guiadevmat_id=request.GET.get('ngdevmat')):
-                        lgdevmatnip.append({
-                            'idgdevmatniple':x.id,
-                            'codguiadevmat':x.guiadevmat_id,
-                            'codmat':x.material_id,
-                            'codbr':x.marca_id,
-                            'codmod':x.model_id,
-                            'cantidad':x.cantidad,
-                            'metrado':x.metrado,
-                            'tipo':x.tipo,
-                            'idtabnipgrem':x.idnipgrem_id,
-                            'idtabniple':x.idnipgrem.related
-                            })
-                    context['lgdevmatnip']=lgdevmatnip
-                    context['status']=True
-
-                if 'sumcantnip' in request.GET:
-                    lgdevmatnip = json.loads(request.GET.get('lgdevmatnip'))
-                    # lgdev=[]
-                    lnip=[]
-                    lnippedido=[]
-                    for x in lgdevmatnip:
-                        for z in NipleGuiaRemision.objects.filter(
-                            id=x['idtabnipgrem']):
-                            lnip.append({
-                                'idtabnipgrem':z.id,
-                                'codmat':z.materiales_id,
-                                'codbr':z.brand_id,
-                                'codped':z.order_id,
-                                'codmod':z.model_id,
-                                'cant':z.cantguide,
-                                'metrado':z.metrado,
-                                'tipo':z.tipo,
-                                'updcantguide':float(z.cantguide)-float(x['cantidad']),
-                                'updcantenv':float(z.cenvdevmat)+float(x['cantidad'])
-                                # 'updcantshop':float(z.cantshop)+float(x['cantidad']),
-                                })
-                        for y in Niple.objects.filter(
-                            id=x['idtabniple']):
-                            lnippedido.append({
-                                'idtabnipped':y.id,
-                                'cantstatic':y.cantidad,
-                                'codmat':y.materiales_id,
-                                'codbr':y.brand_id,
-                                'codmod':y.model_id,
-                                'codped':y.pedido_id,
-                                'metrado':y.metrado,
-                                'tipo':y.tipo,
-                                'updcantguide':float(y.cantguide)-float(x['cantidad']),
-                                'updcantenv':float(y.cenvdevmat)+float(x['cantidad']),
-                                'updcantshop':float(y.cantshop)+float(x['cantidad'])
-                                })
-
-
-                    context['lnip']=lnip
-                    context['lnippedido']=lnippedido
-                    context['status'] = True
-
-                if 'lguiasdev' in request.GET:
-                    lguia=[]
-                    estsearch = request.GET.get('search_one')
-
-                    if estsearch=='true':
-                        for x in GuiaDevMat.objects.filter(
-                            guiadevmat_id=request.GET.get('idguiadevmat'),
-                            estado=request.GET.get('stguia')).order_by('-registro'):
-                            lguia.append({
-                                'empleaut':x.emple_aut_id,
-                                'codproy':x.proyecto_id,
-                                'nameproyecto':x.proyecto.nompro,
-                                'codguiadev':x.guiadevmat_id,
-                                'fechdev':x.fechadevolucion,
-                                'registro':x.registro.strftime('%d-%m-%Y'),
-                                'autnames':'%s, %s' % (x.emple_aut.lastname,x.emple_aut.firstname),
-                                'genero':'%s, %s' % (x.empdni.lastname,x.empdni.firstname),
-                                'coment':x.comentario,
-                                'cond':x.condni_id,
-                                'placa':x.nropla_id,
-                                'transp':x.traruc_id
-                                })
-                        context['lguia']=lguia
-                    else:
-                        for x in GuiaDevMat.objects.filter(
-                            estado=request.GET.get('stguia')).order_by('-registro'):
-                            lguia.append({
-                                'empleaut':x.emple_aut_id,
-                                'codproy':x.proyecto_id,
-                                'nameproyecto':x.proyecto.nompro,
-                                'codguiadev':x.guiadevmat_id,
-                                'fechdev':x.fechadevolucion,
-                                'registro':x.registro.strftime('%d-%m-%Y'),
-                                'autnames':'%s, %s' % (x.emple_aut.lastname,x.emple_aut.firstname),
-                                'genero':'%s, %s' % (x.empdni.lastname,x.empdni.firstname),
-                                'coment':x.comentario,
-                                'cond':x.condni_id,
-                                'placa':x.nropla_id,
-                                'transp':x.traruc_id
-                                })
-
-                        context['lguia']=lguia[0:50]
-                    context['status']=True
-
-
-                if 'lcbotransxguia' in request.GET:
-                    lcond = []
-                    ltransp = []
-                    for x in Conductore.objects.filter(
-                        traruc_id = request.GET.get('codtransp')).order_by('connom'):
-                        lcond.append({
-                            'cod_cond': x.condni_id,
-                            'name_cond':x.connom
-                            })
-                        context['lcond'] = lcond
-
-                    for y in Transporte.objects.filter(
-                        traruc_id = request.GET.get('codtransp')):
-                        ltransp.append({
-                            'placa': y.nropla_id,
-                            'marca': y.marca
-                            })
-                        context['ltransp'] = ltransp
-
-                    context['status'] = True
-
-                if 'getuser' in request.GET:
-                    user='%s, %s' % (request.user.get_profile().empdni.lastname,
-                                      request.user.get_profile().empdni.firstname)
-                    context['user']=user
-                    context['status']=True
-
-
-            except ObjectDoesNotExist, e:
-                context['raise'] = str(e)
-                context['status'] = False
-            return self.render_to_json_response(context)
-
-        lemple = Employee.objects.filter(flag=True).order_by('lastname')
-        lguiadevmat = GuiaDevMat.objects.filter(estado = 'PE').order_by('guiadevmat_id')
-        lguiadevmatge = GuiaDevMat.objects.filter(estado = 'GE').order_by('guiadevmat_id')
-        ltransportist = Transportista.objects.filter(flag=True).order_by('tranom')
-        lplaca= Transporte.objects.filter(flag=True)
-        lconduct=Conductore.objects.filter(flag=True)
-
-        return render(request,'almacen/devolucionmaterial.html',{
-            'lguiadevmat':lguiadevmat,
-            'lguiadevmatge':lguiadevmatge,
-            'lemple':lemple,
-            'ltransportist':ltransportist,
-            'lplaca':lplaca,
-            'lconduct':lconduct
-            })
-
-# ///////////////////////////
-    @method_decorator(login_required)
-    def post(self, request, *args, **kwargs):
-        try:
-            context = dict()
-            if request.is_ajax():
-                try:
-                    if 'exists' in request.POST:
-                        try:
-                            GuiaRemision.objects.get(
-                                guia_id=request.POST.get('codguia'))
-                            context['status'] = True
-                        except GuiaRemision.DoesNotExist, e:
-                            context['status'] = False
-
-                    if 'exguiadevmat' in request.POST:
-                        try:
-                            GuiaDevMat.objects.get(
-                                guiadevmat_id=request.POST.get('codguia'))
-                            context['status'] = True
-                        except GuiaDevMat.DoesNotExist, e:
-                            context['status'] = False
-
-                    if 'updestguiadevmat' in request.POST:
-                        lgdevmatnip = json.loads(request.POST.get('lgdevmatnip'))
-                        ldetgdevmat = json.loads(request.POST.get('ldetgdevmat'))
-                        print 'lgdevmatnip', lgdevmatnip
-                        if len(lgdevmatnip)>0:
-                            for x in lgdevmatnip:
-                                GuiaDevMatNiple.objects.get(
-                                    id=x['idgdevmatniple']).delete()
-
-                        if len(ldetgdevmat)>0:
-                            for x in ldetgdevmat:
-                                detGuiaDevMat.objects.get(
-                                    id=x['id']).delete()
-
-                        GuiaDevMat.objects.get(
-                            guiadevmat_id=request.POST.get('codguidevmat')).delete()
-                        context['status'] = True
-
-                    if 'saveeditmat' in request.POST:
-                        edmat = detGuiaDevMat.objects.get(
-                            id = request.POST.get('idt'))
-                        edmat.cantidad = request.POST.get('cant')
-                        edmat.comentario = request.POST.get('com')
-                        edmat.motivo = request.POST.get('motivo')
-                        edmat.save()
-                        context['status'] = True
-
-
-                    if 'delmatdet' in request.POST:
-                        detGuiaDevMat.objects.get(
-                            id=request.POST.get('idtable')).delete()
-                        context['status'] = True
-
-
-                    if 'savecabgdev' in request.POST:
-                        cabgdev = GuiaDevMat.objects.get(
-                            guiadevmat_id = request.POST.get('codgdev'))
-                        cabgdev.fechadevolucion = request.POST.get('fdev')
-                        cabgdev.emple_aut_id = request.POST.get('empleaut')
-                        cabgdev.comentario = request.POST.get('coment')
-                        cabgdev.save()
-                        context['status'] = True
-
-
-                    if 'savedevmat' in request.POST:
-                        lniplefinal2=json.loads(request.POST.get('lniplefinal2'))
-                        ldetdev = json.loads(request.POST.get('ldetdev'))
-
-
-                        GuiaDevMat.objects.create(
-                            guiadevmat_id = request.POST.get('numeroguia'),
-                            fechadevolucion = request.POST.get('fdev'),
-                            emple_aut_id = request.POST.get('empdniaut'),
-                            empdni_id = request.user.get_profile().empdni_id,
-                            condni_id=request.POST.get('cond'),
-                            nropla_id=request.POST.get('placa'),
-                            proyecto_id=request.POST.get('codproy'),
-                            traruc_id=request.POST.get('transport'),
-                            estado = request.POST.get('est'),
-                            comentario = request.POST.get('comen')
-                            )
-
-
-                        if len(ldetdev) > 0:
-                            for x in ldetdev:
-                                detGuiaDevMat.objects.create(
-                                    guiadevmat_id = request.POST.get('numeroguia'),
-                                    guia_id=x['numguia'],
-                                    material_id = x['codmat'],
-                                    marca_id = x['codbr'],
-                                    model_id = x['codmod'],
-                                    cantidad = x['inputcant'],
-                                    comentario = x['comment'],
-                                    motivo = x['motivo'],
-                                    pedido_id=x['codped']
-                                    )
-
-                        if len(lniplefinal2) > 0:
-                            for y in lniplefinal2:
-                                GuiaDevMatNiple.objects.create(
-                                    guiadevmat_id=request.POST.get('numeroguia'),
-                                    guia_id=y['numguia'],
-                                    material_id=y['codmat'],
-                                    marca_id=y['codbr'],
-                                    model_id=y['codmod'],
-                                    cantidad=y['canti'],
-                                    metrado=y['metrado'],
-                                    tipo=y['tipo'],
-                                    idnipgrem_id=y['idtabnipgrem'],
-                                    motivo='' if y['motinip']==None else y['motinip'],
-                                    comentario='' if y['comnip']==None else y['comnip'],
-                                    pedido_id=y['codped']
-                                    )
-
-                        context['status'] = True
-
-                    if 'upddevmatniple' in request.POST:
-                        nip=GuiaDevMatNiple.objects.get(
-                            id=request.POST.get('codtab'))
-                        nip.cantidad=request.POST.get('cantupdnip')
-                        nip.save()
-
-                        detgdev=detGuiaDevMat.objects.get(
-                            guiadevmat_id=request.POST.get('codguiadevmat'),
-                            material_id=request.POST.get('codmat'),
-                            marca_id=request.POST.get('codbr'),
-                            model_id=request.POST.get('codmod'))
-                        detgdev.cantidad=request.POST.get('canttot')
-                        detgdev.save()
-
-                        context['status']=True
-
-                    if 'delnipdevmat' in request.POST:
-
-                        GuiaDevMatNiple.objects.get(
-                            id=request.POST.get('idtable')).delete()
-
-                        upd=detGuiaDevMat.objects.get(
-                            guiadevmat_id=request.POST.get('codgdevmat'),
-                            material_id=request.POST.get('codmat'),
-                            marca_id=request.POST.get('codbr'),
-                            model_id=request.POST.get('codmod'))
-                        upd.cantidad=request.POST.get('canttotal')
-                        upd.save()
-
-                        context['status']=True
-
-                    if 'updsavedevmat' in request.POST:
-                        # update detguiaremision
-                        ldetgrem = json.loads(request.POST.get('ldetgrem'))
-                        # update nipleguiaremision
-                        lnip=json.loads(request.POST.get('lnip'))
-                        # update inventorybrand
-                        ldetinven = json.loads(request.POST.get('ldetinven'))
-                        # update detpedido
-                        ldetpedido = json.loads(request.POST.get('ldetpedido'))
-                        #update niple(pedido)
-                        lnippedido = json.loads(request.POST.get('lnippedido'))
-
-
-                        if len(ldetgrem)>0:
-                            for x in ldetgrem:
-                                dgr=DetGuiaRemision.objects.get(
-                                    id=x['idtabdetgrem'])
-                                dgr.cantdev=x['updcantdev']
-                                dgr.cantguide=x['updcantguide']
-                                dgr.save()
-                            context['status']=True
-
-                        if len(lnip)>0:
-                            for x in lnip:
-                                if x['cant']==x['updcantenv']:
-                                    estado=True
-                                else:
-                                    estado=False
-
-                                ni=NipleGuiaRemision.objects.get(
-                                    id=x['idtabnipgrem'])
-                                ni.cenvdevmat=x['updcantenv']
-                                ni.cantguide=x['updcantguide']
-                                ni.flagcenvdevmat=estado
-                                ni.save()
-                            context['status']=True
-
-                        if len(ldetpedido)>0:
-                            for x in ldetpedido:
-                                if x['updcantshop']== x['cantstatic']:
-                                    tag = '0'
-                                elif x['updcantshop'] > 0 and x['updcantshop'] < x['cantstatic']:
-                                    tag = '1'
-                                else:
-                                    tag = '2'
-
-                                dped=Detpedido.objects.get(
-                                    id=x['idtabdetped'])
-                                dped.cantshop=x['updcantshop']
-                                dped.cantguide=x['updcantguide']
-                                dped.cenvdevmat=x['updcantenv']
-                                dped.tag=tag
-                                dped.save()
-                            context['status']=True
-
-                        if len(lnippedido)>0:
-                            for x in lnippedido:
-
-                                if x['updcantshop']==x['cantstatic']:
-                                    tag='0'
-                                elif x['updcantshop'] > 0 and x['updcantshop'] < x['cantstatic']:
-                                    tag = '1'
-                                else:
-                                    tag = '2'
-
-                                print 'tag', tag
-
-                                nipped=Niple.objects.get(
-                                    id=x['idtabnipped'])
-                                nipped.cantshop=x['updcantshop']
-                                nipped.cantguide=x['updcantguide']
-                                nipped.cenvdevmat=x['updcantenv']
-                                nipped.tag=tag
-                                nipped.save()
-                            context['status']=True
-
-                        gdevmat=GuiaDevMat.objects.get(
-                            guiadevmat_id=request.POST.get('codguiadevmat'))
-                        gdevmat.estado='GE'
-                        gdevmat.save()
-
-                        if len(ldetinven)>0:
-                            for x in ldetinven:
-                                inv=InventoryBrand.objects.get(
-                                    id=x['idtabinvbrand'])
-                                inv.stock=x['updstock']
-                                inv.save()
-
-                        context['status']=True
-
-
-                except Exception, e:
-                    context['raise'] = str(e)
-                    context['status'] = False
-                return self.render_to_json_response(context)
-        except Exception, e:
-            print e.__str__()
-
-class DevConMaterial(JSONResponseMixin, TemplateView):
-    @method_decorator(login_required)
-    def get(self,request,*args,**kwargs):
-        context = dict();
-        if request.is_ajax():
-            try:
-                if 'lmatdetguiapro' in request.GET:
-                    listprojects = []
-                    for x in Detpedido.objects.filter(
-                        Q(pedido__status='AP') | Q(pedido__status='IN') | Q(pedido__status='CO'),
-                        materiales_id= request.GET.get('txtcodmat'),
-                        pedido__proyecto__status='AC',
-                        pedido__proyecto_id=request.GET.get('cproy'),
-                        flag=True).distinct('pedido__proyecto__proyecto_id').order_by('-pedido__proyecto__proyecto_id'):
-                        if x.cantshop < x.cantidad:
-                            listprojects.append({
-                                'matcod':x.materiales_id,
-                                'matnom':x.materiales.matnom,
-                                'matmed':x.materiales.matmed,
-                                'codproy':x.pedido.proyecto_id,
-                                'nompro':x.pedido.proyecto.nompro
-                                })
-
-                    context['listprojects'] = listprojects
-                    context['status'] = True
-
-
-                if 'lmatdetguia' in request.GET:
-                    lmat = []
-                    count = 1
-                    for x in DetGuiaRemision.objects.filter(
-                        materiales_id = request.GET.get('txtcodmat'),
-                        order__flag = True,
-                        guia__status = 'GE',
-                        guia__flag = True).distinct('guia__pedido__proyecto__proyecto_id').order_by('-guia__pedido__proyecto__proyecto_id'):
-                        lmat.append({
-                            'count':count,
-                            'nguia':x.guia_id,
-                            'matcod':x.materiales_id,
-                            'matnom':x.materiales.matnom,
-                            'matmed':x.materiales.matmed,
-                            'matcodbrand':x.brand_id,
-                            'matnombrand':x.brand.brand,
-                            'matcodmodel':x.model.model_id,
-                            'matnommodel':x.model.model,
-                            'matcant':x.cantguide,
-                            'codped':x.order_id,
-                            'codproy':x.order.proyecto_id,
-                            'nompro':x.order.proyecto.nompro
-                            })
-
-                        count = count + 1
-                    context['lmateriales'] = lmat
-                    if len(lmat) > 0:
-                        context['listmateriales'] = True
-                    else:
-                        context['listmateriales'] = False
-                    context['sizelistmateriales'] = len(lmat)
-                    context['status'] = True
-
-                if 'lproyectos' in request.GET:
-                    listprojects = []
-                    for x in Detpedido.objects.filter(
-                        Q(pedido__status='AP') | Q(pedido__status='IN') | Q(pedido__status='CO'),
-                        materiales_id= request.GET.get('txtcodmat'),
-                        pedido__proyecto__status='AC',
-                        flag=True).distinct('pedido__proyecto__proyecto_id').order_by('-pedido__proyecto__proyecto_id'):
-                        if x.cantshop < x.cantidad:
-                            listprojects.append({
-                                'matcod':x.materiales_id,
-                                'matnom':x.materiales.matnom,
-                                'matmed':x.materiales.matmed,
-                                'codproy':x.pedido.proyecto_id,
-                                'nompro':x.pedido.proyecto.nompro
-                                })
-                    context['listprojects']=listprojects
-                    context['status']=True
-
-
-                if 'listsector' in request.GET:
-                    lsector=[]
-                    for x in DetGuiaRemision.objects.filter(
-                        Q(order__status='AP') | Q(order__status='IN') | Q(order__status='CO'),
-                        materiales_id= request.GET.get('mat_id'),
-                        order__proyecto__status='AC',
-                        flag=True,
-                        order__proyecto_id=request.GET.get('proy_id'),
-                        order__flag=True):
-                        lsector.append({
-                            'codguia':x.guia_id,
-                            'namegrupo':x.order.dsector.sgroup.name,
-                            'namesector':x.order.dsector.sector.nomsec,
-                            'namedsector':x.order.dsector.name
-                            })
-                    context['lsector']=lsector
-                    context['status']=True
-
-                if 'listmat' in request.GET:
-                    listamat = []
-                    stlblcodpro = request.GET.get('stlblcodpro')
-                    if stlblcodpro == 'false':
-                        for x in Detpedido.objects.filter(
-                            Q(pedido__status='AP') | Q(pedido__status='IN') | Q(pedido__status='CO'),
-                            materiales__matnom__icontains= request.GET.get('matdesc'),
-                            pedido__proyecto__status='AC',
-                            flag=True).distinct('materiales__matnom','materiales__matmed').order_by('materiales__matnom'):
-                            if x.cantshop < x.cantidad:
-                                listamat.append({
-                                    'cmat':x.materiales.materiales_id,
-                                    'namemat':x.materiales.matnom,
-                                    'medmat':x.materiales.matmed,
-                                    'unidad':x.materiales.unidad.uninom,
-                                    'marca':x.brand.brand,
-                                    'model':x.model.model,
-                                    'codped':x.pedido_id
-                                    })
-                    else:
-                        for x in Detpedido.objects.filter(
-                            Q(pedido__status='AP') | Q(pedido__status='IN') | Q(pedido__status='CO'),
-                            materiales__matnom__icontains= request.GET.get('matdesc'),
-                            pedido__proyecto_id=request.GET.get('lblcodpro'),
-                            pedido__proyecto__status='AC',
-                            flag=True).distinct('materiales__matnom','materiales__matmed').order_by('materiales__matnom'):
-                            if x.cantshop < x.cantidad:
-                                listamat.append({
-                                    'cmat':x.materiales.materiales_id,
-                                    'namemat':x.materiales.matnom,
-                                    'medmat':x.materiales.matmed,
-                                    'unidad':x.materiales.unidad.uninom,
-                                    'marca':x.brand.brand,
-                                    'model':x.model.model,
-                                    'codped':x.pedido_id
-                                    })
-
-                    context['listamat']= listamat
-                    context['status'] = True
-
-                if 'exniple' in request.GET:
-                    listaniple=[]
-                    count=0
-                    for x in NipleGuiaRemision.objects.filter(
-                        order_id=request.GET.get('codped'),
-                        materiales_id=request.GET.get('codmat'),
-                        brand_id=request.GET.get('codbr'),
-                        model_id=request.GET.get('codmod'),
-                        flag=True,
-                        flagcenvdevmat=False):
-                        listaniple.append({
-                            'idtabnipgrem':x.id,
-                            'codped':x.order_id,
-                            'codmat':x.materiales_id,
-                            'codbr':x.brand_id,
-                            'marca':x.brand.brand,
-                            'codmod':x.model_id,
-                            'modelo':x.model.model,
-                            'count':count,
-                            # 'related':x.related,
-                            'cenvdevmat':x.cenvdevmat,
-                            'cantidad':x.cantguide,
-                            'metrado':x.metrado,
-                            'tipo':x.tipo
-                            # 'dsector_id':x.dsector_id,
-                            })
-                        count=count+1
-                    context['listaniple']=listaniple
-                    context['status']=True
-
-
-                if 'ldetguiarem' in request.GET:
-                    ldetguiaremision=[]
-                    countcod = 0
-                    for x in DetGuiaRemision.objects.filter(
-                        guia_id=request.GET.get('codguiarem'),
-                        materiales_id=request.GET.get('codmat'),
-                        flag=True):
-                        ldetguiaremision.append({
-                            'codped':x.guia.pedido_id,
-                            'codguiarem':x.guia.guia_id,
-                            'codmat':x.materiales_id,
-                            'namemat':x.materiales.matnom,
-                            'medmat':x.materiales.matmed,
-                            'cantidad':x.cantguide,
-                            'codbr':x.brand_id,
-                            'marca':x.brand.brand,
-                            'codmod':x.model_id,
-                            'modelo':x.model.model,
-                            'codproy':x.guia.pedido.proyecto_id,
-                            'nameproy':x.guia.pedido.proyecto.nompro,
-                            'cantdev':x.cantdev,
-                            'countcod':countcod
-                            })
-                        countcod=countcod+1
-
-                    context['ldetguiaremision']=ldetguiaremision
-                    context['status'] = True
-
-                if 'gentcantniple' in request.GET:
-                    sizeniple=[]
-                    ldetguiaremision=json.loads(request.GET.get('ldetguiaremision'))
-                    for y in ldetguiaremision:
-                        for x in Niple.objects.filter(
-                            pedido_id=y['codped'],
-                            materiales_id=y['codmat'],
-                            brand_id=y['codbr'],
-                            model_id=y['codmod']):
-                            sizeniple.append({
-                                'id':x.id
-                                })
-                    context['sizeniple']=sizeniple
-                    context['status']=True
-
-                if 'exguiapemat' in request.GET:
-                    ldetdev = json.loads(request.GET.get('ldetdev'))
-                    lexmat=[]
-                    for y in ldetdev:
-                        for x in detGuiaDevMat.objects.filter(
-                            guiadevmat__estado='PE',
-                            guia__pedido_id=y['codped'],
-                            guia_id=y['nguia'],
-                            material_id=y['codmat'],
-                            marca_id=y['codbr'],
-                            model_id=y['codmod']):
-                            lexmat.append({
-                                'id':x.id,
-                                'coditem':int(y['it'])+1,
-                                'docdevmat':x.guiadevmat_id
-                                })
-
-                    context['lexmat']=lexmat
-                    context['status']=True
-
-                if 'lcbotransxmat' in request.GET:
-                    print 'sfe'
-                    lcond = []
-                    ltransp = []
-                    for x in Conductore.objects.filter(
-                        traruc_id = request.GET.get('codtransp')).order_by('connom'):
-                        lcond.append({
-                            'cod_cond': x.condni_id,
-                            'name_cond':x.connom
-                            })
-                        context['lcond'] = lcond
-
-                    for y in Transporte.objects.filter(
-                        traruc_id = request.GET.get('codtransp')):
-                        ltransp.append({
-                            'placa': y.nropla_id,
-                            'marca': y.marca
-                            })
-                        context['ltransp'] = ltransp
-
-                    context['status'] = True
-
-
-
-            except ObjectDoesNotExist, e:
-                context['raise'] = str(e)
-                context['status'] = False
-            return self.render_to_json_response(context)
-        lempleados = Employee.objects.filter(flag=True).order_by('lastname')
-        ltransportmat = Transportista.objects.filter(flag=True).order_by('tranom')
-        return render(request,'almacen/devconmat.html',{
-            'lempleados':lempleados,
-            'ltransportmat':ltransportmat
-            })
-
-    def post(self,request,*args,**kwargs):
-        try:
-            context = dict()
-            if request.is_ajax():
-                try:
-                    if 'savefinconmat' in request.POST:
-                        lnippleselect = json.loads(request.POST.get('lnippleselect'))
-                        ldetdevfin=json.loads(request.POST.get('ldetdevfin'))
-                        # guiadevmat = genkeys.GenerateIdGuiaMatDev();
-
-                        GuiaDevMat.objects.create(
-                            guiadevmat_id=request.POST.get('codguia'),
-                            fechadevolucion=request.POST.get('fechdev'),
-                            emple_aut_id=request.POST.get('auth'),
-                            empdni_id=request.user.get_profile().empdni_id,
-                            proyecto_id=request.POST.get('cproy'),
-                            condni_id=request.POST.get('codcond'),
-                            nropla_id=request.POST.get('codplaca'),
-                            traruc_id=request.POST.get('codtr'),
-                            estado=request.POST.get('estado'),
-                            comentario=request.POST.get('comenconmat')
-                            )
-
-                        if len(ldetdevfin) > 0:
-                            for x in ldetdevfin:
-                                detGuiaDevMat.objects.create(
-                                    guiadevmat_id=request.POST.get('codguia'),
-                                    guia_id=x['nguia'],
-                                    material_id=x['codmat'],
-                                    marca_id=x['codbr'],
-                                    model_id=x['codmod'],
-                                    cantidad=x['cantidad'],
-                                    motivo=x['motivo'],
-                                    pedido_id=x['codped'],
-                                    comentario=x['comentario'])
-
-                        if len(lnippleselect) > 0:
-                            for x in lnippleselect:
-                                GuiaDevMatNiple.objects.create(
-                                    guiadevmat_id=request.POST.get('codguia'),
-                                    guia_id=x['numguia'],
-                                    material_id=x['codmat'],
-                                    marca_id=x['codbr'],
-                                    model_id=x['codmod'],
-                                    cantidad=x['inputcant'],
-                                    metrado=x['metrado'],
-                                    tipo=x['tipo'],
-                                    idnipgrem_id=x['idtabnipgrem'],
-                                    motivo=x['motivo'],
-                                    pedido_id=x['codped'],
-                                    comentario=x['comentario'])
-
-                        context['status'] = True
-
-                except Exception, e:
-                    context['raise'] = str(e)
-                    context['status'] = False
-                return self.render_to_json_response(context)
-        except Exception, e:
-            print e.__str__()
+# class DevConGuia(JSONResponseMixin, TemplateView):
+#     @method_decorator(login_required)
+#     def get(self,request,*args,**kwargs):
+#         context = dict();
+#         if request.is_ajax():
+#             try:
+
+#                 if 'viewcant' in request.GET:
+#                     context = DetGuiaRemision.objects.values(
+#                         'cantguide',
+#                         'cantdev'
+#                         ).get(
+#                         guia_id=request.GET.get('numguia'),
+#                         order_id=request.GET.get('codped'),
+#                         materiales_id=request.GET.get('codmat'),
+#                         brand_id=request.GET.get('codbrand'),
+#                         model_id=request.GET.get('codmodel'))
+#                     if len(context) > 0:
+#                         context['status'] = True
+#                     context['status'] = True
+
+
+#                 if 'lmatguiadev' in request.GET:
+#                     lmat = []
+#                     count = 1
+#                     for x in detGuiaDevMat.objects.filter(
+#                         guiadevmat_id = request.GET.get('codgdevmat')).order_by('material__matnom'):
+#                         lmat.append({
+#                             'id': x.id,
+#                             'numguia':x.guia_id,
+#                             'guiadevmat':x.guiadevmat_id,
+#                             'count':count,
+#                             'codped':x.pedido_id,
+#                             'codmat':x.material_id,
+#                             'nommat':x.material.matnom,
+#                             'medmat':x.material.matmed,
+#                             'codmarca':x.marca_id,
+#                             'nommarca':x.marca.brand,
+#                             'codmodel': x.model_id,
+#                             'nommodel': x.model.model,
+#                             'cantidad':x.cantidad,
+#                             'coment':x.comentario,
+#                             'motiv':x.motivo
+#                             })
+
+#                         count = count +1
+#                     context['lmat'] = lmat
+
+#                     context['status'] = True
+
+#                 if 'listmaterials' in request.GET:
+#                     lmat = []
+#                     count = 1
+#                     countcod = 0
+#                     for x in DetGuiaRemision.objects.filter(
+#                         guia_id=request.GET.get('txtingresado'),
+#                         stcantdev=False,
+#                         order__flag=True,
+#                         guia__status='GE',
+#                         flag=True,
+#                         guia__flag = True
+#                         ).order_by('materiales__matnom'):
+#                         lmat.append(
+#                             {'numguia':x.guia_id,
+#                             'codmat':x.materiales_id,
+#                             'namemat':x.materiales.matnom,
+#                             'medmat':x.materiales.matmed,
+#                             'codbrand':x.brand_id,
+#                             'namebrand':x.brand.brand,
+#                             'codmodel':x.model_id,
+#                             'namemodel':x.model.model,
+#                             'cantguide':x.cantguide,
+#                             'count':count,
+#                             'cantdev':x.cantdev,
+#                             'codped':x.order_id,
+#                             'countcod':countcod,
+#                             'codproy':x.order.proyecto_id,
+#                             'coddsector':x.order.dsector_id
+#                             })
+#                         count = count + 1
+#                         countcod = countcod + 1
+#                     context['lmaterials'] = lmat
+
+#                     if len(lmat) > 0 :
+#                         context['listmat'] = True
+#                     else:
+#                         context['listmat'] = False
+#                     context['sizelistmat'] = len(lmat)
+
+#                     context['status'] = True
+
+#                 if 'getlnip' in request.GET:
+#                     listnip = []
+#                     countcod = 0
+#                     for x in NipleGuiaRemision.objects.filter(
+#                         order_id = request.GET.get('codped'),
+#                         materiales_id = request.GET.get('codmat'),
+#                         brand_id = request.GET.get('codbr'),
+#                         model_id = request.GET.get('codmod'),
+#                         flag = True,
+#                         flagcenvdevmat=False).order_by('materiales__matnom'):
+#                         listnip.append({
+#                             'idtabnipgrem':x.id,
+#                             'codped':x.order_id,
+#                             'codmat':x.materiales_id,
+#                             'namemat':x.materiales.matnom,
+#                             'medmat':x.materiales.matmed,
+#                             'codbr':x.brand_id,
+#                             'namebran':x.brand.brand,
+#                             'codmod':x.model_id,
+#                             'namemod':x.model.model,
+#                             'cantidad':x.cantguide,
+#                             'metrado':x.metrado,
+#                             'num':request.GET.get('num'),
+#                             'row':countcod,
+#                             'numguia':request.GET.get('numguia'),
+#                             'motinip':request.GET.get('motinip'),
+#                             'comnip':request.GET.get('comnip'),
+#                             'cenvmat':x.cenvdevmat,
+#                             'countcod':countcod,
+#                             'tipo':x.tipo,
+#                             'canti':x.cantguide
+#                             })
+#                         countcod = countcod + 1
+
+#                     context['listnip'] = listnip
+#                     print len(listnip)
+#                     if len(listnip) > 0:
+#                         context['stlistnip'] = True
+#                     else:
+#                         context['stlistnip'] = False
+#                     context['status'] = True
+
+#                 if 'existsnip' in request.GET:
+#                     lstniple=[]
+#                     lmat = json.loads(request.GET.get('lmat'))
+#                     for y in lmat:
+#                         lnip=[]
+#                         for x in NipleGuiaRemision.objects.filter(
+#                             order_id = y['codped'],
+#                             materiales_id = y['codmat'],
+#                             brand_id = y['codbrand'],
+#                             model_id = y['codmodel'],
+#                             flag=True):
+#                             lnip.append({
+#                                 'id':x.id
+#                                 })
+#                         if len(lnip)>0:
+#                             estado = True
+#                         else:
+#                             estado = False
+#                         lstniple.append({
+#                             'estado': estado
+#                             })
+#                     context['lstniple'] = lstniple
+#                     context['status'] = True
+
+#                 if 'existguiape' in request.GET:
+#                     lgdev=[]
+#                     for x in detGuiaDevMat.objects.filter(
+#                         guia_id=request.GET.get('codguia'),
+#                         guiadevmat__estado='PE'):
+#                         lgdev.append({
+#                             'coddevmat':x.guiadevmat_id
+#                             })
+#                     if len(lgdev) > 0:
+#                         context['stlgdev'] = True
+#                     else:
+#                         context['stlgdev'] = False
+
+#                     context['status'] = True
+
+#                 if 'getlistnip' in request.GET:
+#                     listmat = json.loads(request.GET.get('listmat'))
+#                     lstmat=[]
+#                     for x in listmat:
+#                         lmaterials = []
+#                         for y in GuiaDevMatNiple.objects.filter(
+#                             guiadevmat_id=x['guiadevmat'],
+#                             material_id=x['codmat'],
+#                             marca_id=x['codmarca'],
+#                             model_id=x['codmodel']
+#                             ):
+#                             lmaterials.append({
+#                                 'id':y.id
+#                                 })
+#                         if len(lmaterials)==0:
+#                             estado=False
+#                         else:
+#                             estado=True
+#                         lstmat.append({
+#                             'estado':estado
+#                             })
+#                     context['lestados']=lstmat
+#                     context['status']=True
+
+#                 if 'getniple' in request.GET:
+#                     lni=[]
+#                     for x in GuiaDevMatNiple.objects.filter(
+#                         guiadevmat_id=request.GET.get('idgdevmat'),
+#                         material_id=request.GET.get('idmat'),
+#                         pedido_id=request.GET.get('codped'),
+#                         marca_id=request.GET.get('idbr'),
+#                         model_id=request.GET.get('idmod')
+#                         ):
+#                         lni.append({
+#                             'id':x.id
+#                             })
+#                     if len(lni) > 0:
+#                         context['stlni'] = True
+#                     else:
+#                         context['stlni'] = False
+#                     context['status']=True
+
+#                 if 'glnipdevmat' in request.GET:
+#                     lnipdev=[]
+#                     for x in GuiaDevMatNiple.objects.filter(
+#                         guiadevmat_id=request.GET.get('codgdevmat'),
+#                         material_id=request.GET.get('codmat'),
+#                         pedido_id=request.GET.get('codped'),
+#                         marca_id=request.GET.get('codbr'),
+#                         model_id=request.GET.get('codmod')):
+#                         lnipdev.append({
+#                             'idtable':x.id,
+#                             'codguiadevmat':x.guiadevmat_id,
+#                             'codmat':x.material_id,
+#                             'namemat':x.material.matnom,
+#                             'medmat':x.material.matmed,
+#                             'codbr':x.marca_id,
+#                             'codmod':x.model_id,
+#                             'cantidad':x.cantidad,
+#                             'metrado':x.metrado,
+#                             'tipo':x.tipo,
+#                             'idrefid':x.idnipgrem_id,
+#                             'motivo':x.motivo,
+#                             'comentario':x.comentario
+#                             })
+#                     context['lnipdev']=lnipdev
+#                     context['status']=True
+
+#                 if 'getcantnip' in request.GET:
+#                     print request.GET.get('codtabnip')
+#                     context = NipleGuiaRemision.objects.values(
+#                                 'cenvdevmat',
+#                                 'cantguide'
+#                                 ).get(id=request.GET.get('codtabnip'))
+
+#                     context['status'] =True
+
+#                 if 'getcantdevmat' in request.GET:
+#                     context=detGuiaDevMat.objects.values(
+#                             'cantidad').get(
+#                             guiadevmat_id=request.GET.get('codgdevmat'),
+#                             material_id=request.GET.get('codmat'),
+#                             marca_id=request.GET.get('codbr'),
+#                             model_id=request.GET.get('codmod'))
+#                     context['status']=True
+
+#                 if 'getcantdetguiarem' in request.GET:
+
+#                     lmat=json.loads(request.GET.get('lmat'))
+#                     ldetgrem=[]
+#                     ldetinven=[]
+#                     ldetpedido=[]
+#                     # ldetdsmetrado=[]
+#                     for x in lmat:
+#                         for y in DetGuiaRemision.objects.filter(
+#                             guia_id=x['numguia'],
+#                             order_id=x['codped'],
+#                             materiales_id=x['codmat'],
+#                             brand_id=x['codmarca'],
+#                             model_id=x['codmodel']):
+#                             ldetgrem.append({
+#                                 'idtabdetgrem':y.id,
+#                                 'numguia':y.guia_id,
+#                                 'codmat':y.materiales_id,
+#                                 'codbr':y.brand_id,
+#                                 'codmod':y.model_id,
+#                                 'cdevuelta':y.cantdev,
+#                                 'updcantguide':round((float(y.cantguide)-float(x['cantidad']))*100)/100,
+#                                 'updcantdev':round((float(x['cantidad'])+float(y.cantdev))*100)/100
+#                                 })
+
+#                         try:
+#                             InventoryBrand.objects.get(
+#                                 materials_id=x['codmat'],
+#                                 brand_id=x['codmarca'],
+#                                 model_id=x['codmodel'])
+#                             codbrand=x['codmarca']
+#                             codmodel=x['codmodel']
+
+#                         except InventoryBrand.DoesNotExist, e:
+#                             try:
+#                                 InventoryBrand.objects.get(
+#                                     materials_id=x['codmat'],
+#                                     brand_id=x['codmarca'])
+#                                 codbrand=x['codmarca']
+#                                 codmodel='MO000'
+
+#                             except InventoryBrand.DoesNotExist, e:
+#                                 codbrand='BR000'
+#                                 codmodel='MO000'
+
+#                         for z in InventoryBrand.objects.filter(
+#                             materials_id=x['codmat'],
+#                             brand_id=codbrand,
+#                             model_id=codmodel):
+#                             ldetinven.append({
+#                                 'idtabinvbrand':z.id,
+#                                 'codmat':z.materials_id,
+#                                 'codbr':z.brand_id,
+#                                 'codmod':z.model_id,
+#                                 'stock':z.stock,
+#                                 'updstock':round((float(z.stock)+float(x['cantidad']))*100)/100
+#                                 })
+#                         try:
+#                             Detpedido.objects.get(
+#                                 pedido_id=x['codped'],
+#                                 materiales_id=x['codmat'],
+#                                 brand_id=x['codmarca'],
+#                                 model_id=x['codmodel'])
+#                             codbrand=x['codmarca']
+#                             codmodel=x['codmodel']
+#                             print 'existe'
+#                         except Detpedido.DoesNotExist, e:
+#                             try:
+#                                 Detpedido.objects.get(
+#                                     pedido_id=x['codped'],
+#                                     materiales_id=x['codmat'],
+#                                     brand_id=x['codmarca'])
+#                                 codbrand=x['codmarca']
+#                                 codmodel='MO000'
+#                             except Detpedido.DoesNotExist, e:
+#                                 codbrand='BR000'
+#                                 codmodel='MO000'
+
+#                         for n in Detpedido.objects.filter(
+#                             pedido_id=x['codped'],
+#                             materiales_id=x['codmat'],
+#                             brand_id=codbrand,
+#                             model_id=codmodel):
+#                             ldetpedido.append({
+#                                 'idtabdetped':n.id,
+#                                 'cantstatic':n.cantidad,
+#                                 'updcantshop':round((float(n.cantshop)+float(x['cantidad']))*100)/100,
+#                                 'updcantguide':round((float(n.cantguide)-float(x['cantidad']))*100)/100,
+#                                 'updcantenv':round((float(n.cenvdevmat)+float(x['cantidad']))*100)/100,
+#                                 })
+
+#                     context['ldetgrem']=ldetgrem
+#                     context['ldetinven']=ldetinven
+#                     context['ldetpedido']=ldetpedido
+
+#                     context['status']=True
+
+#                 if 'getdetgdevmatnip' in request.GET:
+#                     lgdevmatnip=[]
+#                     for x in GuiaDevMatNiple.objects.filter(
+#                         guiadevmat_id=request.GET.get('ngdevmat')):
+#                         lgdevmatnip.append({
+#                             'idgdevmatniple':x.id,
+#                             'codguiadevmat':x.guiadevmat_id,
+#                             'codmat':x.material_id,
+#                             'codbr':x.marca_id,
+#                             'codmod':x.model_id,
+#                             'cantidad':x.cantidad,
+#                             'metrado':x.metrado,
+#                             'tipo':x.tipo,
+#                             'idtabnipgrem':x.idnipgrem_id,
+#                             'idtabniple':x.idnipgrem.related
+#                             })
+#                     context['lgdevmatnip']=lgdevmatnip
+#                     context['status']=True
+
+#                 if 'sumcantnip' in request.GET:
+#                     lgdevmatnip = json.loads(request.GET.get('lgdevmatnip'))
+#                     # lgdev=[]
+#                     lnip=[]
+#                     lnippedido=[]
+#                     for x in lgdevmatnip:
+#                         for z in NipleGuiaRemision.objects.filter(
+#                             id=x['idtabnipgrem']):
+#                             lnip.append({
+#                                 'idtabnipgrem':z.id,
+#                                 'codmat':z.materiales_id,
+#                                 'codbr':z.brand_id,
+#                                 'codped':z.order_id,
+#                                 'codmod':z.model_id,
+#                                 'cant':z.cantguide,
+#                                 'metrado':z.metrado,
+#                                 'tipo':z.tipo,
+#                                 'updcantguide':float(z.cantguide)-float(x['cantidad']),
+#                                 'updcantenv':float(z.cenvdevmat)+float(x['cantidad'])
+#                                 # 'updcantshop':float(z.cantshop)+float(x['cantidad']),
+#                                 })
+#                         for y in Niple.objects.filter(
+#                             id=x['idtabniple']):
+#                             lnippedido.append({
+#                                 'idtabnipped':y.id,
+#                                 'cantstatic':y.cantidad,
+#                                 'codmat':y.materiales_id,
+#                                 'codbr':y.brand_id,
+#                                 'codmod':y.model_id,
+#                                 'codped':y.pedido_id,
+#                                 'metrado':y.metrado,
+#                                 'tipo':y.tipo,
+#                                 'updcantguide':float(y.cantguide)-float(x['cantidad']),
+#                                 'updcantenv':float(y.cenvdevmat)+float(x['cantidad']),
+#                                 'updcantshop':float(y.cantshop)+float(x['cantidad'])
+#                                 })
+
+
+#                     context['lnip']=lnip
+#                     context['lnippedido']=lnippedido
+#                     context['status'] = True
+
+#                 if 'lguiasdev' in request.GET:
+#                     lguia=[]
+#                     estsearch = request.GET.get('search_one')
+
+#                     if estsearch=='true':
+#                         for x in GuiaDevMat.objects.filter(
+#                             guiadevmat_id=request.GET.get('idguiadevmat'),
+#                             estado=request.GET.get('stguia')).order_by('-registro'):
+#                             lguia.append({
+#                                 'empleaut':x.emple_aut_id,
+#                                 'codproy':x.proyecto_id,
+#                                 'nameproyecto':x.proyecto.nompro,
+#                                 'codguiadev':x.guiadevmat_id,
+#                                 'fechdev':x.fechadevolucion,
+#                                 'registro':x.registro.strftime('%d-%m-%Y'),
+#                                 'autnames':'%s, %s' % (x.emple_aut.lastname,x.emple_aut.firstname),
+#                                 'genero':'%s, %s' % (x.empdni.lastname,x.empdni.firstname),
+#                                 'coment':x.comentario,
+#                                 'cond':x.condni_id,
+#                                 'placa':x.nropla_id,
+#                                 'transp':x.traruc_id
+#                                 })
+#                         context['lguia']=lguia
+#                     else:
+#                         for x in GuiaDevMat.objects.filter(
+#                             estado=request.GET.get('stguia')).order_by('-registro'):
+#                             lguia.append({
+#                                 'empleaut':x.emple_aut_id,
+#                                 'codproy':x.proyecto_id,
+#                                 'nameproyecto':x.proyecto.nompro,
+#                                 'codguiadev':x.guiadevmat_id,
+#                                 'fechdev':x.fechadevolucion,
+#                                 'registro':x.registro.strftime('%d-%m-%Y'),
+#                                 'autnames':'%s, %s' % (x.emple_aut.lastname,x.emple_aut.firstname),
+#                                 'genero':'%s, %s' % (x.empdni.lastname,x.empdni.firstname),
+#                                 'coment':x.comentario,
+#                                 'cond':x.condni_id,
+#                                 'placa':x.nropla_id,
+#                                 'transp':x.traruc_id
+#                                 })
+
+#                         context['lguia']=lguia[0:50]
+#                     context['status']=True
+
+
+#                 if 'lcbotransxguia' in request.GET:
+#                     lcond = []
+#                     ltransp = []
+#                     for x in Conductore.objects.filter(
+#                         traruc_id = request.GET.get('codtransp')).order_by('connom'):
+#                         lcond.append({
+#                             'cod_cond': x.condni_id,
+#                             'name_cond':x.connom
+#                             })
+#                         context['lcond'] = lcond
+
+#                     for y in Transporte.objects.filter(
+#                         traruc_id = request.GET.get('codtransp')):
+#                         ltransp.append({
+#                             'placa': y.nropla_id,
+#                             'marca': y.marca
+#                             })
+#                         context['ltransp'] = ltransp
+
+#                     context['status'] = True
+
+#                 if 'getuser' in request.GET:
+#                     user='%s, %s' % (request.user.get_profile().empdni.lastname,
+#                                       request.user.get_profile().empdni.firstname)
+#                     context['user']=user
+#                     context['status']=True
+
+
+#             except ObjectDoesNotExist, e:
+#                 context['raise'] = str(e)
+#                 context['status'] = False
+#             return self.render_to_json_response(context)
+
+#         lemple = Employee.objects.filter(flag=True).order_by('lastname')
+#         lguiadevmat = GuiaDevMat.objects.filter(estado = 'PE').order_by('guiadevmat_id')
+#         lguiadevmatge = GuiaDevMat.objects.filter(estado = 'GE').order_by('guiadevmat_id')
+#         ltransportist = Transportista.objects.filter(flag=True).order_by('tranom')
+#         lplaca= Transporte.objects.filter(flag=True)
+#         lconduct=Conductore.objects.filter(flag=True)
+
+#         return render(request,'almacen/devolucionmaterial.html',{
+#             'lguiadevmat':lguiadevmat,
+#             'lguiadevmatge':lguiadevmatge,
+#             'lemple':lemple,
+#             'ltransportist':ltransportist,
+#             'lplaca':lplaca,
+#             'lconduct':lconduct
+#             })
+
+# # ///////////////////////////
+#     @method_decorator(login_required)
+#     def post(self, request, *args, **kwargs):
+#         try:
+#             context = dict()
+#             if request.is_ajax():
+#                 try:
+#                     if 'exists' in request.POST:
+#                         try:
+#                             GuiaRemision.objects.get(
+#                                 guia_id=request.POST.get('codguia'))
+#                             context['status'] = True
+#                         except GuiaRemision.DoesNotExist, e:
+#                             context['status'] = False
+
+#                     if 'exguiadevmat' in request.POST:
+#                         try:
+#                             GuiaDevMat.objects.get(
+#                                 guiadevmat_id=request.POST.get('codguia'))
+#                             context['status'] = True
+#                         except GuiaDevMat.DoesNotExist, e:
+#                             context['status'] = False
+
+#                     if 'updestguiadevmat' in request.POST:
+#                         lgdevmatnip = json.loads(request.POST.get('lgdevmatnip'))
+#                         ldetgdevmat = json.loads(request.POST.get('ldetgdevmat'))
+#                         print 'lgdevmatnip', lgdevmatnip
+#                         if len(lgdevmatnip)>0:
+#                             for x in lgdevmatnip:
+#                                 GuiaDevMatNiple.objects.get(
+#                                     id=x['idgdevmatniple']).delete()
+
+#                         if len(ldetgdevmat)>0:
+#                             for x in ldetgdevmat:
+#                                 detGuiaDevMat.objects.get(
+#                                     id=x['id']).delete()
+
+#                         GuiaDevMat.objects.get(
+#                             guiadevmat_id=request.POST.get('codguidevmat')).delete()
+#                         context['status'] = True
+
+#                     if 'saveeditmat' in request.POST:
+#                         edmat = detGuiaDevMat.objects.get(
+#                             id = request.POST.get('idt'))
+#                         edmat.cantidad = request.POST.get('cant')
+#                         edmat.comentario = request.POST.get('com')
+#                         edmat.motivo = request.POST.get('motivo')
+#                         edmat.save()
+#                         context['status'] = True
+
+
+#                     if 'delmatdet' in request.POST:
+#                         detGuiaDevMat.objects.get(
+#                             id=request.POST.get('idtable')).delete()
+#                         context['status'] = True
+
+
+#                     if 'savecabgdev' in request.POST:
+#                         cabgdev = GuiaDevMat.objects.get(
+#                             guiadevmat_id = request.POST.get('codgdev'))
+#                         cabgdev.fechadevolucion = request.POST.get('fdev')
+#                         cabgdev.emple_aut_id = request.POST.get('empleaut')
+#                         cabgdev.comentario = request.POST.get('coment')
+#                         cabgdev.save()
+#                         context['status'] = True
+
+
+#                     if 'savedevmat' in request.POST:
+#                         lniplefinal2=json.loads(request.POST.get('lniplefinal2'))
+#                         ldetdev = json.loads(request.POST.get('ldetdev'))
+
+
+#                         GuiaDevMat.objects.create(
+#                             guiadevmat_id = request.POST.get('numeroguia'),
+#                             fechadevolucion = request.POST.get('fdev'),
+#                             emple_aut_id = request.POST.get('empdniaut'),
+#                             empdni_id = request.user.get_profile().empdni_id,
+#                             condni_id=request.POST.get('cond'),
+#                             nropla_id=request.POST.get('placa'),
+#                             proyecto_id=request.POST.get('codproy'),
+#                             traruc_id=request.POST.get('transport'),
+#                             estado = request.POST.get('est'),
+#                             comentario = request.POST.get('comen')
+#                             )
+
+
+#                         if len(ldetdev) > 0:
+#                             for x in ldetdev:
+#                                 detGuiaDevMat.objects.create(
+#                                     guiadevmat_id = request.POST.get('numeroguia'),
+#                                     guia_id=x['numguia'],
+#                                     material_id = x['codmat'],
+#                                     marca_id = x['codbr'],
+#                                     model_id = x['codmod'],
+#                                     cantidad = x['inputcant'],
+#                                     comentario = x['comment'],
+#                                     motivo = x['motivo'],
+#                                     pedido_id=x['codped']
+#                                     )
+
+#                         if len(lniplefinal2) > 0:
+#                             for y in lniplefinal2:
+#                                 GuiaDevMatNiple.objects.create(
+#                                     guiadevmat_id=request.POST.get('numeroguia'),
+#                                     guia_id=y['numguia'],
+#                                     material_id=y['codmat'],
+#                                     marca_id=y['codbr'],
+#                                     model_id=y['codmod'],
+#                                     cantidad=y['canti'],
+#                                     metrado=y['metrado'],
+#                                     tipo=y['tipo'],
+#                                     idnipgrem_id=y['idtabnipgrem'],
+#                                     motivo='' if y['motinip']==None else y['motinip'],
+#                                     comentario='' if y['comnip']==None else y['comnip'],
+#                                     pedido_id=y['codped']
+#                                     )
+
+#                         context['status'] = True
+
+#                     if 'upddevmatniple' in request.POST:
+#                         nip=GuiaDevMatNiple.objects.get(
+#                             id=request.POST.get('codtab'))
+#                         nip.cantidad=request.POST.get('cantupdnip')
+#                         nip.save()
+
+#                         detgdev=detGuiaDevMat.objects.get(
+#                             guiadevmat_id=request.POST.get('codguiadevmat'),
+#                             material_id=request.POST.get('codmat'),
+#                             marca_id=request.POST.get('codbr'),
+#                             model_id=request.POST.get('codmod'))
+#                         detgdev.cantidad=request.POST.get('canttot')
+#                         detgdev.save()
+
+#                         context['status']=True
+
+#                     if 'delnipdevmat' in request.POST:
+
+#                         GuiaDevMatNiple.objects.get(
+#                             id=request.POST.get('idtable')).delete()
+
+#                         upd=detGuiaDevMat.objects.get(
+#                             guiadevmat_id=request.POST.get('codgdevmat'),
+#                             material_id=request.POST.get('codmat'),
+#                             marca_id=request.POST.get('codbr'),
+#                             model_id=request.POST.get('codmod'))
+#                         upd.cantidad=request.POST.get('canttotal')
+#                         upd.save()
+
+#                         context['status']=True
+
+#                     if 'updsavedevmat' in request.POST:
+#                         # update detguiaremision
+#                         ldetgrem = json.loads(request.POST.get('ldetgrem'))
+#                         # update nipleguiaremision
+#                         lnip=json.loads(request.POST.get('lnip'))
+#                         # update inventorybrand
+#                         ldetinven = json.loads(request.POST.get('ldetinven'))
+#                         # update detpedido
+#                         ldetpedido = json.loads(request.POST.get('ldetpedido'))
+#                         #update niple(pedido)
+#                         lnippedido = json.loads(request.POST.get('lnippedido'))
+
+
+#                         if len(ldetgrem)>0:
+#                             for x in ldetgrem:
+#                                 dgr=DetGuiaRemision.objects.get(
+#                                     id=x['idtabdetgrem'])
+#                                 dgr.cantdev=x['updcantdev']
+#                                 dgr.cantguide=x['updcantguide']
+#                                 dgr.save()
+#                             context['status']=True
+
+#                         if len(lnip)>0:
+#                             for x in lnip:
+#                                 if x['cant']==x['updcantenv']:
+#                                     estado=True
+#                                 else:
+#                                     estado=False
+
+#                                 ni=NipleGuiaRemision.objects.get(
+#                                     id=x['idtabnipgrem'])
+#                                 ni.cenvdevmat=x['updcantenv']
+#                                 ni.cantguide=x['updcantguide']
+#                                 ni.flagcenvdevmat=estado
+#                                 ni.save()
+#                             context['status']=True
+
+#                         if len(ldetpedido)>0:
+#                             for x in ldetpedido:
+#                                 if x['updcantshop']== x['cantstatic']:
+#                                     tag = '0'
+#                                 elif x['updcantshop'] > 0 and x['updcantshop'] < x['cantstatic']:
+#                                     tag = '1'
+#                                 else:
+#                                     tag = '2'
+
+#                                 dped=Detpedido.objects.get(
+#                                     id=x['idtabdetped'])
+#                                 dped.cantshop=x['updcantshop']
+#                                 dped.cantguide=x['updcantguide']
+#                                 dped.cenvdevmat=x['updcantenv']
+#                                 dped.tag=tag
+#                                 dped.save()
+#                             context['status']=True
+
+#                         if len(lnippedido)>0:
+#                             for x in lnippedido:
+
+#                                 if x['updcantshop']==x['cantstatic']:
+#                                     tag='0'
+#                                 elif x['updcantshop'] > 0 and x['updcantshop'] < x['cantstatic']:
+#                                     tag = '1'
+#                                 else:
+#                                     tag = '2'
+
+#                                 print 'tag', tag
+
+#                                 nipped=Niple.objects.get(
+#                                     id=x['idtabnipped'])
+#                                 nipped.cantshop=x['updcantshop']
+#                                 nipped.cantguide=x['updcantguide']
+#                                 nipped.cenvdevmat=x['updcantenv']
+#                                 nipped.tag=tag
+#                                 nipped.save()
+#                             context['status']=True
+
+#                         gdevmat=GuiaDevMat.objects.get(
+#                             guiadevmat_id=request.POST.get('codguiadevmat'))
+#                         gdevmat.estado='GE'
+#                         gdevmat.save()
+
+#                         if len(ldetinven)>0:
+#                             for x in ldetinven:
+#                                 inv=InventoryBrand.objects.get(
+#                                     id=x['idtabinvbrand'])
+#                                 inv.stock=x['updstock']
+#                                 inv.save()
+
+#                         context['status']=True
+
+
+#                 except Exception, e:
+#                     context['raise'] = str(e)
+#                     context['status'] = False
+#                 return self.render_to_json_response(context)
+#         except Exception, e:
+#             print e.__str__()
+
+# class DevConMaterial(JSONResponseMixin, TemplateView):
+#     @method_decorator(login_required)
+#     def get(self,request,*args,**kwargs):
+#         context = dict();
+#         if request.is_ajax():
+#             try:
+#                 if 'lmatdetguiapro' in request.GET:
+#                     listprojects = []
+#                     for x in Detpedido.objects.filter(
+#                         Q(pedido__status='AP') | Q(pedido__status='IN') | Q(pedido__status='CO'),
+#                         materiales_id= request.GET.get('txtcodmat'),
+#                         pedido__proyecto__status='AC',
+#                         pedido__proyecto_id=request.GET.get('cproy'),
+#                         flag=True).distinct('pedido__proyecto__proyecto_id').order_by('-pedido__proyecto__proyecto_id'):
+#                         if x.cantshop < x.cantidad:
+#                             listprojects.append({
+#                                 'matcod':x.materiales_id,
+#                                 'matnom':x.materiales.matnom,
+#                                 'matmed':x.materiales.matmed,
+#                                 'codproy':x.pedido.proyecto_id,
+#                                 'nompro':x.pedido.proyecto.nompro
+#                                 })
+
+#                     context['listprojects'] = listprojects
+#                     context['status'] = True
+
+
+#                 if 'lmatdetguia' in request.GET:
+#                     lmat = []
+#                     count = 1
+#                     for x in DetGuiaRemision.objects.filter(
+#                         materiales_id = request.GET.get('txtcodmat'),
+#                         order__flag = True,
+#                         guia__status = 'GE',
+#                         guia__flag = True).distinct('guia__pedido__proyecto__proyecto_id').order_by('-guia__pedido__proyecto__proyecto_id'):
+#                         lmat.append({
+#                             'count':count,
+#                             'nguia':x.guia_id,
+#                             'matcod':x.materiales_id,
+#                             'matnom':x.materiales.matnom,
+#                             'matmed':x.materiales.matmed,
+#                             'matcodbrand':x.brand_id,
+#                             'matnombrand':x.brand.brand,
+#                             'matcodmodel':x.model.model_id,
+#                             'matnommodel':x.model.model,
+#                             'matcant':x.cantguide,
+#                             'codped':x.order_id,
+#                             'codproy':x.order.proyecto_id,
+#                             'nompro':x.order.proyecto.nompro
+#                             })
+
+#                         count = count + 1
+#                     context['lmateriales'] = lmat
+#                     if len(lmat) > 0:
+#                         context['listmateriales'] = True
+#                     else:
+#                         context['listmateriales'] = False
+#                     context['sizelistmateriales'] = len(lmat)
+#                     context['status'] = True
+
+#                 if 'lproyectos' in request.GET:
+#                     listprojects = []
+#                     for x in Detpedido.objects.filter(
+#                         Q(pedido__status='AP') | Q(pedido__status='IN') | Q(pedido__status='CO'),
+#                         materiales_id= request.GET.get('txtcodmat'),
+#                         pedido__proyecto__status='AC',
+#                         flag=True).distinct('pedido__proyecto__proyecto_id').order_by('-pedido__proyecto__proyecto_id'):
+#                         if x.cantshop < x.cantidad:
+#                             listprojects.append({
+#                                 'matcod':x.materiales_id,
+#                                 'matnom':x.materiales.matnom,
+#                                 'matmed':x.materiales.matmed,
+#                                 'codproy':x.pedido.proyecto_id,
+#                                 'nompro':x.pedido.proyecto.nompro
+#                                 })
+#                     context['listprojects']=listprojects
+#                     context['status']=True
+
+
+#                 if 'listsector' in request.GET:
+#                     lsector=[]
+#                     for x in DetGuiaRemision.objects.filter(
+#                         Q(order__status='AP') | Q(order__status='IN') | Q(order__status='CO'),
+#                         materiales_id= request.GET.get('mat_id'),
+#                         order__proyecto__status='AC',
+#                         flag=True,
+#                         order__proyecto_id=request.GET.get('proy_id'),
+#                         order__flag=True):
+#                         lsector.append({
+#                             'codguia':x.guia_id,
+#                             'namegrupo':x.order.dsector.sgroup.name,
+#                             'namesector':x.order.dsector.sector.nomsec,
+#                             'namedsector':x.order.dsector.name
+#                             })
+#                     context['lsector']=lsector
+#                     context['status']=True
+
+#                 if 'listmat' in request.GET:
+#                     listamat = []
+#                     stlblcodpro = request.GET.get('stlblcodpro')
+#                     if stlblcodpro == 'false':
+#                         for x in Detpedido.objects.filter(
+#                             Q(pedido__status='AP') | Q(pedido__status='IN') | Q(pedido__status='CO'),
+#                             materiales__matnom__icontains= request.GET.get('matdesc'),
+#                             pedido__proyecto__status='AC',
+#                             flag=True).distinct('materiales__matnom','materiales__matmed').order_by('materiales__matnom'):
+#                             if x.cantshop < x.cantidad:
+#                                 listamat.append({
+#                                     'cmat':x.materiales.materiales_id,
+#                                     'namemat':x.materiales.matnom,
+#                                     'medmat':x.materiales.matmed,
+#                                     'unidad':x.materiales.unidad.uninom,
+#                                     'marca':x.brand.brand,
+#                                     'model':x.model.model,
+#                                     'codped':x.pedido_id
+#                                     })
+#                     else:
+#                         for x in Detpedido.objects.filter(
+#                             Q(pedido__status='AP') | Q(pedido__status='IN') | Q(pedido__status='CO'),
+#                             materiales__matnom__icontains= request.GET.get('matdesc'),
+#                             pedido__proyecto_id=request.GET.get('lblcodpro'),
+#                             pedido__proyecto__status='AC',
+#                             flag=True).distinct('materiales__matnom','materiales__matmed').order_by('materiales__matnom'):
+#                             if x.cantshop < x.cantidad:
+#                                 listamat.append({
+#                                     'cmat':x.materiales.materiales_id,
+#                                     'namemat':x.materiales.matnom,
+#                                     'medmat':x.materiales.matmed,
+#                                     'unidad':x.materiales.unidad.uninom,
+#                                     'marca':x.brand.brand,
+#                                     'model':x.model.model,
+#                                     'codped':x.pedido_id
+#                                     })
+
+#                     context['listamat']= listamat
+#                     context['status'] = True
+
+#                 if 'exniple' in request.GET:
+#                     listaniple=[]
+#                     count=0
+#                     for x in NipleGuiaRemision.objects.filter(
+#                         order_id=request.GET.get('codped'),
+#                         materiales_id=request.GET.get('codmat'),
+#                         brand_id=request.GET.get('codbr'),
+#                         model_id=request.GET.get('codmod'),
+#                         flag=True,
+#                         flagcenvdevmat=False):
+#                         listaniple.append({
+#                             'idtabnipgrem':x.id,
+#                             'codped':x.order_id,
+#                             'codmat':x.materiales_id,
+#                             'codbr':x.brand_id,
+#                             'marca':x.brand.brand,
+#                             'codmod':x.model_id,
+#                             'modelo':x.model.model,
+#                             'count':count,
+#                             # 'related':x.related,
+#                             'cenvdevmat':x.cenvdevmat,
+#                             'cantidad':x.cantguide,
+#                             'metrado':x.metrado,
+#                             'tipo':x.tipo
+#                             # 'dsector_id':x.dsector_id,
+#                             })
+#                         count=count+1
+#                     context['listaniple']=listaniple
+#                     context['status']=True
+
+
+#                 if 'ldetguiarem' in request.GET:
+#                     ldetguiaremision=[]
+#                     countcod = 0
+#                     for x in DetGuiaRemision.objects.filter(
+#                         guia_id=request.GET.get('codguiarem'),
+#                         materiales_id=request.GET.get('codmat'),
+#                         flag=True):
+#                         ldetguiaremision.append({
+#                             'codped':x.guia.pedido_id,
+#                             'codguiarem':x.guia.guia_id,
+#                             'codmat':x.materiales_id,
+#                             'namemat':x.materiales.matnom,
+#                             'medmat':x.materiales.matmed,
+#                             'cantidad':x.cantguide,
+#                             'codbr':x.brand_id,
+#                             'marca':x.brand.brand,
+#                             'codmod':x.model_id,
+#                             'modelo':x.model.model,
+#                             'codproy':x.guia.pedido.proyecto_id,
+#                             'nameproy':x.guia.pedido.proyecto.nompro,
+#                             'cantdev':x.cantdev,
+#                             'countcod':countcod
+#                             })
+#                         countcod=countcod+1
+
+#                     context['ldetguiaremision']=ldetguiaremision
+#                     context['status'] = True
+
+#                 if 'gentcantniple' in request.GET:
+#                     sizeniple=[]
+#                     ldetguiaremision=json.loads(request.GET.get('ldetguiaremision'))
+#                     for y in ldetguiaremision:
+#                         for x in Niple.objects.filter(
+#                             pedido_id=y['codped'],
+#                             materiales_id=y['codmat'],
+#                             brand_id=y['codbr'],
+#                             model_id=y['codmod']):
+#                             sizeniple.append({
+#                                 'id':x.id
+#                                 })
+#                     context['sizeniple']=sizeniple
+#                     context['status']=True
+
+#                 if 'exguiapemat' in request.GET:
+#                     ldetdev = json.loads(request.GET.get('ldetdev'))
+#                     lexmat=[]
+#                     for y in ldetdev:
+#                         for x in detGuiaDevMat.objects.filter(
+#                             guiadevmat__estado='PE',
+#                             guia__pedido_id=y['codped'],
+#                             guia_id=y['nguia'],
+#                             material_id=y['codmat'],
+#                             marca_id=y['codbr'],
+#                             model_id=y['codmod']):
+#                             lexmat.append({
+#                                 'id':x.id,
+#                                 'coditem':int(y['it'])+1,
+#                                 'docdevmat':x.guiadevmat_id
+#                                 })
+
+#                     context['lexmat']=lexmat
+#                     context['status']=True
+
+#                 if 'lcbotransxmat' in request.GET:
+#                     print 'sfe'
+#                     lcond = []
+#                     ltransp = []
+#                     for x in Conductore.objects.filter(
+#                         traruc_id = request.GET.get('codtransp')).order_by('connom'):
+#                         lcond.append({
+#                             'cod_cond': x.condni_id,
+#                             'name_cond':x.connom
+#                             })
+#                         context['lcond'] = lcond
+
+#                     for y in Transporte.objects.filter(
+#                         traruc_id = request.GET.get('codtransp')):
+#                         ltransp.append({
+#                             'placa': y.nropla_id,
+#                             'marca': y.marca
+#                             })
+#                         context['ltransp'] = ltransp
+
+#                     context['status'] = True
+
+
+
+#             except ObjectDoesNotExist, e:
+#                 context['raise'] = str(e)
+#                 context['status'] = False
+#             return self.render_to_json_response(context)
+#         lempleados = Employee.objects.filter(flag=True).order_by('lastname')
+#         ltransportmat = Transportista.objects.filter(flag=True).order_by('tranom')
+#         return render(request,'almacen/devconmat.html',{
+#             'lempleados':lempleados,
+#             'ltransportmat':ltransportmat
+#             })
+
+#     def post(self,request,*args,**kwargs):
+#         try:
+#             context = dict()
+#             if request.is_ajax():
+#                 try:
+#                     if 'savefinconmat' in request.POST:
+#                         lnippleselect = json.loads(request.POST.get('lnippleselect'))
+#                         ldetdevfin=json.loads(request.POST.get('ldetdevfin'))
+#                         # guiadevmat = genkeys.GenerateIdGuiaMatDev();
+
+#                         GuiaDevMat.objects.create(
+#                             guiadevmat_id=request.POST.get('codguia'),
+#                             fechadevolucion=request.POST.get('fechdev'),
+#                             emple_aut_id=request.POST.get('auth'),
+#                             empdni_id=request.user.get_profile().empdni_id,
+#                             proyecto_id=request.POST.get('cproy'),
+#                             condni_id=request.POST.get('codcond'),
+#                             nropla_id=request.POST.get('codplaca'),
+#                             traruc_id=request.POST.get('codtr'),
+#                             estado=request.POST.get('estado'),
+#                             comentario=request.POST.get('comenconmat')
+#                             )
+
+#                         if len(ldetdevfin) > 0:
+#                             for x in ldetdevfin:
+#                                 detGuiaDevMat.objects.create(
+#                                     guiadevmat_id=request.POST.get('codguia'),
+#                                     guia_id=x['nguia'],
+#                                     material_id=x['codmat'],
+#                                     marca_id=x['codbr'],
+#                                     model_id=x['codmod'],
+#                                     cantidad=x['cantidad'],
+#                                     motivo=x['motivo'],
+#                                     pedido_id=x['codped'],
+#                                     comentario=x['comentario'])
+
+#                         if len(lnippleselect) > 0:
+#                             for x in lnippleselect:
+#                                 GuiaDevMatNiple.objects.create(
+#                                     guiadevmat_id=request.POST.get('codguia'),
+#                                     guia_id=x['numguia'],
+#                                     material_id=x['codmat'],
+#                                     marca_id=x['codbr'],
+#                                     model_id=x['codmod'],
+#                                     cantidad=x['inputcant'],
+#                                     metrado=x['metrado'],
+#                                     tipo=x['tipo'],
+#                                     idnipgrem_id=x['idtabnipgrem'],
+#                                     motivo=x['motivo'],
+#                                     pedido_id=x['codped'],
+#                                     comentario=x['comentario'])
+
+#                         context['status'] = True
+
+#                 except Exception, e:
+#                     context['raise'] = str(e)
+#                     context['status'] = False
+#                 return self.render_to_json_response(context)
+#         except Exception, e:
+#             print e.__str__()
 
 
 '''

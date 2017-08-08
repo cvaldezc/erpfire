@@ -746,21 +746,22 @@ def GenerateIDItemizerProject(pro):
 
 # @Juan Julcapari 2017-07-17 10:44:40
 # generate number id for guide return materials
-def GenerateIdGuiaMatDev():
-    id = None
-    try:
-        code = GuiaDevMat.objects.aggregate(max=Max('guiadevmat_id'))
-        id = code['max']
-        if id is not None:
-            counter = int(id[2:7])
-            print counter
-            counter += 1
-        else:
-            counter = 1
-        id = '%s%s' % ('DM', '{:0>5d}'.format(counter))
-    except ObjectDoesNotExist, e:
-        raise e
-    return id
+# 2017-07-26 17:08:35 - delete
+# def GenerateIdGuiaMatDev():
+#     id = None
+#     try:
+#         code = GuiaDevMat.objects.aggregate(max=Max('guiadevmat_id'))
+#         id = code['max']
+#         if id is not None:
+#             counter = int(id[2:7])
+#             print counter
+#             counter += 1
+#         else:
+#             counter = 1
+#         id = '%s%s' % ('DM', '{:0>5d}'.format(counter))
+#     except ObjectDoesNotExist, e:
+#         raise e
+#     return id
 # endblock
 # @Juan Julcapari 2017-07-25 09:12:59 -
 def GenerateIdHerra():
@@ -867,6 +868,63 @@ def GenerateIdAreaCargo():
         raise e
     return id
 
+# add 2017-08-08 08:57:56 @Juan Julcapai
+def GetLastIdGuiaHerra():
+    id = None
 
+    try:
+        codhe = GuiaHerramienta.objects.all().aggregate(Max('guia_id'))
+        coddevhe = devolucionHerra.objects.all().aggregate(Max('docdev_id'))
+
+        print 'codheerere', codhe
+        print 'coddeaavhe', coddevhe
+
+        if codhe['guia_id__max'] is not None:
+            seriehe = codhe['guia_id__max'][0:3]
+            numhe = codhe['guia_id__max'][4:]
+        else:
+            seriehe='001'
+            numhe='00000000'
+
+        if coddevhe['docdev_id__max'] is not None:
+            seriedev = coddevhe['docdev_id__max'][0:3]
+            numdev = coddevhe['docdev_id__max'][4:]
+        else:
+            seriedev='001'
+            numdev='00000000'
+
+        if int(seriehe) > int(seriedev):
+            sr = seriehe
+            nume = numhe
+        elif int(seriedev) > int(seriehe):
+            sr = seriedev
+            nume = numdev
+        else:
+            sr = seriehe
+            if numhe > numdev:
+                nume = numhe
+            else:
+                nume = numdev
+        nummayor = sr +'-'+ nume
+        id = nummayor
+        if id is not None:
+            serie = int(id[0:3])
+            num = int(id[4:])
+
+            serie = serie + 1 if num >= 99999999 else serie
+            num = num + 1 if num < 99999999 else 1
+            print 'serie2',serie
+            print 'num2', num
+        else:
+            serie = 1
+            num = 1
+
+        id = '%s-%s' % ('{:0>3d}'.format(serie), '{:0>8d}'.format(num))
+        print 'id', id
+    except ObjectDoesNotExist, e:
+        id = '000-00000000'
+        raise e
+    return id
+#endblock
 
 # endblock

@@ -21,6 +21,7 @@ var fechto=''
 var randmat=''
 var textoherra=''
 var textoinvent=''
+var lherra=''
 tipolist=''
 ltrherra=[]
 ////
@@ -98,6 +99,11 @@ $(document).on("click", ".btnviewdocdevpdf", verdocherrapdf);
 $(document).on("click", ".btnconsexport", consexport);
 $(document).on("click", ".btnexportinvent", exportinvent);
 $(document).on("click", ".btndescformat", descformat);
+$(document).on("click", ".btndownxlshe", downxlshe);
+$(".btnopendownxls").on("click", opendownxls);
+
+
+
 
 
 
@@ -117,6 +123,7 @@ $(".btnopeninv").click(function() { openinv(); });
 $(".btnregrcarga").click(function() { regrcarga(); });
 
 
+$(".btncargarhexls").on("click", cargarhexls);
 
 
 
@@ -145,6 +152,8 @@ $(document).on("click", "button.btndelheguiage", delheguiage);
 
 $(document).on("click", ".btnggecoment", ggecoment);
 $(document).on("click", ".btntrselherra", trselherra);
+$(document).on("click", ".btndelheselect", delheselect);
+$(document).on("click", ".btndelherra", delherra);
 
 
 //traslado
@@ -207,6 +216,120 @@ $(document).on("click", ".btnviewpdfnota", showreportnoteingress);
 
 });
 
+opendownxls=function(){
+	$(".moddownxls").modal("open")
+}
+
+downxlshe = function(){
+	window.open("/almacen/herramienta/guia?downxlshe=true")
+}
+
+cargarhexls = function(event){
+	var inputfile, data;
+
+	event.preventDefault();
+	inputfile = document.getElementsByName("readherra");
+	console.log(inputfile)
+	file = inputfile[0].files[0];
+	if (file!=null) {
+		console.log(file)
+
+		data = new FormData();
+	    data.append("listhexls", true);
+	    data.append("archivo", file);
+	    data.append("csrfmiddlewaretoken", $("[name=csrfmiddlewaretoken]").val());
+
+	    $.ajax({
+	      url: "",
+	      type: "POST",
+	      data: data,
+	      contentType: false,
+	      processData: false,
+	      cache: false,
+
+	      success: function(response) {
+	      	var lheexcel=response.lheexcel
+	      	var mens = response.mens
+	      	console.log(lheexcel)
+	      	console.log(mens)
+
+	      	var dato= new Object
+	      	dato.exherra=true
+	      	dato.tipoacce=tipoacce
+	      	dato.lheexcel=JSON.stringify(lheexcel)
+	      	dato.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
+	      	$.post("",dato,function(response){
+	      		if (response.status) {
+	      			var lhenotpermit=response.lhenotpermit
+	      			var lhepermit = response.lhepermit
+	      			console.log(lhenotpermit)
+	      			console.log(lhepermit)
+
+	      			if (lhepermit.length<16) {
+		      			if (lhenotpermit.length>0) {
+		      				var lnotcods=''
+		      				for (var i = 0; i < lhenotpermit.length; i++) {
+		      					lnotcods = lnotcods+" <strong>"+lhenotpermit[i]['xlscodhe']+":</strong> "+lhenotpermit[i]['error']+"<br>"
+		      				};
+		      				swal({
+		      					title:'Estos codigos no se agregaran',
+		      					text:lnotcods+"<br><h2>Agregar el resto?</h2>",
+		      					showConfirmButton:true,
+		      					showCancelButton:true,
+		      					closeOnConfirm:false,
+		      					closeOnCancel:true,
+		      					confirmButtonText:'Si, Agregar',
+		      					html:true,
+		      					type:'warning'
+
+		      				},function(isConfirm){
+		      					if (isConfirm) {
+		      						swal({title:'Lista Agregado',timer:1500,showConfirmButton:false,type:'success'})
+		      						$("input[name=readherra]").val("")
+		      						$(".txtfile").val("")
+		      						//
+					      			lherranew = lhepermit
+					      			var lherrastring=JSON.stringify(lherranew)
+									locStorage(lherrastring)
+									//
+									lguiaherra();
+									$(".moddownxls").modal("close")
+
+		      					};
+
+		      				})
+		      			}else{
+		      				swal({title:'Lista Agregado',timer:1500,showConfirmButton:false,type:'success'})
+		      				$("input[name=readherra]").val("")
+		      				$(".txtfile").val("")
+		      				lherranew = lhepermit
+			      			var lherrastring=JSON.stringify(lherranew)
+							locStorage(lherrastring)
+							//
+							lguiaherra();
+							$(".moddownxls").modal("close")
+
+		      			}
+		      		}else{
+		      			swal({title:'Cantidad Maxima de Items son: 15',showConfirmButton:false,timer:1500,type:'error'})
+		      			return false
+		      		}
+	      		};
+	      	})
+	      }
+	    });
+	}else{
+		swal({title:"Seleccionar un archivo",showConfirmButton:false,timer:1500,type:'error'})
+		return false
+	}
+
+}
+
+
+
+
+
+
 
 descformat=function(){
 	window.open("/almacen/herramienta/cargar?descformat=true")
@@ -238,8 +361,11 @@ $(combo).chosen({
 viewdivstock = function(){
 	$(".hercod").val(this.value);
 	$(".lblinvcodbr").text(this.getAttribute("data-codbr"))
-	$(".herstock").val(this.getAttribute("data-herrastock"));
+	$(".herstock").val(this.getAttribute("data-herrastock"))
 	$(".ingprecio").val(this.getAttribute("data-lastprice"))
+	$(".ingcant").val(this.getAttribute("data-stock"))
+	$("select[id=invtipomon]").val(this.getAttribute("data-tipomoneda"))
+	$("#invtipomon").trigger('chosen:updated')
 	$(".cardherra").slideDown(1000);
 }
 
@@ -286,13 +412,16 @@ regrcarga=function(){
 }
 
 listgrcreados=function(){
+	console.log(lherranew)
 	var ldescgeneral=[]
 	const unique = [...new Set(lherranew.map(item => item.descgeneral))];
 	console.log(unique)
 	for (var i=0; i<unique.length;i++){
-		ldescgeneral.push({
-			'descgeneral':unique[i]
-		})
+		if (unique[i]!="") {
+			ldescgeneral.push({
+				'descgeneral':unique[i]
+			})
+		};
 	}
 	console.log(ldescgeneral)
 	$tb = $("table.tablegrupo > tbody");
@@ -491,6 +620,7 @@ saveeditguiage = function(){
 			tableguia='tabla-guiagene'
 			estadoguiaherra='GE'
 			listarguiaherra()
+			lproyguia()
 		};
 	})
 }
@@ -530,6 +660,7 @@ saveguiafinedit = function(){
 			tableguia='tabla-guia'
 		 	estadoguiaherra='PE'
 			listarguiaherra()
+			lproyguia()
 			$(".editguia").modal("close");
 		};
 	},"json")
@@ -771,12 +902,10 @@ $(function(){
 	  np = $("select[id=combolproy] > option:selected").text();
 	  $(".nombreproyecto").text(np);
 	  console.log(id);
-	  if (id !== "") {
-	    data = {
-	      codigoproy: id,
-	      lproyherra: true,
-	      tipoacce:tipoacce
-	    };
+	    var data = new Object
+	    data.codigoproy=id
+	    data.lproyherra=true
+	    data.tipoacce=tipoacce
 	    $.getJSON("", data, function(response) {
 	        var $tb, template, x;
 			if (response.status) {
@@ -805,8 +934,6 @@ $(function(){
 
 			}
 	    });
-	  }
-
 	});
 });
 
@@ -979,12 +1106,11 @@ listdetconsult = function(){
 	var data,id;
 	id=codproy;
 	idherra = cherra;
-	if (id !== "") {
-		data = {
-		  numproy: id,
-		  ldetcons: true,
-		  idherramienta : idherra,
-		};
+
+	var data = new Object
+	data.numproy=id
+	data.ldetcons=true
+	data.idherramienta=idherra
 	$.getJSON("", data, function(response) {
 		var $tb, template, x;
 		if (response.status) {
@@ -1000,7 +1126,7 @@ listdetconsult = function(){
 			changecolortd('td.fechdev');
 		}
 	});
-	}
+
 }
 
 
@@ -1235,6 +1361,7 @@ delguiape = function(){
 								tableguia='tabla-guia'
 								estadoguiaherra='PE'
 								listarguiaherra()
+								lproyguia()
 							};
 						})
 					})
@@ -1392,7 +1519,7 @@ $(".newherraguiadev").modal("open");
 
 save_guiadev = function(){
 	console.log(listherradev)
-	var transp,fretorno,codguia,codcond,codplaca,serie,numguia,tipocod;
+	var transp,fretorno,codguia,codcond,codplaca,serie,numguia,tipocod,coment;
 	codguia=$(".numguiadev").text();
 	transp=$("select[id=devcotrans]").val()
 	codcond=$("select[id=devcoconduc]").val()
@@ -1400,17 +1527,14 @@ save_guiadev = function(){
 	fretorno=$(".fdevret").val()
 	serie=$(".devnumserie").val()
 	numguia=$(".devnumguia").val()
-	numguiatot=serie+numguia
+	coment=$("textarea[name=devcomentario]").val()
+
 	console.log(numguia)
-	if (document.getElementById('rddevman').checked) {
-		tipocod='manual'
-		if (numguia.length != 8) {
-	  		swal({title:'Numero de Guia INCORRECTA', timer:1500, showConfirmButton:false,type:'error'})
-	  		return false
-	  	}
-	}else{
-		tipocod='auto'
-	}
+
+	if (numguia.length != 12) {
+  		swal({title:'Numero de Guia INCORRECTA', timer:1500, showConfirmButton:false,type:'error'})
+  		return false
+  	}
 
 
 	if (transp=="") {
@@ -1462,7 +1586,7 @@ save_guiadev = function(){
 
 
 	var da=new Object
-  	da.numguiatot=numguiatot
+  	da.numguiatot=numguia
   	da.ex_guiadev=true
   	da.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
   	$.post("", da, function(exists) {
@@ -1499,9 +1623,9 @@ save_guiadev = function(){
 							dat.transp=transp
 							dat.codguia=codguia
 							dat.fretorno=fretorno
-							dat.numguiatot=numguiatot
+							dat.coment=coment
+							dat.numguia=numguia
 							dat.estado='GE'
-							dat.tipocod=tipocod
 							dat.codplaca=codplaca
 							dat.codcond=codcond
 							dat.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
@@ -1547,7 +1671,6 @@ opennewdev = function(){
 			listherradev=response.listherradev
 			$(".numguiadev").text(codguia);
 			$(".newdev").modal("open");
-			$(".devnumserie").val('002-')
 			$(".devnumguia").val(response.cguia)
 			$tb = $("table.table-herradev > tbody");
 		    $tb.empty();
@@ -1820,6 +1943,10 @@ listallherra=function(){
 			$("#comboherra").empty();
 			var lallherra=response.lallherra
 			console.log(lallherra)
+			var el= document.createElement("option")
+			el.value = ""
+			el.textContent = "";
+			comboherra.appendChild(el)
 			almcbo(lallherra,'descherra','codherra',comboherra,'#comboherra')
 		};
 	})
@@ -1827,7 +1954,7 @@ listallherra=function(){
 
 opennewguia = function(){
 //openstorage
-	var codigorand=localStorage.getItem('codrandhe')
+	var codigorand=localStorage.getItem(tipoacce)
 	console.log(codigorand)
 	if (codigorand!=null) {
 		var lparseherra = localStorage.getItem(codigorand)
@@ -1850,21 +1977,9 @@ getlastguiama = function(){
 			var cguia=response.cguia
 			$(".newguia").modal("open");
 			$(".numguia").val(cguia)
-			datanewguia();
 		};
 	})
 }
-
-datanewguia=function(){
-	document.getElementById('radmanual').checked=true
-	document.getElementById('divnumserie').style.display='block'
-	document.getElementById('divnumguia').style.display='block'
-	$(".numserie").val("002-")
-	$(".fguiasalida").val("");
-	$(".txtcomentguia").val("");
-}
-
-
 
 
 opennewherra = function(){
@@ -1914,9 +2029,8 @@ save_edit_guia = function(){
 }
 
 save_guia_fin = function(){
-	var numserie,codguia,numguiatot,codproy,codtrans,codcond,codplaca,fsalid,coment,tipocod;
+	var codguia,codproy,codtrans,codcond,codplaca,fsalid,coment,tipocod;
 
-	numserie=$(".numserie").val()
 	codguia=$("input[name=numguia]").val();
 	codproy=$("select[id=comboproyecto]").val();
 	codtrans=$("select[id=combotransportista]").val();
@@ -1924,17 +2038,12 @@ save_guia_fin = function(){
 	codplaca=$("select[id=comboplaca]").val();
 	fsalid=$(".fguiasalida").val();
 	coment=$("textarea[name=txtcomentguia]").val();
-	numguiatot=numserie+codguia
 
-	if (document.getElementById('radmanual').checked) {
-		tipocod='manual'
-		if (codguia.length != 8) {
-	  		swal({title:'Numero de Guia INCORRECTA', timer:1500, showConfirmButton:false,type:'error'})
-	  		return false
-	  	}
-	}else{
-		tipocod='auto'
-	}
+
+	if (codguia.length != 12) {
+  		swal({title:'Numero de Guia INCORRECTA', timer:1500, showConfirmButton:false,type:'error'})
+  		return false
+  	}
 
   	if (codtrans == "") {
 	  	swal({title:'Seleccionar Transportista', timer:1500, showConfirmButton:false,type:'error'})
@@ -1953,12 +2062,12 @@ save_guia_fin = function(){
   	};
 
   	var data=new Object
-  	data.numguia=numguiatot
-  	data.exists=true
+  	data.numguiatot=codguia
+  	data.ex_guiadev=true
   	data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
   	$.post("", data, function(exists) {
 		if (!exists.status) {
-			delete data.exists;
+			delete data.ex_guiadev;
 			swal({
 		  		title: "GUARDAR GUIA",
 			    text: "Desea guardar la guia",
@@ -1982,14 +2091,13 @@ save_guia_fin = function(){
 		  					var dat=new Object
 		  					dat.linventrest=JSON.stringify(linventrest)
 		  					dat.savecabguia=true
-		  					dat.codguia=numguiatot
+		  					dat.codguia=codguia
 		  					dat.codproy=codproy
 		  					dat.codtrans=codtrans
 		  					dat.codcond=codcond
 		  					dat.codplaca=codplaca
 		  					dat.estado='PE'
 		  					dat.tipoacce=tipoacce
-		  					dat.tipocod=tipocod
 		  					dat.fsalid=fsalid
 		  					dat.coment=coment
 		  					dat.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
@@ -2003,6 +2111,7 @@ save_guia_fin = function(){
 		  							tableguia='tabla-guia'
 								 	estadoguiaherra='PE'
 									listarguiaherra()
+									lproyguia()
 		  						};
 		  					})
 		  				};
@@ -2011,8 +2120,13 @@ save_guia_fin = function(){
 		  		};
 		  	})
 		}else{
-			swal({title:'Numero de Guia ya existe', showConfirmButton:true,type:'error'})
-			return false;
+			if (!exists.estado) {
+				swal({title:'Numero de Guia existe en Guia de Herramienta',timer:2000,showConfirmButton:false,type:'warning'})
+				return false
+			}else{
+				swal({title:'Numero de Guia existe en Guia de Devolucion',timer:2000,showConfirmButton:false,type:'warning'})
+				return false
+			}
 		}
 	})
 }
@@ -2031,6 +2145,7 @@ listarguiaherra=function(){
 		if (response.status){
 
 			var lguiasherra=response.lguiasherra
+			console.log(lguiasherra)
 			$tb = $("table."+tableguia+" > tbody");
 		    $tb.empty();
 		    template = "<tr class=\"{{ codproy }}\"><td class=\"colst40\">{{ item }}</td><td><strong>{{ codproy }}</strong>  {{ nameproy }}</td><td class=\"colst150\">{{ numguiaherra }}</td><td>{{ apesuperv }} {{ namesuperv }}</td><td class=\"colst150\">{{ fsalida }}</td><td class=\"colst250\"><ul id=\"drop\" style=\"width:10px;\"><li><a><i class=\"fa fa-list\"></i></a><ul><li class=\"litguia\"><button style=\"border:none;\" type=\"button\" class=\"transparent btngenguia\" id=\"btngenguia\" value=\"{{ numguiaherra }}\"><a class=\"title\"><i class=\"fa fa-check-square-o\"></i>Generar Guia</a></button></li><li class=\"litguia\"><button style=\"border:none;\" type=\"button\" class=\"transparent btneditguia\" id=\"btneditguia\" value=\"{{ numguiaherra }}\" data-proy=\"{{ codproy }}\" data-transp=\"{{ codtransporte }}\" data-conductor=\"{{ codconductor }}\" data-placa=\"{{ codplaca }}\" data-fechasalida=\"{{ fsalida }}\" data-comentario=\"{{ comentario }}\"><a class=\"title\"><i class=\"fa fa-pencil-square\"></i>Editar Guia</a></button></li><li class=\"litdet\"><button style=\"border:none;\" type=\"button\" class=\"transparent btnshowdetalle\" id=\"btnshowdetalle\" data-dsuperv=\"{{ apesuperv }} {{ namesuperv }}\" data-dllega=\"{{ direcproy }}\" data-ddest=\"{{ rzcliente }}\" data-dnomproy=\"{{ codproy }} {{ nameproy }}\" data-dnumguia=\"{{ numguiaherra }}\" data-dproyid=\"{{ codproy }}\" data-dtrans=\"{{ transporte }}\" data-dcond=\"{{ conductor }}\" data-dplaca=\"{{ codplaca }} {{ marcatransporte }}\" data-dfsalid=\"{{ fsalida }}\" data-dcoment=\"{{ comentario }}\" value=\"{{ numguiaherra }}\"><a class=\"title\"><i class=\"fa fa-info-circle\"></i>Detalle</a></button></li><li class=\"litanul\"><button style=\"border:none;\" type=\"button\" class=\"transparent btndelguiape\" value=\"{{ numguiaherra }}\" data-idproy=\"{{ codproy }}\"><a class=\"title\"><i class=\"fa fa-times-circle\"></i>Anular</a></button></li></ul></li></ul></td></tr>";
@@ -2192,7 +2307,7 @@ locStorage=function(list){
 	var ldetherra=list
 	randmat = Math.random().toString(36).substr(2, 5);
 	localStorage.setItem(randmat, ldetherra);
-	localStorage.setItem('codrandhe',randmat)
+	localStorage.setItem(tipoacce,randmat)
 	console.log(randmat)
 }
 
@@ -2218,9 +2333,8 @@ save_or_edit_guiaherramienta = function(){
 		};
 	}
 
-
 	console.log(codherra)
-	if (namehe=='') {
+	if (codherra=="") {
 		swal({title:'Error',text:'Seleccione '+lbltipoacce, timer:1500, showConfirmButton:false,type:'error'})
 		return false
 	};
@@ -2427,6 +2541,7 @@ verguiaherrapdf = function(){
 	html:true
 	},function(isConfirm){
 		var hreport = $("[name=hreport]").val();
+		console.log(hreport)
 		var ruc = $("[name=ruc]").val();
 		if (isConfirm) {
 			window.open(hreport + 'guide/tools?ng='+codguia+'&ruc='+ruc+'&format='+est+'&emple='+emple,'_blank');
@@ -2533,17 +2648,168 @@ listarherramienta=function(){
 	}
 	$.getJSON("",data,function(response){
 		if (response.status) {
-			var lherra=response.lherra
+			lherra=response.lherra
 			console.log(lherra)
 			$tb = $("table.tabla-herra > tbody");
 		    $tb.empty();
-		    template = "<tr><td class=\"colst40\">{{ item }}</td><td class=\"colst150\">{{ codherra }}</td><td>{{ nameherra }}</td><td>{{ medherra }}</td><td class=\"colst150\">{{ brand }}</td><td class=\"colst150\">{{ unid }}</td><td class=\"colst150\"><button type=\"button\" style=\"border:none;font-size:20px;\" class=\"transparent btneditherramienta\" value=\"{{ codherra }}\" data-namehe=\"{{ nameherra }}\" data-medida=\"{{ medherra }}\" data-marca=\"{{ codbr }}\" data-unidad=\"{{ codunid }}\" data-tvida=\"{{ tvida }}\" ><a style=\"color:#26a69a\"><i class=\"fa fa-pencil\"></i></a><span class=\"glyphicon glyphicon-edit\"></span></button></td></tr>";
+		    template = "<tr><td class=\"colst40\">{{ item }}</td><td class=\"colst150\">{{ codherra }}</td><td class=\"colst40\" style=\"text-align:center\"><input type=\"checkbox\" value=\"{{ codherra }}\" id=\"checkherra{{ conta }}\"/><label for=\"checkherra{{ conta }}\"></label></td><td>{{ nameherra }}</td><td>{{ medherra }}</td><td class=\"colst150\">{{ brand }}</td><td class=\"colst150\">{{ unid }}</td><td class=\"colst150\"><button type=\"button\" style=\"border:none;font-size:20px;\" class=\"transparent btneditherramienta\" value=\"{{ codherra }}\" data-namehe=\"{{ nameherra }}\" data-medida=\"{{ medherra }}\" data-marca=\"{{ codbr }}\" data-unidad=\"{{ codunid }}\" data-tvida=\"{{ tvida }}\" ><a style=\"color:#26a69a\"><i class=\"fa fa-pencil\"></i></a><span class=\"glyphicon glyphicon-edit\"></span></button><button type=\"button\" style=\"border:none;font-size:20px;\" class=\"transparent btndelherra\" value=\"{{ codherra }}\" data-codbr=\"{{ codbr }}\"><a style=\"color:#ef5350\"><i class=\"fa fa-trash\"></i></a></button></td></tr>";
 		    for (x in lherra) {
 			    lherra[x].item = parseInt(x) + 1;
 			    $tb.append(Mustache.render(template, lherra[x]));
 			}
 		};
 	})
+}
+
+checkboxherra= function(){
+	console.log(lherra)
+
+	for (var i = 0; i < lherra.length; i++) {
+		if (document.getElementById('switchherra').checked) {
+			estado=true
+		}else{
+			estado=false
+		}
+		document.getElementById('checkherra'+i).checked=estado
+	};
+}
+
+delheselect = function(){
+	console.log(lherra)
+	var listchecks=[]
+	for (var i = 0; i < lherra.length; i++) {
+		if (document.getElementById('checkherra'+i).checked) {
+			listchecks.push({
+				'codherra':lherra[i]['codherra'],
+				'codbr':lherra[i]['codbr']
+			})
+		};
+	};
+	console.log(listchecks)
+
+	if (listchecks.length>0){
+
+		var data = new Object
+		data.usedherra = true
+		data.lcodsherra=JSON.stringify(listchecks)
+		$.getJSON("",data,function(response){
+			if (response.status) {
+				var lcodsused=response.lcodsused
+				var lcodnotused=response.lcodnotused
+				console.log(lcodsused) //codigos usados
+				console.log(lcodnotused) // codigos no usados
+
+				if (lcodsused.length==listchecks.length) {
+					swal({title:lbltipoacce+' seleccionados ya estan en uso',timer:1500,showConfirmButton:false,type:'error'});
+					return false;
+				}else{
+					var strcods=''
+					for (var i = 0; i < lcodsused.length; i++) {
+						strcods= strcods+' '+lcodsused[i]['codherra']+"\n"
+					}
+
+					var strcodsnot=''
+					for (var i = 0; i < lcodnotused.length; i++) {
+						strcodsnot= strcodsnot+' '+lcodnotused[i]['codherra']+"\n"
+					}
+
+					swal({
+						title:'Eliminar '+ lbltipoacce,
+						// text:"<div class=\"row\"><div class=\"input-field col\"><h6 style=\"font-weight:bold\">CODIGOS USADOS: "+lcodsused.length+"</h6></div><div class=\"input-field col\"><button type=\"button\" class=\"transparent btndetcodused\" style=\"border:none\"><a><i class=\"fa fa-list\"></i></a></button></div></div><br>"+"<h6 style=\"font-weight:bold\">CODIGOS NO USADOS: "+lcodnotused.length+"</h6>",
+						text:"Solo se eliminara codigos no usados. Eliminar?",
+						showConfirmButton:true,
+						showCancelButton:true,
+						type:'warning',
+						// html:true,
+						confirmButtonText:'Si,Eliminar',
+						closeOnCancel:true,
+						closeOnConfirm:false
+
+					},function(isConfirm){
+						if (isConfirm) {
+							var data=new Object
+							data.delherramienta=true
+							data.lcodnotused=JSON.stringify(lcodnotused)
+							data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
+							$.post("",data,function(response){
+								if (response.status) {
+									console.log('dw')
+									swal({title:lbltipoacce+" eliminados!",showConfirmButton:false,timer:1500,type:'success'})
+									tipolist='all'
+							        listarherramienta()
+								};
+							})
+						};
+					})
+				}
+			};
+		})
+	}else{
+		swal({title:'Seleccionar al menos una herramienta',showConfirmButton:false,timer:1500,type:'error'})
+		return false
+	}
+}
+
+delherra = function(){
+	var codherra,codbr;
+	var lcodsherra = []
+
+	codherra=this.value;
+	codbr=this.getAttribute("data-codbr")
+
+	lcodsherra.push({
+		'codherra':codherra,
+		'codbr':codbr
+	})
+
+	var data=new Object
+	data.usedherra=true
+	data.lcodsherra=JSON.stringify(lcodsherra)
+	$.getJSON("", data,function(response){
+		if (response.status) {
+			var lcodsused=response.lcodsused
+			var lcodnotused=response.lcodnotused
+			console.log(lcodsused)
+			console.log(lcodnotused)
+			if (lcodsused.length>0) {
+				swal({
+					title:lbltipoacce+' se encuentra en uso',
+					text:'No puede eliminarlo',
+					showConfirmButton:false,
+					timer:2000,
+					type:'error'
+				})
+				return false
+			}
+			if (lcodnotused.length>0) {
+				swal({
+					title:'',
+					text:'Seguro de Eliminar '+lbltipoacce,
+					showConfirmButton:true,
+					showCancelButton:true,
+					closeOnCancel:true,
+					closeOnConfirm:false,
+					type:'warning'
+
+				},function(isConfirm){
+					if (isConfirm) {
+						var data= new Object
+						data.delherramienta=true
+						data.lcodnotused=JSON.stringify(lcodnotused)
+						data.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
+						$.post("",data,function(response){
+							if (response.status) {
+								swal({title:lbltipoacce+" eliminado!",showConfirmButton:false,timer:1500,type:'success'})
+								tipolist='all'
+						        listarherramienta()
+							};
+						})
+					};
+				})
+			};
+		};
+	})
+
 }
 
 listarinventario=function(){
@@ -2560,7 +2826,7 @@ listarinventario=function(){
 			console.log(linvent)
 			$tb = $("table.tabla-invent > tbody");
 		    $tb.empty();
-		    template = "<tr><td class=\"colst40\">{{ item }}</td><td class=\"colst150\">{{ codherra }}</td><td>{{ nameherra }}</td><td>{{ medherra }}</td><td class=\"colst150\">{{ brand }}</td><td class=\"colst100\">{{ unid }}</td><td class=\"colst100\">{{ cantalmacen }}</td><td class=\"colst100\">{{#areaemple}}<button value=\"{{ codherra }}\" data-codbr=\"{{ codbr }}\" data-lastprice=\"{{ lastprice }}\" data-herrastock=\"{{ nameherra }} {{ medherra }} {{ brand }}\" type=\"button\" class=\"transparent btnviewdivstock\" style=\"border:none;\"><a style=\"font-size:25px;\"><i class=\"fa fa-pencil-square\"></i></a></button>{{/areaemple}}</td></tr>";
+		    template = "<tr><td class=\"colst40\">{{ item }}</td><td class=\"colst150\">{{ codherra }}</td><td>{{ nameherra }}</td><td>{{ medherra }}</td><td class=\"colst150\">{{ brand }}</td><td class=\"colst100\">{{ unid }}</td><td class=\"colst100\">{{ cantalmacen }}</td><td class=\"colst100\">{{#areaemple}}<button value=\"{{ codherra }}\" data-tipomoneda=\"{{ codmoneda }}\" data-stock=\"{{ cantalmacen }}\" data-codbr=\"{{ codbr }}\" data-lastprice=\"{{ lastprice }}\" data-herrastock=\"{{ nameherra }} {{ medherra }} {{ brand }}\" type=\"button\" class=\"transparent btnviewdivstock\" style=\"border:none;\"><a style=\"font-size:25px;\"><i class=\"fa fa-pencil-square\"></i></a></button>{{/areaemple}}</td></tr>";
 		    for (x in linvent) {
 			    linvent[x].item = parseInt(x) + 1;
 			    $tb.append(Mustache.render(template, linvent[x]));
@@ -2701,7 +2967,6 @@ if (fech != "") {
 
 //filtro combo por proyecto
 $(function(){
-
 	$('#cboproyectos').change(function(){
 		var codproy;
 		codproy=this.value
@@ -3084,10 +3349,6 @@ trsavetras=function(){
 	$('select[id=trcboplaca]').val("")
 	$("#trcboplaca").trigger('chosen:updated')
 	$(".modcabfintras").modal("open")
-	document.getElementById('radiomanual').checked='true'
-	document.getElementById('divtrserieguia').style.display='block'
-	document.getElementById('divtrcodguia').style.display='block'
-	$(".trserieguia").val("002-")
 	$('.trfechtrasl').val("")
 	$("textarea[name=trcoment]").val("")
 	datatrnewguia()
@@ -3145,7 +3406,7 @@ checktrhe=function(numrow,cantidad,cantdev){
 }
 
 trsavetrasl=function(){
-	var numguiatr,serialtr,numguiatot,codproydest,empleauth,transp,cond,placa,ftraslado,comentario,dettraslado;
+	var numguiatr,serialtr,codproydest,empleauth,transp,cond,placa,ftraslado,comentario,dettraslado;
 
 	codproydest=$("select[id=trcboproyecto]").val()
 	empleauth=$("select[id=trcboautoriz]").val()
@@ -3156,17 +3417,11 @@ trsavetrasl=function(){
 	comentario=$("textarea[name=trcoment]").val()
 	numguiatr=$(".trcodguia").val()
 	serialtr=$(".trserieguia").val()
-	numguiatot=serialtr+numguiatr
 
-	if (document.getElementById('radiomanual').checked) {
-		if (numguiatr.length!=8) {
-			swal({title:'Numero de Guia INCORRECTO',timer:1500,showConfirmButton:false,type:'error'})
-			return false
-		};
-	}
 
-	if (codproydest=="") {
-		swal({title:'Seleccionar Proyecto de destino',timer:1500,showConfirmButton:false,type:'error'})
+
+	if (numguiatr.length!=12) {
+		swal({title:'Numero de Guia INCORRECTO',timer:1500,showConfirmButton:false,type:'error'})
 		return false
 	};
 
@@ -3190,8 +3445,8 @@ trsavetrasl=function(){
 	console.log(dettraslado)
 
 	var dat=new Object
-  	dat.numguia=numguiatot
-  	dat.exists=true
+  	dat.numguiatot=numguiatr
+  	dat.ex_guiadev=true
   	dat.csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
   	$.post("/almacen/herramienta/guia", dat, function(exists) {
 		if (!exists.status) {
@@ -3231,22 +3486,14 @@ trsavetrasl=function(){
 							console.log(ltrdghe)
 
 
-							var codauto=''
-							if (document.getElementById('radioauto').checked) {
-								codauto=true
-							}else{
-								codauto=false
-							}
-
 							var data=new Object
 							data.savetraslado=true
 							data.codproydest=codproydest
 							data.empleauth=empleauth
 							data.transp=transp
-							data.codauto=codauto
 							data.cond=cond
 							data.tipoacce=tipoacce
-							data.numguiatr=numguiatot
+							data.numguiatr=numguiatr
 							data.placa=placa
 							data.ftraslado=ftraslado
 							data.comentario=comentario
@@ -3256,10 +3503,18 @@ trsavetrasl=function(){
 							data.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
 							$.post("",data,function(response){
 								if (response.status) {
-									console.log('dwdfw')
-									swal({title:'Guia de Traslado Guardado',timer:1500,showConfirmButton:false,type:'success'})
-									$(".modcabfintras").modal("close")
-									location.reload()
+									swal({
+										title:'Guia de Traslado Guardado',
+										timer:1500,
+										showConfirmButton:true,
+										type:'success'
+									},function(isConfirm){
+										if(isConfirm){
+											$(".modcabfintras").modal("close")
+											location.reload()
+										}
+									})
+
 								};
 							})
 						};
@@ -3267,8 +3522,13 @@ trsavetrasl=function(){
 				};
 			})
 		}else{
-			swal({title:'Numero de Guia ya existe', showConfirmButton:true,type:'error'})
-			return false;
+			if (!exists.estado) {
+				swal({title:'Numero de Guia existe en Guia de Herramienta',timer:2000,showConfirmButton:false,type:'warning'})
+				return false
+			}else{
+				swal({title:'Numero de Guia existe en Guia de Devolucion',timer:2000,showConfirmButton:false,type:'warning'})
+				return false
+			}
 		}
 	});
 
@@ -3307,7 +3567,8 @@ trsavefdev=function(){
 ///////EPPS
 
 switchgeneral=function(){
-	var rutabase='http://'+location.hostname+(location.port != ''? ':'+location.port:'')+'/almacen/herramienta/'
+
+	var rutabase='http://'+location.hostname+':'+location.port+'/almacen/herramienta/'
 	getemple()
 	if (document.getElementById('switchepps').checked) {
 		tipoacce='EP'
@@ -3319,6 +3580,7 @@ switchgeneral=function(){
 	$(".lbltipoacce").text(lbltipoacce)
 
 	if (urlactual==rutabase+'lista') {
+		document.getElementById('switchherra').checked=false
 		document.getElementById('divherramienta').style.display="block"
 		tipolist='all'
 		listarherramienta()
@@ -3330,6 +3592,7 @@ switchgeneral=function(){
 		lproyguia()
 		document.getElementById('divguia').style.display="block"
 	}else if(urlactual==rutabase+'inventario'){
+		$(".cardherra").slideUp(1000);
 		tipolist='all'
 		listarinventario()
 		document.getElementById('divinventario').style.display="block"
@@ -3401,6 +3664,7 @@ lproyconsult=function(){
 		if (response.status) {
 			var lprocons=response.lprocons
 			console.log(lprocons)
+			txtcontecbo="Sin Proyecto"
 			almcboproy(lprocons,'nameproy','codproy',combolproy,'#combolproy')
 		};
 	})
@@ -3432,17 +3696,19 @@ lproyguia=function(){
 		if (response.status) {
 			var listproyguia=response.listproyguia
 			console.log(listproyguia)
+			txtcontecbo="Todos los Proyectos"
 			almcboproy(listproyguia,'nameproy','codproy',cboproyectos,'#cboproyectos')
 		};
 	})
 }
+var txtcontecbo=''
 
 almcboproy = function(lista,contenido,id,combo,idcombo){
 	console.log(lista)
 	$(idcombo).empty()
 	var op= document.createElement("option")
 	op.value = ""
-	op.textContent = "Todos los Proyectos";
+	op.textContent = txtcontecbo;
 	combo.appendChild(op)
 	for(var i = 0; i < lista.length; i++) {
 	    var el = document.createElement("option");
@@ -3672,5 +3938,6 @@ showreportnoteingress = function() {
 	var code = this.value;
 	var hreport = $('[name=hreport]').val();
 	var ruc = $('[name=ruc]').val();
-	window.open(hreport+'tools/note/ingress?idnota='+code+'&ruc='+ruc, '_blank');
+	console.log(emple)
+	window.open(hreport+'tools/note/ingress?idnota='+code+'&ruc='+ruc+'&emple='+emple, '_blank');
 }

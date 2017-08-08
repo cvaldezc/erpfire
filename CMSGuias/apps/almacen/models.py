@@ -79,6 +79,8 @@ class Detpedido(models.Model):
     cantenv = models.FloatField(blank=True, default=0)
     flagcantenv = models.BooleanField(blank=True, default=False)
     flag = models.BooleanField(default=True)
+    cenvdevmat = models.FloatField(default=0) #devmaterial
+    flagcenvdevmat = models.BooleanField(default=False) #d
 
     audit_log = AuditLog()
 
@@ -264,6 +266,8 @@ class NipleGuiaRemision(models.Model):
     flag = models.BooleanField(default=True)
     related = models.IntegerField(null=True, blank=True, default=0)
     order = models.ForeignKey(Pedido, to_field='pedido_id', null=True, blank=True)
+    cenvdevmat = models.FloatField(default=0)
+    flagcenvdevmat = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['materiales']
@@ -578,7 +582,7 @@ class ReparacionHerra(models.Model):
 
 class GuiaHerramienta(models.Model):
     guia_id = models.CharField(max_length=12, primary_key=True)
-    proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id')
+    proyecto = models.ForeignKey(Proyecto, to_field='proyecto_id', null=True, blank=True)
     fechsalida = models.DateField()
     empdni = models.ForeignKey(Employee, to_field='empdni_id', null=True)
     condni = models.ForeignKey(Conductore, to_field='condni_id')
@@ -614,6 +618,7 @@ class devolucionHerra(models.Model):
     condni = models.ForeignKey(Conductore, to_field='condni_id')
     nropla = models.ForeignKey(Transporte, to_field='nropla_id')
     traruc = models.ForeignKey(Transportista, to_field='traruc_id')
+    comentario = models.CharField(max_length=200, null=True, blank=True)
 
 
 class detDevHerramienta(models.Model):
@@ -672,9 +677,9 @@ class detGrupoPedido(models.Model):
 
 
 class GrupoPedNiple(models.Model):
-    """
+    '''
     details for detail of group order storage fields as type measure, order, brand, model
-    """
+    '''
     codgrupo = models.ForeignKey(GrupoPedido, to_field='codgrupo_id')
     pedido = models.ForeignKey(Pedido, to_field='pedido_id')
     material = models.ForeignKey(Materiale, to_field='materiales_id')
@@ -683,7 +688,7 @@ class GrupoPedNiple(models.Model):
     cantidad = models.FloatField()
     metrado = models.FloatField()
     tipo = models.CharField(max_length=1)
-    idref = models.ForeignKey(Niple, to_field='id')
+    idref = models.ForeignKey(Niple, related_name='idrefAsGroupPedNiple')
 
     def __unicode__(self):
         return '{} {} {} {} {} {}'.format(
@@ -695,7 +700,7 @@ class GrupoPedNiple(models.Model):
 model return materials from guide remission
 '''
 class GuiaDevMat(models.Model):
-    guiadevmat_id = models.CharField(max_length=8, primary_key=True)
+    guiadevmat_id = models.CharField(max_length=12, primary_key=True)
     fechadevolucion = models.DateField()
     emple_aut = models.ForeignKey(
         Employee, related_name='AuthAsEmployee', null=True, blank=True)
@@ -712,9 +717,10 @@ class GuiaDevMat(models.Model):
 
 
 class detGuiaDevMat(models.Model):
-    guiadevmat = models.ForeignKey(GuiaDevMat, to_field='guiadevmat_id')
+    guiadevmat = models.ForeignKey(GuiaDevMat, to_field='guiadevmat_id', max_length=12)
     guia = models.ForeignKey(
         GuiaRemision, to_field='guia_id', null=True, blank=True) #quitar null y blank
+    pedido = models.ForeignKey(Pedido, to_field='pedido_id', null=True)
     material = models.ForeignKey(Materiale, to_field='materiales_id')
     marca = models.ForeignKey(Brand, to_field='brand_id')
     model = models.ForeignKey(Model, to_field='model_id')
@@ -726,23 +732,29 @@ class detGuiaDevMat(models.Model):
 
 
 class GuiaDevMatNiple(models.Model):
-    guiadevmat = models.ForeignKey(GuiaDevMat, to_field='guiadevmat_id')
+    guiadevmat = models.ForeignKey(GuiaDevMat, to_field='guiadevmat_id', max_length=12)
     guia = models.ForeignKey(
         GuiaRemision, to_field='guia_id', null=True, blank=True) #quitar null y blank
+    pedido = models.ForeignKey(Pedido, to_field='pedido_id', null=True)
     material = models.ForeignKey(Materiale, to_field='materiales_id')
     marca = models.ForeignKey(Brand, to_field='brand_id')
     model = models.ForeignKey(Model, to_field='model_id')
     cantidad = models.FloatField()
     metrado = models.FloatField()
     tipo = models.CharField(max_length=1)
-    idref = models.ForeignKey(Niple, to_field='id')
+    idnipgrem = models.ForeignKey(
+        NipleGuiaRemision, related_name='idnipAsNipleGuiaRemision', null=True)
     motivo = models.CharField(max_length=60)
     comentario = models.CharField(max_length=200, null=True, blank=True)
 
     audit_log = AuditLog()
+
+
 '''
 endblock
 '''
+
+
 '''
 @Juan Julcapari 2017-07-24 17:47:34
 '''
@@ -752,15 +764,15 @@ class NotaIngresoHe(models.Model):
     compra = models.ForeignKey(Compra, to_field='compra_id')
     guia = models.CharField(max_length=12, null=True, blank=True)
     factura = models.CharField(max_length=12, null=True, blank=True)
-    motivo = models.CharField(max_length=60, blank=True,null=True)
+    motivo = models.CharField(max_length=60, blank=True, null=True)
     registro = models.ForeignKey(Employee, related_name='registroHeAsEmployee')
     # register = models.DateTimeField(default=datetime.now, auto_now=False)
     register = models.DateTimeField(auto_now=True)
     recibido = models.ForeignKey(Employee, related_name='receiveHeAsEmployee')
     inspeccionado = models.ForeignKey(
-                    Employee, related_name='inspectionHeAsEmployee')
+        Employee, related_name='inspectionHeAsEmployee')
     aprobado = models.ForeignKey(Employee, related_name='approvalHeAsEmployee')
-    comentario = models.CharField(max_length=200,null=True, blank=True)
+    comentario = models.CharField(max_length=200, null=True, blank=True)
     estado = models.CharField(max_length=2, default='PE')
     flag = models.BooleanField(default=True)
 

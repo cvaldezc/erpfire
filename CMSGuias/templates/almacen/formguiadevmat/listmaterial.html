@@ -1,13 +1,19 @@
 {% block script %}
     <script src="{{ MEDIA_URL }}js/mustache.js"></script>
 {% endblock script %}
+
 <div class="modal lmaterials">
     <div class="modal-content">
         <div class="row">
             <label class="lblcodproyguia" style="display:none"></label>
+
             <div class="input-field col s2">
-                <input readonly placeholder="" type="text" class="nguiadev">
-                <label for="nguiadev" >NUMERO DE GUIA</label>
+                <input readonly placeholder="" style="color:red" type="text" class="nguiadev">
+                <label for="nguiadev" style="color:red">GUIA </label>
+            </div>
+            <div class="input-field col s2" id="divnumguia">
+                <input placeholder="" id="numguia" name="numguia" type="text" class="numguia" maxlength="12" length="12"/>
+                <label for="numguia" >NUMERO DE GUIA</label>
             </div>
             <div class="input-field col s3" style="margin-top:30px;">
                 <select id="cboguiatransp" class="browser-default cboguiatransp">
@@ -16,20 +22,17 @@
                     <option value="{{ x.traruc_id }}">{{ x.tranom }}</option>
                 {% endfor %}
                 </select>
-            </div>
-            <div class="input-field col s0">
-                <p>Conductor:</p>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">TRANSPORTISTA</label>
             </div>
             <div class="input-field col s2" style="margin-top:30px;">
                 <select id="cboguiaconductor" class="browser-default cboguiaconductor">
                 </select>
-            </div>
-            <div class="input-field col s0">
-                <p>Placa:</p>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">CONDUCTOR</label>
             </div>
             <div class="input-field col s2" style="margin-top:30px;">
                 <select id="cboguiaplaca" class="browser-default cboguiaplaca">
                 </select>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">PLACA</label>
             </div>
         </div>
         <div class="row">
@@ -39,11 +42,11 @@
             </div>
             <div class="input-field col s3" style="margin-top:35px;">
                 <select id="comboempleado" class="browser-default comboempleado">
-                    <option value="" disabled selected>Autorizado por</option>
                     {% for x in lemple %}
                     <option value="{{ x.empdni_id }}">{{ x.lastname }}, {{ x.firstname }}</option>
                     {% endfor %}
                 </select>
+                <label for="comboempleado" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">AUTORIZADO POR:</label>
             </div>
             <div class="input-field col s3">
                 <input placeholder="" length="200" name="comentguiadev" type="text" class="comentguiadev">
@@ -79,20 +82,6 @@
                 <label for="radionone" style="font-size:15px;font-weight:bold;color:black;">Ninguno</label>
             </div>
         </div>
-        <!--
-        <div class="row">
-            <div class="input-field col s8">
-                <i class="prefix fa fa-search"></i>
-                <input class="txtbuscmaterial" style="width:90%;height:30px;" type="search" placeholder="Codigo o Material" name="txtbuscmaterial" id="txtbuscmaterial">
-            </div>
-            <div class="input-field col s3">
-                <button type="button" class="btn waves-effect teal lighten-1 btnsaveallmat">
-                <i class="fa fa-file"></i>
-                <span><strong>Devolver Todo</strong></span>
-                </button>
-            </div>
-        </div>
-        -->
         <hr>
         <div style="overflow-y: scroll;height:400px;">
             <table class="table table-condensed responsive-table highlight table-lmaterials" id="table-lmaterials" >
@@ -100,10 +89,11 @@
                     <tr class="brand-primary">
                         <th class="colst40">#</th>
                         <th class="colst150">Codigo</th>
+                        <th class="colst150">Pedido</th>
                         <th>Material</th>
                         <th>Marca</th>
                         <th>Modelo</th>
-                        <th class="colst100">Cant.Env.</th>
+                        <th class="colst100">Cant.Guia</th>
                         <th class="colst100">Devolvio</th>
                         <th class="colst100">Devolver</th>
                         <th class="colst40"></th>
@@ -114,28 +104,6 @@
                 <tbody></tbody>
             </table>
         </div>
-
-        <!--Niples-->
-        <!--
-        <div id="divtablniple" style="display:none">
-            <table class="table table-condensed highlight tab-sellniple" id="tab-sellniple">
-                <h5>Lista de Niples</h5>
-                <thead class="cab">
-                    <tr>
-                        <th>Codigo</th>
-                        <th>Material</th>
-                        <th>Metrado</th>
-                        <th>Tipo</th>
-                        <th>Cantidad</th>
-                        <th>Motivo</th>
-                        <th>Comentario</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody class="tbody"></tbody>
-            </table>
-        </div>
-        -->
 
         <div align="center" style="margin-top:10px;">
             <button type="button" id="btnsave" class="btn waves-effect teal lighten-1 btnsavedevmat">

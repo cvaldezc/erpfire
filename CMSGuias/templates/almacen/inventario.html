@@ -84,13 +84,13 @@
             <input placeholder="" id="ingcant" name="ingcant" type="text" class="ingcant">
             <label for="ingcant" >STOCK</label>
           </div>
-          <div class="input-field col s2" style="margin-top:35px">
+          <div class="input-field col s2">
             <select id="invtipomon" class="browser-default">
               {% for x in ltipmoned %}
               <option value="{{ x.moneda_id }}">{{ x.moneda }}</option>
               {% endfor %}
             </select>
-            <label style="font-size:0.8rem;color:#0091ea;margin-top:-45px" for="invtipomon">TIPO DE MONEDA</label>
+            <label style="font-size:0.8rem;color:#0091ea;margin-top:-25px" for="invtipomon">TIPO DE MONEDA</label>
           </div>
           <div class="input-field col s1">
             <input placeholder="" type="text" class="ingprecio">
