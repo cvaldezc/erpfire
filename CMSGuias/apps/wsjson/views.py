@@ -8,7 +8,7 @@ import urllib2
 import re
 from bs4 import BeautifulSoup
 
-# from django.shortcuts import get_object_or_404
+from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 # from django.contrib.auth.models import User
@@ -18,6 +18,7 @@ from django.db.models import Sum
 # from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt, csrf_view_exempt
 from django.views.generic import DetailView, ListView, View
 from django.views.generic import TemplateView
 
@@ -1560,3 +1561,30 @@ class Reports(JSONResponseMixin, View):
         kwargs['status'] = True
         return self.render_to_json_response(kwargs)
 #endblock
+
+# @cvaldezc 2017-08-12 11:06:08
+# @method_decorator(csrf_view_exempt)
+class AuthServices(JSONResponseMixin, View):
+
+    @method_decorator(csrf_exempt)
+    def post(self, request, *args, **kwargs):
+        try:
+            usr = request.POST['usr']
+            passwd = request.POST['passwd']
+            user = authenticate(username=usr, password=passwd)
+            if user is not None and user.is_active:
+                employee = Employee.objects.get(empdni_id=user.get_profile().empdni_id)
+                print user.get_profile().empdni_id
+                kwargs['auth'] = user.get_profile().empdni_id
+                kwargs['email'] = employee.email
+                kwargs['names'] = employee.name_complete
+                kwargs['charge'] = user.get_profile().empdni.charge.cargos
+                kwargs['status'] = True
+            else:
+                kwargs['status'] = False
+                kwargs['raise'] = 'Usuario o contraseña son incorectos'
+        except Exception  as ex:
+            kwargs['status'] = False
+            kwargs['raise'] = str(ex)
+        return self.render_to_json_response(kwargs)
+# endblock
