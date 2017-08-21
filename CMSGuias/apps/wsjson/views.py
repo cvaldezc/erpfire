@@ -1568,6 +1568,7 @@ class AuthServices(JSONResponseMixin, View):
 
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
+        print request.POST
         try:
             usr = request.POST['usr']
             passwd = request.POST['passwd']

@@ -311,9 +311,10 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
 
+drop Trigger nipleguideremisioninsertquantityforcantmov_trigger ON almacen_detguiaremision;
 CREATE TRIGGER nipleguideremisioninsertquantityforcantmov_trigger
-AFTER INSERT ON almacen_detguiaremision
-FOR EACH ROW EXECUTE PROCEDURE nipleguideremisioninsertquantityforcantmov_proc();
+AFTER INSERT ON almacen_nipleguiaremision
+FOR EACH ROW EXECUTE PROCEDURE nipleguideremisioninsertquantityforcantmov_proc()
 ---------------------------------------------------------------------------------
 -- ENDBLOCK
 ---------------------------------------------------------------------------------
