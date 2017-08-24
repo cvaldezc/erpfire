@@ -366,9 +366,9 @@ module Controller {
 			angular.element('#mcomment').modal('open');
 		}
 
-		saveComment(pk: number): void {
+		saveComment(): void {
 			let params: object = {
-				pk: pk,
+				pk: this.comments['pk'],
 				savecomment: true,
 				comment: angular.element('.itemobservation').trumbowyg('html')
 			}
@@ -431,7 +431,7 @@ module Controller {
 
 		private odel(): Promise<Array<object>> {
 			return new Promise( (resolve) => {
-				let promises: Array<string> = [];
+				let promises = [];
 				for (var key in this.purchase['modify']) {
 					if (this.purchase['modify'].hasOwnProperty(key)) {
 						let element = this.purchase['modify'][key];
