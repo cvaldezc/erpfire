@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # from django.conf.urls.defaults import patterns, url
 from django.conf.urls import patterns, url, include
+from django.views.decorators.csrf import csrf_exempt
 
 from .views import *
 
@@ -91,4 +92,5 @@ urlpatterns = patterns(
     url(r'^settings/$', RESTFulSettings.as_view()),
     url(r'^inventory/tools/(?P<export>\w{6})/$', RestInventoryTools.as_view()),
     url(r'reports/', Reports.as_view()),
+    url(r'^auth/$', csrf_exempt(AuthServices.as_view())),
 )
