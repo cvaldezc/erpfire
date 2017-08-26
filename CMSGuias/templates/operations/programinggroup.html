@@ -88,8 +88,9 @@
       </button>
     </div>
   </div>
-  {% if request.user.get_profile.empdni.charge.area|lower == 'administrator' or request.user.get_profile.empdni.charge.area|lower == 'ventas' %}
+
     <div class="card card-panel">
+    {% if request.user.get_profile.empdni.charge.area|lower == 'administrator' or request.user.get_profile.empdni.charge.area|lower == 'ventas' %}
       <div class="card-content">
         <strong>{{project.currency.moneda}}</strong>
         <div class="row">
@@ -119,11 +120,16 @@
           </div>
         </div>
       </div>
+    {% endif %}
+
       <div class="card-action right-align">
+        {% if request.user.get_profile.empdni.charge.area|lower == 'administrator' or request.user.get_profile.empdni.charge.area|lower == 'ventas' or request.user.get_profile.empdni.charge.area|lower == 'operaciones' %}
         <a class="btn grey lighten-5 grey-text text-darken-3 left" href="{% url 'compareopsa_view' project.proyecto_id sector.sector_id %}">
           <i class="fa fa-list"></i>
           <span>Comparar materiales</span>
         </a>
+        {% endif %}
+        {% if request.user.get_profile.empdni.charge.area|lower == 'administrator' or request.user.get_profile.empdni.charge.area|lower == 'ventas' %}
         <a href="#" class="dropdown-button btn waves waves-effect" data-activates="viewsa">
           <i class="fa fa-eye"></i> Vistas
         </a>
@@ -132,9 +138,12 @@
           <li class="divider"></li>
           <li><a href="#!" class="grey-text text-darken-3 animate-show" ng-model="sgp" ng-click="sgp=!sgp;slist=sgp"><i class="fa fa-bars"></i> Grupos</a></li>
         </ul>
+        {% endif %}
       </div>
     </div>
-  {% endif %}
+
+
+
   <div class="card" ng-show="dsfshow" ng-class="{'hide': !slist}">
     <div class="card-content">
       <i class="right fa fa-times" ng-click="dsfshow=false"></i>

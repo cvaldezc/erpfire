@@ -23,6 +23,8 @@ urlpatterns = patterns(
     url(r'^load/', include('CMSGuias.apps.load.urls')),
     url(r'^tickets/', include('CMSGuias.apps.boleta.urls')),
     url(r'^rrhh/', include('CMSGuias.apps.rrhh.urls')),
+    # cruds
+    url(r'^cruds/', include('CMSGuias.apps.cruds.urls')),
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),

@@ -1,20 +1,20 @@
-{% extends "base.html" %}
+{% extends "basemd.html" %}
 {% block title %}
-    Unidades
+    Niple
 {% endblock title %}
 {% block menu %}
-    {% include "menus/sale.htm" %}
+    {% include "menus/cruds_menu.html" %}
 {% endblock menu %}
 {% block content %}
     <div class="container">
         <div class="well">
-            <h1>Unidades</h1>
+            <h3>Niple</h3>
             <form method="post" role="form">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <a href="{% url 'unit_list' %}" class="btn btn-primary">
+                <a href="{% url 'mniple_list' %}" class="btn btn-primary">
                     <span class="glyphicon glyphicon-chevron-left"></span>
-                    Regresar
+                    Ver Niples
                 </a>
                 <button type="submit" class="btn btn-success">
                     <span class="glyphicon glyphicon-saved"></span>

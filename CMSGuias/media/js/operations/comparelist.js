@@ -12,6 +12,7 @@ app.factory('fDSMetrado', function($http, $cookies, $q) {
   $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
   obj = new Object;
   uri = location.pathname;
+
   obj.getCompare = function() {
     var deffered;
     deffered = $q.defer();
@@ -113,6 +114,7 @@ app.controller('ctrl', function($scope, $cookies, $timeout, $q, fDSMetrado) {
       $scope.sales = data.sales;
       $scope.operations = data.operations;
       $scope.diff = data.diff;
+      console.log($scope.currency)
       return $scope.loader = true;
     }, function(error) {
       return console.error("error al cargar los datos");
@@ -243,4 +245,10 @@ app.controller('ctrl', function($scope, $cookies, $timeout, $q, fDSMetrado) {
   $scope.exportData = function() {
     window.open('?export=true', '_blank');
   };
+
+
+  $scope.exportDatacomp = function() {
+      window.open('?exportcomp=true', '_blank');
+  };
+
 });

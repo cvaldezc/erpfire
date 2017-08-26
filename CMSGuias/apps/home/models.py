@@ -161,6 +161,15 @@ class DetailsGroup(models.Model):
         return '%s %s %f' % (self.mgroup_id, self.materials, self.quantity)
 
 
+class AreaCargo(models.Model):
+    area_id = models.CharField(max_length=4, primary_key=True)
+    area = models.CharField(max_length=150)
+    flag = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return self.area
+
+
 class Cargo(models.Model):
     cargo_id = models.CharField(primary_key=True, max_length=9)
     cargos = models.CharField(max_length=60)

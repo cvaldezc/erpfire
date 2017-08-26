@@ -16,22 +16,26 @@
         <!-- <strong>Buscar Material</strong> -->
         <div class="panel-body">
           <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="" class="control-label">Tipo</label>
+                <select class="form-control" id="cbotipoit">
+                  {% for x in ltipos %}
+                  <option value="{{ x.id }}">{{ x.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
             <div class="col-md-2">
               <div class="form-group">
                 <label for="" class="control-label">Código</label>
                 <input type="text" maxlength="15" name="code" class="form-control input-sm">
               </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-6">
               <div class="form-group">
                 <label for="" class="control-label">Nombre/Descripción</label>
                 <input type="text" class="form-control input-sm" name="name">
-              </div>
-            </div>
-            <div class="col-md-1">
-              <div class="form-group">
-                <label for="" class="control-label">Buscar</label>
-                <button class="btn btn-sm btn-primary" type="button" name="search"><span class="fa fa-search"></span></button>
               </div>
             </div>
           </div>

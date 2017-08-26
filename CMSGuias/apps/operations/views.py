@@ -1508,6 +1508,100 @@ class CompareMaterials(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
+        def getcompmat():
+            sales = MetProject.objects.filter(
+                    proyecto_id=kwargs['pro'], sector_id=kwargs['sec'])
+            ds = DSector.objects.filter(
+                    project_id=kwargs['pro'], sector_id=kwargs['sec'])
+            operations = DSMetrado.objects.filter(
+                    dsector_id__in=[x.dsector_id for x in ds])
+            lstf = list()
+            for s in sales:
+
+                if s.brand_id == "BR000":
+                    try:
+                        inv = Inventario.objects.get(
+                            materiales_id=s.materiales_id)
+                        stk = inv.stock
+                    except Inventario.DoesNotExist, e:
+                        stk = 0
+                else:
+                    try:
+                        br = InventoryBrand.objects.get(
+                            materials_id=s.materiales_id,
+                            brand_id=s.brand_id)
+                        stk = br.stock
+                    except InventoryBrand.DoesNotExist, e:
+                        stk = 0
+
+                lstf.append({
+                    'usercargo': request.user.get_profile().empdni.charge.area,
+                    'materials': s.materiales_id,
+                    'name': '%s %s' % (
+                        s.materiales.matnom, s.materiales.matmed),
+                    'brand_id': s.brand_id,
+                    'brand': s.brand.brand,
+                    'model_id': s.model_id,
+                    'model': s.model.model,
+                    'unit': s.materiales.unidad.uninom,
+                    'psales':0,
+                    'sales': s.cantidad,
+                    'stock': stk,
+                    'purchase': s.precio,
+                    'operations': '-'})
+            for o in operations:
+                c = 0
+                for x in lstf:
+                    mat = (x['materials'] == o.materials_id)
+                    brand = (x['brand_id'] == o.brand_id)
+                    model = (x['model_id'] == o.model_id)
+                    if mat and brand and model:
+                        if x['operations'] == '-':
+                            x['operations'] = 0
+                        x['purchase'] = o.ppurchase
+                        x['psales'] = o.psales
+                        x['operations'] = (x['operations'] + o.quantity)
+                        x['amount'] = (x['operations'] * float(x['purchase']))
+                        break
+                    else:
+                        c += 1
+                if len(lstf) == c:
+
+                    if o.brand_id == "BR000":
+                        try:
+                            inv = Inventario.objects.get(
+                                materiales_id=s.materiales_id)
+                            stk = inv.stock
+                        except Inventario.DoesNotExist, e:
+                            stk = 0
+                    else:
+                        try:
+                            br = InventoryBrand.objects.get(
+                                materials_id=s.materiales_id,
+                                brand_id=s.brand_id)
+                            stk = br.stock
+                        except InventoryBrand.DoesNotExist, e:
+                            stk = 0
+
+
+                    lstf.append({
+                        'usercargo': request.user.get_profile().empdni.charge.area,
+                        'materials': o.materials_id,
+                        'name': '%s %s' % (
+                            o.materials.matnom, o.materials.matmed),
+                        'brand_id': o.brand_id,
+                        'brand': o.brand.brand,
+                        'model_id': o.model_id,
+                        'model': o.model.model,
+                        'unit': o.materials.unidad.uninom,
+                        'psales':0,
+                        'stock': stk,
+                        'sales': '-',
+                        'purchase': float(o.ppurchase),
+                        'operations': o.quantity,
+                        'amount': (o.quantity*float(o.ppurchase))})
+            lstf.sort(key=lambda x: x['name'])
+            return lstf
         context = dict()
         try:
             if request.is_ajax():
@@ -1535,63 +1629,15 @@ class CompareMaterials(JSONResponseMixin, TemplateView):
                             # time.sleep(3)
                     context['status'] = True
                 if 'glist' in request.GET:
+                    lst = getcompmat()
                     sales = MetProject.objects.filter(
                         proyecto_id=kwargs['pro'], sector_id=kwargs['sec'])
                     ds = DSector.objects.filter(
                         project_id=kwargs['pro'], sector_id=kwargs['sec'])
-                    print ds
                     operations = DSMetrado.objects.filter(
                         dsector_id__in=[x.dsector_id for x in ds])
-                    # print 'count opertaions ', operations.count()
-                    # .order_by(
-                    #    'materials__materiales_id').distinct(
-                    #    'materials__materiales_id')
-                    lst = list()
-                    for s in sales:
-                        lst.append({
-                            'materials': s.materiales_id,
-                            'name': '%s %s' % (
-                                s.materiales.matnom, s.materiales.matmed),
-                            'brand_id': s.brand_id,
-                            'brand': s.brand.brand,
-                            'model_id': s.model_id,
-                            'model': s.model.model,
-                            'unit': s.materiales.unidad.uninom,
-                            'sales': s.cantidad,
-                            'purchase': s.precio,
-                            'operations': '-'})
-                    for o in operations:
-                        c = 0
-                        for x in lst:
-                            mat = (x['materials'] == o.materials_id)
-                            brand = (x['brand_id'] == o.brand_id)
-                            model = (x['model_id'] == o.model_id)
-                            if mat and brand and model:
-                                if x['operations'] == '-':
-                                    x['operations'] = 0
-                                x['purchase'] = o.ppurchase
-                                x['psales'] = o.psales
-                                x['operations'] = (x['operations'] + o.quantity)
-                                x['amount'] = (x['operations'] * float(x['purchase']))
-                                break
-                            else:
-                                c += 1
-                        if len(lst) == c:
-                            lst.append({
-                                'materials': o.materials_id,
-                                'name': '%s %s' % (
-                                    o.materials.matnom, o.materials.matmed),
-                                'brand_id': o.brand_id,
-                                'brand': o.brand.brand,
-                                'model_id': o.model_id,
-                                'model': o.model.model,
-                                'unit': o.materials.unidad.uninom,
-                                'sales': '-',
-                                'purchase': float(o.ppurchase),
-                                'operations': o.quantity,
-                                'amount': (o.quantity*float(o.ppurchase))})
 
-                    context['lst'] = lst
+                    context['lst'] = getcompmat()
                     context['sales'] = sales.aggregate(amount=Sum(
                                         'cantidad', field='cantidad*precio'))['amount']
                     # context['operations'] = operations.aggregate(amount=Sum(
@@ -1607,6 +1653,71 @@ class CompareMaterials(JSONResponseMixin, TemplateView):
                     context['salesap'] = sales[0].sector.amount
                     context['diff'] = (sales[0].sector.amount - context['operations'])
                 return self.render_to_json_response(context)
+            if 'exportcomp' in request.GET:
+                lcomp = getcompmat()
+                response = HttpResponse(mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                response['Content-Disposition'] = 'attachment; filename=DATOS-COMPARATIVO-%s-%s.xlsx' %(kwargs['pro'], kwargs['sec'])
+                wb = Workbook()
+                ws = wb.active
+                ws.title = 'Materiales'
+                ws.sheet_properties.tabColor = '1072BA'
+
+
+
+                columns = [
+                    ('Código', 16),
+                    ('Descripción', 60),
+                    ('Unidad', 9),
+                    ('Marca', 9),
+                    ('Modelo', 9),
+                    ('Precio Compra', 15),
+                    ('Precio Venta', 15),
+                    ('Ventas', 15),
+                    ('Cantidad Vendida', 20),
+                    ('Stock', 15)]
+                border = styles.borders.Border(left=styles.borders.Side(style='thin'),
+                                                right=styles.borders.Side(style='thin'),
+                                                top=styles.borders.Side(style='thin'),
+                                                bottom=styles.borders.Side(style='thin'))
+                mstyle = styles.Style(border=border)
+                # col_num = 0
+                for col_num in xrange(len(columns)):
+                    c = ws.cell(row=1, column=col_num+1)
+                    c.value = columns[col_num][0]
+                    c.style = mstyle
+                    c.font = styles.Font(name='Tahoma', bold=True, size=9)
+                    ws.column_dimensions[cell.get_column_letter(col_num+1)].width = columns[col_num][1]
+                    # col_num+=1
+                rw = 2
+
+                for x in lcomp:
+
+                    ws.cell(column=1, row=rw).value = x['materials']
+                    ws.cell(column=1, row=rw).style = mstyle
+                    ws.cell(column=2, row=rw).value = x['name']
+                    ws.cell(column=2, row=rw).style = mstyle
+                    ws.cell(column=3, row=rw).value = x['unit']
+                    ws.cell(column=3, row=rw).style = mstyle
+                    ws.cell(column=4, row=rw).value = x['brand']
+                    ws.cell(column=4, row=rw).style = mstyle
+                    ws.cell(column=5, row=rw).value = x['model']
+                    ws.cell(column=5, row=rw).style = mstyle
+
+                    ws.cell(column=6, row=rw).value = x['purchase']
+                    ws.cell(column=6, row=rw).style = mstyle
+                    ws.cell(column=7, row=rw).value = x['psales']
+                    ws.cell(column=7, row=rw).style = mstyle
+                    ws.cell(column=8, row=rw).value = x['sales']
+                    ws.cell(column=8, row=rw).style = mstyle
+                    ws.cell(column=9, row=rw).value = x['operations']
+                    ws.cell(column=9, row=rw).style = mstyle
+                    ws.cell(column=10, row=rw).value = x['stock']
+                    ws.cell(column=10, row=rw).style = mstyle
+                    rw+=1
+                # print len(ws.cell(column=1, row=2).width)
+                wb.save(response)
+                return response
+
             if 'export' in request.GET:
                 response = HttpResponse(mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
                 response['Content-Disposition'] = 'attachment; filename=DATOS-%s-%s.xlsx' %(kwargs['pro'], kwargs['sec'])
@@ -1614,13 +1725,7 @@ class CompareMaterials(JSONResponseMixin, TemplateView):
                 ws = wb.active
                 ws.title = 'Materiales'
                 ws.sheet_properties.tabColor = '1072BA'
-                # ws = wb.create_sheet()
-                # sales = MetProject.objects.filter(
-                #         proyecto_id=kwargs['pro'], sector_id=kwargs['sec'])
-                # ds = DSector.objects.filter(
-                #        project_id=kwargs['pro'], sector_id=kwargs['sec'])
                 operations = DSMetrado.objects.filter(sector_id=kwargs['sec']).order_by('materials__matnom')
-                # operations = operations
                 lst = list()
                 for o in operations:
                     c = 0
@@ -1635,6 +1740,23 @@ class CompareMaterials(JSONResponseMixin, TemplateView):
                         else:
                             c += 1
                     if len(lst) == c:
+
+                        if o.brand_id == "BR000":
+                            try:
+                                inv = Inventario.objects.get(
+                                    materiales_id=o.materials_id)
+                                stk = inv.stock
+                            except Inventario.DoesNotExist, e:
+                                stk = 0
+                        else:
+                            try:
+                                br = InventoryBrand.objects.get(
+                                    materials_id=o.materials_id,
+                                    brand_id=o.brand_id)
+                                stk = br.stock
+                            except InventoryBrand.DoesNotExist, e:
+                                stk = 0
+
                         lst.append({
                             'materials': o.materials_id,
                             'name': '%s %s' % (
@@ -1644,17 +1766,20 @@ class CompareMaterials(JSONResponseMixin, TemplateView):
                             'model_id': o.model_id,
                             'model': o.model.model,
                             'unit': o.materials.unidad.uninom,
+                            'stock': stk,
                             #'sales': '-',
                             #'purchase': float(o.ppurchase),
                             'operations': o.quantity,})
                             # 'amount': (o.quantity*float(o.ppurchase))})
+
                 columns = [
                     ('Código', 16),
                     ('Descripción', 60),
                     ('Unidad', 9),
                     ('Marca', 9),
                     ('Modelo', 9),
-                    ('Cantidad Vendida', 20),]
+                    ('Cantidad Vendida', 20),
+                    ('Stock', 15)]
                 border = styles.borders.Border(left=styles.borders.Side(style='thin'),
                                                 right=styles.borders.Side(style='thin'),
                                                 top=styles.borders.Side(style='thin'),
@@ -1682,6 +1807,8 @@ class CompareMaterials(JSONResponseMixin, TemplateView):
                     ws.cell(column=5, row=rw).style = mstyle
                     ws.cell(column=6, row=rw).value = x['operations']
                     ws.cell(column=6, row=rw).style = mstyle
+                    ws.cell(column=7, row=rw).value = x['stock']
+                    ws.cell(column=7, row=rw).style = mstyle
                     rw+=1
                 # print len(ws.cell(column=1, row=2).width)
                 wb.save(response)
