@@ -27,7 +27,8 @@ from CMSGuias.apps.home.models import (
     Proveedor, Documentos, FormaPago,
     Almacene, Moneda, Configuracion,
     LoginProveedor, Brand, Model,
-    Employee, Unidade, Materiale, SettingsApp)
+    Employee, Unidade, Materiale, SettingsApp, Pais,
+    Departamento, Provincia, Distrito, Rubro)
 from .models import (
     Compra, Cotizacion, CotCliente, CotKeys, DetCotizacion,
     DetCompra, tmpcotizacion, tmpcompra, ServiceOrder,
@@ -834,6 +835,26 @@ class ListPurchase(JSONResponseMixin, TemplateView):
             context['servreport'] = SettingsApp.objects.values().get(flag=True)['serverreport']
             if request.is_ajax():
                 try:
+
+                    if 'proveedor' in request.GET:
+                        context['list'] = [
+                            {
+                                'purchase': x.compra_id,
+                                'document': x.proveedor.razonsocial,
+                                'projects': x.projects,
+                                'transfer': globalVariable.format_date_str(
+                                    x.traslado),
+                                'currency': x.moneda.moneda,
+                                'deposito': str(x.deposito),
+                                'status': x.status
+                            }
+                            for x in Compra.objects.filter(
+                                flag=True,
+                                proveedor__razonsocial__icontains=request.GET.get('proveedor')
+                                ).order_by('-registrado')
+                        ]
+
+
                     if 'code' in request.GET:
                         context['list'] = [
                             {
@@ -1321,23 +1342,148 @@ class LoginSupplier(JSONResponseMixin, TemplateView):
             return self.render_to_json_response(context)
 
 
-class SupplierCreate(CreateView):
-    form_class = ProveedorForm
-    model = Proveedor
-    # success_url = reverse_lazy('proveedor_list')
-    template_name = 'logistics/crud/supplier_form.html'
+class SupplierCreate(JSONResponseMixin, TemplateView):
 
     @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super(SupplierCreate, self).dispatch(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        context = dict();
+        if request.is_ajax():
+            try:
+                if 'listdpto' in request.GET:
+                    print 'dpto'
+                    ldpto = []
+                    for x in Departamento.objects.filter(
+                        pais_id=request.GET.get('codigo'),
+                        flag=True):
+                        ldpto.append({
+                            'codigo':x.departamento_id,
+                            'name':x.depnom
+                            })
+                    context['lista'] = ldpto
+                    context['status'] = True
 
-    def form_valid(self, form):
-        # self.instance.save()
-        form.save()
-        return render_to_response(
-            self.template_name,
-            {'msg': 'success'},
-            context_instance=RequestContext(self.request))
+                if 'listprov' in request.GET:
+                    print 'prov'
+                    lprov=[]
+                    for x in Provincia.objects.filter(
+                        departamento_id=request.GET.get('codigo'),
+                        flag=True):
+                        lprov.append({
+                            'codigo':x.provincia_id,
+                            'name':x.pronom
+                            })
+                    context['lista'] = lprov
+                    context['status']=True
+
+                if 'listdist' in request.GET:
+                    ldist=[]
+                    for x in Distrito.objects.filter(
+                        provincia_id=request.GET.get('codigo'),
+                        flag=True):
+                        ldist.append({
+                            'codigo':x.distrito_id,
+                            'name':x.distnom
+                            })
+                    context['lista']=ldist
+                    context['status'] = True
+
+                if 'listproveedor' in request.GET:
+                    lproveedor=[]
+                    for x in Proveedor.objects.filter(flag=True):
+                        lproveedor.append({
+                            'ruc':x.proveedor_id,
+                            'razonsocial':x.razonsocial,
+                            'direcomp':'%s - %s - %s - %s' % (x.direccion,x.distrito.distnom,x.provincia.pronom,x.departamento.depnom),
+                            'direccion':x.direccion,
+                            'pais':x.pais_id,
+                            'coddpto':x.departamento_id,
+                            'namedpto':x.departamento.depnom,
+                            'codprov':x.provincia_id,
+                            'nameprovincia':x.provincia.pronom,
+                            'coddist':x.distrito_id,
+                            'namedist':x.distrito.distnom,
+                            'telefono':x.telefono,
+                            'tipo':x.tipo,
+                            'rubro':x.rubropro_id,
+                            'origen':x.origen,
+                            'email':x.email,
+                            'contacto':x.contact
+                            })
+                    context['lproveedor'] = lproveedor
+                    context['status']=True
+
+            except ObjectDoesNotExist, e:
+                context['raise'] = str(e)
+                context['status'] = False
+            return self.render_to_json_response(context)
+        lpais = Pais.objects.filter(flag=True).order_by('paisnom')
+        lrubro = Rubro.objects.filter(flag=True).order_by('rubro')
+        kwargs['lpais'] = lpais
+        kwargs['lrubro'] = lrubro
+        return render(request, 'logistics/crud/supplier_form.html', kwargs)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        try:
+            context = dict()
+            if request.is_ajax():
+                try:
+                    if 'exists' in request.POST:
+                        print 'ecist'
+                        try:
+                            Proveedor.objects.get(
+                                proveedor_id=request.POST.get('rucprov'))
+                            context['status'] = True
+                        except Proveedor.DoesNotExist, e:
+                            context['status'] = False
+
+                    if 'savesupplier' in request.POST:
+                        Proveedor.objects.create(
+                            proveedor_id=request.POST.get('rucprov'),
+                            razonsocial=request.POST.get('rsocial'),
+                            direccion = request.POST.get('direc'),
+                            pais_id = request.POST.get('pais'),
+                            departamento_id=request.POST.get('dpt'),
+                            provincia_id=request.POST.get('prov'),
+                            distrito_id=request.POST.get('dist'),
+                            telefono=request.POST.get('telef'),
+                            tipo=request.POST.get('tipo'),
+                            origen=request.POST.get('origen'),
+                            email=request.POST.get('email'),
+                            contact=request.POST.get('contacto'),
+                            rubropro_id=request.POST.get('rubro'))
+
+                        context['status'] = True
+
+                    if 'editprove' in request.POST:
+                        pro = Proveedor.objects.get(
+                            proveedor_id=request.POST.get('rucprov'))
+                        pro.razonsocial = request.POST.get('rsocial')
+                        pro.direccion = request.POST.get('direc')
+                        pro.pais_id = request.POST.get('pais')
+                        pro.departamento_id = request.POST.get('dpt')
+                        pro.provincia_id = request.POST.get('prov')
+                        pro.distrito_id = request.POST.get('dist')
+                        pro.telefono = request.POST.get('telef')
+                        pro.tipo = request.POST.get('tipo')
+                        pro.origen = request.POST.get('origen')
+                        pro.email = request.POST.get('email')
+                        pro.contact = request.POST.get('contacto')
+                        pro.rubropro_id = request.POST.get('rubro')
+                        pro.save()
+                        context['status']=True
+
+                    if 'delprov' in request.POST:
+                        Proveedor.objects.get(
+                                proveedor_id=request.POST.get('ruc')).delete()
+                        context['status'] = True
+
+                except Exception, e:
+                    context['raise'] = str(e)
+                    context['status'] = False
+                return self.render_to_json_response(context)
+        except Exception, e:
+            print e.__str__()
 
 
 class CompareQuote(JSONResponseMixin, TemplateView):
@@ -2158,29 +2304,33 @@ class PriceMaterialsViews(JSONResponseMixin, TemplateView):
             try:
                 if 'searchCode' in request.GET:
                     det = DetCompra.objects.filter(
-                            materiales_id=request.GET['code']
+                            materiales_id=request.GET['code'],
+                            compra__tipoing=request.GET['tipoit']
                             ).distinct(
                             'materiales__materiales_id').order_by(
                             'materiales__materiales_id')
                     # print det.count()
-                    context['details'] = [{
-                        'code': det[0].materiales_id,
-                        'name': det[0].materiales.matnom,
-                        'metering': det[0].materiales.matmed}]
-                    context['status'] = True
+                    if det:
+                        context['details'] = [{
+                            'code': det[0].materiales_id,
+                            'name': det[0].materiales.matnom,
+                            'metering': det[0].materiales.matmed}]
+                        context['status'] = True
                 if 'searchName' in request.GET:
                     det = DetCompra.objects.filter(
-                            materiales__matnom__icontains=request.GET['name'])
+                            materiales__matnom__icontains=request.GET['name'],
+                            compra__tipoing=request.GET['tipoit'])
                     det = det.distinct(
                         'materiales__matnom',
                         'materiales__matmed')
                     # print DetCompra.objects.all().count()
-                    context['details'] = [{
-                        'code': x.materiales_id,
-                        'name': x.materiales.matnom,
-                        'metering': x.materiales.matmed}
-                        for x in det]
-                    context['status'] = True
+                    if det:
+                        context['details'] = [{
+                            'code': x.materiales_id,
+                            'name': x.materiales.matnom,
+                            'metering': x.materiales.matmed}
+                            for x in det]
+                        context['status'] = True
                 if 'prices' in request.GET:
                     det = DetCompra.objects.filter(
                         materiales_id=request.GET['code']
@@ -2204,6 +2354,7 @@ class PriceMaterialsViews(JSONResponseMixin, TemplateView):
             return self.render_to_json_response(context)
         else:
             try:
+                context['ltipos'] = globalVariable.MASTER_TYPES
                 return render(request, 'logistics/searchprices.html', context)
             except TemplateDoesNotExist as e:
                 raise Http404(e)

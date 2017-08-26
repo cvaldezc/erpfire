@@ -124,9 +124,9 @@ materials_urls = patterns(
 unit_urls = patterns(
     '',
     url(r'^add/$', UnitAdd.as_view(), name='unit_add'),
-    # url(r'^edit/(?P<unit>\w+)/$', ),
-    # url(r'^del/(?P<unit>\w+)/$', ),
-    url(r'^list/$', Unit.as_view(), name='unit_list'),
+    url(r'^edit/(?P<pk>\w+)/$', UnitEdit.as_view(), name='unit_edit'),
+    url(r'^del/(?P<pk>\w+)/$',UnitDelete.as_view(), name='unit_del'),
+    url(r'^list/$', UnitList.as_view(), name='unit_list'),
 )
 # Crud Cargos y/o ManPower
 manpower_urls = patterns(

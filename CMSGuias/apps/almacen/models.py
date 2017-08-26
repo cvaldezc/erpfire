@@ -610,7 +610,7 @@ class detGuiaHerramienta(models.Model):
     fechdevolucion = models.DateField(null=True, blank=True)
     cantidad = models.FloatField()
     cantdev = models.FloatField(default=0)
-    comentario = models.CharField(max_length=200, null=True, blank=True)
+    comentario = models.TextField(null=True, blank=True)
     flagdev = models.BooleanField(default=False)
     brand = models.ForeignKey(Brand, to_field='brand_id')
     grupo = models.CharField(max_length=200, null=True, blank=True)

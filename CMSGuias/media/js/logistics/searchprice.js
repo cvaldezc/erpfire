@@ -1,5 +1,4 @@
-var getPricesCode, keyuppress, listDetails, searchCode, searchName;
-
+var getPricesCode, keyuppress, listDetails, searchCode, searchName,tipoit='';
 $(function() {
   $("[name=code], [name=name]").on("keyup", keyuppress);
   return $(document).on("click", ".bdetails", getPricesCode);
@@ -9,6 +8,7 @@ keyuppress = function(ev) {
   var key;
   key = window.ev ? ev.keyCode : ev.which;
   if (key === 13) {
+    tipoit = $("select[id=cbotipoit]").val()
     console.log(this.name);
     if (this.name === "code") {
       searchCode();
@@ -23,10 +23,12 @@ searchCode = function(ev) {
   context = new Object;
   context.code = $("[name=code]").val();
   context.searchCode = true;
+  context.tipoit = tipoit;
   $.getJSON("", context, function(response) {
     if (response.status) {
       listDetails(response);
     } else {
+      console.log('error code')
       $().toastmessage("showErrorToast", "No se han encontrado resultados.");
     }
   });
@@ -37,10 +39,12 @@ searchName = function(ev) {
   context = new Object;
   context.name = $("[name=name]").val();
   context.searchName = true;
+  context.tipoit = tipoit;
   $.getJSON("", context, function(response) {
     if (response.status) {
       listDetails(response);
     } else {
+      console.log('error name')
       $().toastmessage("showErrorToast", "No se han encontrado resultados.");
     }
   });

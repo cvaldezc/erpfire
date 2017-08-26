@@ -22,114 +22,122 @@ Supplier
     {% endif %}
 {% endblock menu %}
 {% block content %}
-<div class="container">
+<div style="margin:50px">
     <div class="well">
-        <header>
-            <h3>Nuevo Proveedor</h3>
-        </header>
+        <button class="btn btnnewsupplier" type="button">
+        <i class="fa fa-plus"></i>
+        <span>Nuevo Proveedor</span>
+        </button>
+    </div>
+    <div class="well divnewprov" style="display:none">
         <section>
-            {% if msg %}
-                <div class="alert alert-success alert-block">
-                    <strong>Se guardo correctamente.</strong>
+        <label class="lbltipo" name="lbltipo" style="display:none"></label>
+        <div class="row">
+            <div class="col-md-2">
+                <label class="control-label">Ruc Proveedor</label>
+                <input type="text" id="proveedor_id" name="proveedor_id" maxlength="11">
+            </div>
+            <div class="col-md-5">
+                <label class="control-label">Razón Social</label>
+                <input type="text" name="razonsocial" maxlength="200">
+            </div>
+            <div class="col-md-5">
+                <label class="control-label">Dirección</label>
+                <input type="text" name="direccion" maxlength="200">
+            </div>
+            <div class="col-md-2">
+                <label class="control-label">Pais</label>
+                <select id="cbopais">
+                    <option value="">Seleccionar</option>
+                    {% for x in lpais %}
+                    <option value="{{ x.pais_id }}">{{ x.paisnom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="control-label">Departamento</label>
+                <select id="cbodepartamento"></select>
+            </div>
+            <div class="col-md-2">
+                <label class="control-label">Provincia</label>
+                <select id="cboprovincia"></select>
+            </div>
+            <div class="col-md-2">
+                <label class="control-label">Distrito</label>
+                <select id="cbodistrito"></select>
+            </div>
+            <div class="col-md-2">
+                <label class="control-label">Telefono</label>
+                <input type="text" maxlength="30" placeholder="000-000" name="telefono">
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label">Tipo</label>
+                    <input type="text" maxlength="8" placeholder="NATURAL" name="tipo">
                 </div>
-            {% else %}
-                <form action="" method="POST">
-                    {% csrf_token %}
-                    <div class="panel panel-warning">
-                        {% comment %}<div class="panel-footer">
-                            <button type="button" class="btn btn-warning text-black btn-search" title="Este es proceso puede tardar unos minutos.">
-                                <span class="glyphicon glyphicon-search"></span>
-                                Buscar Proveedor
-                            </button>
-                        </div>{% endcomment %}
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label class="control-label">Ruc Proveedor</label>
-                                        <input type="text" class="form-control" maxlength="20" name="proveedor_id">
-                                    </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label class="control-label">Razón Social</label>
-                                        <input type="text" class="form-control" maxlength="200" name="razonsocial">
-                                    </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label class="control-label">Dirección</label>
-                                        <input type="text" class="form-control" maxlength="200" name="direccion">
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label class="control-label">Pais</label>
-                                        {{ form.pais }}
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label class="control-label">Departamento</label>
-                                        <select name="departamento" class="form-control"></select>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label class="control-label">Provincia</label>
-                                        <select name="provincia" class="form-control"></select>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label class="control-label">Distrito</label>
-                                        <select name="distrito" class="form-control"></select>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label class="control-label">Telefono</label>
-                                        <input type="text" name="telefono" maxlength="30" placeholder="000-000" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label class="control-label">Tipo</label>
-                                        <input type="text" name="tipo" placeholder="NATURAL" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label class="control-label">Origen</label>
-                                        <input type="text" name="origen" placeholder="NACIONAL" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label class="control-label">Email</label>
-                                        <input type="text" placeholder="ejemplo@dominio.com" name="email" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label class="control-label">Contacto</label>
-                                        <input type="text" placeholder="Nombre de Contacto" name="contact" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-4 form-group">
-                                    <label class="control-label">Rubro</label>
-                                    {{form.rubropro}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <button type="reset" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-remove-circle"></span> Limpiar</button>
-                        <button type="submit" class="btn btn-primary pull-right btn-lg"><span class="glyphicon glyphicon-floppy-disk"></span> Guardar Cambios</button>
-                    </div>
-                </form>
-            {% endif %}
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label class="control-label">Origen</label>
+                    <input type="text" maxlength="10" placeholder="NACIONAL" name="origen">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="control-label">Email</label>
+                    <input type="text" maxlength="60" placeholder="ejemplo@dominio.com" name="email">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="control-label">Contacto</label>
+                    <input type="text" placeholder="Nombre de Contacto" maxlength="200" name="contact">
+                </div>
+            </div>
+            <div class="col-md-4 form-group">
+                <label class="control-label">Rubro</label>
+                <select id="cborubro">
+                {% for x in lrubro %}
+                    <option value="{{ x.rubro_id }}">{{ x.rubro }}</option>
+                {% endfor %}
+                </select>
+            </div>
+
+        </div>
+        <button class="btn btn-default btn-lg btnlimpiarprov"><span class="glyphicon glyphicon-remove-circle"></span> Limpiar</button>
+        <button type"button" class="btn btn-primary pull-right btn-lg btnsavesupplier"><span class="glyphicon glyphicon-floppy-disk"></span> Guardar Cambios</button>
+        </section>
+    </div>
+    <div class="well">
+        <div class="row">
+            <div class="input-field col">
+                <h3>Lista de Proveedores</h3>
+            </div>
+            <div class="input-field col">
+                <input class="txtbuscprov" name="txtbuscprov" id="txtbuscprov" type="text" placeholder="Buscar Proveedor">
+            </div>
+        </div>
+        <section>
+            <div class="table-responsive">
+                <table class="table table-resposive highlight condensed table-listprov" id="table-listprov">
+                    <thead class="cab">
+                        <tr>
+                            <th>#</th>
+                            <th>RUC</th>
+                            <th>Razon Social</th>
+                            <th>Direccion</th>
+                            <th>Telefono</th>
+                            <th>Email</th>
+                            <th>Contacto</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </section>
     </div>
 </div>
+{% csrf_token %}
 {% endblock content %}

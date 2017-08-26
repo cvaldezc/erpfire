@@ -33,17 +33,22 @@ $(document).ready(function() {
 
 changeSearch = function() {
   if (this.checked) {
+    console.log(this.value)
     if (this.value === "status") {
-      $("input[name=star],input[name=end],input[name=code]").attr("disabled", true);
+      $("input[name=star],input[name=end],input[name=code],input[name=proveedor]").attr("disabled", true);
       $("select[name=status]").attr("disabled", false);
       return;
     } else if (this.value === "dates") {
       $("input[name=star],input[name=end]").attr("disabled", false);
-      $("select[name=status],input[name=code]").attr("disabled", true);
+      $("select[name=status],input[name=code],input[name=proveedor]").attr("disabled", true);
       return;
     } else if (this.value === "code") {
-      $("input[name=star],input[name=end],select[name=status]").attr("disabled", true);
+      $("input[name=star],input[name=end],select[name=status],input[name=proveedor]").attr("disabled", true);
       $("input[name=code]").attr("disabled", false);
+      return;
+    } else if (this.value === "proveedor"){
+      $("input[name=star],input[name=end],select[name=status],input[name=code]").attr("disabled", true);
+      $("input[name=proveedor]").attr("disabled", false);
       return;
     }
   }
@@ -60,7 +65,7 @@ getSearch = function() {
           data.pass = true;
         } else {
           data.pass = false;
-          $().toastmessage("showWarningToast", "campo de estado se encuntra vacio.");
+          $().toastmessage("showWarningToast", "campo de estado se encuentra vacio.");
         }
       } else if (element.value === "status") {
         if ($("select[name=status]").val() !== "") {
@@ -68,7 +73,7 @@ getSearch = function() {
           data.pass = true;
         } else {
           data.pass = false;
-          $().toastmessage("showWarningToast", "campo de estado se encuntra vacio.");
+          $().toastmessage("showWarningToast", "campo de estado se encuentra vacio.");
         }
       } else if (element.value === "dates") {
         start = $("input[name=star]").val();
@@ -78,13 +83,25 @@ getSearch = function() {
           data.pass = true;
         } else {
           data.pass = false;
-          $().toastmessage("showWarningToast", "campo de fecha inicio se encuntra vacio.");
+          $().toastmessage("showWarningToast", "campo de fecha inicio se encuentra vacio.");
         }
         end = $("input[name=end]").val();
         if (end !== "") {
           data.end = end;
         }
-      }
+      }else if (element.value === "proveedor") {
+        if ($("input[name=proveedor]").val() !== "") {
+          data.proveedor = $("input[name=proveedor]").val();
+          data.pass = true;
+        } else {
+          data.pass = false;
+          $().toastmessage("showWarningToast", "campo de proveedor se encuentra vacio.");
+        }
+      };
+
+
+
+
       console.log(data);
       if (data.pass) {
         $.getJSON("", data, function(response) {
