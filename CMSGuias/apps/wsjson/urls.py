@@ -93,4 +93,5 @@ urlpatterns = patterns(
     url(r'^inventory/tools/(?P<export>\w{6})/$', RestInventoryTools.as_view()),
     url(r'reports/', Reports.as_view()),
     url(r'^auth/$', csrf_exempt(AuthServices.as_view())),
+    url(r'^services/$', FindServices.as_view()),
 )
