@@ -1475,7 +1475,7 @@ class Consulta(JSONResponseMixin, TemplateView):
                     count = 1;
                     for x in detGuiaHerramienta.objects.filter(
                         herramienta_id=request.GET.get('codigoherra'),
-                        guia__estado = 'GE'):
+                        guia__estado = 'GE', flagdev=False):
                         if x.guia.proyecto_id==None:
                             codproy=""
                             nameproy=""
@@ -1529,7 +1529,7 @@ class Consulta(JSONResponseMixin, TemplateView):
                     for x in detGuiaHerramienta.objects.filter(
                         herramienta__matnom__icontains=request.GET.get('textoing'),
                         guia__tipo=request.GET.get('tipoacce'),
-                        guia__estado = 'GE').distinct(
+                        guia__estado = 'GE', flagdev=False).distinct(
                         'herramienta__matnom','herramienta__matmed'):
                         lishe.append(
                             {'codh':x.herramienta_id,

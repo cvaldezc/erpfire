@@ -1568,7 +1568,7 @@ class AuthServices(JSONResponseMixin, View):
 
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
-        print request.POST
+        # print request.POST
         try:
             usr = request.POST['usr']
             passwd = request.POST['passwd']
@@ -1589,3 +1589,32 @@ class AuthServices(JSONResponseMixin, View):
             kwargs['raise'] = str(ex)
         return self.render_to_json_response(kwargs)
 # endblock
+
+
+# @cvaldezch 2017-08-28 14:44:29
+class FindServices(JSONResponseMixin, View):
+    '''
+    class for response consult external
+    '''
+    @method_decorator(csrf_exempt)
+    def get(self, request, *args, **kwargs):
+        try:
+            if 'getallbrand' in request.GET:
+                sbrand = SearchBrand()
+                kwargs = json.loads(sbrand.get(request, *args, **kwargs).content)['brand']
+            if 'getallmodel' in request.GET:
+                smodel = SearchModel()
+                kwargs = json.loads(smodel.get(request, *args, **kwargs).content)['model']
+            if 'codemaster' in request.GET:
+                kwargs = Materiale.objects.values_list(
+                    'materiales_id', 'matnon', 'matmed').get(
+                        materiales_id=request.GET['code'], tipo='MT')
+            if 'namemaster' in request.GET:
+                kwargs = Materiale.objects.values_list(
+                    'materiales_id', 'matnon', 'matmed').filter(
+                        matnom__icontains=request.GET['name'],
+                        tipo='MT').order_by('matnom')
+        except Exception as ex:
+            kwargs['raise'] = str(ex)
+            kwargs['status'] = False
+        return self.render_to_json_response(kwargs)

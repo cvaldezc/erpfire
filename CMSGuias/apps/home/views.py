@@ -58,7 +58,7 @@ class HomeManager(ListView):
             else:
                 f = open(os.path.join(settings.STATIC_ROOT, 'load.json'), 'r')
                 data = json.loads(f.read())
-                # print data
+                print data
                 com = Company.objects.get(pk=data['company'])
                 request.session['company'] = {
                     'ruc': com.ruc,
@@ -1025,11 +1025,27 @@ class UnitAdd(CreateView):
                 mimetype='application/json')
 
 
-class UnitList(ListView):
+class UnitList(JSONResponseMixin, ListView):
     template_name = 'home/crud/unit.html'
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         context = dict()
+        if request.is_ajax():
+            try:
+                if 'list' in request.GET:
+                    context['lunit'] = list(
+                        Unidade.objects.filter(flag=True).values(
+                            'unidad_id', 'uninom').order_by('uninom'))
+                    context['status'] = True
+                else:
+                    context['unit'] = list(
+                        Unidade.objects.filter(flag=True).values(
+                            'unidad_id', 'uninom').order_by('uninom'))
+                    context['status'] = True
+            except ObjectDoesNotExist, e:
+                context['raise'] = str(e)
+                context['status'] = False
+            return self.render_to_json_response(context)
         if request.GET.get('menu'):
             context['menu'] = request.GET.get('menu')
         context['listunits'] = Unidade.objects.filter(flag=True).order_by('uninom')
@@ -1037,6 +1053,7 @@ class UnitList(ListView):
             self.template_name,
             context,
             context_instance=RequestContext(request))
+
 
 class UnitEdit(UpdateView):
     form_class = addUnidadeForm
@@ -1049,6 +1066,7 @@ class UnitEdit(UpdateView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(UnitEdit, self).dispatch(request, *args, **kwargs)
+
 
 class UnitDelete(DeleteView):
     model = Unidade
