@@ -58,7 +58,7 @@ class HomeManager(ListView):
             else:
                 f = open(os.path.join(settings.STATIC_ROOT, 'load.json'), 'r')
                 data = json.loads(f.read())
-                # print data
+                print data
                 com = Company.objects.get(pk=data['company'])
                 request.session['company'] = {
                     'ruc': com.ruc,

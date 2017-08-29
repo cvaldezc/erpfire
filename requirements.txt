@@ -6,7 +6,7 @@ html5lib==0.9999999
 jdcal==1.2
 openpyxl==2.3.3
 Pillow==3.2.0
-pisa==3.0.33
+pisa
 psycopg2==2.6.1
 pyPdf==1.13
 pytz==2015.7
