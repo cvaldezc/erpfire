@@ -851,9 +851,12 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
         if request.is_ajax():
             try:
                 if 'code' in request.GET:
+                    print 'code', request.GET['tipocat']
                     kwargs['list'] = json.loads(serializers.serialize(
                         'json',
-                        Materiale.objects.filter(materiales_id=request.GET['code'])
+                        Materiale.objects.filter(
+                            materiales_id=request.GET['code'],
+                            tipo__icontains=request.GET['tipocat'])
                     ))
                     kwargs['masters'] = kwargs['list']
                     kwargs['status'] = True
@@ -914,9 +917,16 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
                     }
                     kwargs['status'] = True
                 if 'startlist' in request.GET:
+                    # kwargs['masters'] = json.loads(serializers.serialize(
+                    #     'json',
+                    #     Materiale.objects.all().order_by('-register')[:50]))
+                    filt = request.GET['filt']
+                    if filt == 'all':
+                        filt = ''
                     kwargs['masters'] = json.loads(serializers.serialize(
                         'json',
-                        Materiale.objects.all().order_by('-register')[:50]))
+                        Materiale.objects.filter(tipo=filt
+                            ).order_by('-register')[:50]))
                     kwargs['status'] = True
                 if 'catergories' in request.GET:
                     kwargs['mastertypes'] = globalVariable.MASTER_TYPES
@@ -1013,6 +1023,44 @@ class UnitAdd(CreateView):
         return HttpResponse(
                 simplejson.dumps(context),
                 mimetype='application/json')
+
+
+class UnitList(ListView):
+    template_name = 'home/crud/unit.html'
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        context = dict()
+        if request.GET.get('menu'):
+            context['menu'] = request.GET.get('menu')
+        context['listunits'] = Unidade.objects.filter(flag=True).order_by('uninom')
+        return render_to_response(
+            self.template_name,
+            context,
+            context_instance=RequestContext(request))
+
+class UnitEdit(UpdateView):
+    form_class = addUnidadeForm
+    model = Unidade
+    slug_field = 'unidad_id'
+    slug_url_kwarg = 'unidad_id'
+    success_url = reverse_lazy('unit_list')
+    template_name = 'home/crud/unitadd.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(UnitEdit, self).dispatch(request, *args, **kwargs)
+
+class UnitDelete(DeleteView):
+    model = Unidade
+    slug_field = 'unidad_id'
+    slug_url_kwarg = 'unidad_id'
+    success_url = reverse_lazy('unit_list')
+    template_name = 'home/crud/unit_del.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(UnitDelete, self).dispatch(request, *args, **kwargs)
+
 
 
 class Unit(JSONResponseMixin, TemplateView):

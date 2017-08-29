@@ -1,0 +1,22 @@
+{% extends "basemd.html" %}
+{% block title %}
+    Eliminar Cargo
+{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="alert alert-block brand-danger">
+        <h3>Eliminar Cargo</h3>
+        <form method="post">
+             {% csrf_token %}
+            <p>
+                Estas Seguro(a) que desea eliminar Cargo: "{{ object }}" ?
+            </p>
+            <a href="{% url 'cargoemple_list' %}" class="btn btn-default">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                Regresar
+            </a>
+            <button type="submit" class="btn red btn-danger"><span class="glyphicon glyphicon-trash"></span> Eliminar</button>
+        </form>
+    </div>
+</div>
+{% endblock content %}

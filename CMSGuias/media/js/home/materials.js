@@ -36,14 +36,14 @@ var ControllerMasterItem = (function () {
         this.permissionarea = '';
         this.selected = false;
         console.log("ready!!!");
-        this.initialize();
+        this.initialize('all');
     }
-    ControllerMasterItem.prototype.initialize = function () {
+    ControllerMasterItem.prototype.initialize = function (type) {
         setTimeout(function () {
             angular.element('.select-chosen').chosen({ width: '100%' });
         }, 800);
         this.listCategories();
-        this.listMaster({ 'startlist': true });
+        this.listMaster({ 'startlist': true , 'filt': type});
     };
     ControllerMasterItem.prototype.listMaster = function (params) {
         var _this = this;
@@ -66,9 +66,6 @@ var ControllerMasterItem = (function () {
         this.proxy.get('', { 'catergories': true }).then(function (response) {
             if (response['data']['status']) {
                 _this.categories = response['data']['mastertypes'];
-                setTimeout(function () {
-                    angular.element('#tipo').chosen({ width: '100%' });
-                }, 800);
             }
             else {
                 Materialize.toast("Error: " + response['data']['raise'], 4000);
@@ -84,6 +81,12 @@ var ControllerMasterItem = (function () {
         if (event.keyCode == 13) {
             var params = {};
             params[value] = this.search[value];
+            var cbofilttipo = this.master['cbofilttipo']
+            console.log(cbofilttipo)
+            if (cbofilttipo== undefined) {
+                cbofilttipo = ''
+            };
+            params['tipocat']= cbofilttipo
             this.listMaster(params);
         }
     };
@@ -116,9 +119,9 @@ var ControllerMasterItem = (function () {
                 _this.master['matmed'] = '';
                 _this.master['matacb'] = '';
                 _this.master['matare'] = '';
-                _this.master['unidad'] = '';
+                // _this.master['unidad'] = '';
                 _this.master['weight'] = '';
-                _this.master['tipo'] = '';
+                // _this.master['tipo'] = '';
                 _this.master['edit'] = false;
                 _this.blocknew = false;
             }
@@ -183,7 +186,7 @@ var ControllerMasterItem = (function () {
                         angular.element('.toast-remove').remove();
                         if (response['data']['status']) {
                             Materialize.toast('Se han eliminado correctamente', 3000);
-                            _this.initialize();
+                            _this.initialize('all');
                         }
                         else {
                             Materialize.toast("Error: " + response['data']['raise'] + " " + response['data']['nodel'], 8000);
@@ -193,6 +196,26 @@ var ControllerMasterItem = (function () {
             }
         });
     };
+
+    ControllerMasterItem.prototype.filtercategory = function () {
+        var category = this.master['cbofilttipo']
+        if (category==null) {
+            category = "all"
+        };
+        console.log(category)
+        this.initialize(category);
+    };
+
+    ControllerMasterItem.prototype.selectcategory = function () {
+        console.log(this.master['tipo'])
+        angular.element('#tipo').trigger('chosen:updated')
+    };
+
+    ControllerMasterItem.prototype.selectunit = function () {
+        console.log(this.master['unidad'])
+        angular.element('#unidad').trigger('chosen:updated')
+    };
+
     ControllerMasterItem.$inject = ['sproxy'];
     return ControllerMasterItem;
 }());

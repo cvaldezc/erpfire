@@ -1,0 +1,319 @@
+{% extends "basemd.html" %}
+{% block title %}
+  Cruds
+{% endblock %}
+{% block menu %}
+
+{% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+        {% include "menus/salesmd.html" %}
+{% endif %}
+{% if user.get_profile.empdni.charge.area|lower == 'logistica' %}
+    {% include "menus/logisticsmd.htm" %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+<link rel="stylesheet" href="/media/css/cruds/mantenimiento.css">
+<script src="/media/js/cruds/mantenimiento.js"></script>
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+
+{% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' or user.get_profile.empdni.charge.area|lower == 'logistica' %}
+<div style="margin:50px">
+	<h4>Mantenimiento General</h4>
+	<div class="row">
+		<div class="input-field col s6" style="margin-bottom:20px">
+			<select id="cbocruds" class="browser-default">
+				<option value="">Todos</option>
+				<option value="al">Almacen</option>
+				<option value="cn">Contabilidad</option>
+				<option value="lg">Logistica</option>
+				<option value="rh">Recursos Humanos</option>
+		    </select>
+		    <h6 for="cbocruds" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">FILTRAR POR: </h6>
+		</div>
+		<div class="input-field col s6">
+            <i class="prefix fa fa-search"></i>
+            <input class="txtbuschome" type="text" placeholder="Ingresar Descripcion" id="txtbuschome">
+        </div>
+	</div>
+
+	<div class="table-responsive">
+		<table class="table responsive-table condensed highlight table-listcruds" id="table-listcruds">
+			<thead class="cab">
+				<tr>
+					<th>#</th>
+					<th>Descripcion</th>
+					<th>Ingresar</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="tooltipped al" data-position="" data-tooltip="Almacenes de ICR PERU.">
+					<td>1</td>
+					<td>Almacen</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'vista_stores' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="center" data-tooltip="Area donde labora el personal.Ejm: Ingenieria, Operaciones, Ventas, etc.">
+					<td>2</td>
+					<td>Area</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'area_list' %}">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Cargo asignado al empleado.Ejm: Jefe de ventas, Ayudante, Chofer, etc.">
+					<td>3</td>
+					<td>Cargo Empleado</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'cargoemple_list' %}">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped lg" data-position="center" data-tooltip="Clientes de ICR PERU.">
+					<td>4</td>
+					<td>Cliente</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'customers_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Cobertura de salud del personal.Ejm: EPS">
+					<td>5</td>
+					<td>Cobertura</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tipocobertura_list' %} target="_blank"">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Tipo de contrato laboral del personal.Ejm: Plazo Indeterminado, 6 meses, 12 meses, etc.">
+					<td>6</td>
+					<td>Contrato</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tipocontrato_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Departamentos asignado a un pais.">
+					<td>7</td>
+					<td>Departamento</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'departament_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Distrito asignado a una provincia.">
+					<td>8</td>
+					<td>Distrito</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'district_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped cn" data-position="bottom" data-tooltip="Documentos para contabilidad. Boleta, Factura, Nota de Cargo, etc.">
+					<td>9</td>
+					<td>Documento Contabilidad</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'documento_list' %}">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Documentos asociados al personal.Ejm: Dni, Antecedentes policiales, Certificado de trabajo, Licencia de paternidad, etc.">
+					<td>10</td>
+					<td>Documento Recursos Humanos</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tipdoc_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Tipo de empleado.Ejm: Obrero, Administrativo, Taller, etc.">
+					<td>11</td>
+					<td>Empleado</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tipoemple_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Tipo de examen programado al personal.Ejm: Examen Medico, Examen de Altura, etc.">
+					<td>12</td>
+					<td>Examen</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tipoexamen_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped cn" data-position="bottom" data-tooltip="Formas de pagos.Ejm: Adelanto, Cheque, Credito, Letra 30 dias, etc.">
+					<td>13</td>
+					<td>Forma de Pago</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'formpago_list' %}">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Tipo de institucion sobre estudios del personal. Ejm: Universidad, Instituto, Colegio, etc.">
+					<td>14</td>
+					<td>Instituciones</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tipoinst_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped al" data-position="center" data-tooltip="Marca asignado a Materiales, Herramientas, Epp.">
+					<td>15</td>
+					<td>Marca</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'brand_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped al" data-position="bottom" data-tooltip="Materiales, Herramientas, EPPs">
+					<td>16</td>
+					<td>Material</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'materials_view' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped al" data-position="center" data-tooltip="Modelos asignados a una Marca">
+					<td>17</td>
+					<td>Modelo</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'model_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped cn" data-position="bottom" data-tooltip="Tipo de moneda. Ejm: Dolares Americanos, Soles, Euros, etc.">
+					<td>18</td>
+					<td>Moneda</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'moneda_list' %}">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped al" data-position="center" data-tooltip="Tipos de Niples de materiales. Ejm: Roscado, Ranurado, Brida.">
+					<td>19</td>
+					<td>Niple</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'mniple_list' %}">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Pais.">
+					<td>20</td>
+					<td>Pais</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'country_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped cn" data-position="bottom" data-tooltip="Tipo de pago asignado al  personal. Ejm: Semanal, Quincenal, diario, etc.">
+					<td>21</td>
+					<td>Pago</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tipopago_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+
+				<tr class="tooltipped lg" data-position="center" data-tooltip="Proveedores de la empresa ICR PERU.">
+					<td>22</td>
+					<td>Proveedor</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'view_create_supplier' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Provincias asignado a un departamento.">
+					<td>23</td>
+					<td>Provincia</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'province_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Tipo de regimen pensionario. Ejm: SPP Prima, SPP Profuturo, SNP ONP, etc.">
+					<td>24</td>
+					<td>Regimen Pensionario</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tiporegimenpens_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Tipo de regimen de salud. Ejm: ESSALUD REGULAR, CIS, etc.">
+					<td>25</td>
+					<td>Regimen Salud</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tiporegimen_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped lg" data-position="bottom" data-tooltip="Rubro de proveedor. Ejm: Salud, General.">
+					<td>26</td>
+					<td>Rubro Proveedor</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'rubropro_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped rh" data-position="bottom" data-tooltip="Suspensiones que se impone al personal. Ejm: Tardanzas, Falta sin Justificacion, etc.">
+					<td>27</td>
+					<td>Suspension</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'tiposuspension_list' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped al" data-position="center" data-tooltip="Transportista, Transporte, Conductor.">
+					<td>28</td>
+					<td>Transportista</td>
+					<td>
+					<a style="font-size:25px" href="{% url 'vista_carrier' %}" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+				<tr class="tooltipped al" data-position="center" data-tooltip="Unidad.">
+					<td>29</td>
+					<td>Unidad</td>
+					<td>
+					<a style="font-size:25px" href="/unit/list" target="_blank">
+						<i class="fa fa-sign-in"></i>
+					</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endif %}
+{% endblock %}

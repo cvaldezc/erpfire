@@ -1,0 +1,70 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/cruds_menu.html" %}
+{% endblock menu %}
+{% block content %}
+<script src="/media/js/cruds/mantenimiento.js"></script>
+<link rel="stylesheet" href="/media/css/cruds/mantenimiento.css">
+    <div class="container">
+        <div class="well">
+            <h3>Cargo de Empleados</h3>
+            <div class="panel panel-primary">
+                <div class="row">
+                    <div class="input-field col">
+                        <a href="{% url 'cruds_home' %}" style="font-size:30px">
+                            <i class="fa fa-home"></i>
+                        </a>
+                    </div>
+                    <div class="input-field col">
+                        <a href="{% url 'cargoemple_new' %}" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            Agregar Cargo
+                        </a>
+                    </div>
+                
+                    <div class="input-field col s8">
+                        <i class="prefix fa fa-search"></i>
+                        <input class="txtcargo" type="text" placeholder="Buscar Cargo" id="txtcargo">
+                    </div>
+                    
+                </div>
+                <div class="table-responsive">
+                    <table id="table-cargoemp" class="table table-hover highlight responsive-table table-condensed">
+                        <thead class="cab">
+                            <tr class="brand-primary">
+                                <th width="1cm">Item</th>
+                                <th>Codigo</th>
+                                <th>Cargo</th>
+                                <th>Area</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in listcargoemple %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ x.cargo_id }}</td>
+                                <td>{{ x.cargos }}</td>
+                                <td>{{ x.areac.area }}</td>
+                                <td>
+                                    <a href="{% url 'cargoemple_edit' x.cargo_id %}" class="btn btn-xs btn-link text-green">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'cargoemple_del' x.cargo_id %}" class="btn waves-effect red lighten-1">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,68 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/cruds_menu.html" %}
+{% endblock menu %}
+{% block content %}
+<script src="/media/js/cruds/mantenimiento.js"></script>
+<link rel="stylesheet" href="/media/css/cruds/mantenimiento.css">
+    <div class="container">
+        <div class="well">
+            <h3>Documentos de Contabilidad</h3>
+            <div class="panel panel-primary">
+                <div class="row">
+                    <div class="input-field col">
+                        <a href="{% url 'cruds_home' %}" style="font-size:30px">
+                            <i class="fa fa-home"></i>
+                        </a>
+                    </div>
+                    <div class="input-field col">
+                        <a href="{% url 'documento_new' %}" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            Agregar Documento
+                        </a>
+                    </div>
+                    <div class="input-field col s8">
+                        <i class="prefix fa fa-search"></i>
+                        <input class="txtdocument" type="text" placeholder="Buscar Documento" id="txtdocument">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="table-documents" class="table table-hover highlight responsive-table table-condensed">
+                        <thead class="cab">
+                            <tr class="brand-primary">
+                                <th width="1cm">Item</th>
+                                <th width="2cm">Código</th>
+                                <th>Documento</th>
+                                <th>Tipo</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in listdocumento %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ x.documento_id }}</td>
+                                <td>{{ x.documento }}</td>
+                                <td>{{ x.tipo }}</td>
+                                <td>
+                                    <a href="{% url 'documento_edit' x.documento_id %}" class="btn btn-xs btn-link text-green">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'documento_del' x.documento_id %}" class="btn waves-effect red lighten-1">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

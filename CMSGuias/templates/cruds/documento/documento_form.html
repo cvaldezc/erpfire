@@ -1,0 +1,26 @@
+{% extends "basemd.html" %}
+{% block title %}
+    Documentos de Contabilidad
+{% endblock title %}
+{% block menu %}
+    {% include "menus/cruds_menu.html" %}
+{% endblock menu %}
+{% block content %}
+    <div class="container">
+        <div class="well">
+            <h3>Documentos de Contabilidad</h3>
+            <form method="post" role="form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <a href="{% url 'documento_list' %}" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    Ver Tipos
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <span class="glyphicon glyphicon-saved"></span>
+                    Guardar Cambios
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

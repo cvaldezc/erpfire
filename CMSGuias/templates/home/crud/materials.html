@@ -27,28 +27,43 @@
             <h5><i class="fa fa-bars"></i> Materiales, Herramientas y EPPs</h5>
             <strong><i class="fa fa-search"></i> Busqueda</strong>
             <div class="row">
+                <div class="col s12 m9 l4">
+                    <div class="input-field">
+                        <label class="active">Categoria</label>
+                        <select class="browser-default select-chosen" id="cbofilttipo" ng-model="vm.master.cbofilttipo" ng-change="vm.filtercategory()" ng-options="x.id as x.name for x in vm.categories">
+                            <option value=''>Todos</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="col s12 m3 l2">
                     <div class="input-field">
                         <input type="text" maxlength="15" name="searchCode" class="form-control" ng-model="vm.search['code']" ng-keyup="vm.searchMaster($event, 'code')">
                         <label class="control-label">Código</label>
                     </div>
                 </div>
-                <div class="col s12 m9 l10">
+                <div class="col s12 m6 l6">
                     <div class="input-field">
                         <input type="text" name="searchDesc" class="form-control" ng-model="vm.search['desc']" ng-keyup="vm.searchMaster($event, 'desc')">
                         <label class="control-label">Descripción</label>
                     </div>
                 </div>
             </div>
-            <button class="waves-effect waves-light btn light-green grey-text text-darken-3" ng-click="vm.blocknew=!vm.blocknew" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
-                <i class="fa fa-plus"></i>
-                <span class="hide-on-small-only">Nuevo</span>
-            </button>
+            <div class="row">
+                <div class="input-field col">
+                    <button class="waves-effect waves-light btn light-green grey-text text-darken-3" ng-click="vm.blocknew=!vm.blocknew" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                        <i class="fa fa-plus"></i>
+                        <span class="hide-on-small-only">Nuevo</span>
+                    </button>
+                </div>
+                <div class="input-field col">
+                    <button class="waves-effect waves-light btn red" ng-click="vm.selectedDelete()" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
+                        <i class="fa fa-free-code-camp"></i>
+                        <span class="hide-on-small-only">Eliminar Seleccionados</span>
+                    </button>
+                </div>
+            </div>
 
-            <button class="waves-effect waves-light btn red" ng-click="vm.selectedDelete()" ng-if="(vm.permissionarea == 'ventas' || vm.permissionarea == 'administrator' || vm.permissionarea == 'logistica')">
-                <i class="fa fa-free-code-camp"></i>
-                <span class="hide-on-small-only">Eliminar Seleccionados</span>
-            </button>
+
             <div class="card" ng-show="vm.blocknew">
                 <div class="card-content">
                     <div class="row">
@@ -90,7 +105,7 @@
                         </div>
                         <div class="col s12 m2 l2 input-field">
                             <label class="active">Unidad</label>
-                            <select class="browser-default select-chosen" name="unidad" placeholder="Unidad" ng-model="vm.master['unidad']">
+                            <select class="browser-default select-chosen" name="unidad" placeholder="Unidad" ng-model="vm.master['unidad']" ng-change="vm.selectunit()" id="unidad">
                                 {% for x in unidad %}
                                     <option value="{{ x.unidad_id }}">{{ x.uninom }}</option>
                                 {% endfor %}
@@ -98,7 +113,7 @@
                         </div>
                         <div class="col s12 m2 l2 input-field">
                             <label class="active">Categoria</label>
-                            <select class="browser-default select-chosen" id="tipo" ng-model="vm.master.tipo" ng-options="x.id as x.name for x in vm.categories"></select>
+                            <select class="browser-default select-chosen" id="tipo" ng-model="vm.master.tipo" ng-options="x.id as x.name for x in vm.categories" ng-change="vm.selectcategory()"></select>
                         </div>
                         <div class="col s12 m2 l2">
                             <div class="input-field">
