@@ -1607,18 +1607,23 @@ class FindServices(JSONResponseMixin, View):
                 kwargs = json.loads(smodel.get(request, *args, **kwargs).content)['model']
             if 'codemaster' in request.GET:
                 # print request
-                kwargs = Materiale.objects.values_list(
-                    'materiales_id', 'matnon', 'matmed').get(
-                        materiales_id=request.GET['code'], tipo=request.GET['type'])
-                print kwargs
+                kwargs = list(Materiale.objects.values(
+                    'materiales_id', 'matnom', 'matmed').filter(
+                        materiales_id=request.GET['code'],
+                        tipo=request.GET['type']))
+                for x in kwargs:
+                    x['code'] = x.pop('materiales_id')
+                    x['name'] = '{0} {1}'.format(x.pop('matnom'), x.pop('matmed'))
             if 'namemaster' in request.GET:
-                print request.GET
-                master = [Materiale.objects.values('matnom').filter(
+                # print request.GET
+                kwargs = list(Materiale.objects.values(
+                    'materiales_id', 'matnom', 'matmed').filter(
                         matnom__icontains=request.GET['name'],
-                        tipo=request.GET['type'])]
-                print master
-                kwargs = master
-                print kwargs
+                        tipo=request.GET['type']))
+                for x in kwargs:
+                    x['code'] = x.pop('materiales_id')
+                    x['name'] = '{0} {1}'.format(x.pop('matnom'), x.pop('matmed'))
+                #kwargs =
         except Exception as ex:
             kwargs['raise'] = str(ex)
             kwargs['status'] = False
