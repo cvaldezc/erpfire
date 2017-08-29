@@ -1038,7 +1038,7 @@ class UnitList(JSONResponseMixin, ListView):
                             'unidad_id', 'uninom').order_by('uninom'))
                     context['status'] = True
                 else:
-                    context['unit'] = list(
+                    context['lunit'] = list(
                         Unidade.objects.filter(flag=True).values(
                             'unidad_id', 'uninom').order_by('uninom'))
                     context['status'] = True
