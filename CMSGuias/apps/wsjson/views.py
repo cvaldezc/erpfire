@@ -1602,10 +1602,9 @@ class FindServices(JSONResponseMixin, View):
             if 'getallbrand' in request.GET:
                 sbrand = SearchBrand()
                 kwargs = json.loads(sbrand.get(request, *args, **kwargs).content)['brand']
-                # kwargs = kwargs['brand']
-                # kwargs['brand'] = json.loads(kwargs['brand'].content)
-            if 'model' in request.GET:
-                pass
+            if 'getallmodel' in request.GET:
+                smodel = SearchModel()
+                kwargs = json.loads(smodel.get(request, *args, **kwargs).content)['model']
         except Exception as ex:
             kwargs['raise'] = str(ex)
             kwargs['status'] = False
