@@ -922,13 +922,12 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
                     # kwargs['masters'] = json.loads(serializers.serialize(
                     #     'json',
                     #     Materiale.objects.all().order_by('-register')[:50]))
-                    filt = request.GET['filt']
-                    if filt == 'all':
-                        filt = ''
+                    # filt = request.GET['filt']
+                    # if filt == 'all':
+                    #     filt = ''
                     kwargs['masters'] = json.loads(serializers.serialize(
                         'json',
-                        Materiale.objects.filter(tipo=filt
-                            ).order_by('-register')[:50]))
+                        Materiale.objects.all().order_by('-register')[:50]))
                     kwargs['status'] = True
                 if 'catergories' in request.GET:
                     kwargs['mastertypes'] = globalVariable.MASTER_TYPES
