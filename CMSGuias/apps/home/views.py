@@ -919,15 +919,13 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
                     }
                     kwargs['status'] = True
                 if 'startlist' in request.GET:
-                    # kwargs['masters'] = json.loads(serializers.serialize(
-                    #     'json',
-                    #     Materiale.objects.all().order_by('-register')[:50]))
-                    # filt = request.GET['filt']
-                    # if filt == 'all':
-                    #     filt = ''
-                    kwargs['masters'] = json.loads(serializers.serialize(
-                        'json',
-                        Materiale.objects.all().order_by('-register')[:50]))
+                    master = None
+                    filt = request.GET['filt']
+                    if filt == 'all':
+                        master = Materiale.objects.all().order_by('-register')[:50]
+                    else:
+                        maste = Materiale.objects.filter(tipo=fil).order_by('-register')[:50]
+                    kwargs['masters'] = json.loads(serializers.serialize('json', master))
                     kwargs['status'] = True
                 if 'catergories' in request.GET:
                     kwargs['mastertypes'] = globalVariable.MASTER_TYPES
