@@ -924,7 +924,7 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
                     if filt == 'all':
                         master = Materiale.objects.all().order_by('-register')[:50]
                     else:
-                        maste = Materiale.objects.filter(tipo=fil).order_by('-register')[:50]
+                        maste = Materiale.objects.filter(tipo=filt).order_by('-register')[:50]
                     kwargs['masters'] = json.loads(serializers.serialize('json', master))
                     kwargs['status'] = True
                 if 'catergories' in request.GET:
