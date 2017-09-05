@@ -856,7 +856,7 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
                         'json',
                         Materiale.objects.filter(
                             materiales_id=request.GET['code'],
-                            tipo__icontains=request.GET['tipocat'])
+                            tipo=request.GET['tipocat'])
                     ))
                     kwargs['masters'] = kwargs['list']
                     kwargs['status'] = True
@@ -864,7 +864,9 @@ class MaterialsKeep(JSONResponseMixin, TemplateView):
                     kwargs['list'] = json.loads(
                         serializers.serialize(
                             'json',
-                            Materiale.objects.filter(matnom__icontains=request.GET['desc'])
+                            Materiale.objects.filter(
+                                matnom__icontains=request.GET['desc'],
+                                tipo=request.GET['tipocat'])
                         )
                     )
                     kwargs['masters'] = kwargs['list']
