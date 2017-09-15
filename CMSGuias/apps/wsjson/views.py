@@ -1624,6 +1624,24 @@ class FindServices(JSONResponseMixin, View):
                     x['code'] = x.pop('materiales_id')
                     x['name'] = '{0} {1}'.format(x.pop('matnom'), x.pop('matmed'))
                 #kwargs =
+            if 'dni' in request.GET:
+                print request.GET
+                kwargs = list(
+                        Employee
+                            .objects
+                            .values('empdni_id', 'firstname', 'lastname', 'email', 'charge__cargos')
+                            .filter(empdni_id=request.GET['dni']))
+            if 'names' in request.GET:
+                print request.GET
+                kwargs = list(
+                    Employee
+                        .objects
+                        .values('empdni_id', 'firstname', 'lastname', 'email', 'charge__cargos')
+                        .filter(
+                            Q(firstname__icontains=request.GET['names']) |
+                            Q(lastname__icontains=request.GET['names'])
+                        )
+                )
         except Exception as ex:
             kwargs['raise'] = str(ex)
             kwargs['status'] = False
