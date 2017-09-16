@@ -1625,14 +1625,14 @@ class FindServices(JSONResponseMixin, View):
                     x['name'] = '{0} {1}'.format(x.pop('matnom'), x.pop('matmed'))
                 #kwargs =
             if 'dni' in request.GET:
-                print request.GET
+                # rint request.GET
                 kwargs = list(
                         Employee
                             .objects
                             .values('empdni_id', 'firstname', 'lastname', 'email', 'charge__cargos')
                             .filter(empdni_id=request.GET['dni']))
             if 'names' in request.GET:
-                print request.GET
+                # print request.GET
                 kwargs = list(
                     Employee
                         .objects
