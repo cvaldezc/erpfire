@@ -14,7 +14,7 @@ from django.http import HttpResponse, Http404
 # from django.contrib.auth.models import User
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, Q
 # from django.utils import simplejson
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.decorators import method_decorator
@@ -1624,6 +1624,24 @@ class FindServices(JSONResponseMixin, View):
                     x['code'] = x.pop('materiales_id')
                     x['name'] = '{0} {1}'.format(x.pop('matnom'), x.pop('matmed'))
                 #kwargs =
+            if 'dni' in request.GET:
+                # rint request.GET
+                kwargs = list(
+                        Employee
+                            .objects
+                            .values('empdni_id', 'firstname', 'lastname', 'email', 'charge__cargos')
+                            .filter(empdni_id=request.GET['dni']))
+            if 'names' in request.GET:
+                # print request.GET
+                kwargs = list(
+                    Employee
+                        .objects
+                        .values('empdni_id', 'firstname', 'lastname', 'email', 'charge__cargos')
+                        .filter(
+                            Q(firstname__icontains=request.GET['names']) |
+                            Q(lastname__icontains=request.GET['names'])
+                        )
+                )
         except Exception as ex:
             kwargs['raise'] = str(ex)
             kwargs['status'] = False
