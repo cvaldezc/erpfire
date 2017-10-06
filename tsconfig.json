@@ -5,7 +5,10 @@
         // "skipLibCheck": true,
         "moduleResolution": "node",
         "target": "es2015",
-        "lib": ["es5", "dom"],
+        "lib": [
+            "es5",
+            "dom"
+        ],
         "module": "commonjs",
         "removeComments": false,
         "preserveConstEnums": false,
@@ -15,21 +18,26 @@
         "noLib": true,
         "sourceMap": true,
         "watch": true,
-        "types": [
-            "angular",
-            "angular-cookies",
-            "core-js",
-            "node",
-            "jquery",
-            "materialize-css",
-            "sweetalert"
+        // "types": [
+        // //     "angular",
+        // //     "angular-cookies",
+        //     "core-js",
+        //     "node"
+        // //     "jquery",
+        // //     "materialize-css",
+        // //     "sweetalert"
+        // ],
+        "typeRoots": [
+            "node_modules/@types"
         ]
         // "typeRoots": [
         //     // add path to @types
         //     "node_modules/@types/"
         //  ]
     },
-    "include": [ "CMSGuias/media/js/*" ],
+    "include": [
+        "CMSGuias/media/js/*"
+    ],
     "exclude": [
         "node_modules",
         "**/*.spec.ts"

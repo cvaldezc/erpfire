@@ -4,6 +4,8 @@
   "description": "Developer and auto compile coffeescript and stylus and other process and typescript",
   "main": "Gulpfile.js",
   "scripts": {
+    "webpack": "webpack --config webpack.config.js",
+    "venv": "pip install -r requirements.txt",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -11,27 +13,25 @@
     "url": "git+https://github.com/cvaldezc/erpfire.git"
   },
   "author": "Christian Valdez",
-  "license": "ISC",
+  "license": "PRIVATE",
   "bugs": {
     "url": "https://github.com/cvaldezc/erpfire/issues"
   },
   "homepage": "https://github.com/cvaldezc/erpfire#readme",
   "devDependencies": {
-    "@types/angular": "^1.5.11",
-    "@types/angular-cookies": "^1.4.4",
-    "@types/core-js": "^0.9.36",
-    "@types/jquery": "^2.0.32",
-    "@types/node": "^6.0.77",
-    "gulp": "^3.9.0",
-    "gulp-coffee": "^2.3.1",
-    "gulp-plumber": "^1.0.1",
-    "gulp-stylus": "^2.0.5",
-    "gulp-uglify": "^2.0.0",
-    "gulp-watch": "^4.3.1",
-    "nib": "^1.1.0"
-  },
-  "dependencies": {
+    "@types/angular": "^1.6.32",
+    "@types/angular-cookies": "^1.4.5",
+    "@types/core-js": "^0.9.43",
+    "@types/jquery": "^3.2.13",
     "@types/materialize-css": "^0.98.3",
-    "@types/sweetalert": "^1.1.27"
-  }
+    "@types/node": "^8.0.33",
+    "@types/sweetalert": "^1.1.27",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "ts-loader": "^2.3.7",
+    "typescript": "^2.5.3",
+    "webpack": "^3.6.0"
+  },
+  "dependencies": {}
 }

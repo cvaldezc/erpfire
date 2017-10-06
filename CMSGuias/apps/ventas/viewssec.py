@@ -14,7 +14,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.template import TemplateDoesNotExist
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 
 # local Django
 from .models import Proyecto, CloseProject
@@ -217,3 +217,17 @@ class StatusProject(View):
             return render(request, self.template_name, kwargs)
         except TemplateDoesNotExist as ex:
             raise Http404(ex)
+
+
+
+class GeneralExpenses(JSONResponseMixin, TemplateView):
+    '''
+    create and keep other expenses for the project
+    '''
+
+    template_name = 'sales/generalexpenses.html'
+
+    # @method_decorator(login_required)
+    def get_context_data(self, **kwargs):
+        context = super(GeneralExpenses, self).get_context_data(**kwargs)
+        return context
