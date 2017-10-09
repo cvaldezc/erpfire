@@ -4,12 +4,54 @@
     {% include "menus/salesmd.html" %}
 {% endblock menu%}
 {% block content %}
-<section>
+<section ng-app="gexpensesApp" ng-controller="gexpensesCtrl">
     <header>
         <h5>Otros Gastos</h5>
     </header>
     <aside class="card-panel">
-
+        <a href="#!" class="right black-text" ng-model="pshow" ng-init="pshow=false" ng-click="pshow=!pshow">
+            <i class="fa" ng-class="{'fa-times': pshow, 'fa-chevron-down': !pshow}"></i>
+        </a>
+        <div class="row" ng-show="pshow">
+            <div class="input-field col m3">
+                <select name="category" id="category">
+                    <option value="">-- Ninguno --</option>
+                </select>
+                <label for="category">Categoria</label>
+            </div>
+            <div class="input-field col m3">
+                <input type="number" id="amount">
+                <label for="amount">Monto</label>
+            </div>
+            <div class="input-field col m3">
+                <select name="currency" id="currency">
+                    <option value="">-- Ninguno --</option>
+                </select>
+                <label for="currency">Moneda</label>
+            </div>
+            <div class="col m3">
+                <button type="button" class="btn waves-effect waves-light">
+                    <i class="fa fa-floppy-o"></i>
+                    <span class="hide-on-small-only">Guardar</span>
+                </button>
+            </div>
+        </div>
     </aside>
+    <article>
+        <table>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </article>
 </section>
+<!-- scripts -->
+<script src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/sales/gexpenses.bundle.js"></script>
 {% endblock content %}

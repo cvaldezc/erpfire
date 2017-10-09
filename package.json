@@ -33,5 +33,7 @@
     "typescript": "^2.5.3",
     "webpack": "^2.5.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "angular": "^1.5.11"
+  }
 }

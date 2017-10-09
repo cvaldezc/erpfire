@@ -10,20 +10,21 @@ export class ServiceFactory implements IProxy {
 
 	static $inject = ['$http', '$cookies']
 
-	constructor(private $http: ng.IHttpService, private $cookies: ng.cookies.ICookieStoreService) {
-		this.$http.defaults.headers.post['X-CSRFToken'] = $cookies.get('csrftoken')
-		this.$http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+	constructor(private $http: any, private $cookies: any) {
+		// this.$http.defaults.headers['post'][''] = ''
+		$http.defaults.headers.post['X-CSRFToken'] = $cookies.get('csrftoken')
+		$http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 	}
 
 	get(uri: string, options: object) {
-		return this.$http.get(uri, {params: options})
+		return this.$http.get(uri, { params: options })
 	}
 
 	post(uri: string, options: object) {
-		return this.$http.post(uri, this.transformData(options), {transformRequest: angular.identity, headers: {'Content-Type': undefined}})
+		return this.$http.post(uri, this.transformData(options), { transformRequest: angular.identity, headers: { 'Content-Type': undefined } })
 	}
 
-	private transformData(data: object): FormData {
+	private transformData(data: any): FormData {
 		let form = new FormData()
 		for (let key in data) {
 			if (data.hasOwnProperty(key)) {
@@ -35,7 +36,7 @@ export class ServiceFactory implements IProxy {
 	}
 }
 
-export const httpConfigs = ($httpProvider: ng.IHttpProvider) => {
+export const httpConfigs = ($httpProvider: any) => {
 	$httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 	$httpProvider.defaults.xsrfCookieName = 'csrftoken'
 	$httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken'

@@ -5,6 +5,6 @@ import { GeneralExpensesController } from './expenses.controller'
 
 const app = angular.module('gexpensesApp', ['ngCookies'])
 
-app.service('serviceFactory', ServiceFactory)
+app.service('ServiceFactory', ServiceFactory)
 app.controller('gexpensesCtrl', GeneralExpensesController)
 app.config(httpConfigs)

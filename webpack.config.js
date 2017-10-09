@@ -21,9 +21,12 @@ module.exports = {
   resolve: {
     extensions: [".tsx", ".ts", ".js"]
   },
+  externals: {
+    angular: 'angular'
+  },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    filename: 'gexpenses.bundle.js',
+    path: path.resolve(__dirname, 'CMSGuias', 'media', 'js', 'sales') // './CMSGuias/media/js/sales' //path.resolve(__dirname, 'CMSGuias', 'media', 'js', 'sales')
   }
 };
 // const path = require('path')
