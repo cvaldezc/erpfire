@@ -4,27 +4,30 @@
     {% include "menus/salesmd.html" %}
 {% endblock menu%}
 {% block content %}
-<section ng-app="gexpensesApp" ng-controller="gexpensesCtrl">
+<section ng-app="gexpensesApp" ng-controller="gexpensesCtrl as vm">
     <header>
         <h5>Otros Gastos</h5>
     </header>
     <aside class="card-panel">
-        <a href="#!" class="right black-text" ng-model="pshow" ng-init="pshow=false" ng-click="pshow=!pshow">
-            <i class="fa" ng-class="{'fa-times': pshow, 'fa-chevron-down': !pshow}"></i>
+        <a href="#!" class="right black-text" ng-model="vm.pshow" ng-init="vm.pshow=false" ng-click="vm.pshow=!vm.pshow">
+            <i class="fa" ng-class="{'fa-times': vm.pshow, 'fa-chevron-down': !vm.pshow}"></i>
         </a>
-        <div class="row" ng-show="pshow">
+        <div class="row" ng-show="vm.pshow">
             <div class="input-field col m3">
-                <select name="category" id="category">
+                <select name="itemizer" id="itemizer" ng-model="vm.gexpenses.itermizer">
                     <option value="">-- Ninguno --</option>
+                    {% verbatim %}
+                    <option value="{{x.pk}}" ng-repeat="x in vm.itemizers">{{x.fields.name}}</option>
+                    {% endverbatim %}
                 </select>
-                <label for="category">Categoria</label>
+                <label for="itemizer">Categoria</label>
             </div>
             <div class="input-field col m3">
-                <input type="number" id="amount">
+                <input type="number" id="amount" step="0.10" class="right-align" ng-model="vm.gexpenses.amount">
                 <label for="amount">Monto</label>
             </div>
             <div class="input-field col m3">
-                <select name="currency" id="currency">
+                <select name="currency" id="currency" ng-model="vm.gexpenses.currency" ng-options="x.pk as x.fields.moneda for x in vm.currencies">
                     <option value="">-- Ninguno --</option>
                 </select>
                 <label for="currency">Moneda</label>
@@ -37,7 +40,8 @@
             </div>
         </div>
     </aside>
-    <article>
+    <article class="card-panel">
+        <h5>Lista de Gastos</h5>
         <table>
             <tbody>
                 <tr>
@@ -49,6 +53,9 @@
             </tbody>
         </table>
     </article>
+    {% verbatim %}
+        <!-- {{ vm.itemizers }} -->
+    {% endverbatim %}
 </section>
 <!-- scripts -->
 <script src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>

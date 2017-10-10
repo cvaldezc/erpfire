@@ -487,3 +487,19 @@ class ProjectItemizer(models.Model):
         return '{0} {1} {2} {3} {4}'.format(
             self.itemizer_id, self.project, self.name, self.register, self.purchase)
 #endblock
+
+# @author @cvaldezch
+# 2017-10-10 10:48:33
+class PExpenses(models.Model):
+    '''
+    model for storage general expenses
+    '''
+    project = models.ForeignKey(Proyecto, related_name='projectexpenses')
+    itemizer = models.ForeignKey(ProjectItemizer, related_name='projectitemizer')
+    currency = models.ForeignKey(Moneda, related_name='expensescurrency')
+    amount = models.DecimalField(max_digits=12, decimal_places=3, default=0)
+
+    def __unicode__(self):
+        return '{0} {1} {2} {3}'.format(self.project, self.itemizer, self.amount, self.currency)
+
+# endblock

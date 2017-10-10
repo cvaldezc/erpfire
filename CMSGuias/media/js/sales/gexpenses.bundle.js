@@ -83,9 +83,39 @@ var angular = __webpack_require__(0);
 var GeneralExpensesController = /** @class */ (function () {
     function GeneralExpensesController(http) {
         this.http = http;
+        this.itemizers = [];
+        this.currencies = [];
         console.log('Hi World!');
-        angular.element('select').material_select();
+        // angular.element('select').material_select()
+        this.onInit();
     }
+    GeneralExpensesController.prototype.onInit = function () {
+        this.getItemizerByProject();
+        this.getCurrency();
+    };
+    GeneralExpensesController.prototype.getItemizerByProject = function () {
+        var _this = this;
+        this.http.get('', { 'getitemizer': true })
+            .then(function (response) {
+            _this.itemizers = response['data']['itemizer'];
+            setTimeout(function () {
+                angular.element('#itemizer').material_select();
+            }, 800);
+        })
+            .catch(function (err) {
+            console.log(err);
+        });
+    };
+    GeneralExpensesController.prototype.getCurrency = function () {
+        var _this = this;
+        this.http.get('/keep/currency/', {})
+            .then(function (response) {
+            _this.currencies = response['data']['list'];
+            setTimeout(function () {
+                angular.element("#currency").material_select();
+            }, 800);
+        });
+    };
     GeneralExpensesController.$inject = ['ServiceFactory'];
     return GeneralExpensesController;
 }());

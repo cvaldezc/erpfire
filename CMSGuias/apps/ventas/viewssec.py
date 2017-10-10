@@ -17,7 +17,7 @@ from django.template import TemplateDoesNotExist
 from django.views.generic import View, TemplateView
 
 # local Django
-from .models import Proyecto, CloseProject
+from .models import Proyecto, CloseProject, ProjectItemizer
 from ..home.models import Emails
 from ..tools.globalVariable import date_now, get_pin, emails, status
 from ..tools.uploadFiles import descompressRAR, get_extension
@@ -227,7 +227,19 @@ class GeneralExpenses(JSONResponseMixin, TemplateView):
 
     template_name = 'sales/generalexpenses.html'
 
-    # @method_decorator(login_required)
-    def get_context_data(self, **kwargs):
-        context = super(GeneralExpenses, self).get_context_data(**kwargs)
-        return context
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            try:
+                if 'getitemizer' in request.GET:
+                    kwargs['itemizer'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            ProjectItemizer.objects.filter(project_id=kwargs['pro'])
+                        )
+                    )
+            except Exception as ex:
+                kwargs['raise'] = str(e)
+            return self.render_to_json_response(kwargs)
+        else:
+            return render(request, self.template_name, kwargs)

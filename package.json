@@ -4,7 +4,7 @@
   "description": "Developer and auto compile coffeescript and stylus and other process and typescript",
   "main": "Gulpfile.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --config ./webpack.config.js --progress --colors --watch",
     "venv": "pip install -r requirements.txt",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

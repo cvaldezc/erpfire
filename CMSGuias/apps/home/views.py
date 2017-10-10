@@ -1248,11 +1248,11 @@ class DataMaterials(JSONResponseMixin, View):
 
 
 class DocumentPayment(JSONResponseMixin, View):
-    """
+    '''
     keep document payment
     @Christian
     2017-06-05 09:38:18
-    """
+    '''
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
@@ -1277,11 +1277,11 @@ class DocumentPayment(JSONResponseMixin, View):
 
 
 class MethodPayment(JSONResponseMixin, View):
-    """
+    '''
     Payment
     @Christian
     2017-06-05 09:38:18
-    """
+    '''
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
@@ -1304,12 +1304,12 @@ class MethodPayment(JSONResponseMixin, View):
             raise Http404(ext)
 
 
+'''
+Currency
+@Christian
+2017-06-05 10:14:05
+'''
 class Currency(JSONResponseMixin, View):
-    """
-    Currency
-    @Christian
-    2017-06-05 10:14:05
-    """
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
@@ -1331,12 +1331,13 @@ class Currency(JSONResponseMixin, View):
         except TemplateDoesNotExist as ext:
             raise Http404(ext)
 
+
+'''
+Supplier
+@Christian
+2017-06-06 08:56:06
+'''
 class SupplierKeep(JSONResponseMixin, View):
-    """
-    Supplier
-    @Christian
-    2017-06-06 08:56:06
-    """
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
