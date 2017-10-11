@@ -23,6 +23,7 @@ module.exports = {
   },
   externals: {
     angular: 'angular'
+
   },
   output: {
     filename: 'gexpenses.bundle.js',

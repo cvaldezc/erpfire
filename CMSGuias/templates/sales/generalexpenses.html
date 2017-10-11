@@ -5,10 +5,14 @@
 {% endblock menu%}
 {% block content %}
 <section ng-app="gexpensesApp" ng-controller="gexpensesCtrl as vm">
-    <header>
-        <h5>Otros Gastos</h5>
-    </header>
     <aside class="card-panel">
+        <button type="button" class="right btn waves-effect grey lighten-5 grey-text text-darken-3" ng-click="vm.pshow=true;vm.modify=false;">
+            <i class="fa fa-plus"></i>
+            Agregar
+        </button>
+        <header>
+            <h5>Otros Gastos {{ pro }}</h5>
+        </header>
         <a href="#!" class="right black-text" ng-model="vm.pshow" ng-init="vm.pshow=false" ng-click="vm.pshow=!vm.pshow">
             <i class="fa" ng-class="{'fa-times': vm.pshow, 'fa-chevron-down': !vm.pshow}"></i>
         </a>
@@ -20,7 +24,7 @@
                     <option value="{{x.pk}}" ng-repeat="x in vm.itemizers">{{x.fields.name}}</option>
                     {% endverbatim %}
                 </select>
-                <label for="itemizer">Categoria</label>
+                <label for="itemizer">Gastos</label>
             </div>
             <div class="input-field col m3">
                 <input type="number" id="amount" step="0.10" class="right-align" ng-model="vm.gexpenses.amount">
@@ -33,7 +37,7 @@
                 <label for="currency">Moneda</label>
             </div>
             <div class="col m3">
-                <button type="button" class="btn waves-effect waves-light">
+                <button type="button" class="btn waves-effect waves-light" ng-click="vm.saveExpenses()">
                     <i class="fa fa-floppy-o"></i>
                     <span class="hide-on-small-only">Guardar</span>
                 </button>

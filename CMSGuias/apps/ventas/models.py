@@ -497,7 +497,11 @@ class PExpenses(models.Model):
     project = models.ForeignKey(Proyecto, related_name='projectexpenses')
     itemizer = models.ForeignKey(ProjectItemizer, related_name='projectitemizer')
     currency = models.ForeignKey(Moneda, related_name='expensescurrency')
+    register = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=12, decimal_places=3, default=0)
+
+    class Meta:
+        ordering = ['project', '-register']
 
     def __unicode__(self):
         return '{0} {1} {2} {3}'.format(self.project, self.itemizer, self.amount, self.currency)

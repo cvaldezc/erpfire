@@ -17,7 +17,7 @@ from django.template import TemplateDoesNotExist
 from django.views.generic import View, TemplateView
 
 # local Django
-from .models import Proyecto, CloseProject, ProjectItemizer
+from .models import Proyecto, CloseProject, ProjectItemizer, PExpenses
 from ..home.models import Emails
 from ..tools.globalVariable import date_now, get_pin, emails, status
 from ..tools.uploadFiles import descompressRAR, get_extension
@@ -40,7 +40,7 @@ class JSONResponseMixin(object):
 
 
 class ClosedProjectView(JSONResponseMixin, View):
-    """Closed Sales Project"""
+    '''Closed Sales Project'''
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         try:
@@ -205,19 +205,18 @@ class ClosedProjectView(JSONResponseMixin, View):
 
 
 class StatusProject(View):
-    """Show status Project"""
+    '''Show status Project'''
     template_name = 'sales/status.html'
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        """process get"""
+        '''process get'''
         try:
             kwargs['pro'] = Proyecto.objects.get(proyecto_id=kwargs['pk'])
             kwargs['sts'] = status[kwargs['pro'].status]
             return render(request, self.template_name, kwargs)
         except TemplateDoesNotExist as ex:
             raise Http404(ex)
-
 
 
 class GeneralExpenses(JSONResponseMixin, TemplateView):
@@ -238,8 +237,53 @@ class GeneralExpenses(JSONResponseMixin, TemplateView):
                             ProjectItemizer.objects.filter(project_id=kwargs['pro'])
                         )
                     )
+                if 'expenses' in request.GET:
+                    kwargs['expenses'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            PExpenses.objects.filter(project_id=kwargs['pro']),
+                            relations=('itemizer', 'currency')
+                        )
+                    )
             except Exception as ex:
                 kwargs['raise'] = str(e)
             return self.render_to_json_response(kwargs)
         else:
             return render(request, self.template_name, kwargs)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            try:
+                if 'create' in request.POST:
+                    kwargs['status'] = self.save(request.POST, kwargs['pro'])
+                    if isinstance(kwargs['status'], dict):
+                        kwargs['raise'] = kwargs['status']['raise']
+                        # kwargs['status'] = kwargs['status']['status']
+                if 'delete' in request.POST:
+                    pass
+                if 'update' in request.POST:
+                    kwargs['status'] = self.save(request.POST, kwargs['pro'])
+                    if isinstance(kwargs['status'], dict):
+                        kwargs['raise'] = kwargs['status']['raise']
+                        # kwargs['status'] = kwargs['status']['status']
+            except Exception as oex:
+                kwargs['raise'] = str(oex)
+            return self.render_to_json_response(kwargs)
+
+    def save(self, kwargs, pro):
+        try:
+            pex = None
+            if 'update' in kwargs:
+                pex = PExpenses.objects.get(pk=kwargs['pk'])
+            else:
+                pex = PExpenses()
+                pex.project_id = pro
+            pex.itemizer_id = kwargs['itermizer']
+            pex.currency_id = kwargs['currency']
+            pex.amount = kwargs['amount']
+            pex.save()
+            return True
+        except Exception as oex:
+            return { 'status': False, 'raise': str(oex) }
+

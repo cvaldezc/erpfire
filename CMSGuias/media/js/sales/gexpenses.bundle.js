@@ -83,8 +83,15 @@ var angular = __webpack_require__(0);
 var GeneralExpensesController = /** @class */ (function () {
     function GeneralExpensesController(http) {
         this.http = http;
+        this.modify = '';
+        this.pshow = false;
         this.itemizers = [];
         this.currencies = [];
+        this.gexpenses = {
+            'currency': '',
+            'itermizer': '',
+            'amount': 0
+        };
         console.log('Hi World!');
         // angular.element('select').material_select()
         this.onInit();
@@ -115,6 +122,48 @@ var GeneralExpensesController = /** @class */ (function () {
                 angular.element("#currency").material_select();
             }, 800);
         });
+    };
+    GeneralExpensesController.prototype.getExpensesProject = function () {
+        this.http.get('/home/expenses/', {})
+            .then(function (response) {
+            console.log(response['data']);
+        });
+    };
+    GeneralExpensesController.prototype.openEdit = function (expenses) {
+        this.modify = expenses['pk'];
+        this.gexpenses = expenses;
+        this.pshow = true;
+    };
+    GeneralExpensesController.prototype.saveExpenses = function () {
+        var _this = this;
+        var params = this.gexpenses;
+        // console.log(params)
+        if (this.modify.length > 0) {
+            params['update'] = true;
+            params['pk'] = this.modify;
+        }
+        else {
+            params['create'] = true;
+        }
+        this.http.post('', params)
+            .then(function (response) {
+            if (_this.modify.length > 0) {
+                _this.modify = '';
+            }
+            if (!response['data'].hasOwnProperty('raise')) {
+                Materialize.toast('Transacción correctamente!', 3200);
+            }
+            else {
+                Materialize.toast("Error " + response['data']['raise'], 3200);
+            }
+        })
+            .catch(function (err) {
+            console.log(err);
+        });
+    };
+    GeneralExpensesController.prototype.deleteExpenses = function (expenses) {
+        var params = { delete: true };
+        params['pkexpenses'] = expenses;
     };
     GeneralExpensesController.$inject = ['ServiceFactory'];
     return GeneralExpensesController;
