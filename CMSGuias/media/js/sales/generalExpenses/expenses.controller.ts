@@ -3,12 +3,14 @@ import * as angular from 'angular'
 
 import { ServiceFactory } from '../../serviceFactory'
 
+
 interface IGeneralExpenses {
     modify: string|any
     pshow: boolean
     currencies: Array<object>
     itemizers: Array<object>
     gexpenses: any
+    pexpenses: Array<any>
 }
 
 
@@ -20,9 +22,10 @@ export class GeneralExpensesController implements IGeneralExpenses {
     currencies: Array<object> = []
     gexpenses: {[key: string]: string|number} = {
         'currency': '',
-        'itermizer': '',
+        'itemizer': '',
         'amount': 0
     }
+    pexpenses: Array<any> = []
 
     static $inject = ['ServiceFactory']
 
@@ -35,6 +38,7 @@ export class GeneralExpensesController implements IGeneralExpenses {
     onInit(): void {
         this.getItemizerByProject()
         this.getCurrency()
+        this.getExpensesProject()
     }
 
     getItemizerByProject(): void {
@@ -61,16 +65,24 @@ export class GeneralExpensesController implements IGeneralExpenses {
     }
 
     getExpensesProject(): void {
-        this.http.get('/home/expenses/', {})
+        this.http.get('', { 'pexpenses': true })
             .then((response: any) => {
                 console.log(response['data'])
+                this.pexpenses = response['data']
             })
     }
 
     openEdit(expenses: object|any): void {
         this.modify = expenses['pk']
-        this.gexpenses = expenses
+        this.gexpenses['currency'] = expenses['fields']['currency']['pk']
+        this.gexpenses['itemizer'] = expenses['fields']['itemizer']['pk']
+        this.gexpenses['amount'] = parseFloat(expenses['fields']['amount'])
         this.pshow = true
+        // console.log(this.gexpenses, expenses);
+        setTimeout(function() {
+            angular.element('select').material_select()
+        }, 200);
+
     }
 
     saveExpenses(): void {
@@ -84,11 +96,9 @@ export class GeneralExpensesController implements IGeneralExpenses {
         }
         this.http.post('', params)
             .then( (response: any) => {
-                if (this.modify.length > 0) {
-                    this.modify = ''
-                }
                 if (!response['data'].hasOwnProperty('raise')) {
                     Materialize.toast('Transacción correctamente!', 3200)
+                    this.cancelExpenses()
                 } else {
                     Materialize.toast(`Error ${response['data']['raise']}`, 3200)
                 }
@@ -101,6 +111,19 @@ export class GeneralExpensesController implements IGeneralExpenses {
     deleteExpenses(expenses: string | any): void {
         let params: { [key: string]: any} = { delete: true }
         params['pkexpenses'] = expenses
+        console.log(params)
+    }
+
+    cancelExpenses(): void {
+        this.gexpenses = {
+            'currency': '',
+            'itemizer': '',
+            'amount': 0
+        }
+        this.pshow = false
+        if (this.modify.length > 0) {
+            this.modify = ''
+        }
     }
 
 }

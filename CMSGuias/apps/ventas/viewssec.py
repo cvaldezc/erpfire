@@ -245,6 +245,14 @@ class GeneralExpenses(JSONResponseMixin, TemplateView):
                             relations=('itemizer', 'currency')
                         )
                     )
+                if 'pexpenses' in request.GET:
+                    kwargs = json.loads(
+                        serializers.serialize(
+                            'json',
+                            PExpenses.objects.filter(project_id=kwargs['pro'])
+                            , relations=('itemizer', 'currency')
+                        )
+                    )
             except Exception as ex:
                 kwargs['raise'] = str(e)
             return self.render_to_json_response(kwargs)
@@ -279,7 +287,7 @@ class GeneralExpenses(JSONResponseMixin, TemplateView):
             else:
                 pex = PExpenses()
                 pex.project_id = pro
-            pex.itemizer_id = kwargs['itermizer']
+            pex.itemizer_id = kwargs['itemizer']
             pex.currency_id = kwargs['currency']
             pex.amount = kwargs['amount']
             pex.save()

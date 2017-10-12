@@ -89,9 +89,10 @@ var GeneralExpensesController = /** @class */ (function () {
         this.currencies = [];
         this.gexpenses = {
             'currency': '',
-            'itermizer': '',
+            'itemizer': '',
             'amount': 0
         };
+        this.pexpenses = [];
         console.log('Hi World!');
         // angular.element('select').material_select()
         this.onInit();
@@ -99,6 +100,7 @@ var GeneralExpensesController = /** @class */ (function () {
     GeneralExpensesController.prototype.onInit = function () {
         this.getItemizerByProject();
         this.getCurrency();
+        this.getExpensesProject();
     };
     GeneralExpensesController.prototype.getItemizerByProject = function () {
         var _this = this;
@@ -124,15 +126,23 @@ var GeneralExpensesController = /** @class */ (function () {
         });
     };
     GeneralExpensesController.prototype.getExpensesProject = function () {
-        this.http.get('/home/expenses/', {})
+        var _this = this;
+        this.http.get('', { 'pexpenses': true })
             .then(function (response) {
             console.log(response['data']);
+            _this.pexpenses = response['data'];
         });
     };
     GeneralExpensesController.prototype.openEdit = function (expenses) {
         this.modify = expenses['pk'];
-        this.gexpenses = expenses;
+        this.gexpenses['currency'] = expenses['fields']['currency']['pk'];
+        this.gexpenses['itemizer'] = expenses['fields']['itemizer']['pk'];
+        this.gexpenses['amount'] = parseFloat(expenses['fields']['amount']);
         this.pshow = true;
+        // console.log(this.gexpenses, expenses);
+        setTimeout(function () {
+            angular.element('select').material_select();
+        }, 200);
     };
     GeneralExpensesController.prototype.saveExpenses = function () {
         var _this = this;
@@ -147,11 +157,9 @@ var GeneralExpensesController = /** @class */ (function () {
         }
         this.http.post('', params)
             .then(function (response) {
-            if (_this.modify.length > 0) {
-                _this.modify = '';
-            }
             if (!response['data'].hasOwnProperty('raise')) {
                 Materialize.toast('Transacción correctamente!', 3200);
+                _this.cancelExpenses();
             }
             else {
                 Materialize.toast("Error " + response['data']['raise'], 3200);
@@ -164,6 +172,18 @@ var GeneralExpensesController = /** @class */ (function () {
     GeneralExpensesController.prototype.deleteExpenses = function (expenses) {
         var params = { delete: true };
         params['pkexpenses'] = expenses;
+        console.log(params);
+    };
+    GeneralExpensesController.prototype.cancelExpenses = function () {
+        this.gexpenses = {
+            'currency': '',
+            'itemizer': '',
+            'amount': 0
+        };
+        this.pshow = false;
+        if (this.modify.length > 0) {
+            this.modify = '';
+        }
     };
     GeneralExpensesController.$inject = ['ServiceFactory'];
     return GeneralExpensesController;

@@ -13,12 +13,12 @@
         <header>
             <h5>Otros Gastos {{ pro }}</h5>
         </header>
-        <a href="#!" class="right black-text" ng-model="vm.pshow" ng-init="vm.pshow=false" ng-click="vm.pshow=!vm.pshow">
+        <a href="#!" class="right black-text" ng-model="vm.pshow" ng-click="vm.cancelExpenses()">
             <i class="fa" ng-class="{'fa-times': vm.pshow, 'fa-chevron-down': !vm.pshow}"></i>
         </a>
         <div class="row" ng-show="vm.pshow">
             <div class="input-field col m3">
-                <select name="itemizer" id="itemizer" ng-model="vm.gexpenses.itermizer">
+                <select name="itemizer" id="itemizer" ng-model="vm.gexpenses.itemizer">
                     <option value="">-- Ninguno --</option>
                     {% verbatim %}
                     <option value="{{x.pk}}" ng-repeat="x in vm.itemizers">{{x.fields.name}}</option>
@@ -45,17 +45,32 @@
         </div>
     </aside>
     <article class="card-panel">
+        <button type="button" class="right btn waves-effect white grey-text text-darken-3" ng-click="vm.getExpensesProject()">
+            <i class="fa fa-refresh"></i>
+        </button>
         <h5>Lista de Gastos</h5>
-        <table>
+        {% verbatim %}
+        <table class="table responsive-table bordered">
             <tbody>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                <tr ng-repeat="x in vm.pexpenses | orderBy: 'fields.itemizer.fields.name'">
+                    <td>{{$index + 1}}</td>
+                    <td>{{x.fields.itemizer.fields.name}}</td>
+                    <td>{{x.fields.currency.fields.moneda}}</td>
+                    <td class="right-align">{{x.fields.currency.fields.simbolo}} {{x.fields.amount}}</td>
+                    <td class="col-2 center-align">
+                        <button type="button" class="waves-effect btn btn-flat light-green-text" ng-click="vm.openEdit(x)">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                    </td>
+                    <td class="col-2 center-align">
+                        <button type="button" class="waves-effect btn btn-flat red-text" ng-click="vm.deleteExpenses(x)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
                 </tr>
             </tbody>
         </table>
+        {% endverbatim %}
     </article>
     {% verbatim %}
         <!-- {{ vm.itemizers }} -->
