@@ -26,6 +26,12 @@
             Servicios de Proyecto: {{ pro.nompro }}
             <br>
             <small>Moneda {{ pro.currency.moneda }}</small>
+            <br>
+            <h6>
+                <small>
+                    Los precios de las ordenes de servico son base e incluyen descuento.
+                </small>
+            </h6>
           </h5>
           <input type="hidden" ng-model="vm.area" ng-init="vm.area='{{ request.user.get_profile.empdni.charge.area|lower }}'">
           <a href="/sales/projects/manger/{{pro.proyecto_id}}/" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
@@ -38,10 +44,14 @@
                   <i class="fa fa-file-text-o"></i>
                   <span class="hide-on-small-only">Nueva Orden</span>
               </a>
-              <button type="button" data-target="mitemizer" class="waves-effect waves-light btn gray lighten-5 grat-text text-darken-3">
-                <i class="fa fa-tags"></i>
+              <button type="button" data-target="mitemizer" class="waves-effect waves-light btn red accent-3">
+                <i class="fa fa-tags black-text"></i>
                 <span class="hide-on-small-only">Agregar Partida</span>
               </button>
+              <a href="{% url 'project_expenses_view' pro.proyecto_id %}" class="right waves-light btn light-green">
+                <i class="black-text fa fa-money"></i>
+                <span class="hide-on-small-only">Otros Gastos</span>
+              </a>
               <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
                 <i class="fa fa-usd"></i>
                 <span class="hide-on-small-only">Monto Servicios</span>

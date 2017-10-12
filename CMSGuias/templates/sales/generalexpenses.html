@@ -5,6 +5,10 @@
 {% endblock menu%}
 {% block content %}
 <section ng-app="gexpensesApp" ng-controller="gexpensesCtrl as vm">
+    <a class="btn btn-flat" href="{% url 'servicesp_view' pro %}">
+        <i class="fa fa-chevron-left"></i>
+        <span class="hide-on-small-only">REGRESAR</span>
+    </a>
     <aside class="card-panel">
         <button type="button" class="right btn waves-effect grey lighten-5 grey-text text-darken-3" ng-click="vm.pshow=true;vm.modify=false;">
             <i class="fa fa-plus"></i>
@@ -14,7 +18,7 @@
             <h5>Otros Gastos {{ pro }}</h5>
         </header>
         <a href="#!" class="right black-text" ng-model="vm.pshow" ng-click="vm.cancelExpenses()">
-            <i class="fa" ng-class="{'fa-times': vm.pshow, 'fa-chevron-down': !vm.pshow}"></i>
+            <i class="fa" ng-class="{'fa-times': vm.pshow, '': !vm.pshow}"></i>
         </a>
         <div class="row" ng-show="vm.pshow">
             <div class="input-field col m3">
@@ -37,7 +41,7 @@
                 <label for="currency">Moneda</label>
             </div>
             <div class="col m3">
-                <button type="button" class="btn waves-effect waves-light" ng-click="vm.saveExpenses()">
+                <button type="button" class="btn waves-effect waves-light light-green" ng-click="vm.saveExpenses()">
                     <i class="fa fa-floppy-o"></i>
                     <span class="hide-on-small-only">Guardar</span>
                 </button>

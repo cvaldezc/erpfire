@@ -148,7 +148,7 @@ var GeneralExpensesController = /** @class */ (function () {
         var _this = this;
         var params = this.gexpenses;
         // console.log(params)
-        if (this.modify.length > 0) {
+        if (typeof this.modify === 'number') {
             params['update'] = true;
             params['pk'] = this.modify;
         }
@@ -159,6 +159,7 @@ var GeneralExpensesController = /** @class */ (function () {
             .then(function (response) {
             if (!response['data'].hasOwnProperty('raise')) {
                 Materialize.toast('Transacción correctamente!', 3200);
+                _this.getExpensesProject();
                 _this.cancelExpenses();
             }
             else {
@@ -170,9 +171,32 @@ var GeneralExpensesController = /** @class */ (function () {
         });
     };
     GeneralExpensesController.prototype.deleteExpenses = function (expenses) {
-        var params = { delete: true };
-        params['pkexpenses'] = expenses;
-        console.log(params);
+        var _this = this;
+        swal({
+            title: 'Realmente desea Eliminar?',
+            text: expenses['fields']['itemizer']['fields']['name'] + " monto " + expenses['fields']['amount'],
+            type: 'warning',
+            closeOnConfirm: true,
+            closeOnCancel: true,
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Si!, eliminar'
+        }, function (result) {
+            if (result) {
+                var params = { delete: false };
+                params['pkexpenses'] = expenses['pk'];
+                _this.http.post('', params)
+                    .then(function (response) {
+                    if (!response['data'].hasOwnProperty('raise')) {
+                        Materialize.toast('Eliminado correctomente!', 2600);
+                        _this.getExpensesProject();
+                    }
+                    else {
+                        Materialize.toast("Error " + response['data']['raise'], 3200);
+                    }
+                });
+            }
+        });
     };
     GeneralExpensesController.prototype.cancelExpenses = function () {
         this.gexpenses = {
@@ -181,7 +205,7 @@ var GeneralExpensesController = /** @class */ (function () {
             'amount': 0
         };
         this.pshow = false;
-        if (this.modify.length > 0) {
+        if (typeof this.modify === 'number') {
             this.modify = '';
         }
     };
@@ -244,6 +268,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var angular = __webpack_require__(0);
 var serviceFactory_1 = __webpack_require__(2);
 var expenses_controller_1 = __webpack_require__(1);
+/**
+ * This is required in webpack entry for compile
+ * './CMSGuias/media/js/serviceFactory.ts',
+ * './CMSGuias/media/js/sales/generalExpenses/expenses.controller.ts',
+ * './CMSGuias/media/js/sales/generalExpenses/gexpenses.ts'
+ *
+ */
 var app = angular.module('gexpensesApp', ['ngCookies']);
 app.service('ServiceFactory', serviceFactory_1.ServiceFactory);
 app.controller('gexpensesCtrl', expenses_controller_1.GeneralExpensesController);

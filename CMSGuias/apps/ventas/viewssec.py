@@ -264,22 +264,18 @@ class GeneralExpenses(JSONResponseMixin, TemplateView):
         if request.is_ajax():
             try:
                 if 'create' in request.POST:
-                    kwargs['status'] = self.save(request.POST, kwargs['pro'])
-                    if isinstance(kwargs['status'], dict):
-                        kwargs['raise'] = kwargs['status']['raise']
-                        # kwargs['status'] = kwargs['status']['status']
+                    kwargs = self.saveOrUpdate(request.POST, kwargs['pro'])
                 if 'delete' in request.POST:
-                    pass
+                    kwargs = self.delete(request.POST)
                 if 'update' in request.POST:
-                    kwargs['status'] = self.save(request.POST, kwargs['pro'])
-                    if isinstance(kwargs['status'], dict):
-                        kwargs['raise'] = kwargs['status']['raise']
-                        # kwargs['status'] = kwargs['status']['status']
+                    kwargs = self.saveOrUpdate(request.POST, kwargs['pro'])
+                if isinstance(kwargs, dict) and 'raise' in kwargs:
+                    kwargs['raise'] = kwargs['raise']
             except Exception as oex:
                 kwargs['raise'] = str(oex)
             return self.render_to_json_response(kwargs)
 
-    def save(self, kwargs, pro):
+    def saveOrUpdate(self, kwargs, pro):
         try:
             pex = None
             if 'update' in kwargs:
@@ -293,5 +289,12 @@ class GeneralExpenses(JSONResponseMixin, TemplateView):
             pex.save()
             return True
         except Exception as oex:
-            return { 'status': False, 'raise': str(oex) }
+            return { 'raise': str(oex) }
+
+    def delete(self, kwargs):
+        try:
+            PExpenses.objects.get(pk=kwargs['pkexpenses']).delete()
+            return True
+        except Exception as oex:
+            return { 'raise': str(oex) }
 

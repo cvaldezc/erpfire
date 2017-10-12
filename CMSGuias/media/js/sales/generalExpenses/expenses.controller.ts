@@ -1,11 +1,10 @@
 import * as angular from 'angular'
 
-
 import { ServiceFactory } from '../../serviceFactory'
 
 
 interface IGeneralExpenses {
-    modify: string|any
+    modify: number|any
     pshow: boolean
     currencies: Array<object>
     itemizers: Array<object>
@@ -88,7 +87,7 @@ export class GeneralExpensesController implements IGeneralExpenses {
     saveExpenses(): void {
         let params: any = this.gexpenses
         // console.log(params)
-        if (this.modify.length > 0) {
+        if (typeof this.modify === 'number') {
             params['update'] = true
             params['pk'] = this.modify
         } else {
@@ -98,6 +97,7 @@ export class GeneralExpensesController implements IGeneralExpenses {
             .then( (response: any) => {
                 if (!response['data'].hasOwnProperty('raise')) {
                     Materialize.toast('Transacción correctamente!', 3200)
+                    this.getExpensesProject()
                     this.cancelExpenses()
                 } else {
                     Materialize.toast(`Error ${response['data']['raise']}`, 3200)
@@ -109,9 +109,30 @@ export class GeneralExpensesController implements IGeneralExpenses {
     }
 
     deleteExpenses(expenses: string | any): void {
-        let params: { [key: string]: any} = { delete: true }
-        params['pkexpenses'] = expenses
-        console.log(params)
+        swal({
+            title: 'Realmente desea Eliminar?',
+            text: `${expenses['fields']['itemizer']['fields']['name']} monto ${expenses['fields']['amount']}`,
+            type: 'warning',
+            closeOnConfirm: true,
+            closeOnCancel: true,
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Si!, eliminar'
+        }, (result: boolean) => {
+            if (result) {
+                let params: { [key: string]: any} = { delete: false }
+                params['pkexpenses'] = expenses['pk']
+                this.http.post('', params)
+                    .then((response: any) => {
+                        if (!response['data'].hasOwnProperty('raise')) {
+                            Materialize.toast('Eliminado correctomente!', 2600)
+                            this.getExpensesProject()
+                        } else {
+                            Materialize.toast(`Error ${response['data']['raise']}`, 3200)
+                        }
+                    })
+            }
+        })
     }
 
     cancelExpenses(): void {
@@ -121,7 +142,7 @@ export class GeneralExpensesController implements IGeneralExpenses {
             'amount': 0
         }
         this.pshow = false
-        if (this.modify.length > 0) {
+        if (typeof this.modify === 'number') {
             this.modify = ''
         }
     }

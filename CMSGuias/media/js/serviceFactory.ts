@@ -1,5 +1,6 @@
 import * as angular from 'angular'
 
+
 interface IProxy {
 	get: (uri: string, options: object) => ng.IHttpPromise<any>
 
