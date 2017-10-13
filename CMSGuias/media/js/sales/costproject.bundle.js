@@ -255,6 +255,46 @@ var ControllerServiceProject = /** @class */ (function () {
             }
         });
     };
+    /**
+     * block workforce
+     */
+    ControllerServiceProject.prototype.workforce = function () {
+        var gworkforce = document.getElementById("workforce");
+        var gworkforceUsed = document.getElementById("workforceused");
+        var wdiv = document.createElement('div'), winput = document.createElement('input');
+        var wudiv = document.createElement('div'), wuinput = document.createElement('input');
+        // clean content before insert controls
+        gworkforce.innerHTML = '';
+        gworkforceUsed.innerHTML = '';
+        wdiv.setAttribute('class', 'input-field');
+        winput.type = 'number';
+        winput.step = '0.10';
+        winput.id = 'iworkforce';
+        winput.setAttribute('class', 'right-align');
+        wdiv.appendChild(winput);
+        gworkforce.appendChild(wdiv);
+        winput.focus();
+        wudiv.setAttribute('class', 'input-field');
+        wuinput.type = 'number';
+        wuinput.step = '0.10';
+        wuinput.id = 'iworkforceused';
+        wuinput.setAttribute('class', 'right-align');
+        wudiv.appendChild(wuinput);
+        gworkforceUsed.appendChild(wudiv);
+    };
+    ControllerServiceProject.prototype.saveWorkforce = function () {
+        var iwf = document.getElementById('iworkforce'), iwfu = document.getElementById('iworkforceused');
+        if (iwf != undefined && iwfu != undefined) {
+            var params = {
+                workforce: iwf.value,
+                workforceused: iwfu.value,
+                saveworkfoce: true
+            };
+            this.proxy.post('', params)
+                .then(function (response) {
+            });
+        }
+    };
     ControllerServiceProject.$inject = ['ServiceFactory'];
     return ControllerServiceProject;
 }());
@@ -262,7 +302,6 @@ var apps = angular.module('app', ['ngCookies']);
 apps.service('ServiceFactory', serviceFactory_1.ServiceFactory);
 apps.controller('controller', ControllerServiceProject);
 apps.config(serviceFactory_1.httpConfigs);
-// Materialize.toast('hi!', 6000); 
 
 
 /***/ }),

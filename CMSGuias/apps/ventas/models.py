@@ -52,6 +52,8 @@ class Proyecto(models.Model):
     outsaturday = models.TimeField(default='13:30:00', null=False, blank=True)
     shxsaturday = models.TimeField(default='15:00:00', null=False, blank=True)
     shxsaturdayt = models.TimeField(default='17:000:00', null=False, blank=True)
+    workforce = models.DecimalField(max_digits=12, decimal_places=3, default=0, blank=True)
+    workforceused = models.DecimalField(max_digits=12, decimal_places=3, default=0, blank=True)
     flag = models.BooleanField(default=True, null=False)
 
     audit_log = AuditLog()

@@ -1,27 +1,25 @@
 {% extends "basemd.html" %}
-{% block title %}
-  Servicios
-{% endblock title %}
+{% block title %} Servicios {% endblock title %}
 {% block menu %}
-    {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-        {% include "menus/salesmd.html" %}
-    {% endif %}
-    {% if user.get_profile.empdni.charge.area|lower == 'logistica' %}
-        {% include "menus/logisticsmd.htm" %}
-    {% endif %}
-    {% if user.get_profile.empdni.charge.area|lower == 'operaciones' %}
-        {% include "menus/operations.htm" %}
-    {% endif %}
-    {% if user.get_profile.empdni.charge.area|lower == 'almacen' %}
-        {% include "menus/storage_menu.htm" %}
-    {% endif %}
+  {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+    {% include "menus/salesmd.html" %}
+  {% endif %}
+  {% if user.get_profile.empdni.charge.area|lower == 'logistica' %}
+    {% include "menus/logisticsmd.htm" %}
+  {% endif %}
+  {% if user.get_profile.empdni.charge.area|lower == 'operaciones' %}
+    {% include "menus/operations.htm" %}
+  {% endif %}
+  {% if user.get_profile.empdni.charge.area|lower == 'almacen' %}
+    {% include "menus/storage_menu.htm" %}
+  {% endif %}
 {% endblock menu %}
 {% block content %}
 <section ng-app="app" ng-controller="controller as vm">
-    <a href="/sales/projects/manger/{{pro.proyecto_id}}/" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
-      <i class="fa fa-chevron-left"></i>
-      <span class="hide-on-small-only">REGRESAR</span>
-    </a>
+  <a href="/sales/projects/manger/{{pro.proyecto_id}}/" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+    <i class="fa fa-chevron-left"></i>
+    <span class="hide-on-small-only">REGRESAR</span>
+  </a>
   <div class="row">
     <div class="col s12 m12 l12">
       <div class="card">
@@ -31,14 +29,13 @@
             <br>
             <small>
               Moneda {{ pro.currency.moneda }}
-              <br>
-              Tipo de Cambio del Proyecto: {{ pro.exchange }}
+              <br> Tipo de Cambio del Proyecto: {{ pro.exchange }}
             </small>
             <br>
             <h6>
-                <small>
-                    Los precios de las ordenes de servico son base.
-                </small>
+              <small>
+                Los precios de las ordenes de servico son base.
+              </small>
             </h6>
           </h5>
           <input type="hidden" ng-model="vm.prcurrency.pk" ng-init="vm.prcurrency.pk='{{pro.currency_id}}'">
@@ -52,131 +49,218 @@
       <div class="card">
         {% endverbatim %}
         <div class="card-content">
-            <h5>SERVIOS DEL PROYECTO</h5>
-                {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-                <!-- <div class="card-action"> -->
-                  <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
-                      <i class="fa fa-file-text-o"></i>
-                      <span class="hide-on-small-only">Nueva Orden</span>
-                  </a>
-                  <button type="button" data-target="mitemizer" class="waves-effect waves-light btn red accent-3">
-                    <i class="fa fa-tags black-text"></i>
-                    <span class="hide-on-small-only">Agregar Partida</span>
-                  </button>
-                  <a href="{% url 'project_expenses_view' pro.proyecto_id %}" class="right waves-light btn light-green">
-                    <i class="black-text fa fa-money"></i>
-                    <span class="hide-on-small-only">Otros Gastos</span>
-                  </a>
-                  <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
+          <a href="#!up" class="right grey-text text-darken-3" ng-model="vm.sexp" ng-init="vm.sexp=false" ng-click="vm.sexp=!vm.sexp">
+            <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.sexp, 'fa-chevron-down': vm.sexp }"></i>
+          </a>
+          <h5>SERVIOS</h5>
+          {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+          <!-- <div class="card-action"> -->
+          <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
+            <i class="fa fa-file-text-o"></i>
+            <span class="hide-on-small-only">Nueva Orden</span>
+          </a>
+          <button type="button" data-target="mitemizer" class="waves-effect waves-light btn red accent-3">
+            <i class="fa fa-tags black-text"></i>
+            <span class="hide-on-small-only">Agregar Partida</span>
+          </button>
+          <a href="{% url 'project_expenses_view' pro.proyecto_id %}" class="right waves-light btn light-green">
+            <i class="black-text fa fa-money"></i>
+            <span class="hide-on-small-only">Otros Gastos</span>
+          </a>
+          <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
                     <i class="fa fa-usd"></i>
                     <span class="hide-on-small-only">Monto Servicios</span>
                   </button> -->
-                <!-- </div> -->
-              {% endif %}
-            </div>
-            {% verbatim %}
-            <div class="row">
-              <div class="col s12 m6 l6">
-                <ul class="collapsible" data-collapsible="accordion">
-                  <li ng-repeat="x in vm.itemizers">
-                    <div class="collapsible-header lighten-4" ng-class="{'red': x.sum > x.fields.purchase, 'light-green': x.sum <= x.fields.purchase}">
-                      <i class="fa" ng-class="{'fa-frown-o': x.sum > x.fields.purchase, 'fa-smile-o': x.sum <= x.fields.purchase}"></i>
-                      <span><strong>
-                        {{x.fields.name}}
-                        <!-- <span class="fa" ng-class="{'fa-frown-o': x.sum > x.fields.purchase, 'fa-smile-o': x.sum <= x.fields.purchase}"></span> -->
-                      </strong></span>
-                      <span class="badge" ng-show="(vm.area == 'ventas' || vm.area == 'administrator')">
-                        <a href="#edit" class="light-blue-text text-16" ng-click="vm.showEdit(x)">
-                          <span class="fa fa-edit"></span>
-                          &nbsp;
-                        </a>
-                        <a href="#del" class="red-text text-16" ng-click="vm.delItem(x)">
-                          <span class="fa fa-trash"></span>
-                        </a>
-                      </span>
-                    </div>
-                    <div class="collapsible-body">
-                      <div class="card-panel">
-                        <small>
-                          <strong>Asignado</strong>
-                          <strong>Compra:</strong> {{x.fields.purchase | number:2 }}
-                          <strong>Venta:</strong> {{x.fields.sales | number:2 }}
-                          <strong>Disponible:</strong> {{x.fields.purchase - x.sum | number:2 }}
-                        </small>
-                        <i class="fa" ng-class="{'fa-level-down': x.sum > x.fields.purchase, 'fa-level-up': x.sum <= x.fields.purchase}"></i>
-                        <input type="hidden" ng-init="vm.assignament=(vm.assignament + (x.fields.purchase - 0))">
-                        <!-- <input type="hidden" value="{{x['sum']=(0-0)}}"> -->
-                        <!-- details by item-->
-                        <table class="table responsive-table highlight">
-                          <tbody>
-                            <tr ng-repeat="d in x.services">
-                              <td class="col-1">
-                                <a ng-if="d.pk" href="/reports/services/orders/{{d.pk}}/" target="_blank">
-                                  <i class="fa fa-file-text-o"></i>
-                                </a>
-                              </td>
-                              <td class="col-1">
-                                <small><strong>{{d.pk}}</strong></small>
-                              </td>
-                              <td>
-                                <small>{{ d.fields.supplier.fields.razonsocial || d.description }}</small>
-                              </td>
-                              <td class="right-align">
-                                <small>
-                                  <strong>
-                                    <!--
+          <!-- </div> -->
+          {% endif %}
+        </div>
+        {% verbatim %}
+        <div class="row" ng-hide="vm.sexp">
+          <div class="col s12 m6 l6">
+            <ul class="collapsible" data-collapsible="accordion">
+              <li ng-repeat="x in vm.itemizers">
+                <div class="collapsible-header lighten-4" ng-class="{'red': x.sum > x.fields.purchase, 'light-green': x.sum <= x.fields.purchase}">
+                  <i class="fa" ng-class="{'fa-frown-o': x.sum > x.fields.purchase, 'fa-smile-o': x.sum <= x.fields.purchase}"></i>
+                  <span>
+                    <strong>
+                      {{x.fields.name}}
+                      <!-- <span class="fa" ng-class="{'fa-frown-o': x.sum > x.fields.purchase, 'fa-smile-o': x.sum <= x.fields.purchase}"></span> -->
+                    </strong>
+                  </span>
+                  <span class="badge" ng-show="(vm.area == 'ventas' || vm.area == 'administrator')">
+                    <a href="#edit" class="light-blue-text text-16" ng-click="vm.showEdit(x)">
+                      <span class="fa fa-edit"></span>
+                      &nbsp;
+                    </a>
+                    <a href="#del" class="red-text text-16" ng-click="vm.delItem(x)">
+                      <span class="fa fa-trash"></span>
+                    </a>
+                  </span>
+                </div>
+                <div class="collapsible-body">
+                  <div class="card-panel">
+                    <small>
+                      <strong>Asignado</strong>
+                      <strong>Compra:</strong> {{x.fields.purchase | number:2 }}
+                      <strong>Venta:</strong> {{x.fields.sales | number:2 }}
+                      <strong>Disponible:</strong> {{x.fields.purchase - x.sum | number:2 }}
+                    </small>
+                    <i class="fa" ng-class="{'fa-level-down': x.sum > x.fields.purchase, 'fa-level-up': x.sum <= x.fields.purchase}"></i>
+                    <input type="hidden" ng-init="vm.assignament=(vm.assignament + (x.fields.purchase - 0))">
+                    <!-- <input type="hidden" value="{{x['sum']=(0-0)}}"> -->
+                    <!-- details by item-->
+                    <table class="table responsive-table highlight">
+                      <tbody>
+                        <tr ng-repeat="d in x.services">
+                          <td class="col-1">
+                            <a ng-if="d.pk" href="/reports/services/orders/{{d.pk}}/" target="_blank">
+                              <i class="fa fa-file-text-o"></i>
+                            </a>
+                          </td>
+                          <td class="col-1">
+                            <small>
+                              <strong>{{d.pk}}</strong>
+                            </small>
+                          </td>
+                          <td>
+                            <small>{{ d.fields.supplier.fields.razonsocial || d.description }}</small>
+                          </td>
+                          <td class="right-align">
+                            <small>
+                              <strong>
+                                <!--
                                       total = ((d.amounts - ((d.fields.dsct/100) * d.amounts)) * (((d.fields.sigv?d.configure.fields.igv:0)/100)+1));
                                     (d['total'] = (d.fields.currency.pk == d.configure.fields.moneda.pk) ? total : (total / d['exchange']));
                                     (x['sum'] = (d['total'] + (x['sum'] - 0)));
                                     -->
-                                  {{ d['total'] | number:2 }}
-                                  </strong>
-                                </small>
-                              </td>
-                              <td class="right-align col-2">
-                                <small>
-                                  {{(d.fields.currency.pk == vm.prcurrency.pk) ? d.fields.currency.fields.simbolo : d.fields.currency.fields.simbolo + ' - ' + vm.prcurrency.symbol }}
-                                </small>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <!-- endblock -->
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              <div class="col s12 m6 l6">
-                <div class="card-panel">
-                    <table class="table responsive-table highlight">
-                      <tbody>
-                        <tr>
-                          <th><h5>Asignado</h5></th>
-                          <td class="right-align"><h5>{{ vm.assignament | number:2 }}</h5></td>
-                        </tr>
-                        <tr>
-                          <th><h5>Gastado</h5></th>
-                          <th class="right-align"><h5>{{ vm.spent | number:2 }}</h5></th>
-                        </tr>
-                        <tr>
-                          <td colspan="2"><div class="divider"></div></td>
-                        </tr>
-                        <tr ng-class="{'light-green lighten-4': vm.amount > 0, 'red': vm.amount <= 0 }">
-                          <th><h5><strong>TOTAL</strong></h5></th>
-                          <td class="right-align">
-                            <h5>
-                              <i class="fa" ng-class="{'fa-thumbs-up': vm.amount > 0, 'fa-thumbs-down': vm.amount <= 0 }"></i>
-                              &nbsp; {{vm.amount = (vm.assignament - vm.spent) | number: 2 }}
-                            </h5>
+                                {{ d['total'] | number:2 }}
+                              </strong>
+                            </small>
+                          </td>
+                          <td class="right-align col-2">
+                            <small>
+                              {{(d.fields.currency.pk == vm.prcurrency.pk) ? d.fields.currency.fields.simbolo : d.fields.currency.fields.simbolo + ' -
+                              ' + vm.prcurrency.symbol }}
+                            </small>
                           </td>
                         </tr>
                       </tbody>
                     </table>
+                    <!-- endblock -->
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="col s12 m6 l6">
+            <div class="card-panel">
+              <table class="table responsive-table highlight">
+                <tbody>
+                  <tr>
+                    <th>
+                      <h5>Asignado</h5>
+                    </th>
+                    <td class="right-align">
+                      <h5>{{ vm.assignament | number:2 }}</h5>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>
+                      <h5>Gastado</h5>
+                    </th>
+                    <th class="right-align">
+                      <h5>{{ vm.spent | number:2 }}</h5>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <div class="divider"></div>
+                    </td>
+                  </tr>
+                  <tr ng-class="{'light-green lighten-4': vm.amount > 0, 'red': vm.amount <= 0 }">
+                    <th>
+                      <h5>
+                        <strong>TOTAL</strong>
+                      </h5>
+                    </th>
+                    <td class="right-align">
+                      <h5>
+                        <i class="fa" ng-class="{'fa-thumbs-up': vm.amount > 0, 'fa-thumbs-down': vm.amount <= 0 }"></i>
+                        &nbsp; {{vm.amount = (vm.assignament - vm.spent) | number: 2 }}
+                      </h5>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- block workforce -->
+    <div class="col s12 m12 l12">
+      <div class="card">
+        <div class="card-content">
+          <a href="#!up" class="right grey-text text-darken-3" ng-model="vm.swf" ng-init="vm.swf=false" ng-click="vm.swf=!vm.swf">
+            <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.swf, 'fa-chevron-down': vm.swf }"></i>
+          </a>
+          <h5>MANO DE OBRA</h5>
+          <!-- set amount workforce -->
+          <button type="button" class="btn light-green" ng-click="vm.workforce()">
+            <i class="fa fa-money black-text"></i>
+            <span class="hide-on-small-only">ESTABLECER GASTOS</span>
+          </button>
+          <button type="button" class="right btn white black-text" ng-click="vm.saveWorkforce()">
+            <i class="fa fa-floppy-o"></i>
+            <span class="hide-on-small-only">GUARDAR</span>
+          </button>
+          <div class="row" ng-hide="vm.swf">
+            <div class="col l4 m4 s12 offset-l4 offset-m4">
+              <div class="card">
+                <div class="card-content">
+                  <table class="table responsive-table highlight">
+                    <tbody>
+                      <tr>
+                        <th><h5>ASIGNADO</h5></th>
+                        <td class="right-align"><h5 id="workforce"></h5></td>
+                      </tr>
+                      <tr>
+                        <th><h5>USADO</h5></th>
+                        <td class="right-align"><h5 id="workforceused"></h5></td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div class="divider"></div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th><h5>DISPONIBLE</h5></th>
+                        <th class="right-align"><h5 id="workforcetotal"></h5></th>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
-
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- block materials -->
+    <div class="col s12 m12 l12">
+      <div class="card">
+        <div class="card-content">
+          <a href="#!up" class="right grey-text text-darken-3" ng-model="vm.smg" ng-init="vm.smg=false" ng-click="vm.smg=!vm.smg">
+            <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.smg, 'fa-chevron-down': vm.smg }"></i>
+          </a>
+          <h5>MATERIALES
+            <small>(solo guias enviadas)</small>
+          </h5>
+          <div class="row" ng-hide="vm.swf">
+
+          </div>
+        </div>
       </div>
     </div>
     {% endverbatim %}
@@ -185,7 +269,8 @@
     <div class="modal col l4 m12 s12 offset-l4" id="mitemizer">
       <div class="modal-content">
         <h5>
-          Partida de Servicio <br>
+          Partida de Servicio
+          <br>
           <small>Moneda {{ pro.currency.moneda }}</small>
         </h5>
         <div class="input-field">
@@ -193,7 +278,8 @@
           <label for="itemname">Nombre</label>
         </div>
         <div class="input-field">
-          <input type="number" class="right-align" name="itempurchase" step="0.10" min="0" ng-model="vm.itemizer.purchase" ng-change="vm.setItemizerSalesAmount()" ng-value="vm.itemizer.purchase">
+          <input type="number" class="right-align" name="itempurchase" step="0.10" min="0" ng-model="vm.itemizer.purchase" ng-change="vm.setItemizerSalesAmount()"
+            ng-value="vm.itemizer.purchase">
           <label for="itempurchase">Valor de Compra</label>
         </div>
         <div class="input-field">
@@ -204,35 +290,40 @@
       <div class="modal-footer">
         <button type="button" class="waves-effect waves-light btn light-blue" ng-click="vm.saveItemizer()">
           <i class="fa fa-floppy-o"></i>
-          <span class="hide-on-small-only"><small>Guardar</small></span>
+          <span class="hide-on-small-only">
+            <small>Guardar</small>
+          </span>
         </button>
-        <button type="button" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3" ng-click="vm.itemizer={}">
+        <button type="button" class="modal-action modal-close waves-effect waves-light btn grey lighten-5 grey-text text-darken-3"
+          ng-click="vm.itemizer={}">
           <i class="fa fa-times"></i>
-          <span class="hide-on-small-only"><small>Salir</small></span>
+          <span class="hide-on-small-only">
+            <small>Salir</small>
+          </span>
         </button>
       </div>
     </div>
     <!-- block modal assign amount total for project -->
     <div class="modal col l4 offset-l4" id="mservices">
       <form method="post" action="">
-      <div class="modal-content">
-        {% csrf_token %}
-        <h5>Monto de Servicios</h5>
-        <div class="input-field">
-          <input type="number" id="aservices" name="aservices" step="0.01" class="validate">
-          <label for="aservices">Monto</label>
+        <div class="modal-content">
+          {% csrf_token %}
+          <h5>Monto de Servicios</h5>
+          <div class="input-field">
+            <input type="number" id="aservices" name="aservices" step="0.01" class="validate">
+            <label for="aservices">Monto</label>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" name="saservices" value="true" class="btn light-blue grey-text text-darken-3">
-          <i class="fa fa-check"></i>
-          <small>Guardar</small>
-        </button>
-        <button type="reset" class="modal-action modal-close btn grey lighten-5 grey-text text-darken-3 waves-effect">
-          <i class="fa fa-times"></i>
-          <small>Cancelar</small>
-        </button>
-      </div>
+        <div class="modal-footer">
+          <button type="submit" name="saservices" value="true" class="btn light-blue grey-text text-darken-3">
+            <i class="fa fa-check"></i>
+            <small>Guardar</small>
+          </button>
+          <button type="reset" class="modal-action modal-close btn grey lighten-5 grey-text text-darken-3 waves-effect">
+            <i class="fa fa-times"></i>
+            <small>Cancelar</small>
+          </button>
+        </div>
       </form>
     </div>
     <!-- endblock-->

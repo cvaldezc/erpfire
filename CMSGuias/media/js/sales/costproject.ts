@@ -87,7 +87,7 @@ interface IController {
 	itemizers: object;
 	assignament: number;
 	spent: number;
-	prcurrency: {[key: string]: any}
+	prcurrency: { [key: string]: any }
 	getItemizer(): void;
 	saveItemizer(): void;
 	calcAmounts(): void;
@@ -98,10 +98,10 @@ interface IController {
 class ControllerServiceProject implements IController {
 
 	itemizer: any
-	itemizers: {[key: string]: any} = {}
+	itemizers: { [key: string]: any } = {}
 	assignament: number = 0
 	spent: number = 0
-	prcurrency: {[key: string]: any} = {
+	prcurrency: { [key: string]: any } = {
 		'pk': null,
 		'symbol': null
 	}
@@ -116,7 +116,7 @@ class ControllerServiceProject implements IController {
 
 	getItemizer(): void {
 		Materialize.toast('<i class="fa fa-cog"></i> Procesando...!', parseInt('undefined'), 'toast-remove');
-		this.proxy.get('', {itemizer: true}).then(
+		this.proxy.get('', { itemizer: true }).then(
 			(response: any) => {
 				if (response['data']['status']) {
 					this.itemizers = response['data']['itemizers'];
@@ -124,7 +124,7 @@ class ControllerServiceProject implements IController {
 					this.assignament = 0;
 					this.spent = 0;
 					this.calcAmounts();
-				}else{
+				} else {
 					angular.element('.toast-remove').remove();
 					Materialize.toast(`Error: ${response['data']['raise']}`, 2600);
 				}
@@ -154,7 +154,7 @@ class ControllerServiceProject implements IController {
 						sales: 0
 					}
 					angular.element('#mitemizer').modal('close');
-				}else{
+				} else {
 					Materialize.toast(`${response['data']['raise']}`, 6600);
 				}
 			}
@@ -170,7 +170,7 @@ class ControllerServiceProject implements IController {
 				for (var dt in element['services']) {
 					if (element['services'].hasOwnProperty(dt)) {
 						var services = element['services'][dt];
-						let dsct: number = (this.itemizers[key]['services'][dt].amounts * (this.itemizers[key]['services'][dt].fields.dsct/100))
+						let dsct: number = (this.itemizers[key]['services'][dt].amounts * (this.itemizers[key]['services'][dt].fields.dsct / 100))
 						dsct = (this.itemizers[key]['services'][dt].amounts - dsct);
 						// let igv: number = ((this.itemizers[key]['services'][dt].fields.sigv ? this.itemizers[key]['services'][dt].configure.fields.igv : 0)/100)
 						let total: number = dsct
@@ -195,7 +195,7 @@ class ControllerServiceProject implements IController {
 		}
 	}
 
-	showEdit(item: {[key: string]: any}): void {
+	showEdit(item: { [key: string]: any }): void {
 		this.itemizer = {
 			name: item['fields']['name'],
 			purchase: parseFloat(item['fields']['purchase']),
@@ -205,7 +205,7 @@ class ControllerServiceProject implements IController {
 		angular.element('#mitemizer').modal('open');
 	}
 
-	delItem(item: {[key: string]: any}): void {
+	delItem(item: { [key: string]: any }): void {
 		swal({
 			title: `Realmente desea eliminar el item ${item['fields']['name']}?`,
 			text: 'Nota: El item no se eliminara si tiene ordenes asociadas.',
@@ -222,16 +222,68 @@ class ControllerServiceProject implements IController {
 					itemizer: item['pk']
 				}
 				this.proxy.post('', params)
-					.then( (response: any) => {
+					.then((response: any) => {
 						if (response['data']['status']) {
 							this.getItemizer();
 							Materialize.toast('Eliminado!', 2600);
-						}else{
+						} else {
 							Materialize.toast(`Error: ${response['data']['raise']}`, 10600);
 						}
 					});
 			}
 		});
+	}
+
+	/**
+	 * block workforce
+	 */
+
+	workforce(): void {
+		let gworkforce: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforce")
+		let gworkforceUsed: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforceused")
+		let wdiv: HTMLDivElement = document.createElement('div'),
+			winput: HTMLInputElement = document.createElement('input')
+		let	wudiv: HTMLDivElement = document.createElement('div'),
+			wuinput: HTMLInputElement = document.createElement('input')
+
+		// clean content before insert controls
+		gworkforce.innerHTML = ''
+		gworkforceUsed.innerHTML = ''
+
+		wdiv.setAttribute('class', 'input-field')
+		winput.type = 'number'
+		winput.step = '0.10'
+		winput.id = 'iworkforce'
+		winput.setAttribute('class', 'right-align')
+		wdiv.appendChild(winput)
+		gworkforce.appendChild(wdiv)
+		winput.focus()
+
+		wudiv.setAttribute('class', 'input-field')
+		wuinput.type = 'number'
+		wuinput.step = '0.10'
+		wuinput.id = 'iworkforceused'
+		wuinput.setAttribute('class', 'right-align')
+		wudiv.appendChild(wuinput)
+		gworkforceUsed.appendChild(wudiv)
+
+	}
+
+	saveWorkforce(): void {
+		let iwf: HTMLInputElement = <HTMLInputElement>document.getElementById('iworkforce'),
+			iwfu: HTMLInputElement = <HTMLInputElement>document.getElementById('iworkforceused')
+		if (iwf != undefined && iwfu != undefined)
+		{
+			let params: { [key: string]: any} = {
+				workforce: iwf.value,
+				workforceused: iwfu.value,
+				saveworkfoce: true
+			}
+			this.proxy.post('', params)
+				.then((response: any) => {
+
+				})
+		}
 	}
 
 }
@@ -240,4 +292,3 @@ let apps = angular.module('app', ['ngCookies']);
 apps.service('ServiceFactory', ServiceFactory);
 apps.controller('controller', ControllerServiceProject)
 apps.config(httpConfigs);
-// Materialize.toast('hi!', 6000);
