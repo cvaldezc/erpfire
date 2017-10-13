@@ -2,9 +2,8 @@ const path = require('path')
 
 module.exports = {
   entry: [
-    './CMSGuias/media/js/serviceFactory.ts',
-    './CMSGuias/media/js/sales/generalExpenses/expenses.controller.ts',
-    './CMSGuias/media/js/sales/generalExpenses/gexpenses.ts'
+    path.join(__dirname, 'CMSGuias', 'media', 'js', 'serviceFactory.ts'),
+    path.join(__dirname, 'CMSGuias', 'media', 'js', 'sales', 'costproject')
   ],
   module: {
     rules: [
@@ -26,7 +25,7 @@ module.exports = {
 
   },
   output: {
-    filename: 'gexpenses.bundle.js',
+    filename: 'costproject.bundle.js', // change name output
     path: path.resolve(__dirname, 'CMSGuias', 'media', 'js', 'sales') // './CMSGuias/media/js/sales' //path.resolve(__dirname, 'CMSGuias', 'media', 'js', 'sales')
   }
 };

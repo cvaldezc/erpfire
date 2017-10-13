@@ -285,6 +285,7 @@ class GeneralExpenses(JSONResponseMixin, TemplateView):
                 pex.project_id = pro
             pex.itemizer_id = kwargs['itemizer']
             pex.currency_id = kwargs['currency']
+            pex.description = str(kwargs['description']).upper()
             pex.amount = kwargs['amount']
             pex.save()
             return True

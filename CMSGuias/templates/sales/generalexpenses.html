@@ -21,7 +21,7 @@
             <i class="fa" ng-class="{'fa-times': vm.pshow, '': !vm.pshow}"></i>
         </a>
         <div class="row" ng-show="vm.pshow">
-            <div class="input-field col m3">
+            <div class="input-field col l3 m3 s12">
                 <select name="itemizer" id="itemizer" ng-model="vm.gexpenses.itemizer">
                     <option value="">-- Ninguno --</option>
                     {% verbatim %}
@@ -30,17 +30,21 @@
                 </select>
                 <label for="itemizer">Gastos</label>
             </div>
-            <div class="input-field col m3">
+            <div class="input-field col m4 l4 s12">
+                    <input type="text" id="description" ng-model="vm.gexpenses.description">
+                    <label for="description">Descripción</label>
+                </div>
+            <div class="input-field col m1 l1 s12">
                 <input type="number" id="amount" step="0.10" class="right-align" ng-model="vm.gexpenses.amount">
                 <label for="amount">Monto</label>
             </div>
-            <div class="input-field col m3">
+            <div class="input-field col m2 l2 s12">
                 <select name="currency" id="currency" ng-model="vm.gexpenses.currency" ng-options="x.pk as x.fields.moneda for x in vm.currencies">
                     <option value="">-- Ninguno --</option>
                 </select>
                 <label for="currency">Moneda</label>
             </div>
-            <div class="col m3">
+            <div class="col m1 l1 s12">
                 <button type="button" class="btn waves-effect waves-light light-green" ng-click="vm.saveExpenses()">
                     <i class="fa fa-floppy-o"></i>
                     <span class="hide-on-small-only">Guardar</span>
@@ -55,10 +59,22 @@
         <h5>Lista de Gastos</h5>
         {% verbatim %}
         <table class="table responsive-table bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Gastos</th>
+                    <th>Descripción</th>
+                    <th>Moneda</th>
+                    <th>Monto</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
             <tbody>
                 <tr ng-repeat="x in vm.pexpenses | orderBy: 'fields.itemizer.fields.name'">
                     <td>{{$index + 1}}</td>
                     <td>{{x.fields.itemizer.fields.name}}</td>
+                    <td>{{x.fields.description}}</td>
                     <td>{{x.fields.currency.fields.moneda}}</td>
                     <td class="right-align">{{x.fields.currency.fields.simbolo}} {{x.fields.amount}}</td>
                     <td class="col-2 center-align">
@@ -73,6 +89,15 @@
                     </td>
                 </tr>
             </tbody>
+            <tfoot ng-hide="vm.pexpenses.length">
+                <tr>
+                    <td colspan="6">
+                        <div class="progress red lighten-5">
+                            <div class="indeterminate red"></div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
         {% endverbatim %}
     </article>

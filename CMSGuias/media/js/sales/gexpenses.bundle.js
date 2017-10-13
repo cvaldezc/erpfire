@@ -90,6 +90,7 @@ var GeneralExpensesController = /** @class */ (function () {
         this.gexpenses = {
             'currency': '',
             'itemizer': '',
+            'description': '',
             'amount': 0
         };
         this.pexpenses = [];
@@ -137,6 +138,7 @@ var GeneralExpensesController = /** @class */ (function () {
         this.modify = expenses['pk'];
         this.gexpenses['currency'] = expenses['fields']['currency']['pk'];
         this.gexpenses['itemizer'] = expenses['fields']['itemizer']['pk'];
+        this.gexpenses['description'] = expenses['fields']['description'];
         this.gexpenses['amount'] = parseFloat(expenses['fields']['amount']);
         this.pshow = true;
         // console.log(this.gexpenses, expenses);
@@ -202,6 +204,7 @@ var GeneralExpensesController = /** @class */ (function () {
         this.gexpenses = {
             'currency': '',
             'itemizer': '',
+            'description': '',
             'amount': 0
         };
         this.pshow = false;
@@ -270,10 +273,12 @@ var serviceFactory_1 = __webpack_require__(2);
 var expenses_controller_1 = __webpack_require__(1);
 /**
  * This is required in webpack entry for compile
- * './CMSGuias/media/js/serviceFactory.ts',
- * './CMSGuias/media/js/sales/generalExpenses/expenses.controller.ts',
- * './CMSGuias/media/js/sales/generalExpenses/gexpenses.ts'
+ * path.join(__dirname, 'CMSGuias', 'media', 'js', 'serviceFactory.ts'),
+ * path.join(__dirname, 'CMSGuias', 'media', 'js', 'sales', 'generalExpenses', 'expenses.controller'),
+ * path.join(__dirname, 'CMSGuias', 'media', 'js', 'sales', 'generalExpenses', 'gexpenses')
  *
+ * output filename
+ * filename: 'gexpenses.bundle.js'
  */
 var app = angular.module('gexpensesApp', ['ngCookies']);
 app.service('ServiceFactory', serviceFactory_1.ServiceFactory);

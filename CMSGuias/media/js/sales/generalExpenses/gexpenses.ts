@@ -5,10 +5,12 @@ import { GeneralExpensesController } from './expenses.controller'
 
 /**
  * This is required in webpack entry for compile
- * './CMSGuias/media/js/serviceFactory.ts',
- * './CMSGuias/media/js/sales/generalExpenses/expenses.controller.ts',
- * './CMSGuias/media/js/sales/generalExpenses/gexpenses.ts'
+ * path.join(__dirname, 'CMSGuias', 'media', 'js', 'serviceFactory.ts'),
+ * path.join(__dirname, 'CMSGuias', 'media', 'js', 'sales', 'generalExpenses', 'expenses.controller'),
+ * path.join(__dirname, 'CMSGuias', 'media', 'js', 'sales', 'generalExpenses', 'gexpenses')
  *
+ * output filename
+ * filename: 'gexpenses.bundle.js'
  */
 
 const app = angular.module('gexpensesApp', ['ngCookies'])

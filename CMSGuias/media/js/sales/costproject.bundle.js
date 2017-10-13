@@ -1,18 +1,94 @@
-// import * as angular from "angular";
-var SProxy = /** @class */ (function () {
-    function SProxy($http, $cookies) {
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var angular = __webpack_require__(1);
+var ServiceFactory = /** @class */ (function () {
+    function ServiceFactory($http, $cookies) {
         this.$http = $http;
         this.$cookies = $cookies;
-        this.$http.defaults.headers.post['X-CSRFToken'] = $cookies['csrftoken'];
-        this.$http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+        // this.$http.defaults.headers['post'][''] = ''
+        $http.defaults.headers.post['X-CSRFToken'] = $cookies.get('csrftoken');
+        $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
     }
-    SProxy.prototype.get = function (uri, options) {
+    ServiceFactory.prototype.get = function (uri, options) {
         return this.$http.get(uri, { params: options });
     };
-    SProxy.prototype.post = function (uri, options) {
+    ServiceFactory.prototype.post = function (uri, options) {
         return this.$http.post(uri, this.transformData(options), { transformRequest: angular.identity, headers: { 'Content-Type': undefined } });
     };
-    SProxy.prototype.transformData = function (data) {
+    ServiceFactory.prototype.transformData = function (data) {
         var form = new FormData();
         for (var key in data) {
             if (data.hasOwnProperty(key)) {
@@ -22,21 +98,49 @@ var SProxy = /** @class */ (function () {
         }
         return form;
     };
-    SProxy.$inject = ['$http', '$cookies'];
-    return SProxy;
+    ServiceFactory.$inject = ['$http', '$cookies'];
+    return ServiceFactory;
 }());
+exports.ServiceFactory = ServiceFactory;
+exports.httpConfigs = function ($httpProvider) {
+    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+};
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+module.exports = angular;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var angular = __webpack_require__(1);
+var serviceFactory_1 = __webpack_require__(0);
 var ControllerServiceProject = /** @class */ (function () {
     function ControllerServiceProject(proxy) {
         this.proxy = proxy;
+        this.itemizers = {};
         this.assignament = 0;
         this.spent = 0;
+        this.prcurrency = {
+            'pk': null,
+            'symbol': null
+        };
         console.log("hi! hello world!!!");
         angular.element('.modal').modal();
         this.getItemizer();
     }
     ControllerServiceProject.prototype.getItemizer = function () {
         var _this = this;
-        Materialize.toast('<i class="fa fa-cog"></i> Procesando...!', parseInt(undefined), 'toast-remove');
+        Materialize.toast('<i class="fa fa-cog"></i> Procesando...!', parseInt('undefined'), 'toast-remove');
         this.proxy.get('', { itemizer: true }).then(function (response) {
             if (response['data']['status']) {
                 _this.itemizers = response['data']['itemizers'];
@@ -58,7 +162,7 @@ var ControllerServiceProject = /** @class */ (function () {
     };
     ControllerServiceProject.prototype.saveItemizer = function () {
         var _this = this;
-        Materialize.toast('<i class="fa fa-cog"></i> Procesando...!', parseInt(undefined), 'toast-remove');
+        Materialize.toast('<i class="fa fa-cog"></i> Procesando...!', parseInt('undefined'), 'toast-remove');
         var params = this.itemizer;
         params['saveitemizer'] = true;
         this.proxy.post('', params).then(function (response) {
@@ -94,9 +198,18 @@ var ControllerServiceProject = /** @class */ (function () {
                         // igv = (igv > 0) ? (dsct * (igv)) : 0;
                         // let total: number = ((dsct) + (igv));
                         // total = ((this.itemizers[key]['services'][dt].fields.currency.pk == this.itemizers[key]['services'][dt].configure.fields.moneda.pk) ? total : (total / this.itemizers[key]['services'][dt]['exchange']));
+                        if (this.prcurrency.pk !== this.itemizers[key]['services'][dt].fields.currency.pk) {
+                            if (this.itemizers[key]['services'][dt].exchange > 1) {
+                                total = (total / this.itemizers[key]['services'][dt].exchange);
+                            }
+                            else {
+                                total = (total * this.itemizers[key]['services'][dt].exchange);
+                            }
+                        }
                         this.itemizers[key]['services'][dt]['total'] = total;
                         sum += (total);
                     }
+                    // here change amount
                 }
                 this.itemizers[key]['sum'] = sum;
                 this.spent += sum;
@@ -120,7 +233,7 @@ var ControllerServiceProject = /** @class */ (function () {
             showCancelButton: true,
             confirmButtonText: 'Si! eliminar',
             cancelButtonText: 'No',
-            confirmButtonColor: '#fe6969',
+            confirmButtonColor: '#d33',
             closeOnConfirm: true,
             closeOnCancel: true
         }, function (isConfirm) {
@@ -129,7 +242,8 @@ var ControllerServiceProject = /** @class */ (function () {
                     delitemizer: true,
                     itemizer: item['pk']
                 };
-                _this.proxy.post('', params).then(function (response) {
+                _this.proxy.post('', params)
+                    .then(function (response) {
                     if (response['data']['status']) {
                         _this.getItemizer();
                         Materialize.toast('Eliminado!', 2600);
@@ -141,16 +255,23 @@ var ControllerServiceProject = /** @class */ (function () {
             }
         });
     };
-    ControllerServiceProject.$inject = ['sproxy'];
+    ControllerServiceProject.$inject = ['ServiceFactory'];
     return ControllerServiceProject;
 }());
 var apps = angular.module('app', ['ngCookies']);
-apps.service('sproxy', SProxy);
+apps.service('ServiceFactory', serviceFactory_1.ServiceFactory);
 apps.controller('controller', ControllerServiceProject);
-var httpConfigs = function ($httpProvider) {
-    $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-};
-apps.config(httpConfigs);
+apps.config(serviceFactory_1.httpConfigs);
 // Materialize.toast('hi!', 6000); 
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(0);
+module.exports = __webpack_require__(2);
+
+
+/***/ })
+/******/ ]);

@@ -2734,6 +2734,7 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                                 ProjectItemizer.objects.filter(
                                     project_id=kwargs['pro']).order_by('name')))
                         for x in kwargs['itemizers']:
+                            # get documents orders services
                             documents = ServiceOrder.objects.filter(
                                 project_id=kwargs['pro'],
                                 itemizer_id=x['pk'])
@@ -2741,12 +2742,30 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                                 'json', documents, relations=('supplier', 'currency')))
                             for dx in x['services']:
                                 order = DetailsServiceOrder.objects.filter(serviceorder_id=dx['pk'])
-                                dx['configure'] = json.loads(serializers.serialize(
-                                    'json',
-                                    [Configuracion.objects.get(
-                                        periodo=order[0].serviceorder.register.strftime('%Y'))], relations=('moneda')))[0]
+                                # dx['configure'] = json.loads(serializers.serialize(
+                                #    'json',
+                                #    [Configuracion.objects.get(
+                                #        periodo=order[0].serviceorder.register.strftime('%Y'))], relations=('moneda')))[0]
                                 dx['exchange'] = order[0].serviceorder.project.exchange
                                 dx['amounts'] = sum([(od.quantity * float(od.price)) for od in order])
+                            # endblock order services
+                            # get another expenses
+                            oexpenses = PExpenses.objects.filter(project_id=kwargs['pro'], itemizer_id=x['pk'])
+                            if oexpenses:
+                                x['services'] += [{
+                                            'amounts': float(ex.amount),
+                                            'exchange': ex.project.exchange,
+                                            'itemizer': ex.itemizer_id,
+                                            'description': ex.description,
+                                            # 'currency': ex.currency_id,
+                                            'fields': {
+                                                'dsct': 0,
+                                                'currency': {'pk': ex.currency_id, 'fields': { 'simbolo': ex.currency.simbolo}}
+                                            }
+                                        } for ex in oexpenses]
+
+                            # endblock
+
                         kwargs['status'] = True
                 except Exception as oex:
                     kwargs['raise'] = str(oex)

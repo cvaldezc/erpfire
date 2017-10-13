@@ -22,6 +22,7 @@ export class GeneralExpensesController implements IGeneralExpenses {
     gexpenses: {[key: string]: string|number} = {
         'currency': '',
         'itemizer': '',
+        'description': '',
         'amount': 0
     }
     pexpenses: Array<any> = []
@@ -75,6 +76,7 @@ export class GeneralExpensesController implements IGeneralExpenses {
         this.modify = expenses['pk']
         this.gexpenses['currency'] = expenses['fields']['currency']['pk']
         this.gexpenses['itemizer'] = expenses['fields']['itemizer']['pk']
+        this.gexpenses['description'] = expenses['fields']['description']
         this.gexpenses['amount'] = parseFloat(expenses['fields']['amount'])
         this.pshow = true
         // console.log(this.gexpenses, expenses);
@@ -139,6 +141,7 @@ export class GeneralExpensesController implements IGeneralExpenses {
         this.gexpenses = {
             'currency': '',
             'itemizer': '',
+            'description': '',
             'amount': 0
         }
         this.pshow = false
