@@ -88,6 +88,8 @@ interface IController {
 	assignament: number;
 	spent: number;
 	prcurrency: { [key: string]: any }
+	sbworkforce: boolean
+	tworkforce: number
 	getItemizer(): void;
 	saveItemizer(): void;
 	calcAmounts(): void;
@@ -105,6 +107,8 @@ class ControllerServiceProject implements IController {
 		'pk': null,
 		'symbol': null
 	}
+	sbworkforce: boolean = false
+	tworkforce: number = 0
 
 	static $inject = ['ServiceFactory']
 
@@ -266,6 +270,7 @@ class ControllerServiceProject implements IController {
 		wuinput.setAttribute('class', 'right-align')
 		wudiv.appendChild(wuinput)
 		gworkforceUsed.appendChild(wudiv)
+		this.sbworkforce = true
 
 	}
 
@@ -277,13 +282,36 @@ class ControllerServiceProject implements IController {
 			let params: { [key: string]: any} = {
 				workforce: iwf.value,
 				workforceused: iwfu.value,
-				saveworkfoce: true
 			}
 			this.proxy.post('', params)
 				.then((response: any) => {
-
+					if (!response['data'].hasOwnProperty('raise') && response['data']) {
+						let cwf: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById('workforce'),
+							cwfu: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforceused")
+						cwf.innerText = params.workforce
+						cwfu.innerText = params.workforceused
+						this.tworkforce = (params.workforce - params.workforceused)
+						this.sbworkforce = false
+					} else {
+						Materialize.toast(`Error ${response['data']['raise']}`, 3600)
+					}
 				})
 		}
+	}
+
+	workforceData(): void {
+		this.proxy.get('', { 'listworkforce': true })
+			.then((response: any) => {
+				if (!response['data'].hasOwnProperty('raise')) {
+					let cwf: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById('workforce'),
+						cwfu: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforceused")
+					cwf.innerText = response['data'].workforce
+					cwfu.innerText = response['data'].workforceused
+					this.tworkforce = (response['data'].workforce - response['data'].workforceused)
+				} else {
+					Materialize.toast(`Error ${response['data']['raise']}`, 3600)
+				}
+			})
 	}
 
 }

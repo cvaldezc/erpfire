@@ -134,6 +134,8 @@ var ControllerServiceProject = /** @class */ (function () {
             'pk': null,
             'symbol': null
         };
+        this.sbworkforce = false;
+        this.tworkforce = 0;
         console.log("hi! hello world!!!");
         angular.element('.modal').modal();
         this.getItemizer();
@@ -281,19 +283,45 @@ var ControllerServiceProject = /** @class */ (function () {
         wuinput.setAttribute('class', 'right-align');
         wudiv.appendChild(wuinput);
         gworkforceUsed.appendChild(wudiv);
+        this.sbworkforce = true;
     };
     ControllerServiceProject.prototype.saveWorkforce = function () {
+        var _this = this;
         var iwf = document.getElementById('iworkforce'), iwfu = document.getElementById('iworkforceused');
         if (iwf != undefined && iwfu != undefined) {
-            var params = {
+            var params_1 = {
                 workforce: iwf.value,
                 workforceused: iwfu.value,
-                saveworkfoce: true
             };
-            this.proxy.post('', params)
+            this.proxy.post('', params_1)
                 .then(function (response) {
+                if (!response['data'].hasOwnProperty('raise') && response['data']) {
+                    var cwf = document.getElementById('workforce'), cwfu = document.getElementById("workforceused");
+                    cwf.innerText = params_1.workforce;
+                    cwfu.innerText = params_1.workforceused;
+                    _this.tworkforce = (params_1.workforce - params_1.workforceused);
+                    _this.sbworkforce = false;
+                }
+                else {
+                    Materialize.toast("Error " + response['data']['raise'], 3600);
+                }
             });
         }
+    };
+    ControllerServiceProject.prototype.workforceData = function () {
+        var _this = this;
+        this.proxy.get('', { 'listworkforce': true })
+            .then(function (response) {
+            if (!response['data'].hasOwnProperty('raise')) {
+                var cwf = document.getElementById('workforce'), cwfu = document.getElementById("workforceused");
+                cwf.innerText = response['data'].workforce;
+                cwfu.innerText = response['data'].workforceused;
+                _this.tworkforce = (response['data'].workforce - response['data'].workforceused);
+            }
+            else {
+                Materialize.toast("Error " + response['data']['raise'], 3600);
+            }
+        });
     };
     ControllerServiceProject.$inject = ['ServiceFactory'];
     return ControllerServiceProject;

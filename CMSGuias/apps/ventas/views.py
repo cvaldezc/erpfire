@@ -2727,6 +2727,8 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
         try:
             if request.is_ajax():
                 try:
+                    if 'listworkforce' in request.GET:
+                        kwargs = self.workforce(request.GET, kwargs)
                     if 'itemizer' in request.GET:
                         kwargs['itemizers'] = json.loads(
                             serializers.serialize(
@@ -2852,10 +2854,26 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                     kwargs['status'] = False
                     kwargs['raise'] = 'Existén documentos enlazados a esté item,'\
                         ' cambielos o anule las ordenes, STATUS = 1 | {0}'.format(serv.count())
+            if 'workforce' in request.POST:
+                kwargs = self.workforce(request.POST, kwargs)
         except Exception as e:
             kwargs['raise'] = str(e)
             kwargs['status'] = False
         return self.render_to_json_response(kwargs)
+
+    def workforce(self, args, kwargs):
+        try:
+            if 'workforce' in args:
+                pr = Proyecto.objects.get(pk=kwargs['pro'])
+                pr.workforce = args['workforce']
+                pr.workforceused = args['workforceused']
+                pr.save()
+                return True
+            if 'listworkforce' in args:
+                pr = Proyecto.objects.get(pk=kwargs['pro'])
+                return { 'workforce': pr.workforce, 'workforceused': pr.workforceused }
+        except Exception as oex:
+            return { 'raise': str(oex) }
 
 
 # Configuration Painting for Project

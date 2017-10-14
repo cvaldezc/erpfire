@@ -211,7 +211,10 @@
             <i class="fa fa-money black-text"></i>
             <span class="hide-on-small-only">ESTABLECER GASTOS</span>
           </button>
-          <button type="button" class="right btn white black-text" ng-click="vm.saveWorkforce()">
+          <button type="button" class="btn btn-flat" ng-click="vm.workforceData()">
+            <i class="fa fa-refresh"></i>
+          </button>
+          <button type="button" ng-show="vm.sbworkforce" class="right btn white black-text" ng-click="vm.saveWorkforce()">
             <i class="fa fa-floppy-o"></i>
             <span class="hide-on-small-only">GUARDAR</span>
           </button>
@@ -236,7 +239,7 @@
                       </tr>
                       <tr>
                         <th><h5>DISPONIBLE</h5></th>
-                        <th class="right-align"><h5 id="workforcetotal"></h5></th>
+                        <th class="right-align"><h5 id="workforcetotal">{{vm.tworkforce}}</h5></th>
                       </tr>
                     </tbody>
                   </table>
