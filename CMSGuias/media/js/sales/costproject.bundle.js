@@ -139,6 +139,7 @@ var ControllerServiceProject = /** @class */ (function () {
         console.log("hi! hello world!!!");
         angular.element('.modal').modal();
         this.getItemizer();
+        this.workforceData();
     }
     ControllerServiceProject.prototype.getItemizer = function () {
         var _this = this;
@@ -264,7 +265,10 @@ var ControllerServiceProject = /** @class */ (function () {
         var gworkforce = document.getElementById("workforce");
         var gworkforceUsed = document.getElementById("workforceused");
         var wdiv = document.createElement('div'), winput = document.createElement('input');
-        var wudiv = document.createElement('div'), wuinput = document.createElement('input');
+        var wudiv = document.createElement('div'), wuinput = document.createElement('input'), wf = 0, wfu = 0;
+        // set data if content
+        wf = parseFloat(gworkforce.innerText.trim()) || 0;
+        wfu = parseFloat(gworkforceUsed.innerText.trim()) || 0;
         // clean content before insert controls
         gworkforce.innerHTML = '';
         gworkforceUsed.innerHTML = '';
@@ -273,6 +277,7 @@ var ControllerServiceProject = /** @class */ (function () {
         winput.step = '0.10';
         winput.id = 'iworkforce';
         winput.setAttribute('class', 'right-align');
+        winput.value = "" + wf;
         wdiv.appendChild(winput);
         gworkforce.appendChild(wdiv);
         winput.focus();
@@ -281,6 +286,7 @@ var ControllerServiceProject = /** @class */ (function () {
         wuinput.step = '0.10';
         wuinput.id = 'iworkforceused';
         wuinput.setAttribute('class', 'right-align');
+        wuinput.value = "" + wfu;
         wudiv.appendChild(wuinput);
         gworkforceUsed.appendChild(wudiv);
         this.sbworkforce = true;

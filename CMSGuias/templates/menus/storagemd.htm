@@ -8,6 +8,10 @@
     <li><a class="black-text" href="{% url 'view_purchase_input' %}">Ingreso de Compras</a></li>
     <li><a class="black-text" href="{% url 'view_note_ingress' %}">Nota de Ingreso</a></li>
   </ul>
+  <ul id="kardex" class="dropdown-content">
+    <li><a class="black-text" href="{% url 'vista_kardexcons' %}">Consulta</a></li>
+    <li><a class="black-text" href="{% url 'vista_kardexcant' %}">Cantidades</a></li>
+  </ul>
   <!-- block tools -->
   <ul id="tools" class="dropdown-content">
     {% comment %} <li><a class="black-text" href="{% url 'viewherramienta' %}">Herramienta</a></li>
@@ -103,6 +107,9 @@
         </li>
         <li>
           <a href="#" class="dropdown-button" data-hover="true" data-activates="tools" data-contrainwidth="200" data-gutter="0" data-beloworigin="true"> Herramientas <b class="fa fa-caret-down"></b></a>
+        </li>
+        <li>
+          <a href="#" class="dropdown-button" data-hover="true" data-activates="kardex" data-contrainwidth="200" data-gutter="0" data-beloworigin="true"> Kardex <b class="fa fa-caret-down"></b></a>
         </li>
         <li>
           <a href="#" class="dropdown-button" data-hover="true" data-activates="mantenice" data-contrainwidth="200" data-gutter="0" data-beloworigin="true"> Mantenimiento <b class="fa fa-caret-down"></b></a>

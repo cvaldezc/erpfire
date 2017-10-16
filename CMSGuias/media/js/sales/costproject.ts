@@ -113,9 +113,10 @@ class ControllerServiceProject implements IController {
 	static $inject = ['ServiceFactory']
 
 	constructor(private proxy: ServiceFactory) {
-		console.log("hi! hello world!!!");
-		angular.element('.modal').modal();
-		this.getItemizer();
+		console.log("hi! hello world!!!")
+		angular.element('.modal').modal()
+		this.getItemizer()
+		this.workforceData()
 	}
 
 	getItemizer(): void {
@@ -248,8 +249,13 @@ class ControllerServiceProject implements IController {
 		let wdiv: HTMLDivElement = document.createElement('div'),
 			winput: HTMLInputElement = document.createElement('input')
 		let	wudiv: HTMLDivElement = document.createElement('div'),
-			wuinput: HTMLInputElement = document.createElement('input')
+			wuinput: HTMLInputElement = document.createElement('input'),
+			wf: number = 0,
+			wfu: number = 0
 
+		// set data if content
+		wf = parseFloat(gworkforce.innerText.trim()) || 0
+		wfu = parseFloat(gworkforceUsed.innerText.trim()) || 0
 		// clean content before insert controls
 		gworkforce.innerHTML = ''
 		gworkforceUsed.innerHTML = ''
@@ -259,6 +265,7 @@ class ControllerServiceProject implements IController {
 		winput.step = '0.10'
 		winput.id = 'iworkforce'
 		winput.setAttribute('class', 'right-align')
+		winput.value = `${wf}`
 		wdiv.appendChild(winput)
 		gworkforce.appendChild(wdiv)
 		winput.focus()
@@ -268,6 +275,7 @@ class ControllerServiceProject implements IController {
 		wuinput.step = '0.10'
 		wuinput.id = 'iworkforceused'
 		wuinput.setAttribute('class', 'right-align')
+		wuinput.value = `${wfu}`
 		wudiv.appendChild(wuinput)
 		gworkforceUsed.appendChild(wudiv)
 		this.sbworkforce = true

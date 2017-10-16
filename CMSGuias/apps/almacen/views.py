@@ -25,8 +25,7 @@ from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.views.generic import TemplateView, ListView, View
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
-
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook, cell, styles
 
 from .models import *
 from CMSGuias.apps.home.models import *
@@ -4304,4 +4303,731 @@ class DevConMaterial(JSONResponseMixin, TemplateView):
                 return self.render_to_json_response(context)
         except Exception, e:
             print e.__str__()
+
+
+
+class kardex(JSONResponseMixin, TemplateView):
+    @method_decorator(login_required)
+    def get(self,request,*args,**kwargs):
+        context = dict();
+        if request.is_ajax():
+            try:
+
+                if 'getdescmat' in request.GET:
+                    try:
+                        mat = Materiale.objects.get(
+                            materiales_id=request.GET.get('codmat'),
+                            tipo='MT')
+                        desc = '%s - %s' % (mat.matnom,mat.matmed)
+                        context['desc'] = desc
+                    except Materiale.DoesNotExist, e:
+                        context['status'] = False
+                    context['status'] = True
+
+
+                if 'filtramat' in request.GET:
+                    lishe = []
+                    for x in Materiale.objects.filter(
+                        matnom__icontains =request.GET.get('tingresado')):
+                        lishe.append(
+                            {'hcod':x.materiales_id,
+                            'matname':x.matnom,
+                            'matmedida':x.matmed,
+                            })
+                    context['lmat'] = lishe
+                    context['status'] = True
+
+                if 'filtbrandmodel' in request.GET:
+                    lism = []
+                    for x in DetIngress.objects.filter(
+                        materials_id=request.GET.get('codm')
+                        ).distinct('brand','model').order_by('brand'):
+                        lism.append({
+                            'matcod':x.materials_id,
+                            'matbrandcod':x.brand_id,
+                            'matmodelcod':x.model_id,
+                            'matbrand' :x.brand.brand,
+                            'matmodel' : x.model.model
+                            })
+
+                    for x in DetGuiaRemision.objects.filter(
+                        materiales_id = request.GET.get('codm')
+                        ).distinct('brand','model').order_by('brand'):
+                        lism.append({
+                            'matcod':x.materiales_id,
+                            'matbrandcod':x.brand_id,
+                            'matmodelcod':x.model_id,
+                            'matbrand' :x.brand.brand,
+                            'matmodel' : x.model.model
+                            })
+
+                    for x in detGuiaDevMat.objects.filter(
+                        material_id = request.GET.get('codm')
+                        ).distinct('marca','model').order_by('marca'):
+                        lism.append({
+                            'matcod':x.material_id,
+                            'matbrandcod':x.marca_id,
+                            'matmodelcod':x.model_id,
+                            'matbrand' :x.marca.brand,
+                            'matmodel' : x.model.model
+                            })
+                    context['lbrmod'] = lism
+                    context['status'] = True
+
+
+            except ObjectDoesNotExist, e:
+                context['raise'] = str(e)
+                context['status'] = False
+            return self.render_to_json_response(context)
+        kwargs['lmonths'] = globalVariable.months_number
+        kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+        kwargs['ruc'] = request.session['company']['ruc']
+        return render(request, 'almacen/kardex/consulta.html',kwargs)
+
+
+class kardexCant(JSONResponseMixin, TemplateView):
+    @method_decorator(login_required)
+    def get(self,request,*args,**kwargs):
+        context = dict();
+
+        def getkardex(codmat,anio,codbr,codmod,mes):
+            lkardex=[]
+            for x in DetIngress.objects.filter(
+                materials_id=codmat,
+                ingress__register__month=mes,
+                ingress__register__year=anio,
+                brand_id=codbr,
+                model_id=codmod,
+                ingress__status='CO'):
+                lkardex.append({
+                    'fecha':x.ingress.register.strftime('%d-%m-%Y'),
+                    'numguia':x.ingress.guide,
+                    'cantidad':x.quantity,
+                    'costunit':x.purchase,
+                    'serie':"-" if len(x.ingress.guide)<4 else x.ingress.guide[0:3],
+                    'guia':"-" if len(x.ingress.guide)<4 else x.ingress.guide[4:len(x.ingress.guide)],
+                    'sumtotal':float(x.quantity)*float(x.purchase),
+                    'tipo':'02',
+                    })
+            for x in DetGuiaRemision.objects.filter(
+                materiales_id=codmat,
+                guia__traslado__month=mes,
+                guia__traslado__year=anio,
+                brand_id=codbr,
+                model_id=codmod,
+                guia__status='GE'):
+                lkardex.append({
+                    'fecha':x.guia.traslado.strftime('%d-%m-%Y'),
+                    'numguia':x.guia.guia_id,
+                    'cantidad':x.cantguide,
+                    'costunit':'1',
+                    'serie':"-" if len(x.guia_id)<4 else x.guia_id[0:3],
+                    'guia':"-" if len(x.guia_id)<4 else x.guia_id[4:len(x.guia_id)],
+                    'sumtotal':'',
+                    'tipo':'01'
+                    })
+            for x in detGuiaDevMat.objects.filter(
+                material_id=codmat,
+                guiadevmat__fechadevolucion__month=mes,
+                guiadevmat__fechadevolucion__year=anio,
+                marca_id=codbr,
+                model_id=codmod,
+                guiadevmat__estado='GE'):
+                lkardex.append({
+                    'fecha':x.guiadevmat.fechadevolucion.strftime('%d-%m-%Y'),
+                    'numguia':x.guiadevmat.guiadevmat_id,
+                    'cantidad':x.cantidad,
+                    'costunit':'1',
+                    'serie':"-" if len(x.guiadevmat_id)<4 else x.guiadevmat_id[0:3],
+                    'guia':"-" if len(x.guiadevmat_id)<4 else x.guiadevmat_id[4:len(x.guiadevmat_id)],
+                    'sumtotal':'',
+                    'tipo':'02'
+                    })
+            print 'lkardex',lkardex
+            lkardex.sort(key=lambda x: x['fecha'])
+            return lkardex
+
+
+
+
+        if 'exportkardex' in request.GET:
+            codmat=request.GET.get('codmat')
+            anio=request.GET.get('anio')
+            codbr=request.GET.get('codbr')
+            codmod=request.GET.get('codmod')
+            rangemes=json.loads(request.GET.get('rangemes'))
+            descmat = request.GET.get('descmat')
+
+
+
+            ####GENERALES
+            response = HttpResponse(mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename="Kardex_%s_%s.xlsx"' % (codmat,anio)
+            wb = Workbook()
+            ws = wb.active
+
+            ws.title = 'Kardex_%s' % codmat
+            ws.sheet_properties.tabColor = '1072BA'
+
+            border = styles.borders.Border(left=styles.borders.Side(style='thin'),
+                                            right=styles.borders.Side(style='thin'),
+                                            top=styles.borders.Side(style='thin'),
+                                            bottom=styles.borders.Side(style='thin'))
+
+            mstyle = styles.Style(border=border)
+
+            columns = [
+                ('FECHA', 12),
+                ('TIPO(TABLA 10)', 12),
+                ('SERIE', 6),
+                ('NUMERO', 12),
+                ('TIPO OPERACION', 15),
+                ('CANTIDAD', 8),
+                ('COSTO UNIT.', 12),
+                ('COSTO TOTAL', 12),
+                ('CANTIDAD', 8),
+                ('COSTO UNIT.', 12),
+                ('COSTO TOTAL', 12),
+                ('CANTIDAD', 8),
+                ('COSTO UNIT.', 12),
+                ('COSTO TOTAL', 12)]
+
+            ################
+            backgroundcab = styles.PatternFill(start_color='9e9e9e',
+                               end_color='9e9e9e',
+                               fill_type='solid')
+            white = 'ffffffff'
+
+            rwfin = 0
+            for r in rangemes:
+                # #############SALDOS INICIALES################
+                iniecant=0
+                inifcant=0.0 #SALDO FINAL DEL MES ANTERIOR
+                iniecost=0.0
+                inifcost=0.0 #COSTO UNITARIO FINAL
+
+                for x in Balance.objects.filter(
+                    materials_id=codmat,
+                    brand_id=codbr,
+                    model_id=codmod,
+                    register__lte=anio+"-"+r['mes']+"-"+"01").order_by('-register')[:1]:
+                    inifcant= x.balance
+                    print 'inifcant',inifcant
+
+                for x in DetIngress.objects.filter(
+                    materials_id=codmat,
+                    brand_id=codbr,
+                    model_id=codmod,
+                    ingress__register__lte=anio+"-"+r['mes']+"-"+"01").order_by('-ingress__register')[:1]:
+                    inifcost=x.purchase
+                    print 'inifcost',inifcost
+
+                iniftotal = float(inifcant)*float(inifcost)
+                inietotal = float(iniecant)*float(iniecost)
+
+                # ##############################################
+
+                lkardex = getkardex(codmat,anio,codbr,codmod,r['mes'])
+
+                if len(lkardex)>0:
+
+                    # #############################################
+                    tit = "INGRESO DE INVENTARIO PERMANENTE VALORIZADO - DETALLE DEL INVENTARIO VALORIZADO"
+                    ws.merge_cells('B%s:O%s' % (rwfin+2,rwfin+2))
+                    ce = ws.cell(column=2, row=rwfin+2)
+                    ce.value=tit
+                    ce.font = styles.Font(bold=True,size=14)
+
+                    cabecera = [
+                        ('PERIODO','%s %s' % (globalVariable.months_name[r['mes']],anio)),
+                        ('RUC', request.session['company']['ruc']),
+                        ('RAZON SOCIAL',request.session['company']['name']),
+                        ('ESTABLECIMIENTO','001 Almacen General'),
+                        ('CODIGO DE EXISTENCIA',codmat),
+                        ('TIPO (TABLA 5)','01 Mercaderias'),
+                        ('DESCRIPCION',descmat),
+                        ('CODIGO DE UNIDAD DE MEDIDA (TABLA 6)','99'),
+                        ('METODO DE VALUACION','Promedio')]
+
+                    ####### UNION Y DATA DE CELDAS DE CABECERA
+                    cont=rwfin + 4
+                    for x in xrange(len(cabecera)):
+                        ws.merge_cells('B%s:E%s' % (cont,cont))
+                        ws.merge_cells('F%s:O%s' % (cont,cont))
+                        ws.cell(column=2, row=cont).value = cabecera[x][0]
+                        ws.cell(column=6, row=cont).value = cabecera[x][1]
+                        ws.cell(column=2, row=cont).font = styles.Font(bold=True)
+                        cont+=1
+
+
+                    ################## CABECERA DE TABLA KARDEX
+                    colcab=[
+                        ('DOCUMENTO DE TRASLADO',2,5,rwfin+16),
+                        ('TIPO DE OPERACION',6,6,rwfin+17),
+                        ('ENTRADAS',7,9,rwfin+16),
+                        ('SALIDAS',10,12,rwfin+16),
+                        ('SALDO FINAL',13,15,rwfin+16)]
+
+                    for x in xrange(len(colcab)):
+                        value=colcab[x][0]
+                        st_col=colcab[x][1]
+                        end_col=colcab[x][2]
+                        rw_end=colcab[x][3]
+
+                        ws.merge_cells(start_row=rwfin+15,start_column=st_col,end_row=rw_end,end_column=end_col)
+                        ce = ws.cell(column=st_col, row=rwfin+15)
+                        ce.value = value
+                        ce.style = mstyle
+                        ce.font = styles.Font(bold=True,size=12,color=white)
+                        ce.fill = backgroundcab
+
+                    #########################################################
+                    # formato y data de subcabecera de tabla kardex
+                    count=2
+                    for col_num in xrange(len(columns)):
+                        c = ws.cell(row=rwfin+17, column=col_num+count)
+                        c.value = columns[col_num][0]
+                        c.style = mstyle
+                        c.font = styles.Font(name='Tahoma', bold=True, size=9,color=white)
+                        c.fill = backgroundcab
+                        ws.column_dimensions[cell.get_column_letter(col_num+count)].width = columns[col_num][1]
+
+                        ##### estilo de saldo inicial
+                        st = ws.cell(row=rwfin+18, column=col_num+count)
+                        st.style = mstyle
+                        ws.merge_cells('D%s:E%s' % (str(rwfin+18),str(rwfin+18)))
+                        ce = ws.cell(column=4, row=rwfin+18)
+                        ce.value='SALDO INICIAL'
+                        ce.font=styles.Font(bold=True,size=9)
+                     #######
+
+
+                    ### SALDOS INICIALES
+
+                    saldoinicial = [
+                        (6,'16'),
+                        (7,iniecant),
+                        (8,iniecost),
+                        (9,inietotal),
+                        (13,inifcant),
+                        (14,inifcost),
+                        (15,iniftotal)]
+
+                    for x in xrange(len(saldoinicial)):
+                        colini = saldoinicial[x][0]
+                        valini = saldoinicial[x][1]
+                        ws.cell(column=colini, row=rwfin+18).value = valini
+
+                    cantfin = inifcant
+
+
+                    pretip=0
+                    if lkardex[0]['tipo']=="01":
+                        pretip = inifcost
+
+                    rw = rwfin+19
+                    tip = 0.0
+
+                    for x in lkardex:
+                        ws.cell(column=2, row=rw).value = x['fecha']
+                        ws.cell(column=2, row=rw).style = mstyle
+                        ws.cell(column=3, row=rw).value = "01"
+                        ws.cell(column=3, row=rw).style = mstyle
+                        ws.cell(column=4, row=rw).value = x['serie']
+                        ws.cell(column=4, row=rw).style = mstyle
+                        ws.cell(column=5, row=rw).value = x['guia']
+                        ws.cell(column=5, row=rw).style = mstyle
+                        ws.cell(column=6, row=rw).value = x['tipo']
+                        ws.cell(column=6, row=rw).style = mstyle
+                        # ENTRADAS
+
+                        if x['tipo']=='02':
+                            pretip = x['costunit']
+
+                        if x['tipo']=='01':
+                            tip=pretip
+                        else:
+                            tip=x['costunit']
+
+                        if x['tipo']=='02':
+                            cantfin=float(cantfin) + float(x['cantidad'])
+                            ws.cell(column=7, row=rw).value = x['cantidad']
+                            ws.cell(column=8, row=rw).value = x['costunit']
+                            ws.cell(column=9, row=rw).value = x['sumtotal']
+                        ######
+                        else:
+                            cantfin=float(cantfin) - float(x['cantidad'])
+                            #SALIDAS
+                            ws.cell(column=10, row=rw).value = x['cantidad']
+                            ws.cell(column=11, row=rw).value = tip
+                            ws.cell(column=12, row=rw).value = float(tip)*float(x['cantidad'])
+
+                        ws.cell(column=7, row=rw).style = mstyle
+                        ws.cell(column=8, row=rw).style = mstyle
+                        ws.cell(column=9, row=rw).style = mstyle
+                        ws.cell(column=10, row=rw).style = mstyle
+                        ws.cell(column=11, row=rw).style = mstyle
+                        ws.cell(column=12, row=rw).style = mstyle
+                            ######
+
+                        #TOTAL FINAL
+                        ws.cell(column=13, row=rw).value = cantfin
+                        ws.cell(column=13, row=rw).style = mstyle
+                        ws.cell(column=14, row=rw).value = tip
+                        ws.cell(column=14, row=rw).style = mstyle
+                        ws.cell(column=15, row=rw).value = float(cantfin)*float(tip)
+                        ws.cell(column=15, row=rw).style = mstyle
+
+                        rw= rw+1
+                    lastrow=rw-1
+                    print 'rw', rw, lastrow
+                    ###TOTALES
+                    coltotales=[
+                        (2,"TOTALES"),
+                        (7,"=SUM(G%s:G%s)" % (str(rwfin+19),str(lastrow))),
+                        (9,"=SUM(I%s:I%s)" % (str(rwfin+19),str(lastrow))),
+                        (10,"=SUM(J%s:J%s)" % (str(rwfin+19),str(lastrow))),
+                        (12,"=SUM(L%s:L%s)" % (str(rwfin+19),str(lastrow)))]
+
+                    for x in xrange(len(columns)):
+                        ws.cell(column=x+2, row=rw).style = mstyle
+                    ws.merge_cells('B%s:F%s' % (str(rw),str(rw)))
+
+                    for x in xrange(len(coltotales)):
+                        ce= ws.cell(column=coltotales[x][0], row=rw)
+                        ce.value=coltotales[x][1]
+                        ce.style=mstyle
+                        ce.font=styles.Font(bold=True)
+
+                        # ws.cell(column=coltotales[x][0], row=rw).value = coltotales[x][1]
+                        # ws.cell(column=coltotales[x][0], row=rw).style = mstyle
+                        # ws.cell(column=coltotales[x][0], row=rw).font = styles.Font(bold=True)
+                        print "coltotales[x][0]",coltotales[x][0]
+                    print 'rwfin',rwfin
+                    rwfin=lastrow + 2
+
+            wb.save(response)
+            return response
+
+
+
+        if request.is_ajax():
+            try:
+
+                if 'getmatgen' in request.GET:
+                    rangemes = json.loads(request.GET.get('rangemes'))
+                    cantbymov = request.GET.get('cantbymov')
+                    anio = request.GET.get('anio')
+                    signo = request.GET.get('signo')
+                    lmatgen=[]
+                    rows = 0
+
+                    for r in rangemes:
+                        for x in DetGuiaRemision.objects.filter(
+                            guia__traslado__year=anio,
+                            guia__traslado__month=r['mes'],
+                            guia__status='GE').order_by('materiales__materiales_id').distinct('materiales__materiales_id'):
+                            lmatgen.append({
+                                'codmat':x.materiales_id,
+                                'namemat':x.materiales.matnom,
+                                'medmat':x.materiales.matmed,
+                                'unidad':x.materiales.unidad.uninom,
+                                'tipo':'dgr'
+                                })
+                        for x in DetIngress.objects.filter(
+                            ingress__register__year=anio,
+                            ingress__register__month=r['mes'],
+                            ingress__status='CO').order_by('materials__materiales_id').distinct('materials__materiales_id'):
+                            lmatgen.append({
+                                'codmat':x.materials_id,
+                                'namemat':x.materials.matnom,
+                                'medmat':x.materials.matmed,
+                                'unidad':x.materials.unidad.uninom,
+                                'tipo':'ding'
+                                })
+                        for x in detGuiaDevMat.objects.filter(
+                            guiadevmat__fechadevolucion__year=anio,
+                            guiadevmat__fechadevolucion__month=r['mes'],
+                            guiadevmat__estado='GE').order_by('material__materiales_id').distinct('material__materiales_id'):
+                            lmatgen.append({
+                                'codmat':x.material_id,
+                                'namemat':x.material.matnom,
+                                'medmat':x.material.matmed,
+                                'unidad':x.material.unidad.uninom,
+                                'tipo':'dgd'
+                                })
+                        lmatgen = {x['codmat']:x for x in lmatgen}.values()
+                    rowdgr=0
+                    rowding=0
+                    rowdgd=0
+                    lfilter=[]
+
+                    for r in rangemes:
+                        for x in lmatgen:
+                            rowdgr = DetGuiaRemision.objects.filter(
+                                guia__traslado__year=anio,
+                                guia__traslado__month=r['mes'],
+                                guia__status='GE',
+                                materiales_id=x['codmat']).count()
+                            rowding = DetIngress.objects.filter(
+                                ingress__register__year=anio,
+                                ingress__register__month=r['mes'],
+                                ingress__status='CO',
+                                materials_id=x['codmat']).count()
+                            rowdgd = detGuiaDevMat.objects.filter(
+                                guiadevmat__fechadevolucion__year=anio,
+                                guiadevmat__fechadevolucion__month=r['mes'],
+                                guiadevmat__estado='GE',
+                                material_id=x['codmat']).count()
+
+                            cantrows = rowdgr+rowding+rowdgd
+                            lfilter.append({
+                                'codmat':x['codmat'],
+                                'namemat':x['namemat'],
+                                'medmat':x['medmat'],
+                                'unidad':x['unidad'],
+                                'sumtotal':cantrows
+                                })
+                    lfilter.sort(key=lambda x: x['namemat'])
+
+                    context['lfilter'] = lfilter
+                    # context['lmatgen'] = lmatgen
+                    context['status'] = True
+
+
+                if 'getmatsal' in request.GET:
+                    rangemes = json.loads(request.GET.get('rangemes'))
+                    lmatsal=[]
+                    print 'rangemes', rangemes
+                    for r in rangemes:
+                        for x in DetGuiaRemision.objects.filter(
+                            guia__traslado__year=request.GET.get('anio'),
+                            guia__traslado__month=r['mes'],
+                            guia__status='GE'):
+                            lmatsal.append({
+                                'codmat':x.materiales_id,
+                                'namemat':x.materiales.matnom,
+                                'medmat':x.materiales.matmed,
+                                'unidad':x.materiales.unidad.uninom,
+                                'sumtotal':x.cantguide
+                                })
+                    context['lmatsal'] = lmatsal
+                    context['status'] = True
+
+                if 'getmating' in request.GET:
+                    lmating=[]
+                    lmatdev=[]
+                    rangemes = json.loads(request.GET.get('rangemes'))
+
+                    for r in rangemes:
+                        for x in DetIngress.objects.filter(
+                            ingress__register__year=request.GET.get('anio'),
+                            ingress__register__month=r['mes'],
+                            ingress__status='CO').distinct('materials'):
+
+                            lmating.append({
+                                'codmat':x.materials_id,
+                                'namemat':x.materials.matnom,
+                                'medmat':x.materials.matmed,
+                                'unidad':x.materials.unidad.uninom,
+                                'type':'ing',
+                                })
+                        for x in detGuiaDevMat.objects.filter(
+                            guiadevmat__fechadevolucion__year=request.GET.get('anio'),
+                            guiadevmat__fechadevolucion__month=r['mes'],
+                            guiadevmat__estado='GE'
+                            ).distinct('material'):
+                            lmatdev.append({
+                                'codmat':x.material_id,
+                                'namemat':x.material.matnom,
+                                'medmat':x.material.matmed,
+                                'unidad':x.material.unidad.uninom,
+                                'type':'dev'
+                                })
+
+                    context['lmatdev'] = lmatdev
+                    context['lmating'] = lmating
+                    context['status'] = True
+
+                if 'getcanting' in request.GET:
+                    lmating = json.loads(request.GET.get('lmating'))
+                    lmatdev = json.loads(request.GET.get('lmatdev'))
+                    rangemes = json.loads(request.GET.get('rangemes'))
+                    lsumlmating = []
+                    lsumlmatdev = []
+
+                    for r in rangemes:
+                        for x in lmating:
+                            sumating = 0
+                            for y in DetIngress.objects.filter(
+                                materials_id=x['codmat'],
+                                ingress__register__year=request.GET.get('anio'),
+                                ingress__register__month=r['mes'],
+                                ingress__status='CO'):
+                                sumating = round((sumating + float(y.quantity))*1000)/1000
+
+                            lsumlmating.append({
+                                'codmat':x['codmat'],
+                                'namemat':x['namemat'],
+                                'medmat':x['medmat'],
+                                'unidad':x['unidad'],
+                                'sumtotal':sumating
+                                })
+
+                    for r in rangemes:
+                        for x in lmatdev:
+                            sumating = 0
+                            for y in detGuiaDevMat.objects.filter(
+                                material_id=x['codmat'],
+                                guiadevmat__fechadevolucion__year=request.GET.get('anio'),
+                                guiadevmat__fechadevolucion__month=r['mes'],
+                                guiadevmat__estado='GE'):
+                                sumating = round((sumating + float(y.cantidad))*1000)/1000
+                            lsumlmating.append({
+                                'codmat':x['codmat'],
+                                'namemat':x['namemat'],
+                                'medmat':x['medmat'],
+                                'unidad':x['unidad'],
+                                'sumtotal':sumating
+                                })
+
+                    lsumlmating.sort(key=lambda x: x['namemat'])
+                    context['lsumlmating'] = lsumlmating
+                    context['status'] = True
+
+
+                if 'getbrands' in request.GET:
+                    rangemes = json.loads(request.GET.get('rangemes'))
+                    filtro = request.GET.get('filtro')
+                    typebrand = request.GET.get('typebrand')
+                    lbrands = []
+                    codmat = request.GET.get('codmat')
+                    year = request.GET.get('year')
+
+
+                    lbrfinal=[]
+                    for r in rangemes:
+                        dataing = DetIngress.objects.filter(
+                                    materials_id=codmat,
+                                    ingress__register__month=r['mes'],
+                                    ingress__register__year=year,
+                                    ingress__status='CO')
+                        datadev = detGuiaDevMat.objects.filter(
+                                    material_id=codmat,
+                                    guiadevmat__fechadevolucion__month=r['mes'],
+                                    guiadevmat__fechadevolucion__year=year,
+                                    guiadevmat__estado='GE')
+                        datadgr = DetGuiaRemision.objects.filter(
+                                    materiales_id=codmat,
+                                    guia__traslado__month=r['mes'],
+                                    guia__traslado__year=year,
+                                    guia__status='GE')
+                        print 'typebrand ',typebrand
+                        if typebrand=='bymat':
+                            if filtro == 'in':
+                                for x in dataing:
+                                    lbrands.append({
+                                        'id':x.id,
+                                        'codbrand':x.brand_id,
+                                        'brand':x.brand.brand,
+                                        'codmodel':x.model_id,
+                                        'model':x.model.model,
+                                        'cantidad':float(x.quantity)
+                                        })
+                                for x in datadev:
+                                    lbrands.append({
+                                        'id':y.id,
+                                        'codbrand':y.marca_id,
+                                        'brand':y.marca.brand,
+                                        'codmodel':y.model_id,
+                                        'model':y.model.model,
+                                        'cantidad':float(y.cantidad)
+                                        })
+                            else:
+                                for x in datadgr:
+                                    lbrands.append({
+                                        'id':x.id,
+                                        'codbrand':x.brand_id,
+                                        'brand':x.brand.brand,
+                                        'codmodel':x.model_id,
+                                        'model':x.model.model,
+                                        'cantidad':float(x.cantguide)
+                                        })
+                            context['lbrbymat'] = lbrands
+                        else:
+                            for x in dataing:
+                                lbrands.append({
+                                    'codbrand':x.brand_id,
+                                    'brand':x.brand.brand,
+                                    'model':x.model.model,
+                                    'codmodel':x.model_id
+                                    })
+                            for x in datadev:
+                                lbrands.append({
+                                    'codbrand':x.marca_id,
+                                    'codmodel':x.model_id,
+                                    'brand':x.marca.brand,
+                                    'model':x.model.model,
+                                    })
+                            for x in datadgr:
+                                lbrands.append({
+                                    'codbrand':x.brand_id,
+                                    'codmodel':x.model_id,
+                                    'brand':x.brand.brand,
+                                    'model':x.model.model,
+                                    })
+                            lbr = {x['codbrand']:x for x in lbrands}.values()
+
+                            # lbrfinal=[]
+                            # sumabrfinal = 0
+                            print 'lbr ',lbr
+                            for x in lbr:
+                                sumabrfinal=0
+                                canting = DetIngress.objects.filter(
+                                    materials_id=codmat,
+                                    brand_id=x['codbrand'],
+                                    model_id=x['codmodel'],
+                                    ingress__register__month=r['mes'],
+                                    ingress__register__year=year,
+                                    ingress__status='CO').count()
+                                cantgdv = detGuiaDevMat.objects.filter(
+                                    material_id=codmat,
+                                    marca_id=x['codbrand'],
+                                    model_id=x['codmodel'],
+                                    guiadevmat__fechadevolucion__month=r['mes'],
+                                    guiadevmat__fechadevolucion__year=year,
+                                    guiadevmat__estado='GE').count()
+                                cantdgr = DetGuiaRemision.objects.filter(
+                                    materiales_id=codmat,
+                                    brand_id=x['codbrand'],
+                                    model_id=x['codmodel'],
+                                    guia__traslado__month=r['mes'],
+                                    guia__traslado__year=year,
+                                    guia__status='GE').count()
+                                sumabrfinal = canting+cantgdv+cantdgr
+                                print 'sumabrfinal ',r['mes'], sumabrfinal
+                                lbrfinal.append({
+                                    'codbrand':x['codbrand'],
+                                    'brand':x['brand'],
+                                    'codmodel':x['codmodel'],
+                                    'model':x['model'],
+                                    'cantidad':sumabrfinal,
+                                    })
+                            print 'lbrfinal ',lbrfinal
+                            context['lbrbymov'] = lbrfinal
+
+                    # context['lbrbymat'] = lbrands
+                    # context['lbrbymov'] = lbrfinal
+                    context['status'] = True
+
+
+            except ObjectDoesNotExist, e:
+                context['raise'] = str(e)
+                context['status'] = False
+            return self.render_to_json_response(context)
+        kwargs['lmonths'] = globalVariable.months_number
+        kwargs['hreport'] = SettingsApp.objects.get(flag=True).serverreport
+        kwargs['ruc'] = request.session['company']['ruc']
+        return render(request, 'almacen/kardex/kardexcant.html',kwargs)
+
 
