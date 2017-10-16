@@ -2727,6 +2727,8 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
         try:
             if request.is_ajax():
                 try:
+                    if 'listworkforce' in request.GET:
+                        kwargs = self.workforce(request.GET, kwargs)
                     if 'itemizer' in request.GET:
                         kwargs['itemizers'] = json.loads(
                             serializers.serialize(
@@ -2734,6 +2736,7 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                                 ProjectItemizer.objects.filter(
                                     project_id=kwargs['pro']).order_by('name')))
                         for x in kwargs['itemizers']:
+                            # get documents orders services
                             documents = ServiceOrder.objects.filter(
                                 project_id=kwargs['pro'],
                                 itemizer_id=x['pk'])
@@ -2741,12 +2744,30 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                                 'json', documents, relations=('supplier', 'currency')))
                             for dx in x['services']:
                                 order = DetailsServiceOrder.objects.filter(serviceorder_id=dx['pk'])
-                                dx['configure'] = json.loads(serializers.serialize(
-                                    'json',
-                                    [Configuracion.objects.get(
-                                        periodo=order[0].serviceorder.register.strftime('%Y'))], relations=('moneda')))[0]
+                                # dx['configure'] = json.loads(serializers.serialize(
+                                #    'json',
+                                #    [Configuracion.objects.get(
+                                #        periodo=order[0].serviceorder.register.strftime('%Y'))], relations=('moneda')))[0]
                                 dx['exchange'] = order[0].serviceorder.project.exchange
                                 dx['amounts'] = sum([(od.quantity * float(od.price)) for od in order])
+                            # endblock order services
+                            # get another expenses
+                            oexpenses = PExpenses.objects.filter(project_id=kwargs['pro'], itemizer_id=x['pk'])
+                            if oexpenses:
+                                x['services'] += [{
+                                            'amounts': float(ex.amount),
+                                            'exchange': ex.project.exchange,
+                                            'itemizer': ex.itemizer_id,
+                                            'description': ex.description,
+                                            # 'currency': ex.currency_id,
+                                            'fields': {
+                                                'dsct': 0,
+                                                'currency': {'pk': ex.currency_id, 'fields': { 'simbolo': ex.currency.simbolo}}
+                                            }
+                                        } for ex in oexpenses]
+
+                            # endblock
+
                         kwargs['status'] = True
                 except Exception as oex:
                     kwargs['raise'] = str(oex)
@@ -2833,10 +2854,26 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                     kwargs['status'] = False
                     kwargs['raise'] = 'Existén documentos enlazados a esté item,'\
                         ' cambielos o anule las ordenes, STATUS = 1 | {0}'.format(serv.count())
+            if 'workforce' in request.POST:
+                kwargs = self.workforce(request.POST, kwargs)
         except Exception as e:
             kwargs['raise'] = str(e)
             kwargs['status'] = False
         return self.render_to_json_response(kwargs)
+
+    def workforce(self, args, kwargs):
+        try:
+            if 'workforce' in args:
+                pr = Proyecto.objects.get(pk=kwargs['pro'])
+                pr.workforce = args['workforce']
+                pr.workforceused = args['workforceused']
+                pr.save()
+                return True
+            if 'listworkforce' in args:
+                pr = Proyecto.objects.get(pk=kwargs['pro'])
+                return { 'workforce': pr.workforce, 'workforceused': pr.workforceused }
+        except Exception as oex:
+            return { 'raise': str(oex) }
 
 
 # Configuration Painting for Project

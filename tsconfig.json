@@ -1,37 +1,12 @@
 {
-    "sourceMap": false,
-    "compileOnSave": true,
-    "compilerOptions": {
-        // "skipLibCheck": true,
-        "moduleResolution": "node",
-        "target": "es2015",
-        "lib": ["es5", "dom"],
-        "module": "commonjs",
-        "removeComments": false,
-        "preserveConstEnums": false,
-        "noEmitOnError": true,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "noLib": true,
-        "sourceMap": true,
-        "watch": true,
-        "types": [
-            "angular",
-            "angular-cookies",
-            "core-js",
-            "node",
-            "jquery",
-            "materialize-css",
-            "sweetalert"
-        ]
-        // "typeRoots": [
-        //     // add path to @types
-        //     "node_modules/@types/"
-        //  ]
-    },
-    "include": [ "CMSGuias/media/js/*" ],
-    "exclude": [
-        "node_modules",
-        "**/*.spec.ts"
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true,
+    "strict": true,
+    "baseUrl": "./",
+    "typeRoots": [
+      "node_modules/@types"
     ]
+  }
 }

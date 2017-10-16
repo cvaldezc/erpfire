@@ -52,6 +52,8 @@ class Proyecto(models.Model):
     outsaturday = models.TimeField(default='13:30:00', null=False, blank=True)
     shxsaturday = models.TimeField(default='15:00:00', null=False, blank=True)
     shxsaturdayt = models.TimeField(default='17:000:00', null=False, blank=True)
+    workforce = models.DecimalField(max_digits=12, decimal_places=3, default=0, blank=True)
+    workforceused = models.DecimalField(max_digits=12, decimal_places=3, default=0, blank=True)
     flag = models.BooleanField(default=True, null=False)
 
     audit_log = AuditLog()
@@ -487,3 +489,24 @@ class ProjectItemizer(models.Model):
         return '{0} {1} {2} {3} {4}'.format(
             self.itemizer_id, self.project, self.name, self.register, self.purchase)
 #endblock
+
+# @author @cvaldezch
+# 2017-10-10 10:48:33
+class PExpenses(models.Model):
+    '''
+    model for storage general expenses
+    '''
+    project = models.ForeignKey(Proyecto, related_name='projectexpenses')
+    itemizer = models.ForeignKey(ProjectItemizer, related_name='projectitemizer')
+    currency = models.ForeignKey(Moneda, related_name='expensescurrency')
+    description = models.CharField(max_length=255, null=True, blank=True)
+    register = models.DateTimeField(auto_now_add=True)
+    amount = models.DecimalField(max_digits=12, decimal_places=3, default=0)
+
+    class Meta:
+        ordering = ['project', '-register']
+
+    def __unicode__(self):
+        return '{0} {1} {2} {3} {4}'.format(self.project, self.description, self.itemizer, self.amount, self.currency)
+
+# endblock

@@ -1,0 +1,176 @@
+{% extends "basemd.html" %}
+{% block menu %}
+    {% include "menus/storagemd.htm" %}
+{% endblock menu %}
+{% block content %}
+<script src="/media/js/almacen/kardexfiltcant.js"></script>
+<script src="{{ MEDIA_URL }}js/mustache.js"></script>
+<script src="{{ MEDIA_URL }}vendor/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ MEDIA_URL }}vendor/chosen/chosen.css">
+
+<div style="margin:50px;">
+	<div class="modal-content">
+		<h5>Movimientos de Materiales</h5>
+		<div style="width:100%;float:left;">
+			<div style="width:50%;float:left">
+				<div class="card" style="border-top:2px solid;border-right:2px solid; border-color:#0091ea;">
+					<div class="card-content">
+					<label class="card-title">Especificar Fecha</label>
+						<div class="row">
+							<input onclick="javascript:radiomeses();" name="groupmes" type="radio" id="rdmes" checked/>
+					        <label for="rdmes" style="font-weight:bold;color:black;">Mes</label>
+					        <input onclick="javascript:radiomeses();" name="groupmes" type="radio" id="rdrango"/>
+					        <label for="rdrango" style="font-weight:bold;color:black;">Rango de Meses</label>
+						</div>
+						<div class="row">
+							<div class="input-field col s5" id="divcbofrommes">
+								<select id = "cbofrommes" class="browser-default">
+				                    <option value="" selected disabled>Seleccionar</option>
+				                    {% for x in lmonths %}
+				                    <option value="{{ x.id }}">{{ x.name }}</option>
+				                    {% endfor %}
+				                </select>
+				                <h6 for="cbofrommes" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">MES</h6>
+							</div>
+							<div class="input-field col s5" id="divcbotomes" style="display:none">
+								<select id = "cbotomes" class="browser-default">
+				                    <option value="" selected disabled>Seleccionar</option>
+				                    {% for x in lmonths %}
+				                    <option value="{{ x.id }}">{{ x.name }}</option>
+				                    {% endfor %}
+				                </select>
+				                <h6 for="cbotomes" style="color:#0091ea;margin-top:-45px;font-size:0.8rem">MES FINAL</h6>
+							</div>
+							<div class="input-field col s2" id="divyear">
+								<input class="year" type="text" placeholder="" name="year" maxlength="4">
+								<label for="year">AÑO</label>
+							</div>
+						</div>
+	                    <label style="color:#ef5350;font-weight:bold;margin-top:-30px">Filtro avanzado?</label>
+	                    <div class="switch">
+	                        <label style="font-weight:bold;color:#0091ea">
+	                            No
+	                        <input onchange="stfilt()" type="checkbox" id="checkstfilt">
+	                        <span class="lever"></span>
+	                            Si
+	                        </label>
+	                    </div>
+					</div>
+				</div>
+			</div>
+			<div style="width:45%;float:left;margin-left:5%;display:none" id="div-detfiltro">
+				<div class="card" style="border-top:2px solid;border-right:2px solid; border-color:#0091ea">
+					<div class="card-content">
+						<label class="card-title">Detalle de filtro</label>
+
+						<div class="col s12">
+							<ul class="tabs">
+								<li class="tab col s6"><a value="tab1" href="#divtab-cantregister" data-toggle="taba" style="font-weight:bold">POR CANTIDAD DE MOVIMIENTOS</a></li>
+								<li class="tab col s6"><a value="tab2" href="#divtab-cantmat" data-toggle="taba" style="font-weight:bold">POR CANTIDAD DE MATERIALES</a></li>
+							</ul>
+						</div>
+
+						<div class="row" style="margin-top:40px" id="divtab-cantregister">
+							<div class="input-field col s3">
+								<select id="cbosimbbymov" class="browser-default">
+									<option value="mayor">Mayor a</option>
+									<option value="menor">Menor a</option>
+									<option value="igual">Igual a</option>
+								</select>
+							</div>
+							<div class="input-field col">
+								<input class="cantbymov" type="number" placeholder="" step="1" min="1">
+				                <label for="cantbymov">CANTIDAD</label>
+							</div>
+						</div>
+
+
+						<div class="row" style="margin-top:40px" id="divtab-cantmat">
+							<div class="input-field col s3">
+								<select id="cbosimbcant" class="browser-default">
+									<option value="mayor">Mayor a</option>
+									<option value="menor">Menor a</option>
+									<option value="igual">Igual a</option>
+								</select>
+							</div>
+							<div class="input-field col">
+								<input class="cantidad" type="number" placeholder="" step="0.1" min="0.1">
+				                <label for="txtfiltramat">CANTIDAD</label>		
+							</div>
+							<div class="input-field col">
+								<input name="groupinout" onclick="javascript:radioinout();" type="radio" id="rdin" checked value="in" />
+						        <label for="rdin" style="font-weight:bold;color:black;">Entradas</label>
+						        <input name="groupinout" onclick="javascript:radioinout();" value="out" type="radio" id="rdout"/>
+						        <label for="rdout" style="font-weight:bold;color:black;">Salidas</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="width:100%;float:left">
+			<div style="width:20%;float:left">
+				<div class="input-field col">
+					<button type="button" class="btn waves-effect red lighten-1 btnfiltmat"><span><strong><i class="fa fa-sign-in"></i>Filtrar Materiales</strong></span></button>
+				</div>	
+			</div>
+			<div style="width:60%;float:left" class="input-field">
+				<i class="prefix fa fa-search"></i>
+				<input class="txtbuscarmat" id="txtbuscarmat" type="text" placeholder="Codigo o Material">	
+			</div>
+		</div>
+
+		<div style="width:100%;float:left">
+			<div style="width:10%;float:left">
+				<h6 class="lblcodmat" style="font-weight:bold"></h6>
+			</div>
+			<div style="width:90%;float:left">
+				<h6 class="lbldescmat" style="font-weight:bold"></h6>
+			</div>
+		</div>
+		<div style="width:100%;float:left;display:none" id="divtables">
+			<div style="width:70%;float:left">
+				<div style="overflow-y:scroll;height:240px">
+					<table class="table responsive-table condensed highlight table-materiales" id="table-materiales">
+						<thead style="background-color:#9e9e9e;color:white">
+							<tr>
+								<th>#</th>
+								<th>Codigo</th>
+								<th>Material</th>
+								<th>Unidad</th>
+								<th>Cantidad</th>
+								<th>S/M</th>
+								<th>Excel</th>
+								<th steyle="text-align:center">C/M</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>	
+			</div>
+			<div style="width:28%;float:left;margin-left:2%">
+				<div style="overflow-y:scroll;height:240px">
+					<table class="table responsive-table condensed highlight table-brands">
+						<thead style="background-color:#9e9e9e;color:white">
+							<tr>
+								<th>#</th>
+								<th>Marca</th>
+								<th>Modelo</th>
+								<th>Cantidad</th>
+								<th>PDF</th>
+								<th>Excel</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<input type="hidden" name="hreport" value="{{ hreport }}">
+<input type="hidden" name="ruc" value="{{ ruc }}">
+
+{% csrf_token %}
+{% endblock %}

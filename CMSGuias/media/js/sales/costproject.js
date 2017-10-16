@@ -1,5 +1,5 @@
 // import * as angular from "angular";
-var SProxy = (function () {
+var SProxy = /** @class */ (function () {
     function SProxy($http, $cookies) {
         this.$http = $http;
         this.$cookies = $cookies;
@@ -25,7 +25,7 @@ var SProxy = (function () {
     SProxy.$inject = ['$http', '$cookies'];
     return SProxy;
 }());
-var ControllerServiceProject = (function () {
+var ControllerServiceProject = /** @class */ (function () {
     function ControllerServiceProject(proxy) {
         this.proxy = proxy;
         this.assignament = 0;
@@ -89,10 +89,11 @@ var ControllerServiceProject = (function () {
                         var services = element['services'][dt];
                         var dsct = (this.itemizers[key]['services'][dt].amounts * (this.itemizers[key]['services'][dt].fields.dsct / 100));
                         dsct = (this.itemizers[key]['services'][dt].amounts - dsct);
-                        var igv = ((this.itemizers[key]['services'][dt].fields.sigv ? this.itemizers[key]['services'][dt].configure.fields.igv : 0) / 100);
-                        igv = (igv > 0) ? (dsct * (igv)) : 0;
-                        var total = ((dsct) + (igv));
-                        total = ((this.itemizers[key]['services'][dt].fields.currency.pk == this.itemizers[key]['services'][dt].configure.fields.moneda.pk) ? total : (total / this.itemizers[key]['services'][dt]['exchange']));
+                        // let igv: number = ((this.itemizers[key]['services'][dt].fields.sigv ? this.itemizers[key]['services'][dt].configure.fields.igv : 0)/100)
+                        var total = dsct;
+                        // igv = (igv > 0) ? (dsct * (igv)) : 0;
+                        // let total: number = ((dsct) + (igv));
+                        // total = ((this.itemizers[key]['services'][dt].fields.currency.pk == this.itemizers[key]['services'][dt].configure.fields.moneda.pk) ? total : (total / this.itemizers[key]['services'][dt]['exchange']));
                         this.itemizers[key]['services'][dt]['total'] = total;
                         sum += (total);
                     }

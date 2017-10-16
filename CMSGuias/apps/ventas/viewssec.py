@@ -14,10 +14,10 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.template import TemplateDoesNotExist
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 
 # local Django
-from .models import Proyecto, CloseProject
+from .models import Proyecto, CloseProject, ProjectItemizer, PExpenses
 from ..home.models import Emails
 from ..tools.globalVariable import date_now, get_pin, emails, status
 from ..tools.uploadFiles import descompressRAR, get_extension
@@ -40,7 +40,7 @@ class JSONResponseMixin(object):
 
 
 class ClosedProjectView(JSONResponseMixin, View):
-    """Closed Sales Project"""
+    '''Closed Sales Project'''
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         try:
@@ -205,15 +205,97 @@ class ClosedProjectView(JSONResponseMixin, View):
 
 
 class StatusProject(View):
-    """Show status Project"""
+    '''Show status Project'''
     template_name = 'sales/status.html'
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        """process get"""
+        '''process get'''
         try:
             kwargs['pro'] = Proyecto.objects.get(proyecto_id=kwargs['pk'])
             kwargs['sts'] = status[kwargs['pro'].status]
             return render(request, self.template_name, kwargs)
         except TemplateDoesNotExist as ex:
             raise Http404(ex)
+
+
+class GeneralExpenses(JSONResponseMixin, TemplateView):
+    '''
+    create and keep other expenses for the project
+    '''
+
+    template_name = 'sales/generalexpenses.html'
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            try:
+                if 'getitemizer' in request.GET:
+                    kwargs['itemizer'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            ProjectItemizer.objects.filter(project_id=kwargs['pro'])
+                        )
+                    )
+                if 'expenses' in request.GET:
+                    kwargs['expenses'] = json.loads(
+                        serializers.serialize(
+                            'json',
+                            PExpenses.objects.filter(project_id=kwargs['pro']),
+                            relations=('itemizer', 'currency')
+                        )
+                    )
+                if 'pexpenses' in request.GET:
+                    kwargs = json.loads(
+                        serializers.serialize(
+                            'json',
+                            PExpenses.objects.filter(project_id=kwargs['pro'])
+                            , relations=('itemizer', 'currency')
+                        )
+                    )
+            except Exception as ex:
+                kwargs['raise'] = str(e)
+            return self.render_to_json_response(kwargs)
+        else:
+            return render(request, self.template_name, kwargs)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            try:
+                if 'create' in request.POST:
+                    kwargs = self.saveOrUpdate(request.POST, kwargs['pro'])
+                if 'delete' in request.POST:
+                    kwargs = self.delete(request.POST)
+                if 'update' in request.POST:
+                    kwargs = self.saveOrUpdate(request.POST, kwargs['pro'])
+                if isinstance(kwargs, dict) and 'raise' in kwargs:
+                    kwargs['raise'] = kwargs['raise']
+            except Exception as oex:
+                kwargs['raise'] = str(oex)
+            return self.render_to_json_response(kwargs)
+
+    def saveOrUpdate(self, kwargs, pro):
+        try:
+            pex = None
+            if 'update' in kwargs:
+                pex = PExpenses.objects.get(pk=kwargs['pk'])
+            else:
+                pex = PExpenses()
+                pex.project_id = pro
+            pex.itemizer_id = kwargs['itemizer']
+            pex.currency_id = kwargs['currency']
+            pex.description = str(kwargs['description']).upper()
+            pex.amount = kwargs['amount']
+            pex.save()
+            return True
+        except Exception as oex:
+            return { 'raise': str(oex) }
+
+    def delete(self, kwargs):
+        try:
+            PExpenses.objects.get(pk=kwargs['pkexpenses']).delete()
+            return True
+        except Exception as oex:
+            return { 'raise': str(oex) }
+

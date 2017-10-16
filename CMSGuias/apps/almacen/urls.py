@@ -99,8 +99,6 @@ urlpatterns = patterns(
     url(r'^herramienta/trasladohe$', Trasladohe.as_view(), name='viewtrasladohe'),
     url(r'^herramienta/notaingreso$', NotaIngreso.as_view(), name='viewnotaingreso'),
 
-
-
     # # devolucion material
     # url(r'^devolucionmaterial/$', DevMaterial.as_view(), name='viewdevolucionmat'),
     # 2017-05-19 09:16:53
@@ -114,4 +112,9 @@ urlpatterns = patterns(
     # devolucion material
     url(r'^devolucionmaterial/$', DevConMaterial.as_view(), name='viewdevolucionmat'),
     url(r'^devolucionguia/$', DevConGuia.as_view(), name='viewdevolucionguia'),
+
+    # @Juan Julcapari 2017-10-16 09:36:55
+    # kardex materials
+    url(r'^kardex/consulta$', kardex.as_view(), name='vista_kardexcons'),
+    url(r'^kardex/cantidades$', kardexCant.as_view(), name='vista_kardexcant'),
 )

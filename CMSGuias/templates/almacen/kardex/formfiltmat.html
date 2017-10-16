@@ -1,0 +1,29 @@
+
+{% block script %}
+    <script src="{{ MEDIA_URL }}js/mustache.js"></script>
+{% endblock script %}
+
+<div class="modal lfiltmat">
+    <div class="modal-content">
+        <div class="input-field col s12">
+        <i class="prefix fa fa-search"></i>
+        <input class="txtbuscmat" style="width:90%;" type="text" placeholder="Buscar Material" name="txtbuscmat" id="txtbuscmat" >
+        </div>
+        <div style="overflow-y: scroll;height:300px">
+            <table class="table responsive-table condensed highlight table-lfiltmat" id="table-lfiltmat" >
+                <thead style="background-color:#9e9e9e;color:white">
+                    <tr>
+                        <th>#</th>
+                        <th>Material</th>
+                        <th>Medida</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div align="right" >
+        <button type="button" class="btn modal-action modal-close waves-effect waves-green blue lighten-1 btn-flat" style="color:white;font-weight:bold">SALIR</button>
+        </div>
+    </div>
+</div>

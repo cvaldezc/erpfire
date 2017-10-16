@@ -1,0 +1,112 @@
+{% extends "basemd.html" %}
+{% block title %}GG [{{pro}}] - Project{% endblock %}
+{% block menu %}
+    {% include "menus/salesmd.html" %}
+{% endblock menu%}
+{% block content %}
+<section ng-app="gexpensesApp" ng-controller="gexpensesCtrl as vm">
+    <a class="btn btn-flat" href="{% url 'servicesp_view' pro %}">
+        <i class="fa fa-chevron-left"></i>
+        <span class="hide-on-small-only">REGRESAR</span>
+    </a>
+    <aside class="card-panel">
+        <button type="button" class="right btn waves-effect grey lighten-5 grey-text text-darken-3" ng-click="vm.pshow=true;vm.modify=false;">
+            <i class="fa fa-plus"></i>
+            Agregar
+        </button>
+        <header>
+            <h5>Otros Gastos {{ pro }}</h5>
+        </header>
+        <a href="#!" class="right black-text" ng-model="vm.pshow" ng-click="vm.cancelExpenses()">
+            <i class="fa" ng-class="{'fa-times': vm.pshow, '': !vm.pshow}"></i>
+        </a>
+        <div class="row" ng-show="vm.pshow">
+            <div class="input-field col l3 m3 s12">
+                <select name="itemizer" id="itemizer" ng-model="vm.gexpenses.itemizer">
+                    <option value="">-- Ninguno --</option>
+                    {% verbatim %}
+                    <option value="{{x.pk}}" ng-repeat="x in vm.itemizers">{{x.fields.name}}</option>
+                    {% endverbatim %}
+                </select>
+                <label for="itemizer">Gastos</label>
+            </div>
+            <div class="input-field col m4 l4 s12">
+                    <input type="text" id="description" ng-model="vm.gexpenses.description">
+                    <label for="description">Descripción</label>
+                </div>
+            <div class="input-field col m1 l1 s12">
+                <input type="number" id="amount" step="0.10" class="right-align" ng-model="vm.gexpenses.amount">
+                <label for="amount">Monto</label>
+            </div>
+            <div class="input-field col m2 l2 s12">
+                <select name="currency" id="currency" ng-model="vm.gexpenses.currency" ng-options="x.pk as x.fields.moneda for x in vm.currencies">
+                    <option value="">-- Ninguno --</option>
+                </select>
+                <label for="currency">Moneda</label>
+            </div>
+            <div class="col m1 l1 s12">
+                <button type="button" class="btn waves-effect waves-light light-green" ng-click="vm.saveExpenses()">
+                    <i class="fa fa-floppy-o"></i>
+                    <span class="hide-on-small-only">Guardar</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+    <article class="card-panel">
+        <button type="button" class="right btn waves-effect white grey-text text-darken-3" ng-click="vm.getExpensesProject()">
+            <i class="fa fa-refresh"></i>
+        </button>
+        <h5>Lista de Gastos</h5>
+        {% verbatim %}
+        <table class="table responsive-table bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Gastos</th>
+                    <th>Descripción</th>
+                    <th>Moneda</th>
+                    <th>Monto</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="x in vm.pexpenses | orderBy: 'fields.itemizer.fields.name'">
+                    <td>{{$index + 1}}</td>
+                    <td>{{x.fields.itemizer.fields.name}}</td>
+                    <td>{{x.fields.description}}</td>
+                    <td>{{x.fields.currency.fields.moneda}}</td>
+                    <td class="right-align">{{x.fields.currency.fields.simbolo}} {{x.fields.amount}}</td>
+                    <td class="col-2 center-align">
+                        <button type="button" class="waves-effect btn btn-flat light-green-text" ng-click="vm.openEdit(x)">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                    </td>
+                    <td class="col-2 center-align">
+                        <button type="button" class="waves-effect btn btn-flat red-text" ng-click="vm.deleteExpenses(x)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot ng-hide="vm.pexpenses.length">
+                <tr>
+                    <td colspan="6">
+                        <div class="progress red lighten-5">
+                            <div class="indeterminate red"></div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        {% endverbatim %}
+    </article>
+    {% verbatim %}
+        <!-- {{ vm.itemizers }} -->
+    {% endverbatim %}
+</section>
+<!-- scripts -->
+<script src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
+<script src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
+<script defer src="{{ MEDIA_URL }}js/sales/gexpenses.bundle.js"></script>
+{% endblock content %}

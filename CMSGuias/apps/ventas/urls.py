@@ -38,6 +38,7 @@ project_urls = patterns(
     url(r'^closed/(?P<pro>\w{7})/$', ClosedProjectView.as_view(),
         name='closedproject_view'),
     url(r'^status/(?P<pk>\w{7})/$', StatusProject.as_view(), name='statusproject_view'),
+    url(r'^expenses/(?P<pro>\w{7})/$', GeneralExpenses.as_view(), name='project_expenses_view'),
 )
 
 urlpatterns = patterns(
