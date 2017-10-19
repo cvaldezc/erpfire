@@ -22,7 +22,9 @@ class ProjectForm(forms.ModelForm):
             'starthour',
             'outsaturday',
             'shxsaturday',
-            'shxsaturdayt'}
+            'shxsaturdayt',
+            'workforce',
+            'workforceused'}
 
 
 class SectoreForm(forms.ModelForm):

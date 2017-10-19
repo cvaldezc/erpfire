@@ -16,7 +16,7 @@
 {% endblock menu %}
 {% block content %}
 <section ng-app="app" ng-controller="controller as vm">
-  <a href="/sales/projects/manger/{{pro.proyecto_id}}/" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+  <a href="{% url 'managerpro_view' pro.proyecto_id %}" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
     <i class="fa fa-chevron-left"></i>
     <span class="hide-on-small-only">REGRESAR</span>
   </a>
@@ -52,7 +52,7 @@
           <a href="#!up" class="right grey-text text-darken-3" ng-model="vm.sexp" ng-init="vm.sexp=false" ng-click="vm.sexp=!vm.sexp">
             <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.sexp, 'fa-chevron-down': vm.sexp }"></i>
           </a>
-          <h5>SERVIOS</h5>
+          <h5>SERVICIOS</h5>
           {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
           <!-- <div class="card-action"> -->
           <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
@@ -257,11 +257,20 @@
           <a href="#!up" class="right grey-text text-darken-3" ng-model="vm.smg" ng-init="vm.smg=false" ng-click="vm.smg=!vm.smg">
             <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.smg, 'fa-chevron-down': vm.smg }"></i>
           </a>
-          <h5>MATERIALES
+          <h5>
+            <span>ACCESORIOS</span>
             <small>(solo guias enviadas)</small>
           </h5>
           <div class="row" ng-hide="vm.swf">
-
+            <div class="col m4 l4 s12">
+              <h5>En Presupuesto</h5>
+            </div>
+            <div class="col m4 l4 s12">
+              <h5>Costo en Operaciones</h5>
+            </div>
+            <div class="col m4 l4 s12">
+              <h5>Costo en Obra</h5>
+            </div>
           </div>
         </div>
       </div>

@@ -486,17 +486,20 @@ class ProjectManager(JSONResponseMixin, View):
         try:
             if request.is_ajax():
                 try:
+                    if 'costproject' in request.GET:
+                        pass
                     if 'listPurchase' in request.GET:
-                        context['list'] = [{
-                            'nro': x.nropurchase,
-                            'issued': globalVariable.format_date_str(x.issued),
-                            'document': x.document.documento,
-                            'order': str(x.order),
-                            'id': x.id}
-                            for x in PurchaseOrder.objects.filter(
-                                        flag=True,
-                                        project_id=kwargs['project']
-                                        ).order_by('register')]
+                        context['list'] = [
+                            {
+                                'nro': x.nropurchase,
+                                'issued': globalVariable.format_date_str(x.issued),
+                                'document': x.document.documento,
+                                'order': str(x.order),
+                                'id': x.id
+                            } for x in PurchaseOrder.objects.filter(
+                                flag=True,
+                                project_id=kwargs['project']).order_by('register')
+                        ]
                         context['status'] = True
                     if 'editPurchase' in request.GET:
                         obj = PurchaseOrder.objects.get(
@@ -540,18 +543,26 @@ class ProjectManager(JSONResponseMixin, View):
                 return self.render_to_json_response(context)
             context['project'] = Proyecto.objects.get(pk=kwargs['project'], flag=True)
             if context['project'].status != 'AC' and context['project'].status != 'PE':
-                return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['project']}))
+                return redirect(reverse('statusproject_view', kwargs={ 'pk': kwargs['project'] }))
             try:
                 context['subpro'] = Subproyecto.objects.filter(
-                                        proyecto_id=kwargs['project'],
-                                        flag=True)
+                    proyecto_id=kwargs['project'],
+                    flag=True)
             except ObjectDoesNotExist, e:
                 context['subpro'] = list()
-            context['sectors'] = Sectore.objects.filter(proyecto_id=kwargs['project'], flag=True).order_by('subproyecto', 'planoid')
+            context['sectors'] = Sectore.objects.filter(
+                proyecto_id=kwargs['project'],
+                flag=True).order_by('subproyecto', 'planoid')
             context['operation'] = Employee.objects.filter(
-                Q(charge__area__istartswith='opera') | Q(empdni_id=72604244)).order_by('charge__area')
-            context['admin'] = Employee.objects.filter(charge__area__istartswith='admin').order_by('charge__area')
-            context['alerts'] = Alertasproyecto.objects.filter(Q(proyecto_id=kwargs['project']) | ~Q(subproyecto_id=None), Q(sector_id=None), Q(flag=True)).order_by('-registrado')
+                Q(charge__area__istartswith='opera') |
+                Q(empdni_id=72604244)).order_by('charge__area')
+            context['admin'] = Employee.objects.filter(
+                charge__area__istartswith='admin').order_by('charge__area')
+            context['alerts'] = Alertasproyecto.objects.filter(
+                Q(proyecto_id=kwargs['project']) |
+                ~Q(subproyecto_id=None),
+                Q(sector_id=None),
+                Q(flag=True)).order_by('-registrado')
             context['currency'] = Moneda.objects.filter(flag=True)
             context['document'] = Documentos.objects.filter(flag=True)
             context['method'] = FormaPago.objects.filter(flag=True)
@@ -957,6 +968,9 @@ class ProjectManager(JSONResponseMixin, View):
                 context['raise'] = e.__str__()
                 context['status'] = False
             return self.render_to_json_response(context)
+
+    def costProject(self):
+        pass
 
 
 # Manager View Sectors
