@@ -41,6 +41,7 @@
           <input type="hidden" ng-model="vm.prcurrency.pk" ng-init="vm.prcurrency.pk='{{pro.currency_id}}'">
           <input type="hidden" ng-model="vm.prcurrency.symbol" ng-init="vm.prcurrency.symbol='{{pro.currency.simbolo}}'">
           <input type="hidden" ng-model="vm.area" ng-init="vm.area='{{ request.user.get_profile.empdni.charge.area|lower }}'">
+          <input type="hidden" ng-model="vm.project" ng-init="vm.project={ 'pk': '{{ pro.proyecto_id }}', 'symbol': '{{ pro.currency.simbolo }}' }">
         </div>
       </div>
     </div>
@@ -260,16 +261,20 @@
           <h5>
             <span>ACCESORIOS</span>
             <small>(solo guias enviadas)</small>
+            <h6><small>los precio son base y solo se considera el preico de compras.</small></h6>
           </h5>
           <div class="row" ng-hide="vm.swf">
             <div class="col m4 l4 s12">
               <h5>En Presupuesto</h5>
+              <h5>{{ vm.accbudget }}</h5>
             </div>
             <div class="col m4 l4 s12">
               <h5>Costo en Operaciones</h5>
+              <h5></h5>
             </div>
             <div class="col m4 l4 s12">
               <h5>Costo en Obra</h5>
+              <h5></h5>
             </div>
           </div>
         </div>

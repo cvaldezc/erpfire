@@ -487,7 +487,7 @@ class ProjectManager(JSONResponseMixin, View):
             if request.is_ajax():
                 try:
                     if 'costproject' in request.GET:
-                        pass
+                        return self.costProject(request, kwargs)
                     if 'listPurchase' in request.GET:
                         context['list'] = [
                             {
@@ -969,8 +969,18 @@ class ProjectManager(JSONResponseMixin, View):
                 context['status'] = False
             return self.render_to_json_response(context)
 
-    def costProject(self):
-        pass
+    def costProject(self, request, kwargs):
+        try:
+            if 'budget' in request.GET:
+                csects = Sectore.objects.fitler(proyecto_id=kwargs['project'])
+                kwargs = { 'purchase': sum([x.amount for x in csects], 0), 'sales': sum([x.amountsales for x in csects]) }
+            if 'operations' in request.GET:
+                kwargs = { 'purchase': 0  , 'sales': 0 }
+            if 'guides' in request.GET:
+                kwargs = { 'purchase': 0  , 'sales': 0 }
+        except Exception as oex:
+            return { 'raise': str(oex) }
+        return self.render_to_json_response(kwargs)
 
 
 # Manager View Sectors

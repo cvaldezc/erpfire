@@ -126,6 +126,7 @@ var angular = __webpack_require__(1);
 var serviceFactory_1 = __webpack_require__(0);
 var ControllerServiceProject = /** @class */ (function () {
     function ControllerServiceProject(proxy) {
+        var _this = this;
         this.proxy = proxy;
         this.itemizers = {};
         this.assignament = 0;
@@ -136,10 +137,17 @@ var ControllerServiceProject = /** @class */ (function () {
         };
         this.sbworkforce = false;
         this.tworkforce = 0;
+        this.project = { pk: '', symbol: '' };
+        this.accbudget = 0;
+        this.accoperations = 0;
+        this.accguides = 0;
         console.log("hi! hello world!!!");
         angular.element('.modal').modal();
         this.getItemizer();
         this.workforceData();
+        setTimeout(function () {
+            _this.costBudget();
+        }, 800);
     }
     ControllerServiceProject.prototype.getItemizer = function () {
         var _this = this;
@@ -323,6 +331,22 @@ var ControllerServiceProject = /** @class */ (function () {
                 cwf.innerText = response['data'].workforce;
                 cwfu.innerText = response['data'].workforceused;
                 _this.tworkforce = (response['data'].workforce - response['data'].workforceused);
+            }
+            else {
+                Materialize.toast("Error " + response['data']['raise'], 3600);
+            }
+        });
+    };
+    /* enblock */
+    /**
+     * block cost
+     */
+    ControllerServiceProject.prototype.costBudget = function () {
+        var _this = this;
+        this.proxy.get("/sales/projects/manager/" + this.project.pk + "/", { 'budget': true })
+            .then(function (response) {
+            if (!response.data.hasOwnProperty('raise')) {
+                _this.accbudget = response['data']['purchase'];
             }
             else {
                 Materialize.toast("Error " + response['data']['raise'], 3600);

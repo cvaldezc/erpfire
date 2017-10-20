@@ -83,13 +83,6 @@ import { ServiceFactory, httpConfigs } from '../serviceFactory'
 // }
 
 interface IController {
-	itemizer: object;
-	itemizers: object;
-	assignament: number;
-	spent: number;
-	prcurrency: { [key: string]: any }
-	sbworkforce: boolean
-	tworkforce: number
 	getItemizer(): void;
 	saveItemizer(): void;
 	calcAmounts(): void;
@@ -109,6 +102,10 @@ class ControllerServiceProject implements IController {
 	}
 	sbworkforce: boolean = false
 	tworkforce: number = 0
+	project: { [key: string]: any } = { pk: '', symbol: '' }
+	accbudget: number = 0
+	accoperations: number = 0
+	accguides: number = 0
 
 	static $inject = ['ServiceFactory']
 
@@ -117,6 +114,9 @@ class ControllerServiceProject implements IController {
 		angular.element('.modal').modal()
 		this.getItemizer()
 		this.workforceData()
+		setTimeout(() => {
+			this.costBudget()
+		}, 800)
 	}
 
 	getItemizer(): void {
@@ -279,7 +279,6 @@ class ControllerServiceProject implements IController {
 		wudiv.appendChild(wuinput)
 		gworkforceUsed.appendChild(wudiv)
 		this.sbworkforce = true
-
 	}
 
 	saveWorkforce(): void {
@@ -321,6 +320,22 @@ class ControllerServiceProject implements IController {
 				}
 			})
 	}
+
+	/* enblock */
+	/**
+	 * block cost
+	 */
+	costBudget(): void {
+		this.proxy.get(`/sales/projects/manager/${this.project.pk}/`, { 'budget': true})
+			.then( (response: any) => {
+				if (!response.data.hasOwnProperty('raise')) {
+					this.accbudget = response['data']['purchase']
+				} else {
+					Materialize.toast(`Error ${response['data']['raise']}`, 3600)
+				}
+			})
+	}
+	/** endblock */
 
 }
 
