@@ -326,7 +326,7 @@ class ControllerServiceProject implements IController {
 	 * block cost
 	 */
 	costBudget(): void {
-		this.proxy.get(`/sales/projects/manager/${this.project.pk}/`, { 'budget': true})
+		this.proxy.get(`/sales/projects/manager/${this.project.pk}/`, { 'budget': true, 'cost': true })
 			.then( (response: any) => {
 				if (!response.data.hasOwnProperty('raise')) {
 					this.accbudget = response['data']['purchase']

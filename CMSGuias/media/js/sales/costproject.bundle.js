@@ -343,7 +343,7 @@ var ControllerServiceProject = /** @class */ (function () {
      */
     ControllerServiceProject.prototype.costBudget = function () {
         var _this = this;
-        this.proxy.get("/sales/projects/manager/" + this.project.pk + "/", { 'budget': true })
+        this.proxy.get("/sales/projects/manager/" + this.project.pk + "/", { 'budget': true, 'cost': true })
             .then(function (response) {
             if (!response.data.hasOwnProperty('raise')) {
                 _this.accbudget = response['data']['purchase'];
