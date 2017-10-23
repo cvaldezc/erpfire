@@ -4,6 +4,7 @@
 import json
 import os
 import shutil
+from decimal import Decimal
 
 from django.db.models import Q, Sum
 # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -32,7 +33,8 @@ from CMSGuias.apps.operations.models import (
     DeductiveOutputs,
     Letter,
     LetterAnexo,
-    DSector)
+    DSector,
+    DSMetrado)
 from CMSGuias.apps.almacen.models import (
     Inventario,
     Pedido,
@@ -574,7 +576,7 @@ class ProjectManager(JSONResponseMixin, View):
                 pass
             return render_to_response(self.template_name, context, context_instance = RequestContext(request))
         except TemplateDoesNotExist, e:
-            messages.error(request, 'Template not Exist %s',e)
+            messages.error(request, 'Template not Exist %s', e)
             raise Http404(e)
 
     @method_decorator(login_required)
@@ -976,8 +978,10 @@ class ProjectManager(JSONResponseMixin, View):
                 csects = Sectore.objects.filter(proyecto_id=kwargs['project'])
                 kwargs = { 'purchase': sum([x.amount for x in csects], 0), 'sales': sum([x.amountsales for x in csects]) }
             if 'operations' in request.GET:
-                kwargs = { 'purchase': 0  , 'sales': 0 }
+                kwargs = Decimal(sum([(Decimal(x.quantity).quantize(Decimal('0.01')) * x.ppurchase) for x in DSMetrado.objects.filter(dsector__dsector_id__startswith=kwargs['project'])])).quantize(Decimal('0.01'))
+                # kwargs = { 'purchase': 0  , 'sales': 0 }
             if 'guides' in request.GET:
+                guides =
                 kwargs = { 'purchase': 0  , 'sales': 0 }
             return kwargs
         except Exception as oex:

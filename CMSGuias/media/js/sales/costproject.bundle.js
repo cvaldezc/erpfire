@@ -147,6 +147,7 @@ var ControllerServiceProject = /** @class */ (function () {
         this.workforceData();
         setTimeout(function () {
             _this.costBudget();
+            _this.costOperations();
         }, 800);
     }
     ControllerServiceProject.prototype.getItemizer = function () {
@@ -350,6 +351,30 @@ var ControllerServiceProject = /** @class */ (function () {
             }
             else {
                 Materialize.toast("Error " + response['data']['raise'], 3600);
+            }
+        });
+    };
+    ControllerServiceProject.prototype.costOperations = function () {
+        var _this = this;
+        this.proxy.get("/sales/projects/manager/" + this.project.pk + "/", { 'cost': true, 'operations': true })
+            .then(function (response) {
+            if (!response.data.hasOwnProperty('raise')) {
+                _this.accoperations = response['data'];
+            }
+            else {
+                Materialize.toast("Error " + response['data']['raise'], 3600);
+            }
+        });
+    };
+    ControllerServiceProject.prototype.costGuides = function () {
+        var _this = this;
+        this.proxy.get("/sales/projects/manager/" + this.project.pk, { 'cost': true, 'guides': true })
+            .then(function (response) {
+            if (!response.data.hasOwnProperty('raise')) {
+                _this.accguides = response['data'];
+            }
+            else {
+                Materialize.toast("Error: " + response['data']['raise'], 3600);
             }
         });
     };
