@@ -148,6 +148,7 @@ var ControllerServiceProject = /** @class */ (function () {
         setTimeout(function () {
             _this.costBudget();
             _this.costOperations();
+            _this.costGuides();
         }, 800);
     }
     ControllerServiceProject.prototype.getItemizer = function () {
@@ -359,7 +360,7 @@ var ControllerServiceProject = /** @class */ (function () {
         this.proxy.get("/sales/projects/manager/" + this.project.pk + "/", { 'cost': true, 'operations': true })
             .then(function (response) {
             if (!response.data.hasOwnProperty('raise')) {
-                _this.accoperations = response['data'];
+                _this.accoperations = parseFloat(response['data']['purchase']);
             }
             else {
                 Materialize.toast("Error " + response['data']['raise'], 3600);
@@ -371,7 +372,7 @@ var ControllerServiceProject = /** @class */ (function () {
         this.proxy.get("/sales/projects/manager/" + this.project.pk, { 'cost': true, 'guides': true })
             .then(function (response) {
             if (!response.data.hasOwnProperty('raise')) {
-                _this.accguides = response['data'];
+                _this.accguides = parseFloat(response['data']['purchase']);
             }
             else {
                 Materialize.toast("Error: " + response['data']['raise'], 3600);

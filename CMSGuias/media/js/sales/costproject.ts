@@ -117,6 +117,7 @@ class ControllerServiceProject implements IController {
 		setTimeout(() => {
 			this.costBudget()
 			this.costOperations()
+			this.costGuides()
 		}, 800)
 	}
 
@@ -341,7 +342,7 @@ class ControllerServiceProject implements IController {
 		this.proxy.get(`/sales/projects/manager/${this.project.pk}/`, { 'cost': true, 'operations': true })
 			.then( (response: any) => {
 				if (!response.data.hasOwnProperty('raise')) {
-					this.accoperations = response['data']
+					this.accoperations = parseFloat(response['data']['purchase'])
 				} else {
 					Materialize.toast(`Error ${response['data']['raise'] }`, 3600)
 				}
@@ -352,7 +353,7 @@ class ControllerServiceProject implements IController {
 		this.proxy.get(`/sales/projects/manager/${this.project.pk}`, { 'cost': true, 'guides': true})
 			.then( (response: any) => {
 				if(!response.data.hasOwnProperty('raise')) {
-					this.accguides = response['data']
+					this.accguides = parseFloat(response['data']['purchase'])
 				} else {
 					Materialize.toast(`Error: ${response['data']['raise']}`, 3600)
 				}

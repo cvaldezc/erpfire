@@ -260,34 +260,29 @@
           </a>
           <h5>
             <span>MATERIALES</span>
-            <small>(solo guias enviadas)</small>
-            <h6><small>los precio son base y solo se considera el preico de compras.</small></h6>
+            <!-- <small>(solo guias enviadas)</small> -->
+            <!-- <h6><small>los precio son base y solo se considera el preico de compras.</small></h6> -->
           </h5>
-          <div class="row" ng-hide="vm.swf">
+          <div class="row" ng-hide="vm.smg">
             <div class="col m4 l4 s12">
               <h5>En Presupuesto</h5>
               <h5 class="right-align">
                 {{ vm.accbudget }}
-                &nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;
+
               </h5>
             </div>
             <div class="col m4 l4 s12">
               <h5>Costo en Operaciones</h5>
               <h5 class="right-align">
                 {{ vm.accoperations }}
-                &nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;
+
               </h5>
             </div>
             <div class="col m4 l4 s12">
               <h5>Costo en Obra</h5>
               <h5 class="right-align">
-                &nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;
+                {{ vm.accguides }}
+
               </h5>
             </div>
           </div>

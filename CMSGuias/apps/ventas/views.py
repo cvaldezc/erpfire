@@ -978,11 +978,31 @@ class ProjectManager(JSONResponseMixin, View):
                 csects = Sectore.objects.filter(proyecto_id=kwargs['project'])
                 kwargs = { 'purchase': sum([x.amount for x in csects], 0), 'sales': sum([x.amountsales for x in csects]) }
             if 'operations' in request.GET:
-                kwargs = Decimal(sum([(Decimal(x.quantity).quantize(Decimal('0.01')) * x.ppurchase) for x in DSMetrado.objects.filter(dsector__dsector_id__startswith=kwargs['project'])])).quantize(Decimal('0.01'))
-                # kwargs = { 'purchase': 0  , 'sales': 0 }
+                acc = DSMetrado.objects.filter(dsector__dsector_id__startswith=kwargs['project'])
+                kwargs = {
+                    'purchase': Decimal(sum([(Decimal(x.quantity).quantize(Decimal('0.01')) * x.ppurchase) for x in acc])).quantize(Decimal('0.01')),
+                    'sales': Decimal(sum([(Decimal(x.quantity).quantize(Decimal('0.01')) * x.psales) for x in acc])).quantize(Decimal('0.01'))
+                }
             if 'guides' in request.GET:
-                guides =
-                kwargs = { 'purchase': 0  , 'sales': 0 }
+                orders = Pedido.objects.filter(proyecto_id=kwargs['project'], status__in=['IN', 'CO'])
+                dguides =  DetGuiaRemision.objects.filter(
+                    order_id__in=[x.pedido_id for x in orders],
+                    guia__status='GE')
+                purchase, sales = 0, 0
+                for x in dguides:
+                    dsm = DSMetrado.objects.filter(
+                        dsector__dsector_id__startswith=kwargs['project'],
+                        materials_id=x.materiales_id)
+                    if len(dsm):
+                        dsm = dsm[0]
+
+                        purchase += (Decimal(x.cantguide) * dsm.ppurchase)
+                        sales += (Decimal(x.cantguide) * dsm.psales)
+
+                kwargs = {
+                    'purchase': Decimal(purchase).quantize(Decimal('0.01')),
+                    'sales': Decimal(sales).quantize(Decimal('0.01'))
+                    }
             return kwargs
         except Exception as oex:
             kwargs = { 'raise': str(oex) }
