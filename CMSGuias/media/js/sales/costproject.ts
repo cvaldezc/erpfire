@@ -101,11 +101,14 @@ class ControllerServiceProject implements IController {
 		'symbol': null
 	}
 	sbworkforce: boolean = false
+	wf: number = 0
+	wfu: number = 0
 	tworkforce: number = 0
 	project: { [key: string]: any } = { pk: '', symbol: '' }
 	accbudget: number = 0
 	accoperations: number = 0
 	accguides: number = 0
+	chart_data: Array<Array<any>> = []
 
 	static $inject = ['ServiceFactory']
 
@@ -115,9 +118,12 @@ class ControllerServiceProject implements IController {
 		this.getItemizer()
 		this.workforceData()
 		setTimeout(() => {
+			this.getCurve()
 			this.costBudget()
 			this.costOperations()
 			this.costGuides()
+			google.charts.load("visualization", "1", { 'packages': ['corechart']})
+			google.charts.setOnLoadCallback(() => this.getCurve())
 		}, 800)
 	}
 
@@ -299,6 +305,8 @@ class ControllerServiceProject implements IController {
 							cwfu: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforceused")
 						cwf.innerText = params.workforce
 						cwfu.innerText = params.workforceused
+						this.wf = parseFloat(params['workforce'])
+						this.wfu = parseFloat(params['workforceused'])
 						this.tworkforce = (params.workforce - params.workforceused)
 						this.sbworkforce = false
 					} else {
@@ -316,6 +324,8 @@ class ControllerServiceProject implements IController {
 						cwfu: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforceused")
 					cwf.innerText = response['data'].workforce
 					cwfu.innerText = response['data'].workforceused
+					this.wf = parseFloat(response['data']['workforce'])
+					this.wfu = parseFloat(response['data']['workforceused'])
 					this.tworkforce = (response['data'].workforce - response['data'].workforceused)
 				} else {
 					Materialize.toast(`Error ${response['data']['raise']}`, 3600)
@@ -359,11 +369,45 @@ class ControllerServiceProject implements IController {
 				}
 			})
 	}
+
+	getCurve(): void {
+		this.proxy.get(`/sales/projects/manager/${this.project.pk}`, { 'cost': true, 'curves': true })
+			.then( (response: any ) => {
+				// console.log(response['data'])
+				if (!response['data'].hasOwnProperty('raise')) {
+					this.chart_data = response['data']
+					// this.chart_data.forEach((arr) => {
+					// 	arr[0] = new Date(arr[0])
+					// })
+					console.log(google)
+					let data: any = google.visualization.arrayToDataTable(response['data'])
+					// data.addColumn('string', 'Day')
+					// data.addColumn('number', 'Purchase')
+					// data.addColumn('number', 'Sales')
+
+					// data.addRows(this.chart_data)
+
+					let options = {
+						title: 'Company Performance',
+						hAxis: {title: 'Year',  titleTextStyle: {color: '#333'}},
+						vAxis: {minValue: 0},
+						width: 1280,
+						height: 500
+					}
+					let chart = new google.visualization.AreaChart(document.getElementById('chart_view'));
+					chart.draw(data, options)
+				}
+			})
+	}
 	/** endblock */
+
+	// drawChart(): void {
+
+	// }
 
 }
 
-let apps = angular.module('app', ['ngCookies']);
-apps.service('ServiceFactory', ServiceFactory);
+let apps = angular.module('app', ['ngCookies'])
+apps.service('ServiceFactory', ServiceFactory)
 apps.controller('controller', ControllerServiceProject)
 apps.config(httpConfigs);

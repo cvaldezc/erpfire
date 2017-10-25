@@ -1,5 +1,5 @@
 {% extends "basemd.html" %}
-{% block title %} Servicios {% endblock title %}
+{% block title %} Expenses {% endblock title %}
 {% block menu %}
   {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
     {% include "menus/salesmd.html" %}
@@ -24,6 +24,14 @@
     <div class="col s12 m12 l12">
       <div class="card">
         <div class="card-content">
+          <button type="button" class="model-trigger right waves-effect waves-light btn white black-text" data-target="charts">
+              <i class="fa fa-line-chart"></i>
+              <!-- <span class="hide-on-small-only"></span> -->
+            </button>
+          <button type="button" class="modal-trigger right waves-effect waves-light btn white black-text" data-target="summary">
+            <i class="fa fa-table"></i>
+            <!-- <span class="hide-on-small-only"></span> -->
+          </button>
           <h5>
             GASTOS DE PROYECTO: [{{pro.proyecto_id}}] {{ pro.nompro }}
             <br>
@@ -352,9 +360,77 @@
         </div>
       </form>
     </div>
+    <!-- block summary -->
+    <div class="modal" id="summary">
+      <div class="modal-content">
+        <h6>
+          Balance de Utilidad
+        </h6>
+        {% verbatim %}
+        <table class="table bordered striped responsive-table">
+          <thead>
+            <tr>
+              <th>MATERIALES</th>
+              <th>MANO DE OBRA</th>
+              <th>GASTOS GENERALES</th>
+              <th>TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="right-align">{{vm.accbudget | number:2}}</td>
+              <td class="right-align">{{vm.wf | number:2}}</td>
+              <td class="right-align">{{vm.assignament | number:2}}</td>
+              <td class="right-align">{{(vm.accbudget + vm.wf + vm.assignament) | number:2}}</td>
+            </tr>
+            <tr>
+              <td class="right-align">{{vm.accguides | number:2}}</td>
+              <td class="right-align">{{vm.wfu | number:2}}</td>
+              <td class="right-align">{{vm.spent | number: 2}}</td>
+              <td class="right-align">{{(vm.accguides + vm.wfu + vm.spent) | number:2}}</td>
+            </tr>
+            <tr>
+              <td class="right-align">{{vm.accbudget - vm.accguides | number:2}}</td>
+              <td class="right-align">{{vm.wf - vm.wfu | number:2}}</td>
+              <td class="right-align">{{vm.assignament - vm.spent | number:2}}</td>
+              <td class="right-align">{{(vm.accbudget - vm.accguides) + (vm.wf - vm.wfu) + (vm.assignament - vm.spent) | number:2}}</td>
+            </tr>
+          </tbody>
+        </table>
+        {% endverbatim %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 black-text">
+          <i class="fa fa-times"></i>
+          <span class="hide-on-small-only">Salir</span>
+        </button>
+        <!-- <button type="button" class="waves-effect waves-light btn light-blue">
+          <i class="fa fa-floppy-o"></i>
+          <span class="hide-on-small-only"></span>
+        </button> -->
+      </div>
+    </div>
+    <!-- block chart -->
+    <div class="modal col l12 m12 s12" style="max-height: 95%;" id="charts">
+      <div class="modal-content">
+        <div id="chart_view" style="width: 100%; min-height: 500px"></div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 black-text">
+            <i class="fa fa-times"></i>
+            <span class="hide-on-small-only">Salir</span>
+          </button>
+          <!-- <button type="button" class="waves-effect waves-light btn light-blue">
+            <i class="fa fa-floppy-o"></i>
+            <span class="hide-on-small-only"></span>
+          </button> -->
+        </div>
+    </div>
     <!-- endblock-->
   </div>
 </section>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://www.google.com/jsapi"></script>
 <script defer src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
 <script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
 <script defer src="{{ MEDIA_URL }}js/sales/costproject.bundle.js"></script>

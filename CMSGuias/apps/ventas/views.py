@@ -995,7 +995,6 @@ class ProjectManager(JSONResponseMixin, View):
                         materials_id=x.materiales_id)
                     if len(dsm):
                         dsm = dsm[0]
-
                         purchase += (Decimal(x.cantguide) * dsm.ppurchase)
                         sales += (Decimal(x.cantguide) * dsm.psales)
 
@@ -1003,10 +1002,54 @@ class ProjectManager(JSONResponseMixin, View):
                     'purchase': Decimal(purchase).quantize(Decimal('0.01')),
                     'sales': Decimal(sales).quantize(Decimal('0.01'))
                     }
-            return kwargs
+            if 'curves' in request.GET:
+                orders = Pedido.objects.filter(proyecto_id=kwargs['project'], status__in=['IN', 'CO'])
+                dguides = self.orders(orders)
+                lguides = dguides.values('guia_id').distinct('guia__guia_id').order_by('guia__guia_id')
+                guides = [['Dates', 'Purchase', 'Sales']]
+                for guide in lguides:
+                    try:
+                        # print guide['guia_id']
+                        bhg = GuiaRemision.objects.get(guia_id=guide['guia_id'])
+                        # print bhg.guia_id, bhg.traslado
+                        amount = self.amount_guides(bhg.guia_id, kwargs['project'])
+                        # print amount
+                        # bhg.guia_id,
+                        print bhg.traslado, type(bhg.traslado)
+                        guides.append([bhg.traslado.strftime('%m/%d'), float(amount['purchase']), float(amount['sales'])])
+                    except Exception, ex:
+                        print 'HERE EXCEPTION ', ex
+                kwargs = guides
         except Exception as oex:
             kwargs = { 'raise': str(oex) }
         return kwargs
+
+    def orders(self, orders):
+        try:
+            return DetGuiaRemision.objects.filter(
+                order_id__in=[x.pedido_id for x in orders],
+                guia__status='GE')
+        except Exception, ex:
+            print ex
+
+    def amount_guides(self, guide, pro):
+        try:
+            amount = { 'purchase': 0, 'sales': 0 }
+            for x in DetGuiaRemision.objects.filter(guia_id=guide):
+                dsm = DSMetrado.objects.filter(
+                    dsector__dsector_id__startswith=pro,
+                    materials_id=x.materiales_id)
+                if dsm:
+                    dsm = dsm[0]
+                    amount['purchase'] += dsm.ppurchase * Decimal(x.cantguide)
+                    amount['sales'] += dsm.psales * Decimal(x.cantguide)
+
+            amount['purchase'] = amount['purchase'].quantize(Decimal('0.01'))
+            amount['sales'] = amount['sales'].quantize(Decimal('0.01'))
+            return amount
+        except Exception, ex:
+            # print ex
+            return { 'purchase': 0, 'sales': 0 }
 
 
 # Manager View Sectors

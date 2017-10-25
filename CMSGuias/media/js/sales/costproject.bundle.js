@@ -136,19 +136,25 @@ var ControllerServiceProject = /** @class */ (function () {
             'symbol': null
         };
         this.sbworkforce = false;
+        this.wf = 0;
+        this.wfu = 0;
         this.tworkforce = 0;
         this.project = { pk: '', symbol: '' };
         this.accbudget = 0;
         this.accoperations = 0;
         this.accguides = 0;
+        this.chart_data = [];
         console.log("hi! hello world!!!");
         angular.element('.modal').modal();
         this.getItemizer();
         this.workforceData();
         setTimeout(function () {
+            _this.getCurve();
             _this.costBudget();
             _this.costOperations();
             _this.costGuides();
+            google.charts.load("visualization", "1", { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () { return _this.getCurve(); });
         }, 800);
     }
     ControllerServiceProject.prototype.getItemizer = function () {
@@ -315,6 +321,8 @@ var ControllerServiceProject = /** @class */ (function () {
                     var cwf = document.getElementById('workforce'), cwfu = document.getElementById("workforceused");
                     cwf.innerText = params_1.workforce;
                     cwfu.innerText = params_1.workforceused;
+                    _this.wf = parseFloat(params_1['workforce']);
+                    _this.wfu = parseFloat(params_1['workforceused']);
                     _this.tworkforce = (params_1.workforce - params_1.workforceused);
                     _this.sbworkforce = false;
                 }
@@ -332,6 +340,8 @@ var ControllerServiceProject = /** @class */ (function () {
                 var cwf = document.getElementById('workforce'), cwfu = document.getElementById("workforceused");
                 cwf.innerText = response['data'].workforce;
                 cwfu.innerText = response['data'].workforceused;
+                _this.wf = parseFloat(response['data']['workforce']);
+                _this.wfu = parseFloat(response['data']['workforceused']);
                 _this.tworkforce = (response['data'].workforce - response['data'].workforceused);
             }
             else {
@@ -376,6 +386,34 @@ var ControllerServiceProject = /** @class */ (function () {
             }
             else {
                 Materialize.toast("Error: " + response['data']['raise'], 3600);
+            }
+        });
+    };
+    ControllerServiceProject.prototype.getCurve = function () {
+        var _this = this;
+        this.proxy.get("/sales/projects/manager/" + this.project.pk, { 'cost': true, 'curves': true })
+            .then(function (response) {
+            // console.log(response['data'])
+            if (!response['data'].hasOwnProperty('raise')) {
+                _this.chart_data = response['data'];
+                // this.chart_data.forEach((arr) => {
+                // 	arr[0] = new Date(arr[0])
+                // })
+                console.log(google);
+                var data = google.visualization.arrayToDataTable(response['data']);
+                // data.addColumn('string', 'Day')
+                // data.addColumn('number', 'Purchase')
+                // data.addColumn('number', 'Sales')
+                // data.addRows(this.chart_data)
+                var options = {
+                    title: 'Company Performance',
+                    hAxis: { title: 'Year', titleTextStyle: { color: '#333' } },
+                    vAxis: { minValue: 0 },
+                    width: 1280,
+                    height: 500
+                };
+                var chart = new google.visualization.AreaChart(document.getElementById('chart_view'));
+                chart.draw(data, options);
             }
         });
     };
