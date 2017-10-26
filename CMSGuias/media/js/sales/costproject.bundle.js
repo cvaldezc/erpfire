@@ -143,19 +143,21 @@ var ControllerServiceProject = /** @class */ (function () {
         this.accbudget = 0;
         this.accoperations = 0;
         this.accguides = 0;
-        this.chart_data = [];
+        this.chart_indeterminate = [];
+        this.chart_progress = [];
         console.log("hi! hello world!!!");
         angular.element('.modal').modal();
         this.getItemizer();
         this.workforceData();
         setTimeout(function () {
-            _this.getCurve();
+            // this.getCurve()
             _this.costBudget();
             _this.costOperations();
             _this.costGuides();
             google.charts.load("visualization", "1", { 'packages': ['corechart'] });
             google.charts.setOnLoadCallback(function () { return _this.getCurve(); });
         }, 800);
+        window.addEventListener('resize', function () { _this.drawCharts(); }, false);
     }
     ControllerServiceProject.prototype.getItemizer = function () {
         var _this = this;
@@ -395,27 +397,33 @@ var ControllerServiceProject = /** @class */ (function () {
             .then(function (response) {
             // console.log(response['data'])
             if (!response['data'].hasOwnProperty('raise')) {
-                _this.chart_data = response['data'];
-                // this.chart_data.forEach((arr) => {
-                // 	arr[0] = new Date(arr[0])
-                // })
-                console.log(google);
-                var data = google.visualization.arrayToDataTable(response['data']);
-                // data.addColumn('string', 'Day')
-                // data.addColumn('number', 'Purchase')
-                // data.addColumn('number', 'Sales')
-                // data.addRows(this.chart_data)
-                var options = {
-                    title: 'Company Performance',
-                    hAxis: { title: 'Year', titleTextStyle: { color: '#333' } },
-                    vAxis: { minValue: 0 },
-                    width: 1280,
-                    height: 500
-                };
-                var chart = new google.visualization.AreaChart(document.getElementById('chart_view'));
-                chart.draw(data, options);
+                _this.chart_indeterminate = response['data']['indeterminate'];
+                _this.chart_indeterminate.unshift(['Dates', 'Purchase', 'Sales']);
+                _this.chart_progress = response['data']['progress'];
+                _this.chart_progress.unshift(['Dates', 'Purchase', 'Sales']);
+                _this.drawCharts();
             }
         });
+    };
+    /** endblock */
+    ControllerServiceProject.prototype.drawCharts = function () {
+        var data = google.visualization.arrayToDataTable(this.chart_indeterminate);
+        var options = {
+            title: 'Costo del Proyecto en el Tiempo',
+            hAxis: { title: 'Fechas', titleTextStyle: { color: '#333' } },
+            vAxis: { minValue: 0, title: 'Costo' },
+            curveType: 'none',
+            explorer: { axis: 'horizontal', keepInBounds: false },
+            width: (window.innerWidth < 780) ? 1024 : (window.innerWidth - 80),
+            height: 500
+        };
+        var chart = new google.visualization.AreaChart(document.getElementById('chart_view_indeterminate'));
+        chart.draw(data, options);
+        // block chart progess
+        var dprogess = google.visualization.arrayToDataTable(this.chart_progress);
+        var chart_progres = new google.visualization.LineChart(document.getElementById('chart_view_progress'));
+        options['curveType'] = 'function';
+        chart_progres.draw(dprogess, options);
     };
     ControllerServiceProject.$inject = ['ServiceFactory'];
     return ControllerServiceProject;

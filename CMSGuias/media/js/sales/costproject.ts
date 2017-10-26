@@ -108,7 +108,8 @@ class ControllerServiceProject implements IController {
 	accbudget: number = 0
 	accoperations: number = 0
 	accguides: number = 0
-	chart_data: Array<Array<any>> = []
+	chart_indeterminate: Array<Array<any>> = []
+	chart_progress: Array<Array<any>> = []
 
 	static $inject = ['ServiceFactory']
 
@@ -118,13 +119,14 @@ class ControllerServiceProject implements IController {
 		this.getItemizer()
 		this.workforceData()
 		setTimeout(() => {
-			this.getCurve()
+			// this.getCurve()
 			this.costBudget()
 			this.costOperations()
 			this.costGuides()
-			google.charts.load("visualization", "1", { 'packages': ['corechart']})
+			google.charts.load("visualization", "1", { 'packages': ['corechart'] })
 			google.charts.setOnLoadCallback(() => this.getCurve())
 		}, 800)
+		window.addEventListener('resize', () => { this.drawCharts() }, false)
 	}
 
 	getItemizer(): void {
@@ -256,7 +258,7 @@ class ControllerServiceProject implements IController {
 		let gworkforceUsed: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforceused")
 		let wdiv: HTMLDivElement = document.createElement('div'),
 			winput: HTMLInputElement = document.createElement('input')
-		let	wudiv: HTMLDivElement = document.createElement('div'),
+		let wudiv: HTMLDivElement = document.createElement('div'),
 			wuinput: HTMLInputElement = document.createElement('input'),
 			wf: number = 0,
 			wfu: number = 0
@@ -292,9 +294,8 @@ class ControllerServiceProject implements IController {
 	saveWorkforce(): void {
 		let iwf: HTMLInputElement = <HTMLInputElement>document.getElementById('iworkforce'),
 			iwfu: HTMLInputElement = <HTMLInputElement>document.getElementById('iworkforceused')
-		if (iwf != undefined && iwfu != undefined)
-		{
-			let params: { [key: string]: any} = {
+		if (iwf != undefined && iwfu != undefined) {
+			let params: { [key: string]: any } = {
 				workforce: iwf.value,
 				workforceused: iwfu.value,
 			}
@@ -339,7 +340,7 @@ class ControllerServiceProject implements IController {
 	 */
 	costBudget(): void {
 		this.proxy.get(`/sales/projects/manager/${this.project.pk}/`, { 'budget': true, 'cost': true })
-			.then( (response: any) => {
+			.then((response: any) => {
 				if (!response.data.hasOwnProperty('raise')) {
 					this.accbudget = response['data']['purchase']
 				} else {
@@ -350,19 +351,19 @@ class ControllerServiceProject implements IController {
 
 	costOperations(): void {
 		this.proxy.get(`/sales/projects/manager/${this.project.pk}/`, { 'cost': true, 'operations': true })
-			.then( (response: any) => {
+			.then((response: any) => {
 				if (!response.data.hasOwnProperty('raise')) {
 					this.accoperations = parseFloat(response['data']['purchase'])
 				} else {
-					Materialize.toast(`Error ${response['data']['raise'] }`, 3600)
+					Materialize.toast(`Error ${response['data']['raise']}`, 3600)
 				}
 			})
 	}
 
 	costGuides(): void {
-		this.proxy.get(`/sales/projects/manager/${this.project.pk}`, { 'cost': true, 'guides': true})
-			.then( (response: any) => {
-				if(!response.data.hasOwnProperty('raise')) {
+		this.proxy.get(`/sales/projects/manager/${this.project.pk}`, { 'cost': true, 'guides': true })
+			.then((response: any) => {
+				if (!response.data.hasOwnProperty('raise')) {
 					this.accguides = parseFloat(response['data']['purchase'])
 				} else {
 					Materialize.toast(`Error: ${response['data']['raise']}`, 3600)
@@ -372,38 +373,41 @@ class ControllerServiceProject implements IController {
 
 	getCurve(): void {
 		this.proxy.get(`/sales/projects/manager/${this.project.pk}`, { 'cost': true, 'curves': true })
-			.then( (response: any ) => {
+			.then((response: any) => {
 				// console.log(response['data'])
 				if (!response['data'].hasOwnProperty('raise')) {
-					this.chart_data = response['data']
-					// this.chart_data.forEach((arr) => {
-					// 	arr[0] = new Date(arr[0])
-					// })
-					console.log(google)
-					let data: any = google.visualization.arrayToDataTable(response['data'])
-					// data.addColumn('string', 'Day')
-					// data.addColumn('number', 'Purchase')
-					// data.addColumn('number', 'Sales')
+					this.chart_indeterminate = response['data']['indeterminate']
+					this.chart_indeterminate.unshift(['Dates', 'Purchase', 'Sales'])
+					this.chart_progress = response['data']['progress']
+					this.chart_progress.unshift(['Dates', 'Purchase', 'Sales'])
 
-					// data.addRows(this.chart_data)
-
-					let options = {
-						title: 'Company Performance',
-						hAxis: {title: 'Year',  titleTextStyle: {color: '#333'}},
-						vAxis: {minValue: 0},
-						width: 1280,
-						height: 500
-					}
-					let chart = new google.visualization.AreaChart(document.getElementById('chart_view'));
-					chart.draw(data, options)
+					this.drawCharts()
 				}
 			})
 	}
 	/** endblock */
 
-	// drawChart(): void {
+	drawCharts(): void {
+		let data: any = google.visualization.arrayToDataTable(this.chart_indeterminate)
 
-	// }
+		let options = {
+			title: 'Costo del Proyecto en el Tiempo',
+			hAxis: { title: 'Fechas', titleTextStyle: { color: '#333' } },
+			vAxis: { minValue: 0, title: 'Costo' },
+			curveType: 'none',
+			explorer: { axis: 'horizontal', keepInBounds: false },
+			width: (window.innerWidth < 780) ? 1024 : (window.innerWidth - 80),
+			height: 500
+		}
+		let chart = new google.visualization.AreaChart(document.getElementById('chart_view_indeterminate'))
+		chart.draw(data, options)
+
+		// block chart progess
+		let dprogess: any = google.visualization.arrayToDataTable(this.chart_progress)
+		let chart_progres = new google.visualization.LineChart(document.getElementById('chart_view_progress'))
+		options['curveType'] = 'function'
+		chart_progres.draw(dprogess, options)
+	}
 
 }
 

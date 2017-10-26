@@ -15,6 +15,7 @@
   {% endif %}
 {% endblock menu %}
 {% block content %}
+<link rel="stylesheet" href="{{ MEDIA_URL }}css/charts.css">
 <section ng-app="app" ng-controller="controller as vm">
   <a href="{% url 'managerpro_view' pro.proyecto_id %}" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
     <i class="fa fa-chevron-left"></i>
@@ -24,10 +25,14 @@
     <div class="col s12 m12 l12">
       <div class="card">
         <div class="card-content">
-          <button type="button" class="model-trigger right waves-effect waves-light btn white black-text" data-target="charts">
-              <i class="fa fa-line-chart"></i>
-              <!-- <span class="hide-on-small-only"></span> -->
-            </button>
+          <button type="button" class="model-trigger right waves-effect waves-light btn white black-text" data-target="chart_progress">
+            <i class="fa fa-line-chart"></i>
+            <!-- <span class="hide-on-small-only"></span> -->
+          </button>
+          <button type="button" class="model-trigger right waves-effect waves-light btn white black-text" data-target="chart_indeterminate">
+            <i class="fa fa-area-chart"></i>
+            <!-- <span class="hide-on-small-only"></span> -->
+          </button>
           <button type="button" class="modal-trigger right waves-effect waves-light btn white black-text" data-target="summary">
             <i class="fa fa-table"></i>
             <!-- <span class="hide-on-small-only"></span> -->
@@ -214,7 +219,10 @@
           <a href="#!up" class="right grey-text text-darken-3" ng-model="vm.swf" ng-init="vm.swf=false" ng-click="vm.swf=!vm.swf">
             <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.swf, 'fa-chevron-down': vm.swf }"></i>
           </a>
-          <h5>MANO DE OBRA</h5>
+          <h5>
+            MANO DE OBRA
+            <small>(DEBE DE INGRESAR EL MONTO EN DOLARES)</small>
+          </h5>
           <!-- set amount workforce -->
           <button type="button" class="btn light-green" ng-click="vm.workforce()">
             <i class="fa fa-money black-text"></i>
@@ -364,12 +372,13 @@
     <div class="modal" id="summary">
       <div class="modal-content">
         <h6>
-          Balance de Utilidad
+          BALANCE
         </h6>
         {% verbatim %}
         <table class="table bordered striped responsive-table">
           <thead>
             <tr>
+              <th></th>
               <th>MATERIALES</th>
               <th>MANO DE OBRA</th>
               <th>GASTOS GENERALES</th>
@@ -378,18 +387,21 @@
           </thead>
           <tbody>
             <tr>
+              <th>Asignado</th>
               <td class="right-align">{{vm.accbudget | number:2}}</td>
               <td class="right-align">{{vm.wf | number:2}}</td>
               <td class="right-align">{{vm.assignament | number:2}}</td>
               <td class="right-align">{{(vm.accbudget + vm.wf + vm.assignament) | number:2}}</td>
             </tr>
             <tr>
+              <th>Gastado</th>
               <td class="right-align">{{vm.accguides | number:2}}</td>
               <td class="right-align">{{vm.wfu | number:2}}</td>
               <td class="right-align">{{vm.spent | number: 2}}</td>
               <td class="right-align">{{(vm.accguides + vm.wfu + vm.spent) | number:2}}</td>
             </tr>
             <tr>
+              <th>Utilidad</th>
               <td class="right-align">{{vm.accbudget - vm.accguides | number:2}}</td>
               <td class="right-align">{{vm.wf - vm.wfu | number:2}}</td>
               <td class="right-align">{{vm.assignament - vm.spent | number:2}}</td>
@@ -410,10 +422,26 @@
         </button> -->
       </div>
     </div>
-    <!-- block chart -->
-    <div class="modal col l12 m12 s12" style="max-height: 95%;" id="charts">
+    <!-- block chart indeterminate -->
+    <div class="modal col l12 m12 s12" style="max-height: 95%;" id="chart_indeterminate">
       <div class="modal-content">
-        <div id="chart_view" style="width: 100%; min-height: 500px"></div>
+        <div id="chart_view_indeterminate" class="charts-views"></div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 black-text">
+            <i class="fa fa-times"></i>
+            <span class="hide-on-small-only">Salir</span>
+          </button>
+          <!-- <button type="button" class="waves-effect waves-light btn light-blue">
+            <i class="fa fa-floppy-o"></i>
+            <span class="hide-on-small-only"></span>
+          </button> -->
+        </div>
+    </div>
+    <!-- block chart progress -->
+    <div class="modal col l12 m12 s12" style="max-height: 95%;" id="chart_progress">
+      <div class="modal-content">
+        <div id="chart_view_progress" class="charts-views"></div>
       </div>
       <div class="modal-footer">
           <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 black-text">
