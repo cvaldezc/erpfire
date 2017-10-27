@@ -83,13 +83,6 @@ import { ServiceFactory, httpConfigs } from '../serviceFactory'
 // }
 
 interface IController {
-	itemizer: object;
-	itemizers: object;
-	assignament: number;
-	spent: number;
-	prcurrency: { [key: string]: any }
-	sbworkforce: boolean
-	tworkforce: number
 	getItemizer(): void;
 	saveItemizer(): void;
 	calcAmounts(): void;
@@ -108,7 +101,15 @@ class ControllerServiceProject implements IController {
 		'symbol': null
 	}
 	sbworkforce: boolean = false
+	wf: number = 0
+	wfu: number = 0
 	tworkforce: number = 0
+	project: { [key: string]: any } = { pk: '', symbol: '' }
+	accbudget: number = 0
+	accoperations: number = 0
+	accguides: number = 0
+	chart_indeterminate: Array<Array<any>> = []
+	chart_progress: Array<Array<any>> = []
 
 	static $inject = ['ServiceFactory']
 
@@ -117,6 +118,15 @@ class ControllerServiceProject implements IController {
 		angular.element('.modal').modal()
 		this.getItemizer()
 		this.workforceData()
+		setTimeout(() => {
+			// this.getCurve()
+			this.costBudget()
+			this.costOperations()
+			this.costGuides()
+			google.charts.load("visualization", "1", { 'packages': ['corechart'] })
+			google.charts.setOnLoadCallback(() => this.getCurve())
+		}, 800)
+		window.addEventListener('resize', () => { this.drawCharts() }, false)
 	}
 
 	getItemizer(): void {
@@ -248,7 +258,7 @@ class ControllerServiceProject implements IController {
 		let gworkforceUsed: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforceused")
 		let wdiv: HTMLDivElement = document.createElement('div'),
 			winput: HTMLInputElement = document.createElement('input')
-		let	wudiv: HTMLDivElement = document.createElement('div'),
+		let wudiv: HTMLDivElement = document.createElement('div'),
 			wuinput: HTMLInputElement = document.createElement('input'),
 			wf: number = 0,
 			wfu: number = 0
@@ -279,15 +289,13 @@ class ControllerServiceProject implements IController {
 		wudiv.appendChild(wuinput)
 		gworkforceUsed.appendChild(wudiv)
 		this.sbworkforce = true
-
 	}
 
 	saveWorkforce(): void {
 		let iwf: HTMLInputElement = <HTMLInputElement>document.getElementById('iworkforce'),
 			iwfu: HTMLInputElement = <HTMLInputElement>document.getElementById('iworkforceused')
-		if (iwf != undefined && iwfu != undefined)
-		{
-			let params: { [key: string]: any} = {
+		if (iwf != undefined && iwfu != undefined) {
+			let params: { [key: string]: any } = {
 				workforce: iwf.value,
 				workforceused: iwfu.value,
 			}
@@ -298,6 +306,8 @@ class ControllerServiceProject implements IController {
 							cwfu: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforceused")
 						cwf.innerText = params.workforce
 						cwfu.innerText = params.workforceused
+						this.wf = parseFloat(params['workforce'])
+						this.wfu = parseFloat(params['workforceused'])
 						this.tworkforce = (params.workforce - params.workforceused)
 						this.sbworkforce = false
 					} else {
@@ -315,6 +325,8 @@ class ControllerServiceProject implements IController {
 						cwfu: HTMLHeadingElement = <HTMLHeadingElement>document.getElementById("workforceused")
 					cwf.innerText = response['data'].workforce
 					cwfu.innerText = response['data'].workforceused
+					this.wf = parseFloat(response['data']['workforce'])
+					this.wfu = parseFloat(response['data']['workforceused'])
 					this.tworkforce = (response['data'].workforce - response['data'].workforceused)
 				} else {
 					Materialize.toast(`Error ${response['data']['raise']}`, 3600)
@@ -322,9 +334,84 @@ class ControllerServiceProject implements IController {
 			})
 	}
 
+	/* enblock */
+	/**
+	 * block cost
+	 */
+	costBudget(): void {
+		this.proxy.get(`/sales/projects/manager/${this.project.pk}/`, { 'budget': true, 'cost': true })
+			.then((response: any) => {
+				if (!response.data.hasOwnProperty('raise')) {
+					this.accbudget = response['data']['purchase']
+				} else {
+					Materialize.toast(`Error ${response['data']['raise']}`, 3600)
+				}
+			})
+	}
+
+	costOperations(): void {
+		this.proxy.get(`/sales/projects/manager/${this.project.pk}/`, { 'cost': true, 'operations': true })
+			.then((response: any) => {
+				if (!response.data.hasOwnProperty('raise')) {
+					this.accoperations = parseFloat(response['data']['purchase'])
+				} else {
+					Materialize.toast(`Error ${response['data']['raise']}`, 3600)
+				}
+			})
+	}
+
+	costGuides(): void {
+		this.proxy.get(`/sales/projects/manager/${this.project.pk}`, { 'cost': true, 'guides': true })
+			.then((response: any) => {
+				if (!response.data.hasOwnProperty('raise')) {
+					this.accguides = parseFloat(response['data']['purchase'])
+				} else {
+					Materialize.toast(`Error: ${response['data']['raise']}`, 3600)
+				}
+			})
+	}
+
+	getCurve(): void {
+		this.proxy.get(`/sales/projects/manager/${this.project.pk}`, { 'cost': true, 'curves': true })
+			.then((response: any) => {
+				// console.log(response['data'])
+				if (!response['data'].hasOwnProperty('raise')) {
+					this.chart_indeterminate = response['data']['indeterminate']
+					this.chart_indeterminate.unshift(['Dates', 'Compra', 'Ventas'])
+					this.chart_progress = response['data']['progress']
+					this.chart_progress.unshift(['Dates', 'Compra', 'Ventas'])
+
+					this.drawCharts()
+				}
+			})
+	}
+	/** endblock */
+
+	drawCharts(): void {
+		let data: any = google.visualization.arrayToDataTable(this.chart_indeterminate)
+
+		let options = {
+			title: 'Costo del Proyecto en el Tiempo',
+			hAxis: { title: 'Fechas', titleTextStyle: { color: '#333' } },
+			vAxis: { minValue: 0, title: 'Costo' },
+			curveType: 'none',
+			explorer: { axis: 'horizontal', keepInBounds: false },
+			width: (window.innerWidth < 780) ? 1024 : (window.innerWidth - 80),
+			height: 500
+		}
+		let chart = new google.visualization.AreaChart(document.getElementById('chart_view_indeterminate'))
+		chart.draw(data, options)
+
+		// block chart progess
+		let dprogess: any = google.visualization.arrayToDataTable(this.chart_progress)
+		let chart_progres = new google.visualization.LineChart(document.getElementById('chart_view_progress'))
+		options['curveType'] = 'function'
+		chart_progres.draw(dprogess, options)
+	}
+
 }
 
-let apps = angular.module('app', ['ngCookies']);
-apps.service('ServiceFactory', ServiceFactory);
+let apps = angular.module('app', ['ngCookies'])
+apps.service('ServiceFactory', ServiceFactory)
 apps.controller('controller', ControllerServiceProject)
 apps.config(httpConfigs);

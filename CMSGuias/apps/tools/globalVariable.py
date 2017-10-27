@@ -14,9 +14,9 @@ from CMSGuias.apps.tools import number_to_char
 #######################
 #  Variables Globals  #
 #######################
-"""
+'''
     Status ENTITIES
-"""
+'''
 status = {
     'AC': 'ACTIVO',
     'AN': 'ANULADO',

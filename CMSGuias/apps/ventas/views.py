@@ -4,6 +4,8 @@
 import json
 import os
 import shutil
+import datetime
+from decimal import Decimal
 
 from django.db.models import Q, Sum
 # from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -32,7 +34,8 @@ from CMSGuias.apps.operations.models import (
     DeductiveOutputs,
     Letter,
     LetterAnexo,
-    DSector)
+    DSector,
+    DSMetrado)
 from CMSGuias.apps.almacen.models import (
     Inventario,
     Pedido,
@@ -486,17 +489,20 @@ class ProjectManager(JSONResponseMixin, View):
         try:
             if request.is_ajax():
                 try:
+                    if 'cost' in request.GET:
+                        context = self.costProject(request, kwargs)
                     if 'listPurchase' in request.GET:
-                        context['list'] = [{
-                            'nro': x.nropurchase,
-                            'issued': globalVariable.format_date_str(x.issued),
-                            'document': x.document.documento,
-                            'order': str(x.order),
-                            'id': x.id}
-                            for x in PurchaseOrder.objects.filter(
-                                        flag=True,
-                                        project_id=kwargs['project']
-                                        ).order_by('register')]
+                        context['list'] = [
+                            {
+                                'nro': x.nropurchase,
+                                'issued': globalVariable.format_date_str(x.issued),
+                                'document': x.document.documento,
+                                'order': str(x.order),
+                                'id': x.id
+                            } for x in PurchaseOrder.objects.filter(
+                                flag=True,
+                                project_id=kwargs['project']).order_by('register')
+                        ]
                         context['status'] = True
                     if 'editPurchase' in request.GET:
                         obj = PurchaseOrder.objects.get(
@@ -540,18 +546,26 @@ class ProjectManager(JSONResponseMixin, View):
                 return self.render_to_json_response(context)
             context['project'] = Proyecto.objects.get(pk=kwargs['project'], flag=True)
             if context['project'].status != 'AC' and context['project'].status != 'PE':
-                return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['project']}))
+                return redirect(reverse('statusproject_view', kwargs={ 'pk': kwargs['project'] }))
             try:
                 context['subpro'] = Subproyecto.objects.filter(
-                                        proyecto_id=kwargs['project'],
-                                        flag=True)
+                    proyecto_id=kwargs['project'],
+                    flag=True)
             except ObjectDoesNotExist, e:
                 context['subpro'] = list()
-            context['sectors'] = Sectore.objects.filter(proyecto_id=kwargs['project'], flag=True).order_by('subproyecto', 'planoid')
+            context['sectors'] = Sectore.objects.filter(
+                proyecto_id=kwargs['project'],
+                flag=True).order_by('subproyecto', 'planoid')
             context['operation'] = Employee.objects.filter(
-                Q(charge__area__istartswith='opera') | Q(empdni_id=72604244)).order_by('charge__area')
-            context['admin'] = Employee.objects.filter(charge__area__istartswith='admin').order_by('charge__area')
-            context['alerts'] = Alertasproyecto.objects.filter(Q(proyecto_id=kwargs['project']) | ~Q(subproyecto_id=None), Q(sector_id=None), Q(flag=True)).order_by('-registrado')
+                Q(charge__area__istartswith='opera') |
+                Q(empdni_id=72604244)).order_by('charge__area')
+            context['admin'] = Employee.objects.filter(
+                charge__area__istartswith='admin').order_by('charge__area')
+            context['alerts'] = Alertasproyecto.objects.filter(
+                Q(proyecto_id=kwargs['project']) |
+                ~Q(subproyecto_id=None),
+                Q(sector_id=None),
+                Q(flag=True)).order_by('-registrado')
             context['currency'] = Moneda.objects.filter(flag=True)
             context['document'] = Documentos.objects.filter(flag=True)
             context['method'] = FormaPago.objects.filter(flag=True)
@@ -563,7 +577,7 @@ class ProjectManager(JSONResponseMixin, View):
                 pass
             return render_to_response(self.template_name, context, context_instance = RequestContext(request))
         except TemplateDoesNotExist, e:
-            messages.error(request, 'Template not Exist %s',e)
+            messages.error(request, 'Template not Exist %s', e)
             raise Http404(e)
 
     @method_decorator(login_required)
@@ -957,6 +971,188 @@ class ProjectManager(JSONResponseMixin, View):
                 context['raise'] = e.__str__()
                 context['status'] = False
             return self.render_to_json_response(context)
+
+    def costProject(self, request, kwargs):
+        try:
+            if 'budget' in request.GET:
+                csects = Sectore.objects.filter(proyecto_id=kwargs['project'])
+                kwargs = { 'purchase': sum([x.amount for x in csects], 0), 'sales': sum([x.amountsales for x in csects]) }
+            if 'operations' in request.GET:
+                acc = DSMetrado.objects.filter(dsector__dsector_id__startswith=kwargs['project'])
+                kwargs = {
+                    'purchase': Decimal(sum([(Decimal(x.quantity).quantize(Decimal('0.01')) * x.ppurchase) for x in acc])).quantize(Decimal('0.01')),
+                    'sales': Decimal(sum([(Decimal(x.quantity).quantize(Decimal('0.01')) * x.psales) for x in acc])).quantize(Decimal('0.01'))
+                }
+            if 'guides' in request.GET:
+                orders = Pedido.objects.filter(proyecto_id=kwargs['project'], status__in=['IN', 'CO'])
+                dguides =  DetGuiaRemision.objects.filter(
+                    order_id__in=[x.pedido_id for x in orders],
+                    guia__status='GE')
+                purchase, sales = 0, 0
+                for x in dguides:
+                    dsm = DSMetrado.objects.filter(
+                        dsector__dsector_id__startswith=kwargs['project'],
+                        materials_id=x.materiales_id)
+                    if len(dsm):
+                        dsm = dsm[0]
+                        purchase += (Decimal(x.cantguide) * dsm.ppurchase)
+                        sales += (Decimal(x.cantguide) * dsm.psales)
+
+                kwargs = {
+                    'purchase': Decimal(purchase).quantize(Decimal('0.01')),
+                    'sales': Decimal(sales).quantize(Decimal('0.01'))
+                    }
+            if 'curves' in request.GET:
+                orders = Pedido.objects.filter(proyecto_id=kwargs['project'], status__in=['IN', 'CO'])
+                dguides = self.orders(orders)
+                guides = []
+                amguides = []
+                for guide in dguides:
+                    try:
+                        amount = self.amount_material(guide.materiales_id, kwargs['project'])
+                        post = self.index_date(guides, guide.guia.traslado.strftime('%y/%m/%d'))
+                        if post == -1:
+                            guides.append([guide.guia.traslado.strftime('%y/%m/%d'), (amount['purchase'] * guide.cantguide), (amount['sales'] * guide.cantguide) ])
+                        else:
+                            guides[post][1] += (amount['purchase'] * guide.cantguide)
+                            guides[post][2] += (amount['sales'] * guide.cantguide)
+                    except Exception, ex:
+                        print 'HERE EXCEPTION ', ex
+
+                # add other expenses
+                expenses = self.cost_general_expenses(kwargs['project'])
+                print 'EXPENSES ', expenses
+                for x in expenses:
+                    index = self.index_date(guides, x[0])
+                    if index == -1:
+                        guides.append(x)
+                    else:
+                        guides[index][1] += x[1]
+                        guides[index][2] += x[2]
+
+                # add cost workforce
+                wf = ServicesProjectView().workforce({'listworkforce': True}, {'pro': kwargs['project']})
+                print wf
+                guides[len(guides)-1][1] += float(wf['workforceused'])
+                guides[len(guides)-1][2] += float(wf['workforceused'])*1.15
+                # order guides by date register
+                guides = sorted(guides, key=lambda dates: dates[0])
+
+                lastam = { 'purchase': 0, 'sales': 0 }
+                for x in guides:
+                    if x[0] != 'Dates':
+                        lastam['purchase'] += x[1]
+                        lastam['sales'] += x[2]
+                        amguides.append([x[0], lastam['purchase'], lastam['sales']])
+
+
+                kwargs = { 'indeterminate': guides, 'progress': amguides }
+        except Exception as oex:
+            kwargs = { 'raise': str(oex) }
+        return kwargs
+
+    def orders(self, orders):
+        try:
+            return DetGuiaRemision.objects.filter(
+                order_id__in=[x.pedido_id for x in orders],
+                guia__status='GE').order_by('-guia__traslado')
+        except Exception, ex:
+            print ex
+
+    def amount_guides(self, guide, pro):
+        try:
+            amount = { 'purchase': 0, 'sales': 0 }
+            for x in DetGuiaRemision.objects.filter(guia_id=guide):
+                dsm = DSMetrado.objects.filter(
+                    dsector__dsector_id__startswith=pro,
+                    materials_id=x.materiales_id)
+                if dsm:
+                    dsm = dsm[0]
+                    amount['purchase'] += dsm.ppurchase * Decimal(x.cantguide)
+                    amount['sales'] += dsm.psales * Decimal(x.cantguide)
+
+            amount['purchase'] = amount['purchase'].quantize(Decimal('0.01'))
+            amount['sales'] = amount['sales'].quantize(Decimal('0.01'))
+            return amount
+        except Exception, ex:
+            # print ex
+            return { 'purchase': 0, 'sales': 0 }
+
+    def amount_material(self, materials, project):
+        amount = { 'purchase': 0, 'sales': 0 }
+        try:
+            dsm = DSMetrado.objects.filter(
+                    dsector__dsector_id__startswith=project,
+                    materials_id=materials)
+            if dsm:
+                dsm = dsm[0]
+                amount['purchase'] = float(dsm.ppurchase)
+                amount['sales'] = float(dsm.psales)
+        except Exception as ex:
+            print ex
+        return amount
+
+    def index_date(self, arr, date):
+        index = -1
+        try:
+            for x in range(len(arr)):
+                # print x
+                if arr[x][0] == date:
+                    # print arr[x], date, x
+                    index = x
+                    break
+        except Exception as ex:
+            index = -1
+        return index
+
+    def cost_general_expenses(self, project):
+        cost = []
+        try:
+            serv = ServiceOrder.objects.filter(project_id=project).exclude(itemizer_id=None)
+            if serv:
+                exchange = serv[0].project.exchange
+
+            for xsv in serv:
+                date = xsv.register.strftime('%y/%m/%d')
+                index = self.index_date(cost, date)
+                details = DetailsServiceOrder.objects.filter(serviceorder_id=xsv.serviceorder_id)
+                price = float(sum([(Decimal(x.quantity)*x.price) for x in details]))
+                dsct = ((price*xsv.dsct)/100)
+                if xsv.currency_id == 'CU02':
+                    if exchange > 1:
+                        price = price/exchange
+                        dsct = dsct/exchange
+                    # else:
+                    #     price = price*exchange
+                    #     dsct = dsct*exchange
+
+                # print date, price-dsct, xsv.currency_id, exchange
+                if index == -1:
+                    cost.append([date, (price-dsct), ((price-dsct)*1.15)])
+                else:
+                    cost[index][1] += (price-dsct)
+                    cost[index][2] += ((price-dsct)*1.15)
+            # print '--------------------------'
+            oexpenses = PExpenses.objects.filter(project_id=project)
+            for xpe in oexpenses:
+                date = xpe.register.strftime('%y/%m/%d')
+                amount = float(xpe.amount)
+                if xpe.currency_id == 'CU02':
+                    if xpe.project.exchange > 1:
+                        amount = amount/xpe.project.exchange
+                    # else:
+                    #     amount = amount*xpe.project.exchange
+                index = self.index_date(cost, date)
+                # print date, amount, index, xpe.currency_id, xpe.project.exchange
+                if index == -1:
+                    cost.append([date, amount, amount*1.15])
+                else:
+                    cost[index][1] += (amount)
+                    cost[index][2] += ((amount)*1.15)
+
+        except Exception as ex:
+            print 'HERE ERROR ', ex
+        return cost
 
 
 # Manager View Sectors
@@ -2750,6 +2946,9 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                                 #        periodo=order[0].serviceorder.register.strftime('%Y'))], relations=('moneda')))[0]
                                 dx['exchange'] = order[0].serviceorder.project.exchange
                                 dx['amounts'] = sum([(od.quantity * float(od.price)) for od in order])
+                                dx['register'] = datetime.datetime.strptime(dx['fields']['register'][:10], '%Y-%m-%d')
+                                # print dx['fields']['register']
+
                             # endblock order services
                             # get another expenses
                             oexpenses = PExpenses.objects.filter(project_id=kwargs['pro'], itemizer_id=x['pk'])
@@ -2759,6 +2958,7 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                                             'exchange': ex.project.exchange,
                                             'itemizer': ex.itemizer_id,
                                             'description': ex.description,
+                                            'register': ex.register,
                                             # 'currency': ex.currency_id,
                                             'fields': {
                                                 'dsct': 0,

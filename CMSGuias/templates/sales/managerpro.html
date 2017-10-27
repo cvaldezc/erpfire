@@ -169,8 +169,8 @@
                                                 </button>
                                             </li> -->
                                         {% comment %}{% endif %}{% endcomment %}
-                                        <!-- load file materials -->
                                         {% if request.user.get_profile.empdni.charge.area|lower == 'ventas' or request.user.get_profile.empdni.charge.area|lower == 'administrator' %}
+                                            <!-- load file materials -->
                                             <li>
                                                 <button type="button" class="btn btn-link btn-xs text-black btn-prices-list pull-left" data-toggle="modal" data-target="#mlprices">
                                                     <span class="fa fa-file-excel-o"></span>
@@ -178,6 +178,13 @@
                                                 </button>
                                             </li>
                                         {% endif %}
+                                        <!-- Option Service -->
+                                        <li>
+                                            <a href="{% url 'servicesp_view' project.proyecto_id %}" class="btn btn-link btn-xs text-black">
+                                                <i class="fa fa-usd"></i>
+                                                <span class="glyphicon-class">Servicios</span>
+                                            </a>
+                                        </li>
                                         {% if project.status == 'AC' %}
                                             {% if request.user.get_profile.empdni.charge.area|lower == 'ventas' or  request.user.get_profile.empdni.charge.area|lower == 'logistica' or  request.user.get_profile.empdni.charge.area|lower == 'administrator' %}
                                                 <li>
@@ -185,13 +192,6 @@
                                                         <span class="fa fa-list-alt"></span>
                                                         <span class="glyphicon glyphicon-compressed"></span>
                                                         <span class="glyphicon-class">Lista Materiales</span>
-                                                    </a>
-                                                </li>
-                                                <!-- Option Service -->
-                                                <li>
-                                                    <a href="{% url 'servicesp_view' project.proyecto_id %}" class="btn btn-link btn-xs text-black">
-                                                        <i class="fa fa-usd"></i>
-                                                        <span class="glyphicon-class">Servicios</span>
                                                     </a>
                                                 </li>
                                                 <!-- Option Configuration Painting -->

@@ -126,6 +126,7 @@ var angular = __webpack_require__(1);
 var serviceFactory_1 = __webpack_require__(0);
 var ControllerServiceProject = /** @class */ (function () {
     function ControllerServiceProject(proxy) {
+        var _this = this;
         this.proxy = proxy;
         this.itemizers = {};
         this.assignament = 0;
@@ -135,11 +136,28 @@ var ControllerServiceProject = /** @class */ (function () {
             'symbol': null
         };
         this.sbworkforce = false;
+        this.wf = 0;
+        this.wfu = 0;
         this.tworkforce = 0;
+        this.project = { pk: '', symbol: '' };
+        this.accbudget = 0;
+        this.accoperations = 0;
+        this.accguides = 0;
+        this.chart_indeterminate = [];
+        this.chart_progress = [];
         console.log("hi! hello world!!!");
         angular.element('.modal').modal();
         this.getItemizer();
         this.workforceData();
+        setTimeout(function () {
+            // this.getCurve()
+            _this.costBudget();
+            _this.costOperations();
+            _this.costGuides();
+            google.charts.load("visualization", "1", { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () { return _this.getCurve(); });
+        }, 800);
+        window.addEventListener('resize', function () { _this.drawCharts(); }, false);
     }
     ControllerServiceProject.prototype.getItemizer = function () {
         var _this = this;
@@ -305,6 +323,8 @@ var ControllerServiceProject = /** @class */ (function () {
                     var cwf = document.getElementById('workforce'), cwfu = document.getElementById("workforceused");
                     cwf.innerText = params_1.workforce;
                     cwfu.innerText = params_1.workforceused;
+                    _this.wf = parseFloat(params_1['workforce']);
+                    _this.wfu = parseFloat(params_1['workforceused']);
                     _this.tworkforce = (params_1.workforce - params_1.workforceused);
                     _this.sbworkforce = false;
                 }
@@ -322,12 +342,88 @@ var ControllerServiceProject = /** @class */ (function () {
                 var cwf = document.getElementById('workforce'), cwfu = document.getElementById("workforceused");
                 cwf.innerText = response['data'].workforce;
                 cwfu.innerText = response['data'].workforceused;
+                _this.wf = parseFloat(response['data']['workforce']);
+                _this.wfu = parseFloat(response['data']['workforceused']);
                 _this.tworkforce = (response['data'].workforce - response['data'].workforceused);
             }
             else {
                 Materialize.toast("Error " + response['data']['raise'], 3600);
             }
         });
+    };
+    /* enblock */
+    /**
+     * block cost
+     */
+    ControllerServiceProject.prototype.costBudget = function () {
+        var _this = this;
+        this.proxy.get("/sales/projects/manager/" + this.project.pk + "/", { 'budget': true, 'cost': true })
+            .then(function (response) {
+            if (!response.data.hasOwnProperty('raise')) {
+                _this.accbudget = response['data']['purchase'];
+            }
+            else {
+                Materialize.toast("Error " + response['data']['raise'], 3600);
+            }
+        });
+    };
+    ControllerServiceProject.prototype.costOperations = function () {
+        var _this = this;
+        this.proxy.get("/sales/projects/manager/" + this.project.pk + "/", { 'cost': true, 'operations': true })
+            .then(function (response) {
+            if (!response.data.hasOwnProperty('raise')) {
+                _this.accoperations = parseFloat(response['data']['purchase']);
+            }
+            else {
+                Materialize.toast("Error " + response['data']['raise'], 3600);
+            }
+        });
+    };
+    ControllerServiceProject.prototype.costGuides = function () {
+        var _this = this;
+        this.proxy.get("/sales/projects/manager/" + this.project.pk, { 'cost': true, 'guides': true })
+            .then(function (response) {
+            if (!response.data.hasOwnProperty('raise')) {
+                _this.accguides = parseFloat(response['data']['purchase']);
+            }
+            else {
+                Materialize.toast("Error: " + response['data']['raise'], 3600);
+            }
+        });
+    };
+    ControllerServiceProject.prototype.getCurve = function () {
+        var _this = this;
+        this.proxy.get("/sales/projects/manager/" + this.project.pk, { 'cost': true, 'curves': true })
+            .then(function (response) {
+            // console.log(response['data'])
+            if (!response['data'].hasOwnProperty('raise')) {
+                _this.chart_indeterminate = response['data']['indeterminate'];
+                _this.chart_indeterminate.unshift(['Dates', 'Compra', 'Ventas']);
+                _this.chart_progress = response['data']['progress'];
+                _this.chart_progress.unshift(['Dates', 'Compra', 'Ventas']);
+                _this.drawCharts();
+            }
+        });
+    };
+    /** endblock */
+    ControllerServiceProject.prototype.drawCharts = function () {
+        var data = google.visualization.arrayToDataTable(this.chart_indeterminate);
+        var options = {
+            title: 'Costo del Proyecto en el Tiempo',
+            hAxis: { title: 'Fechas', titleTextStyle: { color: '#333' } },
+            vAxis: { minValue: 0, title: 'Costo' },
+            curveType: 'none',
+            explorer: { axis: 'horizontal', keepInBounds: false },
+            width: (window.innerWidth < 780) ? 1024 : (window.innerWidth - 80),
+            height: 500
+        };
+        var chart = new google.visualization.AreaChart(document.getElementById('chart_view_indeterminate'));
+        chart.draw(data, options);
+        // block chart progess
+        var dprogess = google.visualization.arrayToDataTable(this.chart_progress);
+        var chart_progres = new google.visualization.LineChart(document.getElementById('chart_view_progress'));
+        options['curveType'] = 'function';
+        chart_progres.draw(dprogess, options);
     };
     ControllerServiceProject.$inject = ['ServiceFactory'];
     return ControllerServiceProject;

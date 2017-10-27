@@ -1,0 +1,6 @@
+.charts-views {
+    min-height: 500px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+}

@@ -1,5 +1,5 @@
 {% extends "basemd.html" %}
-{% block title %} Servicios {% endblock title %}
+{% block title %} Expenses {% endblock title %}
 {% block menu %}
   {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
     {% include "menus/salesmd.html" %}
@@ -15,8 +15,9 @@
   {% endif %}
 {% endblock menu %}
 {% block content %}
+<link rel="stylesheet" href="{{ MEDIA_URL }}css/charts.css">
 <section ng-app="app" ng-controller="controller as vm">
-  <a href="/sales/projects/manger/{{pro.proyecto_id}}/" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
+  <a href="{% url 'managerpro_view' pro.proyecto_id %}" class="waves-effect waves-light btn grey lighten-5 grey-text text-darken-3">
     <i class="fa fa-chevron-left"></i>
     <span class="hide-on-small-only">REGRESAR</span>
   </a>
@@ -24,6 +25,20 @@
     <div class="col s12 m12 l12">
       <div class="card">
         <div class="card-content">
+          {% if request.user.get_profile.empdni.charge.area|lower == 'ventas' or request.user.get_profile.empdni.charge.area|lower == 'administrator' %}
+          <button type="button" class="model-trigger right waves-effect waves-light btn white black-text" data-target="chart_progress">
+            <i class="fa fa-line-chart"></i>
+            <!-- <span class="hide-on-small-only"></span> -->
+          </button>
+          <button type="button" class="model-trigger right waves-effect waves-light btn white black-text" data-target="chart_indeterminate">
+            <i class="fa fa-area-chart"></i>
+            <!-- <span class="hide-on-small-only"></span> -->
+          </button>
+          <button type="button" class="modal-trigger right waves-effect waves-light btn white black-text" data-target="summary">
+            <i class="fa fa-table"></i>
+            <!-- <span class="hide-on-small-only"></span> -->
+          </button>
+          {% endif %}
           <h5>
             GASTOS DE PROYECTO: [{{pro.proyecto_id}}] {{ pro.nompro }}
             <br>
@@ -41,6 +56,7 @@
           <input type="hidden" ng-model="vm.prcurrency.pk" ng-init="vm.prcurrency.pk='{{pro.currency_id}}'">
           <input type="hidden" ng-model="vm.prcurrency.symbol" ng-init="vm.prcurrency.symbol='{{pro.currency.simbolo}}'">
           <input type="hidden" ng-model="vm.area" ng-init="vm.area='{{ request.user.get_profile.empdni.charge.area|lower }}'">
+          <input type="hidden" ng-model="vm.project" ng-init="vm.project={ 'pk': '{{ pro.proyecto_id }}', 'symbol': '{{ pro.currency.simbolo }}' }">
         </div>
       </div>
     </div>
@@ -52,27 +68,27 @@
           <a href="#!up" class="right grey-text text-darken-3" ng-model="vm.sexp" ng-init="vm.sexp=false" ng-click="vm.sexp=!vm.sexp">
             <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.sexp, 'fa-chevron-down': vm.sexp }"></i>
           </a>
-          <h5>SERVIOS</h5>
-          {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-          <!-- <div class="card-action"> -->
+          <h5>SERVICIOS</h5>
           <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
             <i class="fa fa-file-text-o"></i>
             <span class="hide-on-small-only">Nueva Orden</span>
           </a>
-          <button type="button" data-target="mitemizer" class="waves-effect waves-light btn red accent-3">
-            <i class="fa fa-tags black-text"></i>
-            <span class="hide-on-small-only">Agregar Partida</span>
-          </button>
-          <a href="{% url 'project_expenses_view' pro.proyecto_id %}" class="right waves-light btn light-green">
-            <i class="black-text fa fa-money"></i>
-            <span class="hide-on-small-only">Otros Gastos</span>
-          </a>
-          <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
-                    <i class="fa fa-usd"></i>
-                    <span class="hide-on-small-only">Monto Servicios</span>
-                  </button> -->
-          <!-- </div> -->
+          {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+            <!-- <div class="card-action"> -->
+            <button type="button" data-target="mitemizer" class="waves-effect waves-light btn red accent-3">
+              <i class="fa fa-tags black-text"></i>
+              <span class="hide-on-small-only">Agregar Partida</span>
+            </button>
+            <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
+              <i class="fa fa-usd"></i>
+              <span class="hide-on-small-only">Monto Servicios</span>
+            </button> -->
+            <!-- </div> -->
           {% endif %}
+            <a href="{% url 'project_expenses_view' pro.proyecto_id %}" class="right waves-light btn light-green">
+              <i class="black-text fa fa-money"></i>
+              <span class="hide-on-small-only">Otros Gastos</span>
+            </a>
         </div>
         {% verbatim %}
         <div class="row" ng-hide="vm.sexp">
@@ -198,6 +214,9 @@
         </div>
       </div>
     </div>
+    {% endverbatim %}
+    {% if request.user.get_profile.empdni.charge.area|lower == 'ventas' or request.user.get_profile.empdni.charge.area|lower == 'administrator' %}
+    {% verbatim%}
     <!-- block workforce -->
     <div class="col s12 m12 l12">
       <div class="card">
@@ -205,7 +224,10 @@
           <a href="#!up" class="right grey-text text-darken-3" ng-model="vm.swf" ng-init="vm.swf=false" ng-click="vm.swf=!vm.swf">
             <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.swf, 'fa-chevron-down': vm.swf }"></i>
           </a>
-          <h5>MANO DE OBRA</h5>
+          <h5>
+            MANO DE OBRA
+            <small>(DEBE DE INGRESAR EL MONTO EN DOLARES)</small>
+          </h5>
           <!-- set amount workforce -->
           <button type="button" class="btn light-green" ng-click="vm.workforce()">
             <i class="fa fa-money black-text"></i>
@@ -257,16 +279,39 @@
           <a href="#!up" class="right grey-text text-darken-3" ng-model="vm.smg" ng-init="vm.smg=false" ng-click="vm.smg=!vm.smg">
             <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.smg, 'fa-chevron-down': vm.smg }"></i>
           </a>
-          <h5>MATERIALES
-            <small>(solo guias enviadas)</small>
+          <h5>
+            <span>MATERIALES</span>
+            <!-- <small>(solo guias enviadas)</small> -->
+            <!-- <h6><small>los precio son base y solo se considera el preico de compras.</small></h6> -->
           </h5>
-          <div class="row" ng-hide="vm.swf">
+          <div class="row" ng-hide="vm.smg">
+            <div class="col m4 l4 s12">
+              <h5>En Presupuesto</h5>
+              <h5 class="right-align">
+                {{ vm.accbudget }}
 
+              </h5>
+            </div>
+            <div class="col m4 l4 s12">
+              <h5>Costo en Operaciones</h5>
+              <h5 class="right-align">
+                {{ vm.accoperations }}
+
+              </h5>
+            </div>
+            <div class="col m4 l4 s12">
+              <h5>Costo en Obra</h5>
+              <h5 class="right-align">
+                {{ vm.accguides }}
+
+              </h5>
+            </div>
           </div>
         </div>
       </div>
     </div>
     {% endverbatim %}
+    {% endif %}
   </div>
   <div class="row">
     <div class="modal col l4 m12 s12 offset-l4" id="mitemizer">
@@ -329,9 +374,97 @@
         </div>
       </form>
     </div>
+    <!-- block summary -->
+    <div class="modal" id="summary">
+      <div class="modal-content">
+        <h6>
+          BALANCE
+        </h6>
+        {% verbatim %}
+        <table class="table bordered striped responsive-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>MATERIALES</th>
+              <th>MANO DE OBRA</th>
+              <th>GASTOS GENERALES</th>
+              <th>TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Asignado</th>
+              <td class="right-align">{{vm.accbudget | number:2}}</td>
+              <td class="right-align">{{vm.wf | number:2}}</td>
+              <td class="right-align">{{vm.assignament | number:2}}</td>
+              <td class="right-align">{{(vm.accbudget + vm.wf + vm.assignament) | number:2}}</td>
+            </tr>
+            <tr>
+              <th>Gastado</th>
+              <td class="right-align">{{vm.accguides | number:2}}</td>
+              <td class="right-align">{{vm.wfu | number:2}}</td>
+              <td class="right-align">{{vm.spent | number: 2}}</td>
+              <td class="right-align">{{(vm.accguides + vm.wfu + vm.spent) | number:2}}</td>
+            </tr>
+            <tr>
+              <th>Utilidad</th>
+              <td class="right-align">{{vm.accbudget - vm.accguides | number:2}}</td>
+              <td class="right-align">{{vm.wf - vm.wfu | number:2}}</td>
+              <td class="right-align">{{vm.assignament - vm.spent | number:2}}</td>
+              <td class="right-align">{{(vm.accbudget - vm.accguides) + (vm.wf - vm.wfu) + (vm.assignament - vm.spent) | number:2}}</td>
+            </tr>
+          </tbody>
+        </table>
+        {% endverbatim %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 black-text">
+          <i class="fa fa-times"></i>
+          <span class="hide-on-small-only">Salir</span>
+        </button>
+        <!-- <button type="button" class="waves-effect waves-light btn light-blue">
+          <i class="fa fa-floppy-o"></i>
+          <span class="hide-on-small-only"></span>
+        </button> -->
+      </div>
+    </div>
+    <!-- block chart indeterminate -->
+    <div class="modal col l12 m12 s12" style="max-height: 95%;" id="chart_indeterminate">
+      <div class="modal-content">
+        <div id="chart_view_indeterminate" class="charts-views"></div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 black-text">
+            <i class="fa fa-times"></i>
+            <span class="hide-on-small-only">Salir</span>
+          </button>
+          <!-- <button type="button" class="waves-effect waves-light btn light-blue">
+            <i class="fa fa-floppy-o"></i>
+            <span class="hide-on-small-only"></span>
+          </button> -->
+        </div>
+    </div>
+    <!-- block chart progress -->
+    <div class="modal col l12 m12 s12" style="max-height: 95%;" id="chart_progress">
+      <div class="modal-content">
+        <div id="chart_view_progress" class="charts-views"></div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="modal-action modal-close waves-effect btn grey lighten-5 black-text">
+            <i class="fa fa-times"></i>
+            <span class="hide-on-small-only">Salir</span>
+          </button>
+          <!-- <button type="button" class="waves-effect waves-light btn light-blue">
+            <i class="fa fa-floppy-o"></i>
+            <span class="hide-on-small-only"></span>
+          </button> -->
+        </div>
+    </div>
     <!-- endblock-->
   </div>
 </section>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://www.google.com/jsapi"></script>
 <script defer src="{{ MEDIA_URL }}vendor/angular/angular.min.js"></script>
 <script defer src="{{ MEDIA_URL }}vendor/angular-cookies/angular-cookies.min.js"></script>
 <script defer src="{{ MEDIA_URL }}js/sales/costproject.bundle.js"></script>
