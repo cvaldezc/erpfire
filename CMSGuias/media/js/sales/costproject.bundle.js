@@ -398,9 +398,9 @@ var ControllerServiceProject = /** @class */ (function () {
             // console.log(response['data'])
             if (!response['data'].hasOwnProperty('raise')) {
                 _this.chart_indeterminate = response['data']['indeterminate'];
-                _this.chart_indeterminate.unshift(['Dates', 'Purchase', 'Sales']);
+                _this.chart_indeterminate.unshift(['Dates', 'Compra', 'Ventas']);
                 _this.chart_progress = response['data']['progress'];
-                _this.chart_progress.unshift(['Dates', 'Purchase', 'Sales']);
+                _this.chart_progress.unshift(['Dates', 'Compra', 'Ventas']);
                 _this.drawCharts();
             }
         });

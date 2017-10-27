@@ -25,6 +25,7 @@
     <div class="col s12 m12 l12">
       <div class="card">
         <div class="card-content">
+          {% if request.user.get_profile.empdni.charge.area|lower == 'ventas' or request.user.get_profile.empdni.charge.area|lower == 'administrator' %}
           <button type="button" class="model-trigger right waves-effect waves-light btn white black-text" data-target="chart_progress">
             <i class="fa fa-line-chart"></i>
             <!-- <span class="hide-on-small-only"></span> -->
@@ -37,6 +38,7 @@
             <i class="fa fa-table"></i>
             <!-- <span class="hide-on-small-only"></span> -->
           </button>
+          {% endif %}
           <h5>
             GASTOS DE PROYECTO: [{{pro.proyecto_id}}] {{ pro.nompro }}
             <br>
@@ -67,26 +69,26 @@
             <i class="fa fa-lg" ng-class="{'fa-chevron-up': !vm.sexp, 'fa-chevron-down': vm.sexp }"></i>
           </a>
           <h5>SERVICIOS</h5>
-          {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
-          <!-- <div class="card-action"> -->
           <a href="{% url 'oservicenew_view' %}" class="btn light-blue">
             <i class="fa fa-file-text-o"></i>
             <span class="hide-on-small-only">Nueva Orden</span>
           </a>
-          <button type="button" data-target="mitemizer" class="waves-effect waves-light btn red accent-3">
-            <i class="fa fa-tags black-text"></i>
-            <span class="hide-on-small-only">Agregar Partida</span>
-          </button>
-          <a href="{% url 'project_expenses_view' pro.proyecto_id %}" class="right waves-light btn light-green">
-            <i class="black-text fa fa-money"></i>
-            <span class="hide-on-small-only">Otros Gastos</span>
-          </a>
-          <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
-                    <i class="fa fa-usd"></i>
-                    <span class="hide-on-small-only">Monto Servicios</span>
-                  </button> -->
-          <!-- </div> -->
+          {% if user.get_profile.empdni.charge.area|lower == 'ventas' or user.get_profile.empdni.charge.area|lower == 'administrator' %}
+            <!-- <div class="card-action"> -->
+            <button type="button" data-target="mitemizer" class="waves-effect waves-light btn red accent-3">
+              <i class="fa fa-tags black-text"></i>
+              <span class="hide-on-small-only">Agregar Partida</span>
+            </button>
+            <!-- <button type="button" class="right waves-effect waves-light btn light-green" data-target="mservices">
+              <i class="fa fa-usd"></i>
+              <span class="hide-on-small-only">Monto Servicios</span>
+            </button> -->
+            <!-- </div> -->
           {% endif %}
+            <a href="{% url 'project_expenses_view' pro.proyecto_id %}" class="right waves-light btn light-green">
+              <i class="black-text fa fa-money"></i>
+              <span class="hide-on-small-only">Otros Gastos</span>
+            </a>
         </div>
         {% verbatim %}
         <div class="row" ng-hide="vm.sexp">
@@ -212,6 +214,9 @@
         </div>
       </div>
     </div>
+    {% endverbatim %}
+    {% if request.user.get_profile.empdni.charge.area|lower == 'ventas' or request.user.get_profile.empdni.charge.area|lower == 'administrator' %}
+    {% verbatim%}
     <!-- block workforce -->
     <div class="col s12 m12 l12">
       <div class="card">
@@ -306,6 +311,7 @@
       </div>
     </div>
     {% endverbatim %}
+    {% endif %}
   </div>
   <div class="row">
     <div class="modal col l4 m12 s12 offset-l4" id="mitemizer">

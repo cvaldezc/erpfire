@@ -377,9 +377,9 @@ class ControllerServiceProject implements IController {
 				// console.log(response['data'])
 				if (!response['data'].hasOwnProperty('raise')) {
 					this.chart_indeterminate = response['data']['indeterminate']
-					this.chart_indeterminate.unshift(['Dates', 'Purchase', 'Sales'])
+					this.chart_indeterminate.unshift(['Dates', 'Compra', 'Ventas'])
 					this.chart_progress = response['data']['progress']
-					this.chart_progress.unshift(['Dates', 'Purchase', 'Sales'])
+					this.chart_progress.unshift(['Dates', 'Compra', 'Ventas'])
 
 					this.drawCharts()
 				}
