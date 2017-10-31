@@ -2974,7 +2974,7 @@ class ServicesProjectView(JSONResponseMixin, TemplateView):
                     kwargs['status'] = False
                 return self.render_to_json_response(kwargs)
             kwargs['pro'] = Proyecto.objects.get(proyecto_id=kwargs['pro'])
-            if kwargs['pro'].status != 'AC' and kwargs['project'].status != 'PE':
+            if kwargs['pro'].status != 'AC' and kwargs['pro'].status != 'PE':
                 return redirect(reverse('statusproject_view', kwargs={'pk': kwargs['pro']}))
             # svc = ServiceOrder.objects.filter(project_id=kwargs['pro'])
             # dsvc = DetailsServiceOrder.objects.filter(
